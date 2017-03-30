@@ -18,46 +18,26 @@ limitations under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.apache.calcite</groupId>
-    <artifactId>calcite</artifactId>
-    <version>1.13.0-SNAPSHOT</version>
+    <groupId>org.apache.calcite.avatica</groupId>
+    <artifactId>avatica-parent</artifactId>
+    <version>1.10.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>calcite-core</artifactId>
+  <artifactId>avatica-core</artifactId>
   <packaging>jar</packaging>
-  <version>1.13.0-SNAPSHOT</version>
-  <name>Calcite Core</name>
-  <description>Core Calcite APIs and engine.</description>
+  <name>Apache Calcite Avatica</name>
+  <description>JDBC driver framework.</description>
 
   <properties>
     <top.dir>${project.basedir}/..</top.dir>
-    <build.timestamp>${maven.build.timestamp}</build.timestamp>
   </properties>
 
   <dependencies>
-    <!-- Sorted by groupId, artifactId; calcite dependencies first. Put versions
-         in dependencyManagement in the root POM, not here. -->
+    <!-- Make sure that there are no dependencies on other calcite modules,
+         or on libraries other than Jackson. -->
     <dependency>
       <groupId>org.apache.calcite.avatica</groupId>
-      <artifactId>avatica-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.calcite</groupId>
-      <artifactId>calcite-linq4j</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.calcite.avatica</groupId>
-      <artifactId>avatica-server</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
+      <artifactId>avatica-metrics</artifactId>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -72,68 +52,24 @@ limitations under the License.
       <artifactId>jackson-databind</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>jsr305</artifactId>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.hydromatic</groupId>
-      <artifactId>aggdesigner-algorithm</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>net.hydromatic</groupId>
-      <artifactId>foodmart-data-hsqldb</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.hydromatic</groupId>
-      <artifactId>foodmart-queries</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.hydromatic</groupId>
-      <artifactId>quidem</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>net.hydromatic</groupId>
-      <artifactId>scott-data-hsqldb</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.janino</groupId>
-      <artifactId>janino</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.janino</groupId>
-      <artifactId>commons-compiler</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.incava</groupId>
-      <artifactId>java-diff</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -142,111 +78,84 @@ limitations under the License.
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>sqlline</groupId>
-      <artifactId>sqlline</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <versionRange>[2.12.1,)</versionRange>
+                    <goals>
+                      <goal>check</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-          <excludes>
-            <exclude>org/apache/calcite/sql/parser/parserextensiontesting/*.java</exclude>
-          </excludes>
-          <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/javacc</generatedTestSourcesDirectory>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>org/apache/calcite/test/CalciteSuite.java</include>
-          </includes>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.codehaus.mojo</groupId>
-        <artifactId>javacc-maven-plugin</artifactId>
+        <artifactId>build-helper-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>javacc</id>
+            <id>add-filtered-java-source</id>
             <goals>
-              <goal>javacc</goal>
+              <goal>add-source</goal>
             </goals>
+            <phase>generate-sources</phase>
             <configuration>
-              <sourceDirectory>${project.build.directory}/generated-sources/fmpp</sourceDirectory>
-              <includes>
-                <include>**/Parser.jj</include>
-              </includes>
-              <lookAhead>2</lookAhead>
-              <isStatic>false</isStatic>
-            </configuration>
-          </execution>
-          <execution>
-            <id>javacc-test</id>
-            <phase>generate-test-sources</phase>
-            <goals>
-              <goal>javacc</goal>
-            </goals>
-            <configuration>
-              <sourceDirectory>${project.build.directory}/generated-test-sources/fmpp</sourceDirectory>
-              <outputDirectory>${project.build.directory}/generated-test-sources/javacc</outputDirectory>
-              <includes>
-                <include>**/Parser.jj</include>
-              </includes>
-              <lookAhead>2</lookAhead>
-              <isStatic>false</isStatic>
+              <sources>
+                <source>${project.build.directory}/filtered-java-src</source>
+              </sources>
             </configuration>
           </execution>
         </executions>
       </plugin>
       <plugin>
-        <groupId>net.hydromatic</groupId>
-        <artifactId>hydromatic-resource-maven-plugin</artifactId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>${maven-dependency-plugin.version}</version>
         <executions>
           <execution>
+            <id>analyze</id>
             <goals>
-              <goal>generate-sources</goal>
+              <goal>analyze-only</goal>
             </goals>
             <configuration>
-              <packageName>org.apache.calcite.runtime</packageName>
+              <failOnWarning>true</failOnWarning>
+              <!-- ignore "unused but declared" warnings -->
+              <ignoredUnusedDeclaredDependencies>
+                <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
+              </ignoredUnusedDeclaredDependencies>
             </configuration>
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
       <!-- Parent module has the same plugin and does the work of
            generating -sources.jar for each project. But without the
            plugin declared here, IDEs don't know the sources are
@@ -265,238 +174,64 @@ limitations under the License.
           </execution>
         </executions>
       </plugin>
+
+      <!-- Produce a tests jar so that avatica-server/pom.xml can reference for suite.
+           TODO: remove after moving over to annotation-based TestSuite definitions. -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>${maven-dependency-plugin.version}</version>
-        <!-- configurations do not cascade, so all of the definition from
-             ../pom.xml:build:plugin-management:plugins:plugin must be repeated in child poms -->
+        <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
-            <id>analyze</id>
             <goals>
-              <goal>analyze-only</goal>
+              <goal>test-jar</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>prepare-filtered-java-source</id>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <phase>generate-sources</phase>
             <configuration>
-              <failOnWarning>true</failOnWarning>
-              <!-- ignore "unused but declared" warnings -->
-              <ignoredUnusedDeclaredDependencies>
-                <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
-                <ignoredUnusedDeclaredDependency>com.oracle:ojdbc6</ignoredUnusedDeclaredDependency>
-                <ignoredUnusedDeclaredDependency>mysql:mysql-connector-java</ignoredUnusedDeclaredDependency>
-                <ignoredUnusedDeclaredDependency>net.hydromatic:scott-data-hsqldb</ignoredUnusedDeclaredDependency>
-                <ignoredUnusedDeclaredDependency>net.hydromatic:foodmart-data-hsqldb</ignoredUnusedDeclaredDependency>
-                <ignoredUnusedDeclaredDependency>org.postgresql:postgresql</ignoredUnusedDeclaredDependency>
-                <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-api</ignoredUnusedDeclaredDependency>
-                <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
-              </ignoredUnusedDeclaredDependencies>
-              <ignoredUsedUndeclaredDependencies>
-                <ignoredUsedUndeclaredDependency>org.eclipse.jetty:jetty-server</ignoredUsedUndeclaredDependency>
-              </ignoredUsedUndeclaredDependencies>
+              <outputDirectory>${project.build.directory}/filtered-java-src</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/java-filtered</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
             </configuration>
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.xolstice.maven.plugins</groupId>
+        <artifactId>protobuf-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile-protoc</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.rat</groupId>
+        <artifactId>apache-rat-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>src/main/java/org/apache/calcite/avatica/proto/*.java</exclude>
+            <exclude>src/main/resources/META-INF/services/java.sql.Driver</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
-
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <excludes>
-          <exclude>version/*.properties</exclude>
-        </excludes>
-      </resource>
-      <resource>
-        <!-- Copy freemarker template and fmpp configuration files of
-             Calcite's SQL parser to allow clients to extend parser. -->
-        <directory>${basedir}/src/main/codegen</directory>
-        <targetPath>codegen</targetPath>
-      </resource>
-    </resources>
   </build>
-
-  <profiles>
-    <profile>
-      <id>it</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>failsafe-integration-test</id>
-                <!-- Disable the integration test inherited from the parent pom
-                     so that we can run multiple tests, one per database. -->
-                <phase>none</phase>
-              </execution>
-              <execution>
-                <id>failsafe-test-mysql</id>
-                <goals>
-                  <goal>integration-test</goal>
-                </goals>
-                <phase>integration-test</phase>
-                <configuration>
-                  <includes>
-                    <include>org/apache/calcite/test/JdbcAdapterTest.java</include>
-                    <include>org/apache/calcite/test/JdbcTest.java</include>
-                  </includes>
-                  <systemPropertyVariables>
-                    <calcite.test.db>mysql</calcite.test.db>
-                  </systemPropertyVariables>
-                </configuration>
-              </execution>
-              <execution>
-                <id>failsafe-test-postgresql</id>
-                <goals>
-                  <goal>integration-test</goal>
-                </goals>
-                <phase>integration-test</phase>
-                <configuration>
-                  <includes>
-                    <include>org/apache/calcite/test/JdbcAdapterTest.java</include>
-                    <include>org/apache/calcite/test/JdbcTest.java</include>
-                  </includes>
-                  <systemPropertyVariables>
-                    <calcite.test.db>postgresql</calcite.test.db>
-                  </systemPropertyVariables>
-                </configuration>
-              </execution>
-              <execution>
-                <id>failsafe-test-h2</id>
-                <goals>
-                  <goal>integration-test</goal>
-                </goals>
-                <phase>integration-test</phase>
-                <configuration>
-                  <includes>
-                    <include>org/apache/calcite/test/JdbcAdapterTest.java</include>
-                    <include>org/apache/calcite/test/JdbcTest.java</include>
-                  </includes>
-                  <systemPropertyVariables>
-                    <calcite.test.db>h2</calcite.test.db>
-                  </systemPropertyVariables>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>it-oracle</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>failsafe-integration-test</id>
-                <!-- Disable the integration test inherited from the parent pom
-                     so that we can run multiple tests, one per database. -->
-                <phase>none</phase>
-              </execution>
-              <execution>
-                <id>failsafe-test-oracle</id>
-                <goals>
-                  <goal>integration-test</goal>
-                </goals>
-                <phase>integration-test</phase>
-                <configuration>
-                  <includes>
-                    <include>org/apache/calcite/test/JdbcAdapterTest.java</include>
-                    <include>org/apache/calcite/test/JdbcTest.java</include>
-                  </includes>
-                  <systemPropertyVariables>
-                    <calcite.test.db>oracle</calcite.test.db>
-                  </systemPropertyVariables>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-      <dependencies>
-        <dependency>
-          <!-- Oracle's driver is not open source. If you wish to test against
-               Oracle, install the jar in your local maven repository as follows:
-
-               $ cd $ORACLE_HOME/jdbc/lib
-               $ mvn install:install-file -DgroupId=com.oracle
-                 -DartifactId=ojdbc6 -Dversion=${oracle-jdbc6-driver.version}
-                 -Dpackaging=jar -Dfile=ojdbc6.jar -DgeneratePom=true
-          -->
-          <groupId>com.oracle</groupId>
-          <artifactId>ojdbc6</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <!-- CALCITE-539: workaround for MSHARED-394: Avoid rewrite of
-      destination in DefaultMavenFileFilter#filterFile when producing
-      the same contents -->
-      <id>generate-version-properties</id>
-      <activation>
-        <property>
-          <name>!skipGenerate</name>
-        </property>
-      </activation>
-      <build>
-        <resources>
-          <resource>
-            <directory>src/main/resources/version</directory>
-            <filtering>true</filtering>
-          </resource>
-        </resources>
-      </build>
-    </profile>
-    <profile>
-      <!-- CALCITE-538: workaround for https://github.com/freemarker/fmpp/issues/11
-        FMPP always overwrites destination file, however we do not want
-        recompile the whole module every time.
-      -->
-      <id>generate-parser</id>
-      <activation>
-        <property>
-          <name>!skipGenerate</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.googlecode.fmpp-maven-plugin</groupId>
-            <artifactId>fmpp-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <configuration>
-                  <cfgFile>src/main/codegen/config.fmpp</cfgFile>
-                  <templateDirectory>src/main/codegen/templates</templateDirectory>
-                </configuration>
-                <id>generate-fmpp-sources</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>generate</goal>
-                </goals>
-              </execution>
-              <execution>
-                <configuration>
-                  <cfgFile>src/test/codegen/config.fmpp</cfgFile>
-                  <templateDirectory>src/main/codegen/templates</templateDirectory>
-                  <outputDirectory>${project.build.directory}/generated-test-sources/fmpp</outputDirectory>
-                </configuration>
-                <id>generate-fmpp-test-sources</id>
-                <phase>validate</phase>
-                <goals>
-                  <goal>generate</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-
 </project>

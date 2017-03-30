@@ -18,8 +18,13 @@ limitations under the License.
 -->
 [![Build Status](https://travis-ci.org/julianhyde/calcite.svg?branch=master)](https://travis-ci.org/julianhyde/calcite)
 
-# Apache Calcite
+# Apache Calcite -- Avatica
 
-Apache Calcite is a dynamic data management framework.
+Apache Calcite's Avatica is a framework for building database drivers.
 
-For more details, see the [home page](http://calcite.apache.org).
+Avatica is a sub-project of [Apache Calcite](https://calcite.apache.org).
+
+For more details, see the [home page](https://calcite.apache.org/avatica).
+
+Release notes for all published versions are available on the [history
+page](https://calcite.apache.org/avatica/docs/history.html).
