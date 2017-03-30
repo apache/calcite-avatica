@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 {% endcomment %}
 -->
-[![Build Status](https://travis-ci.org/julianhyde/calcite.svg?branch=master)](https://travis-ci.org/julianhyde/calcite)
+[![Build Status](https://travis-ci.org/joshelser/calcite-avatica.svg?branch=master)](https://travis-ci.org/joshelser/calcite-avatica)
 
 # Apache Calcite -- Avatica
 
