@@ -17,8 +17,8 @@ markdown: kramdown
 permalink: /news/:year/:month/:day/:title/
 excerpt_separator: ""
 
-repository: https://github.com/apache/calcite
-destination: ../../site/target/avatica
+repository: https://github.com/apache/calcite-avatica
+destination: site/target/avatica
 exclude: [README.md,Gemfile*]
 keep_files: [".git", ".svn", "apidocs", "testapidocs"]
 
@@ -27,7 +27,7 @@ collections:
     output: true
 
 # The URL where the code can be found
-sourceRoot: https://github.com/apache/calcite/tree/master/avatica
+sourceRoot: https://github.com/apache/calcite-avatica/tree/master
 
 # The URL where Avatica Javadocs are located
 apiRoot: /avatica/apidocs
