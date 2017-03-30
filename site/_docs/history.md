@@ -24,11 +24,11 @@ limitations under the License.
 -->
 
 For a full list of releases, see
-<a href="https://github.com/apache/calcite/releases">github</a>.
+<a href="https://github.com/apache/calcite-avatica/releases">github</a>.
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/).
 
-## <a href="https://github.com/apache/calcite/releases/tag/calcite-avatica-1.9.0">1.9.0</a> / 2016-11-01
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/calcite-avatica-1.9.0">1.9.0</a> / 2016-11-01
 {: #v1-9-0}
 
 Apache Calcite Avatica 1.9.0 includes various improvements to make it
@@ -112,7 +112,7 @@ Web site and documentation
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-1285">CALCITE-1285</a>]
   Fix client URL template in example config file
 
-## <a href="https://github.com/apache/calcite/releases/tag/calcite-avatica-1.8.0">1.8.0</a> / 2016-06-04
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/calcite-avatica-1.8.0">1.8.0</a> / 2016-06-04
 {: #v1-8-0}
 
 Apache Calcite Avatica 1.8.0 continues the focus on compatibility with previous
@@ -212,7 +212,7 @@ Web site and documentation
 * [<a href='https://issues.apache.org/jira/browse/CALCITE-1202'>CALCITE-1202</a>]
   Lock version of Jekyll used by website
 
-## <a href="https://github.com/apache/calcite/releases/tag/calcite-avatica-1.7.1">1.7.1</a> / 2016-03-18
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/calcite-avatica-1.7.1">1.7.1</a> / 2016-03-18
 {: #v1-7-1}
 
 This is the first release of Avatica as an independent project. (It

@@ -45,7 +45,7 @@ Release          | Date       | Commit   | Download
 {% endcomment %}{% endif %}{% comment %}
 {% endcomment %}<a href="{{ site.baseurl }}/docs/history.html#{{ post.tag }}">{{ post.version }}</a>{% comment %}
 {% endcomment %} | {{ post.date | date_to_string }}{% comment %}
-{% endcomment %} | <a href="https://github.com/apache/calcite/commit/{{ post.sha }}">{{ post.sha }}</a>{% comment %}
+{% endcomment %} | <a href="https://github.com/apache/calcite-avatica/commit/{{ post.sha }}">{{ post.sha }}</a>{% comment %}
 {% endcomment %} | <a href="{{ p }}/{{ v }}-src.tar.gz{{ q }}">tar</a>{% comment %}
 {% endcomment %} (<a href="{{ d }}/calcite/{{ v }}/{{ v }}-src.tar.gz.md5">md5</a>{% comment %}
 {% endcomment %} <a href="{{ d }}/calcite/{{ v }}/{{ v }}-src.tar.gz.asc">pgp</a>){% comment %}

@@ -67,4 +67,4 @@ Need help with Calcite? Try these resources:
   your question.
 * **Browse the code**.
   One of the advantages of open source software is that you can browse the code.
-  The code is available on [github](https://github.com/apache/calcite/tree/master/avatica).
+  The code is available on [github](https://github.com/apache/calcite-avatica/tree/master).

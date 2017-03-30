@@ -57,8 +57,8 @@ Create a local copy of the github repository,
 then build using maven:
 
 {% highlight bash %}
-$ git clone git://github.com/apache/calcite.git
-$ cd calcite/avatica
+$ git clone git://github.com/apache/calcite-avatica.git avatica
+$ cd avatica
 $ mvn install
 {% endhighlight %}
 
@@ -380,7 +380,7 @@ I have created a build for Apache Calcite Avatica X.Y.Z, release candidate N.
 
 Thanks to everyone who has contributed to this release.
 <Further details about release.> You can read the release notes here:
-https://github.com/apache/calcite/blob/XXXX/site/_docs/history.md
+https://github.com/apache/calcite-avatica/blob/XXXX/site/_docs/history.md
 
 The commit to be voted upon:
 http://git-wip-us.apache.org/repos/asf/calcite/commit/NNNNNN

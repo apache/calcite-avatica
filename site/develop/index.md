@@ -35,7 +35,7 @@ or from source control.
 Calcite uses git for version control.  The canonical source is in
 [Apache](https://git-wip-us.apache.org/repos/asf/calcite.git),
 but most people find the
-[Github mirror](https://github.com/apache/calcite) more
+[Github mirror](https://github.com/apache/calcite-avatica) more
 user-friendly.
 
 ## Download source, build, and run tests
@@ -47,8 +47,8 @@ Create a local copy of the git repository, `cd` to its root directory,
 then build using maven:
 
 {% highlight bash %}
-$ git clone git://github.com/apache/calcite.git
-$ cd calcite/avatica
+$ git clone git://github.com/apache/calcite-avatica.git avatica
+$ cd avatica
 $ mvn install
 {% endhighlight %}
 
