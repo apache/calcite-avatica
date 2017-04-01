@@ -32,7 +32,7 @@ limitations under the License.
   </properties>
 
   <dependencies>
-    <!-- Sorted by groupId, artifactId; calcite dependencies first. Put versions
+    <!-- Sorted by groupId, artifactId; avatica dependencies first. Put versions
          in dependencyManagement in the root POM, not here. -->
     <dependency>
       <groupId>org.apache.calcite.avatica</groupId>

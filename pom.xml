@@ -95,9 +95,9 @@ limitations under the License.
   </issueManagement>
 
   <scm>
-    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/calcite.git</connection>
-    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/calcite.git</developerConnection>
-    <url>https://github.com/apache/calcite</url>
+    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/calcite-avatica.git</connection>
+    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/calcite-avatica.git</developerConnection>
+    <url>https://github.com/apache/calcite-avatica</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -119,7 +119,7 @@ limitations under the License.
 
   <dependencyManagement>
     <dependencies>
-      <!-- Sorted by groupId, artifactId; calcite dependencies first. -->
+      <!-- Sorted by groupId, artifactId; avatica dependencies first. -->
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
         <artifactId>avatica</artifactId>

@@ -23,8 +23,7 @@ limitations under the License.
 {% endcomment %}
 -->
 
-Here's some miscellaneous documentation about using Calcite and its various
-adapters.
+Here's some miscellaneous documentation about using Avatica.
 
 * TOC
 {:toc}
@@ -284,7 +283,7 @@ Verify the staged artifacts in the Nexus repository:
   (or a similar URL)
 
 Upload the artifacts via subversion to a staging area,
-https://dist.apache.org/repos/dist/dev/calcite/apache-calcite-X.Y.Z-rcN:
+https://dist.apache.org/repos/dist/dev/calcite/apache-calcite-avatica-X.Y.Z-rcN:
 
 {% highlight bash %}
 # Create a subversion workspace, if you haven't already
@@ -312,7 +311,7 @@ svn ci
 git tag
 
 # If the tag exists, delete it locally and remotely
-git tag -d apache-calcite-X.Y.Z
+git tag -d apache-calcite-avatica-X.Y.Z
 git push origin :refs/tags/apache-calcite-avatica-X.Y.Z
 
 # Remove modified files
@@ -363,7 +362,7 @@ function checkHash() {
     fi
   done
 }
-checkHash apache-calcite-X.Y.Z-rcN
+checkHash apache-calcite-avatica-X.Y.Z-rcN
 {% endhighlight %}
 
 ## Get approval for a release via Apache voting process (for Calcite committers)
@@ -495,7 +494,7 @@ cd ~/dist/release
 svn co https://dist.apache.org/repos/dist/release/calcite
 cd calcite
 cp -rp ../../dev/calcite/apache-calcite-avatica-X.Y.Z-rcN apache-calcite-avatica-X.Y.Z
-svn add apache-calcite-X.Y.Z
+svn add apache-calcite-avatica-X.Y.Z
 
 # Check in.
 svn ci
