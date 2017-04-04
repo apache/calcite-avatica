@@ -20,8 +20,11 @@ MAINTAINER Apache Avatica <dev@calcite.apache.org>
 RUN useradd -m avatica
 RUN mkdir -p /home/avatica/classpath
 
+# This line must be preserved. The Maven build will verify this version matches its version
+ARG AVATICA_VERSION="1.10.0"
+
 # Dependencies
-ADD https://repository.apache.org/content/groups/public/org/apache/calcite/avatica/avatica-standalone-server/1.10.0/avatica-standalone-server-1.10.0-shaded.jar /home/avatica/classpath
+ADD https://repository.apache.org/content/groups/public/org/apache/calcite/avatica/avatica-standalone-server/${AVATICA_VERSION}/avatica-standalone-server-${AVATICA_VERSION}-shaded.jar /home/avatica/classpath
 
 # Make sure avatica owns its files
 RUN chown -R avatica: /home/avatica
