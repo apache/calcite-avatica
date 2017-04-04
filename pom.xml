@@ -29,7 +29,7 @@ limitations under the License.
   <groupId>org.apache.calcite.avatica</groupId>
   <artifactId>avatica-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.10.0</version>
+  <version>1.11.0-SNAPSHOT</version>
 
   <!-- More project information. -->
   <name>Apache Calcite Avatica Project</name>
@@ -98,7 +98,7 @@ limitations under the License.
     <connection>scm:git:https://git-wip-us.apache.org/repos/asf/calcite-avatica.git</connection>
     <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/calcite-avatica.git</developerConnection>
     <url>https://github.com/apache/calcite-avatica</url>
-    <tag>test-avatica-1.10.0-elserj-test</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <modules>
