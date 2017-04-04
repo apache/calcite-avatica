@@ -30,8 +30,15 @@ limitations under the License.
 
   <properties>
     <top.dir>${project.basedir}/..</top.dir>
+    <standalone.jar>avatica-standalone-server-${project.build.version}-shaded.jar</standalone.jar>
   </properties>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.calcite.avatica</groupId>
+      <artifactId>avatica-standalone-server</artifactId>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>
@@ -75,14 +82,14 @@ limitations under the License.
               <imageName>avatica-server</imageName>
               <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
               <imageTags>
-                <imageTag>${project.build.version}</imageTag>
+                <imageTag>${project.version}</imageTag>
                 <imageTag>latest</imageTag>
               </imageTags>
               <resources>
                 <resource>
                   <targetPath>/</targetPath>
                   <directory>${top.dir}/standalone-server/target</directory>
-                  <include>avatica-standalone-server-${project.build.version}-shaded.jar</include>
+                  <include>avatica-standalone-server-${project.version}-shaded.jar</include>
                 </resource>
               </resources>
             </configuration>

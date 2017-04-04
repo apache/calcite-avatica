@@ -153,6 +153,11 @@ limitations under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
+        <artifactId>avatica-standalone-server</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.calcite.avatica</groupId>
         <artifactId>avatica-core</artifactId>
         <version>${project.version}</version>
         <type>test-jar</type>
