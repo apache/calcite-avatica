@@ -99,7 +99,7 @@ public class StandaloneServer {
     JCommander jc = new JCommander(server, args);
     if (server.help) {
       jc.usage();
-      System.exit(1);
+      Unsafe.systemExit(ExitCodes.USAGE.ordinal());
       return;
     }
 
@@ -140,7 +140,8 @@ public class StandaloneServer {
   private enum ExitCodes {
     NORMAL,
     ALREADY_STARTED, // 1
-    START_FAILED;    // 2
+    START_FAILED,    // 2
+    USAGE;           // 3
   }
 }
 
