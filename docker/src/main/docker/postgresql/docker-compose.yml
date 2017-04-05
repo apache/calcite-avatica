@@ -20,15 +20,14 @@ services:
       - "8765:8765"
     links:
       - postgresql
+    build: ./
     image: avatica-postgresql-server
+    # Default port for the docker image
     command: "-u 'jdbc:postgresql://postgresql:5432/avatica' -p 8765"
     depends_on:
       - postgresql
   postgresql:
     image: postgres:9.6
-    ports:
-      # Default port for the docker image
-      - "5432:5432"
     environment:
       POSTGRES_DB: avatica
       POSTGRES_USER: user

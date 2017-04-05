@@ -20,14 +20,13 @@ services:
       - "8765:8765"
     links:
       - mysql
+    build: ./
     image: avatica-mysql-server
     command: "-u 'jdbc:mysql://mysql:3306/avatica' -p 8765"
     depends_on:
       - mysql
   mysql:
     image: mysql:5.7
-    ports:
-      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: avatica
       MYSQL_DATABASE: avatica
