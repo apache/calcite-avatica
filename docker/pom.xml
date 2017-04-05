@@ -30,7 +30,6 @@ limitations under the License.
 
   <properties>
     <top.dir>${project.basedir}/..</top.dir>
-    <standalone.jar>avatica-standalone-server-${project.build.version}-shaded.jar</standalone.jar>
   </properties>
 
   <dependencies>
