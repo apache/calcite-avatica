@@ -13,11 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM openjdk:8-jre
+FROM openjdk:8-jre-alpine
 MAINTAINER Apache Avatica <dev@calcite.apache.org>
 
 # Create an avatica user
-RUN useradd -m avatica
+RUN addgroup -S avatica && adduser -S -G avatica avatica
 RUN mkdir -p /home/avatica/classpath
 
 # This line must be preserved. The Maven build will verify this version matches its version

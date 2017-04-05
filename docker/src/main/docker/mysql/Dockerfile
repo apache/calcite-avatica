@@ -21,4 +21,4 @@ ADD https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.41/mysql-conne
 RUN chown -R avatica: /home/avatica
 
 USER avatica
-ENTRYPOINT ["/usr/lib/jvm/java-8-openjdk-amd64/bin/java", "-cp", "/home/avatica/classpath/*", "org.apache.calcite.avatica.standalone.StandaloneServer"]
+ENTRYPOINT ["/usr/bin/java", "-cp", "/home/avatica/classpath/*", "org.apache.calcite.avatica.standalone.StandaloneServer"]

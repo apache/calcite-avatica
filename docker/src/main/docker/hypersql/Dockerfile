@@ -20,4 +20,4 @@ MAINTAINER Apache Avatica <dev@calcite.apache.org>
 ADD https://repo1.maven.org/maven2/net/hydromatic/scott-data-hsqldb/0.1/scott-data-hsqldb-0.1.jar /home/avatica/classpath/
 ADD https://repo1.maven.org/maven2/org/hsqldb/hsqldb/2.3.1/hsqldb-2.3.1.jar /home/avatica/classpath/
 
-ENTRYPOINT ["/usr/lib/jvm/java-8-openjdk-amd64/bin/java", "-cp", "/home/avatica/classpath/*", "org.apache.calcite.avatica.standalone.StandaloneServer", "-u", "jdbc:hsqldb:res:scott"]
+ENTRYPOINT ["/usr/bin/java", "-cp", "/home/avatica/classpath/*", "org.apache.calcite.avatica.standalone.StandaloneServer", "-u", "jdbc:hsqldb:res:scott"]
