@@ -17,25 +17,25 @@ limitations under the License.
 {% endcomment %}
 -->
 
-This module contains a number of Docker images to ease testing of
+This module contains a number of Dockerfiles to ease testing of
 Avatica clients against a known-server.
 
 ## Docker
 
-`src/main/docker` contains a number of Docker images and Docker-compose
+`src/main/docker` contains a number of Dockerfiles and Docker-compose
 configuration files to launch a standalone-Avatica server. Maven automation
 exists for the base Docker image "avatica-server" which can be invoked with
 the "-Pdocker" Maven profile.
 
-The other Docker images must be built by hand.
+The other Dockerfiles must be built by hand.
 
 ### Provided Images
 
-A number of Docker images for different databases are provided. Presently, they include:
+A number of Dockerfiles for different databases are provided. Presently, they include:
 
 * [HyperSQL](https://github.com/apache/calcite-avatica/tree/master/docker/src/main/docker/hypersql)
 * [MySQL](https://github.com/apache/calcite-avatica/tree/master/docker/src/main/docker/mysql)
-* [PostgreSQL(https://github.com/apache/calcite-avatica/tree/master/docker/src/main/docker/postgresql)
+* [PostgreSQL](https://github.com/apache/calcite-avatica/tree/master/docker/src/main/docker/postgresql)
 
 ## Dockerhub
 
