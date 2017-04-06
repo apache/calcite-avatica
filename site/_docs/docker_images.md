@@ -115,7 +115,7 @@ For example, to connect to a MySQL server, the following could be used:
 ```
 $ ./avatica-docker-*/mysql/build.sh
 $ docker run --rm -it avatica-mysql-server \
-    -u jdbc:mysql://<fqdn>:3306/my_database -p 8765
+    -u jdbc:mysql://<fqdn>:3306/my_database
 ```
 
 To debug these docker images, the `ENTRYPOINT` can be overriden to launch a shell
