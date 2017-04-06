@@ -16,8 +16,11 @@
 FROM avatica-server:latest
 MAINTAINER Apache Avatica <dev@calcite.apache.org>
 
+ARG HSQLDB_VERSION="2.3.1"
+
 # Dependencies
 ADD https://repo1.maven.org/maven2/net/hydromatic/scott-data-hsqldb/0.1/scott-data-hsqldb-0.1.jar /home/avatica/classpath/
-ADD https://repo1.maven.org/maven2/org/hsqldb/hsqldb/2.3.1/hsqldb-2.3.1.jar /home/avatica/classpath/
+ADD https://repo1.maven.org/maven2/org/hsqldb/hsqldb/${HSQLDB_VERSION}/hsqldb-${HSQLDB_VERSION}.jar /home/avatica/classpath/
 
-ENTRYPOINT ["/usr/bin/java", "-cp", "/home/avatica/classpath/*", "org.apache.calcite.avatica.standalone.StandaloneServer", "-u", "jdbc:hsqldb:res:scott"]
+# Add on to avatica-server's entrypoint
+CMD ["-u", "jdbc:hsqldb:res:scott"]

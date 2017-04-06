@@ -21,6 +21,7 @@ RUN addgroup -S avatica && adduser -S -G avatica avatica
 RUN mkdir -p /home/avatica/classpath
 
 # Dependencies
+# TODO would be nice to remove the hard-coded version
 ADD avatica-standalone-server-1.10.0-SNAPSHOT-shaded.jar /home/avatica/classpath
 
 # Make sure avatica owns its files
@@ -28,6 +29,9 @@ RUN chown -R avatica: /home/avatica
 
 # Expose the default port as a convenience
 EXPOSE 8765
+
 # Switch off of the root user
 # TODO Would like to do this, but screws up downstream due to https://github.com/docker/docker/issues/6119
 # USER avatica
+
+ENTRYPOINT ["/usr/bin/java", "-cp", "/home/avatica/classpath/*", "org.apache.calcite.avatica.standalone.StandaloneServer", "-p", "8765"]

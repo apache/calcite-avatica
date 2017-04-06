@@ -16,9 +16,10 @@
 FROM avatica-server:latest
 MAINTAINER Apache Avatica <dev@calcite.apache.org>
 
+ARG MYSQL_VERSION="5.1.41"
+
 # Dependencies
-ADD https://repo1.maven.org/maven2/mysql/mysql-connector-java/5.1.41/mysql-connector-java-5.1.41.jar /home/avatica/classpath/
+ADD https://repo1.maven.org/maven2/mysql/mysql-connector-java/${MYSQL_VERSION}/mysql-connector-java-${MYSQL_VERSION}.jar /home/avatica/classpath/
 RUN chown -R avatica: /home/avatica
 
 USER avatica
-ENTRYPOINT ["/usr/bin/java", "-cp", "/home/avatica/classpath/*", "org.apache.calcite.avatica.standalone.StandaloneServer"]
