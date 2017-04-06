@@ -52,8 +52,8 @@ To make the lives of end-users who want to use a specific database easier, some 
 images are provided for some common databases. The current databases include:
 
 * [HyperSQL](http://hsqldb.org) (2.3.1)
-* [MySQL](https://www.mysql.com/) (5.1.41)
-* [PostgreSQL](https://www.postgresql.org/) (42.0)
+* [MySQL](https://www.mysql.com/) (Client 5.1.41, supports MySQL server 4.1, 5.0, 5.1, 5.5, 5.6, 5.7)
+* [PostgreSQL](https://www.postgresql.org/) (Client 42.0.0, supports PostgreSQL servers >=8.3)
 
 These images are not deployed as the licensing on each database driver is varied. Please
 understand and accept the license of each before using in any software project.
@@ -123,3 +123,29 @@ To debug these docker images, the `ENTRYPOINT` can be overriden to launch a shel
 ```
 $ docker run --rm --entrypoint='' -it avatica-mysql-server /bin/sh
 ```
+
+### Running Docker containers for custom databases
+
+The provided `avatica-server` Docker image is designed to be generally reusable
+for developers that want to expose a database of their choosing. A custom Dockerfile
+can be created by copying what the `avatica-mysql-server` or `avatica-postgresql-server`
+do, but this is also achievable via the Docker volumes.
+
+For example, consider we have a JAR with a JDBC driver for our database on our local
+machine `/home/user/my-database-jars/my-database-jdbc-1.0.jar`. We can run the following command to
+launch a custom Avatica server against our database with this JDBC driver.
+
+```
+$ docker run --rm -p 8765:8765 \
+    -v /home/user/my-database-jars/:/my-database-jars --entrypoint="" -it avatica-server \
+    /usr/bin/java -cp "/home/avatica/classpath/*:/my-database-jars/*" \
+    org.apache.calcite.avatica.standalone.StandaloneServer -p 8765 \
+    -u "jdbc:my_jdbc_url"
+```
+
+This command does the following:
+
+* Exposes the internal port 8765 on the local machine as 8765
+* Maps the local directory "home/user/my-database-jars" to the Docker container at "/my-database-jars" using the Docker volumes feature
+* Adds that mapped directory to the Java classpath
+* Sets the correct JDBC URL for the database
