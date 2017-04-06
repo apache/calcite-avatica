@@ -34,3 +34,5 @@ EXPOSE 8765
 
 # TODO Would like to do this, but screws up downstream due to https://github.com/docker/docker/issues/6119
 # USER avatica
+
+ENTRYPOINT ["/usr/bin/java", "-cp", "/home/avatica/classpath/*", "org.apache.calcite.avatica.standalone.StandaloneServer", "-p", "8765"]

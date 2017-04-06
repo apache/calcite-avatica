@@ -22,7 +22,7 @@ RUN mkdir -p /home/avatica/classpath
 
 # Dependencies
 # TODO would be nice to remove the hard-coded version
-ADD avatica-standalone-server-1.10.0-SNAPSHOT-shaded.jar /home/avatica/classpath
+ADD avatica-standalone-server-*-shaded.jar /home/avatica/classpath
 
 # Make sure avatica owns its files
 RUN chown -R avatica: /home/avatica
