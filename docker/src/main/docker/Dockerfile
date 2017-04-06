@@ -21,7 +21,6 @@ RUN addgroup -S avatica && adduser -S -G avatica avatica
 RUN mkdir -p /home/avatica/classpath
 
 # Dependencies
-# TODO would be nice to remove the hard-coded version
 ADD avatica-standalone-server-*-shaded.jar /home/avatica/classpath
 
 # Make sure avatica owns its files
