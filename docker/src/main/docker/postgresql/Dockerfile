@@ -16,7 +16,7 @@
 FROM avatica-server:latest
 MAINTAINER Apache Avatica <dev@calcite.apache.org>
 
-ARG POSTGRESQL_VERSION="42.0.0.jre7"
+ARG POSTGRESQL_VERSION="42.0.0"
 
 # Dependencies
 ADD https://repo1.maven.org/maven2/org/postgresql/postgresql/${POSTGRESQL_VERSION}/postgresql-${POSTGRESQL_VERSION}.jar /home/avatica/classpath/
