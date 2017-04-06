@@ -22,7 +22,7 @@ services:
       - mysql
     build: ./
     image: avatica-mysql-server
-    command: "-u 'jdbc:mysql://mysql:3306/avatica' -p 8765"
+    command: "-u 'jdbc:mysql://mysql:3306/avatica'"
     depends_on:
       - mysql
   mysql:
