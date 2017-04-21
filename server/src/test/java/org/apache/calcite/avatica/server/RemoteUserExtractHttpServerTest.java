@@ -48,11 +48,12 @@ public class RemoteUserExtractHttpServerTest extends HttpAuthBase {
   private static HttpServer server;
   private static String url1;
   private static String url2;
+  private static String url3;
 
   @BeforeClass public static void startServer() throws Exception {
 
     final String userPropertiesFile = BasicAuthHttpServerTest.class
-            .getResource("/auth-users.properties").getFile();
+            .getResource("/auth-users.properties").getFile().replace("%20", " ");
     assertNotNull("Could not find properties file for basic auth users", userPropertiesFile);
 
     // Create a LocalService around HSQLDB
@@ -83,16 +84,15 @@ public class RemoteUserExtractHttpServerTest extends HttpAuthBase {
                                                 Callable<T> action) throws Exception {
 
             if (remoteUserName.equals("USER4")) {
-              throw new RuntimeException("USER4 is a disallowed user");
-            } else if (remoteUserName.equals("USER2")) {
-              return action.call();
+              throw new RuntimeException("USER4 is a disallowed user!");
             } else {
-              throw new RuntimeException("Unknown user.");
+              return action.call();
             }
           }
 
           @Override public RemoteUserExtractor getRemoteUserExtractor() {
             return new RemoteUserExtractor() {
+              boolean useDoAs = false;
               HttpQueryStringParameterRemoteUserExtractor paramRemoteUserExtractor =
                       new HttpQueryStringParameterRemoteUserExtractor();
               HttpRequestRemoteUserExtractor requestRemoteUserExtractor =
@@ -100,14 +100,16 @@ public class RemoteUserExtractHttpServerTest extends HttpAuthBase {
 
               @Override public String extract(HttpServletRequest request)
                   throws RemoteUserExtractionException {
-                if (request.getParameter("doAs") != null) {
-                  String doAsUser = request.getParameter("doAs");
-                  LOG.info("doAsUser is " + doAsUser);
+                LOG.info(request.toString());
+                if (request.getParameter("useDoAs") != null
+                    && request.getParameter("useDoAs").equals("true")) {
+                  useDoAs = true;
+                }
+                if (useDoAs) {
                   return paramRemoteUserExtractor.extract(request);
                 } else {
-                  return "USER2";
+                  throw new RemoteUserExtractionException("HTTP/401");
                 }
-
               }
             };
           }
@@ -135,7 +137,10 @@ public class RemoteUserExtractHttpServerTest extends HttpAuthBase {
             + ";authentication=BASIC;serialization=PROTOBUF";
 
     url2 = "jdbc:avatica:remote:url=http://localhost:" + server.getPort()
-            + "?doAs=USER4" + ";authentication=BASIC;serialization=PROTOBUF";
+            + "?useDoAs=true" + ";authentication=BASIC;serialization=PROTOBUF";
+
+    url3 = "jdbc:avatica:remote:url=http://localhost:" + server.getPort()
+            + "?doAs=USER4&useDoAs=true" + ";authentication=BASIC;serialization=PROTOBUF";
 
     // Create and grant permissions to our users
     createHsqldbUsers();
@@ -147,23 +152,42 @@ public class RemoteUserExtractHttpServerTest extends HttpAuthBase {
     }
   }
 
-  @Test public void testUserWithAllowedDoAsRole() throws Exception {
-    // Disallowed by avatica
-    final Properties props = new Properties();
-    props.put("avatica_user", "USER2");
-    props.put("avatica_password", "password2");
+  @Test public void testUserWithDisallowedRole() throws Exception {
 
-    readWriteData(url1, "ALLOWED_doAs_AVATICA_USER", props);
-  }
-
-  @Test public void testUserWithDisallowedDoAsRole() throws Exception {
-    // Disallowed by avatica
     final Properties props = new Properties();
     props.put("avatica_user", "USER2");
     props.put("avatica_password", "password2");
 
     try {
-      readWriteData(url2, "DISALLOWED_doAs_AVATICA_USER", props);
+      readWriteData(url1, "DoAs_not_enabled", props);
+      fail("Expected an exception");
+    } catch (RuntimeException e) {
+      assertThat(e.getMessage(), containsString("HTTP/401"));
+    }
+  }
+
+  @Test public void testNoDoAsParam() throws Exception {
+
+    final Properties props = new Properties();
+    props.put("avatica_user", "USER2");
+    props.put("avatica_password", "password2");
+
+    try {
+      readWriteData(url2, "No_doAs_Param", props);
+      fail("Expected an exception");
+    } catch (RuntimeException e) {
+      assertThat(e.getMessage(), containsString("Cannot Extract doAs User"));
+    }
+  }
+
+  @Test public void testUserWithDisallowedDoAsRole() throws Exception {
+
+    final Properties props = new Properties();
+    props.put("avatica_user", "USER4");
+    props.put("avatica_password", "password4");
+
+    try {
+      readWriteData(url3, "DISALLOWED_doAs_AVATICA_USER", props);
       fail("Expected an exception");
     } catch (RuntimeException e) {
       assertThat(e.getMessage(), containsString("USER4 is a disallowed user"));

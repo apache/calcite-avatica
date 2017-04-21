@@ -22,9 +22,12 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class HttpQueryStringParameterRemoteUserExtractor
         implements RemoteUserExtractor {
-  public String extract(HttpServletRequest request)
-      throws RemoteUserExtractionException {
-    return request.getParameter("doAs");
+  public String extract(HttpServletRequest request) throws RemoteUserExtractionException {
+    String remoteUser = request.getParameter("doAs");
+    if (remoteUser == null) {
+      throw new RemoteUserExtractionException("Cannot Extract doAs User!");
+    }
+    return remoteUser;
   }
 
 }

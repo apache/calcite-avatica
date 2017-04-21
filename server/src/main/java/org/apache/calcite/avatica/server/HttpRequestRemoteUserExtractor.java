@@ -25,7 +25,11 @@ public class HttpRequestRemoteUserExtractor
         implements RemoteUserExtractor {
   public String extract(HttpServletRequest request)
       throws RemoteUserExtractionException {
-    return request.getRemoteUser();
+    String remoteUser = request.getRemoteUser();
+    if (remoteUser == null) {
+      throw new RemoteUserExtractionException("Cannot Extract Request User!");
+    }
+    return remoteUser;
   }
 
 }
