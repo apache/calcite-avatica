@@ -16,21 +16,19 @@
  */
 package org.apache.calcite.avatica.server;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
- * A {@link RemoteUserExtractor} that extracts the remote user from the HTTP request.
+ * An exception to encapsulate that a user is disallowed to access Avatica.
  */
-public class HttpRequestRemoteUserExtractor implements RemoteUserExtractor {
-  @Override public String extract(HttpServletRequest request) throws RemoteUserExtractionException {
-    final String remoteUser = request.getRemoteUser();
-    if (remoteUser == null) {
-      throw new RemoteUserExtractionException(
-          "Failed to extract the remote user from the HTTP request");
-    }
-    return remoteUser;
+public class RemoteUserDisallowedException extends Exception {
+  private static final long serialVersionUID = 1L;
+
+  public RemoteUserDisallowedException(String message) {
+    super(message);
   }
 
+  public RemoteUserDisallowedException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }
 
-// End HttpRequestRemoteUserExtractor.java
+// End RemoteUserDisallowedException.java

@@ -17,9 +17,11 @@
 package org.apache.calcite.avatica.server;
 
 /**
- * The exception of extracting remote user
+ * An exception thrown when encountering an error extracting a remote user from a request.
  */
 public class RemoteUserExtractionException extends Exception {
+  private static final long serialVersionUID = 1L;
+
   /**
    * Creates a RemoteUserExtractionException.
    */

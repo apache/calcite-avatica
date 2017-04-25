@@ -16,16 +16,25 @@
  */
 package org.apache.calcite.avatica.server;
 
+import java.util.Objects;
+
 import javax.servlet.http.HttpServletRequest;
+
 /**
- * A RemoteUserExtrator that extracts "doAs" user
+ * A {@link RemoteUserExtractor} that extracts the remote user from an HTTP query string parameter.
  */
-public class HttpQueryStringParameterRemoteUserExtractor
-        implements RemoteUserExtractor {
-  public String extract(HttpServletRequest request) throws RemoteUserExtractionException {
-    String remoteUser = request.getParameter("doAs");
+public class HttpQueryStringParameterRemoteUserExtractor implements RemoteUserExtractor {
+  private final String parameter;
+
+  public HttpQueryStringParameterRemoteUserExtractor(String parameter) {
+    this.parameter = Objects.requireNonNull(parameter);
+  }
+
+  @Override public String extract(HttpServletRequest request) throws RemoteUserExtractionException {
+    final String remoteUser = request.getParameter(parameter);
     if (remoteUser == null) {
-      throw new RemoteUserExtractionException("Cannot Extract doAs User!");
+      throw new RemoteUserExtractionException(
+          "Failed to extract user from HTTP query string parameter: " + parameter);
     }
     return remoteUser;
   }

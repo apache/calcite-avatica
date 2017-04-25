@@ -89,6 +89,8 @@ public interface AvaticaServerConfiguration {
    * @param remoteUserName The remote user making a request to the Avatica server.
    * @param remoteAddress The address the remote user is making the request from.
    * @return The result from the Callable.
+   *
+   * @see RemoteUserDisallowedException to deny a remoteUser access
    */
   <T> T doAsRemoteUser(String remoteUserName, String remoteAddress, Callable<T> action)
       throws Exception;
