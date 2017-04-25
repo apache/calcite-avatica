@@ -119,7 +119,8 @@ public class AvaticaJsonHandler extends AbstractAvaticaHandler {
         HandlerResponse<String> jsonResponse;
         try {
           if (null != serverConfig && serverConfig.supportsImpersonation()) {
-            jsonResponse = serverConfig.doAsRemoteUser(request.getRemoteUser(),
+            String remoteUser = serverConfig.getRemoteUserExtractor().extract(request);
+            jsonResponse = serverConfig.doAsRemoteUser(remoteUser,
                 request.getRemoteAddr(), new Callable<HandlerResponse<String>>() {
                   @Override public HandlerResponse<String> call() {
                     return jsonHandler.apply(jsonRequest);

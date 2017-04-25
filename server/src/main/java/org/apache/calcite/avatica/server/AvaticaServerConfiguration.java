@@ -92,6 +92,13 @@ public interface AvaticaServerConfiguration {
    */
   <T> T doAsRemoteUser(String remoteUserName, String remoteAddress, Callable<T> action)
       throws Exception;
+
+  /**
+   * Extract the user this request should execute as.
+   *
+   * @return Name of the RemoteUserExtractor
+   */
+  RemoteUserExtractor getRemoteUserExtractor();
 }
 
 // End AvaticaServerConfiguration.java
