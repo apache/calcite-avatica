@@ -128,6 +128,15 @@ public class DateTimeUtilsTest {
     assertEquals(-25508, ymdToUnixDate(1900, 3, 1));
   }
 
+  @Test public void testDateConversion() {
+    for (int i = 0; i < 4000; ++i) {
+      for (int j = 1; j <= 12; ++j) {
+        String date = String.format(Locale.ENGLISH, "%04d-%02d-28", i, j);
+        assertEquals(date, unixDateToString(ymdToUnixDate(i, j, 28)));
+      }
+    }
+  }
+
   @Test public void testDateToString() {
     checkDateString("1970-01-01", 0);
     //noinspection PointlessArithmeticExpression
