@@ -41,6 +41,21 @@ public class AvaticaSpnegoAuthenticator extends SpnegoAuthenticator {
   @Override public Authentication validateRequest(ServletRequest request,
       ServletResponse response, boolean mandatory) throws ServerAuthException {
     final Authentication computedAuth = super.validateRequest(request, response, mandatory);
+    try {
+      return sendChallengeIfNecessary(computedAuth, request, response);
+    } catch (IOException e) {
+      throw new ServerAuthException(e);
+    }
+  }
+
+  /**
+   * Jetty has a bug in which if there is an Authorization header sent by a client which is
+   * not of the Negotiate type, Jetty does not send the challenge to negotiate. This works
+   * around that issue, forcing the challenge to be sent. Will require investigation on
+   * upgrade to a newer version of Jetty.
+   */
+  Authentication sendChallengeIfNecessary(Authentication computedAuth, ServletRequest request,
+      ServletResponse response) throws IOException {
     if (computedAuth == Authentication.UNAUTHENTICATED) {
       HttpServletRequest req = (HttpServletRequest) request;
       HttpServletResponse res = (HttpServletResponse) response;
@@ -48,18 +63,15 @@ public class AvaticaSpnegoAuthenticator extends SpnegoAuthenticator {
       String header = req.getHeader(HttpHeader.AUTHORIZATION.asString());
       // We have an authorization header, but it's not Negotiate
       if (header != null && !header.startsWith(HttpHeader.NEGOTIATE.asString())) {
-        LOG.debug("Client sent Authorization header that was not for Negotiate");
-        try {
-          if (DeferredAuthentication.isDeferred(res)) {
-            return Authentication.UNAUTHENTICATED;
-          }
-
-          res.setHeader(HttpHeader.WWW_AUTHENTICATE.asString(), HttpHeader.NEGOTIATE.asString());
-          res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-          return Authentication.SEND_CONTINUE;
-        } catch (IOException ioe) {
-          throw new ServerAuthException(ioe);
+        LOG.debug("Client sent Authorization header that was not for Negotiate,"
+            + " sending challenge anyways.");
+        if (DeferredAuthentication.isDeferred(res)) {
+          return Authentication.UNAUTHENTICATED;
         }
+
+        res.setHeader(HttpHeader.WWW_AUTHENTICATE.asString(), HttpHeader.NEGOTIATE.asString());
+        res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+        return Authentication.SEND_CONTINUE;
       }
     }
     return computedAuth;
