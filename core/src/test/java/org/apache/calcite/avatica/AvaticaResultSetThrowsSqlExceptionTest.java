@@ -16,6 +16,7 @@
  */
 package org.apache.calcite.avatica;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -53,6 +54,21 @@ public class AvaticaResultSetThrowsSqlExceptionTest {
     }
   }
 
+  /**
+   * Auxiliary method returning a result set on a test table.
+   * @return a result set on a test table.
+   * @throws SQLException in case of database error
+   */
+  private ResultSet getResultSet() throws SQLException {
+    Properties properties = new Properties();
+    properties.setProperty("timeZone", "GMT");
+
+    final TestDriver driver = new TestDriver();
+    final Connection connection = driver.connect("jdbc:test", properties);
+
+    return connection.createStatement().executeQuery("SELECT * FROM TABLE");
+  }
+
   @Test
   public void testPrevious() throws SQLException {
     Properties properties = new Properties();
@@ -60,8 +76,8 @@ public class AvaticaResultSetThrowsSqlExceptionTest {
 
     final TestDriver driver = new TestDriver();
     try (Connection connection = driver.connect("jdbc:test", properties);
-         ResultSet resultSet =
-             connection.createStatement().executeQuery("SELECT * FROM TABLE")) {
+       ResultSet resultSet =
+               connection.createStatement().executeQuery("SELECT * FROM TABLE")) {
       thrown.expect(SQLFeatureNotSupportedException.class);
       resultSet.previous();
     }
@@ -75,11 +91,133 @@ public class AvaticaResultSetThrowsSqlExceptionTest {
     final TestDriver driver = new TestDriver();
     try (Connection connection = driver.connect("jdbc:test", properties);
          ResultSet resultSet =
-             connection.createStatement().executeQuery("SELECT * FROM TABLE")) {
+                 connection.createStatement().executeQuery("SELECT * FROM TABLE")) {
       thrown.expect(SQLFeatureNotSupportedException.class);
       resultSet.updateNull(1);
     }
   }
-}
 
+  @Test
+  public void testCommonCursorStates() throws SQLException {
+    final ResultSet resultSet = getResultSet();
+
+    // right after statement execution, result set is before first row
+    Assert.assertTrue(resultSet.isBeforeFirst());
+
+    // checking that return values of next and isAfterLast are coherent
+    for (int c = 0; c < 3 && !resultSet.isAfterLast(); ++c) {
+      Assert.assertTrue(resultSet.next() != resultSet.isAfterLast());
+    }
+
+    // result set is not closed yet, despite fully consumed
+    Assert.assertFalse(resultSet.isClosed());
+
+    resultSet.close();
+
+    // result set is now closed
+    Assert.assertTrue(resultSet.isClosed());
+
+    // once closed, next should fail
+    thrown.expect(SQLException.class);
+    resultSet.next();
+  }
+
+  /**
+   * Auxiliary method for testing column access.
+   * @param resultSet the result set
+   * @param index the index of the column to be accessed
+   * @param shouldThrow true iff the column access should throw an exception
+   * @return true iff the method invocation succeeded
+   * @throws SQLException in case of database error
+   */
+  private boolean getColumn(final ResultSet resultSet,
+                            final int index,
+                            final boolean shouldThrow) throws SQLException {
+    try {
+      switch (index) {
+      case 1:
+        resultSet.getBoolean(index);   // BOOLEAN
+        break;
+      case 2:
+        resultSet.getByte(index);      // TINYINT
+        break;
+      case 3:
+        resultSet.getShort(index);     // SMALLINT
+        break;
+      case 4:
+        resultSet.getInt(index);       // INTEGER
+        break;
+      case 5:
+        resultSet.getLong(index);      // BIGINT
+        break;
+      case 6:
+        resultSet.getFloat(index);     // REAL
+        break;
+      case 7:
+        resultSet.getDouble(index);    // FLOAT
+        break;
+      case 8:
+        resultSet.getString(index);    // VARCHAR
+        break;
+      case 9:
+        resultSet.getDate(index);      // DATE
+        break;
+      case 10:
+        resultSet.getTime(index);      // TIME
+        break;
+      case 11:
+        resultSet.getTimestamp(index); // TIMESTAMP
+        break;
+      default:
+        resultSet.getObject(index);
+      }
+    } catch (SQLException e) {
+      if (!shouldThrow) {
+        throw e;
+      }
+      return true;
+    }
+
+    return !shouldThrow;
+  }
+
+  @Test
+  public void testGetColumnsBeforeNext() throws SQLException {
+    try (ResultSet resultSet = getResultSet()) {
+      // we have not called next, so each column getter should throw SQLException
+      for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
+        //System.out.println(resultSet.getMetaData().getColumnTypeName(i));
+        Assert.assertTrue(getColumn(resultSet, i, true));
+      }
+    }
+  }
+
+  @Test
+  public void testGetColumnsAfterNext() throws SQLException {
+    try (ResultSet resultSet = getResultSet()) {
+      // result set is composed by 1 row, we call next before accessing columns
+      resultSet.next();
+
+      // after calling next, column getters should succeed
+      for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); ++i) {
+        Assert.assertTrue(getColumn(resultSet, i, false));
+      }
+    }
+  }
+
+  @Test
+  public void testGetColumnsAfterLast() throws SQLException {
+    try (ResultSet resultSet = getResultSet()) {
+      // these two steps move the cursor after the last row
+      resultSet.next();
+      resultSet.next();
+
+      // the cursor being after the last row, column getters should fail
+      for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); ++i) {
+        Assert.assertTrue(getColumn(resultSet, i, true));
+      }
+    }
+  }
+
+}
 // End AvaticaResultSetThrowsSqlExceptionTest.java
