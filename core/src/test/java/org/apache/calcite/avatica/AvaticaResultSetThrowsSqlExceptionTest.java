@@ -16,6 +16,7 @@
  */
 package org.apache.calcite.avatica;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -101,20 +102,20 @@ public class AvaticaResultSetThrowsSqlExceptionTest {
     final ResultSet resultSet = getResultSet();
 
     // right after statement execution, result set is before first row
-    assert resultSet.isBeforeFirst();
+    Assert.assertTrue(resultSet.isBeforeFirst());
 
-    // retrieve each row until the last one
-    while (!resultSet.isAfterLast()) {
-      assert resultSet.next() != resultSet.isAfterLast();
+    // checking that return values of next and isAfterLast are coherent
+    for (int c = 0; c < 3 && !resultSet.isAfterLast(); ++c) {
+      Assert.assertTrue(resultSet.next() != resultSet.isAfterLast());
     }
 
     // result set is not closed yet, despite fully consumed
-    assert !resultSet.isClosed();
+    Assert.assertFalse(resultSet.isClosed());
 
     resultSet.close();
 
     // result set is now closed
-    assert resultSet.isClosed();
+    Assert.assertTrue(resultSet.isClosed());
 
     // once closed, next should fail
     thrown.expect(SQLException.class);
@@ -186,7 +187,7 @@ public class AvaticaResultSetThrowsSqlExceptionTest {
       // we have not called next, so each column getter should throw SQLException
       for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
         //System.out.println(resultSet.getMetaData().getColumnTypeName(i));
-        assert getColumn(resultSet, i, true);
+        Assert.assertTrue(getColumn(resultSet, i, true));
       }
     }
   }
@@ -199,7 +200,21 @@ public class AvaticaResultSetThrowsSqlExceptionTest {
 
       // after calling next, column getters should succeed
       for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); ++i) {
-        assert getColumn(resultSet, i, false);
+        Assert.assertTrue(getColumn(resultSet, i, false));
+      }
+    }
+  }
+
+  @Test
+  public void testGetColumnsAfterLast() throws SQLException {
+    try (ResultSet resultSet = getResultSet()) {
+      // these two steps move the cursor after the last row
+      resultSet.next();
+      resultSet.next();
+
+      // the cursor being after the last row, column getters should fail
+      for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); ++i) {
+        Assert.assertTrue(getColumn(resultSet, i, true));
       }
     }
   }
