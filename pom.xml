@@ -103,6 +103,7 @@ limitations under the License.
     <scott-data-hsqldb.version>0.1</scott-data-hsqldb.version>
     <servlet.version>4.0.1</servlet.version>
     <slf4j.version>1.7.25</slf4j.version>
+    <spark.version>2.4.0</spark.version>
     <spotbugs.version>3.1.8</spotbugs.version>
     <spotbugs-maven-plugin.version>3.1.8</spotbugs-maven-plugin.version>
   </properties>
@@ -199,6 +200,21 @@ limitations under the License.
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.spark</groupId>
+        <artifactId>spark-catalyst_2.11</artifactId>
+        <version>${spark.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.spark</groupId>
+        <artifactId>spark-sql_2.11</artifactId>
+        <version>${spark.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.module</groupId>
+        <artifactId>jackson-module-scala_2.11</artifactId>
         <version>${jackson.version}</version>
       </dependency>
       <dependency>
