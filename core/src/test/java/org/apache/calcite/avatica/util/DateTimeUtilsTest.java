@@ -433,7 +433,7 @@ public class DateTimeUtilsTest {
         unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(1, 2, 1)),
         is(1L));
     // TODO: For a small time range around year 1, due to the Gregorian shift,
-    // we end up in the wrong century. Should be 1.
+    // we end up in the wrong decade. Should be 1.
     assertThat(
         unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(1, 1, 1)),
         is(0L));
