@@ -397,27 +397,6 @@ public class DateTimeUtilsTest {
     // from -1 century to 1 century. If you disagree with this, please write
     // your complaint to: Pope, Cathedral Saint-Peter of Roma, Vatican.
 
-    assertThat(
-            unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(2001, 1, 1)),
-            is(201L));
-    assertThat(
-            unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(2000, 12, 31)),
-            is(200L));
-    assertThat(
-            unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(1852, 6, 7)),
-            is(186L));
-    assertThat(
-            unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(1, 2, 1)),
-            is(1L));
-    // TODO: For a small time range around year 1, due to the Gregorian shift,
-    // we end up in the wrong century. Should be 1.
-    assertThat(
-            unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(1, 1, 1)),
-            is(0L));
-    assertThat(
-            unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(-2, 1, 1)),
-            is(-1L));
-
     // The 21st century started on 2001/01/01
     assertThat(
         unixDateExtract(TimeUnitRange.CENTURY, ymdToUnixDate(2001, 1, 1)),
@@ -438,6 +417,28 @@ public class DateTimeUtilsTest {
         is(0L));
     assertThat(
         unixDateExtract(TimeUnitRange.CENTURY, ymdToUnixDate(-2, 1, 1)),
+        is(-1L));
+
+    // The 201st decade started on 2001/01/01
+    assertThat(
+        unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(2001, 1, 1)),
+        is(201L));
+    assertThat(
+        unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(2000, 12, 31)),
+        is(200L));
+    assertThat(
+        unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(1852, 6, 7)),
+        is(186L));
+    assertThat(
+        unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(1, 2, 1)),
+        is(1L));
+    // TODO: For a small time range around year 1, due to the Gregorian shift,
+    // we end up in the wrong century. Should be 1.
+    assertThat(
+        unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(1, 1, 1)),
+        is(0L));
+    assertThat(
+        unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(-2, 1, 1)),
         is(-1L));
 
     // The 3rd millennium started on 2001/01/01
@@ -476,7 +477,7 @@ public class DateTimeUtilsTest {
     final long dow = unixDateExtract(TimeUnitRange.DOW, unixDate);
     assertTrue(dow >= 1 && dow <= 7);
     final long doy = unixDateExtract(TimeUnitRange.DOY, unixDate);
-    assertTrue(doy >= 1 && dow <= 366);
+    assertTrue(doy >= 1 && doy <= 366);
     final long q = unixDateExtract(TimeUnitRange.QUARTER, unixDate);
     assertTrue(q >= 1 && q <= 4);
     final long d = unixDateExtract(TimeUnitRange.DECADE, unixDate);
