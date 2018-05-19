@@ -239,18 +239,8 @@ public class HttpServer {
     server.setConnectors(new Connector[] { connector });
 
     // Default to using the handler that was passed in
-    final HandlerList handlerList = new HandlerList();
-    Handler avaticaHandler = handler;
+    configureHandlers(securityHandler);
 
-    // Wrap the provided handler for security if we made one
-    if (null != securityHandler) {
-      securityHandler.setHandler(handler);
-      avaticaHandler = securityHandler;
-    }
-
-    handlerList.setHandlers(new Handler[] {avaticaHandler, new DefaultHandler()});
-
-    server.setHandler(handlerList);
     // Apply server customizers
     for (ServerCustomizer<Server> customizer : this.serverCustomizers) {
       customizer.customize(server);
@@ -274,7 +264,22 @@ public class HttpServer {
     }
   }
 
-  private ServerConnector getConnector() {
+  protected void configureHandlers(ConstraintSecurityHandler securityHandler) {
+    final HandlerList handlerList = new HandlerList();
+    Handler avaticaHandler = handler;
+
+    // Wrap the provided handler for security if we made one
+    if (null != securityHandler) {
+      securityHandler.setHandler(handler);
+      avaticaHandler = securityHandler;
+    }
+
+    handlerList.setHandlers(new Handler[] {avaticaHandler, new DefaultHandler()});
+
+    server.setHandler(handlerList);
+  }
+
+  protected ServerConnector getConnector() {
     HttpConnectionFactory factory = new HttpConnectionFactory();
     factory.getHttpConfiguration().setRequestHeaderSize(maxAllowedHeaderSize);
 
@@ -467,6 +472,8 @@ public class HttpServer {
 
     // The maximum size in bytes of an http header the server will read (64KB)
     private int maxAllowedHeaderSize = MAX_ALLOWED_HEADER_SIZE;
+    private AvaticaServerConfiguration serverConfig;
+    private Subject subject;
 
     public Builder() {}
 
@@ -659,6 +666,12 @@ public class HttpServer {
       return withAuthentication(AuthenticationType.DIGEST, properties, allowedRoles);
     }
 
+    public Builder<T> withCustomAuthentication(AvaticaServerConfiguration config) {
+      this.authenticationType = AuthenticationType.CUSTOM;
+      this.serverConfig = config;
+      return this;
+    }
+
     private Builder<T> withAuthentication(AuthenticationType authType, String properties,
         String[] allowedRoles) {
       this.loginServiceRealm = "Avatica";
@@ -721,8 +734,6 @@ public class HttpServer {
      */
     @SuppressWarnings("unchecked")
     public HttpServer build() {
-      final AvaticaServerConfiguration serverConfig;
-      final Subject subject;
       switch (authenticationType) {
       case NONE:
         serverConfig = null;
@@ -747,6 +758,10 @@ public class HttpServer {
         }
         serverConfig = buildSpnegoConfiguration(this);
         break;
+      case CUSTOM:
+        serverConfig = buildCustomConfiguration(this);
+        subject = null;
+        break;
       default:
         throw new IllegalArgumentException("Unhandled AuthenticationType");
       }
@@ -769,6 +784,10 @@ public class HttpServer {
 
       return new HttpServer(port, handler, serverConfig, subject, sslFactory, jettyCustomizers,
           maxAllowedHeaderSize);
+    }
+
+    private AvaticaServerConfiguration buildCustomConfiguration(Builder<T> tBuilder) {
+      return tBuilder.serverConfig;
     }
 
     /**

@@ -129,16 +129,7 @@ public class HttpQueryStringParameterRemoteUserExtractorTest extends HttpAuthBas
     }
 
     @Override public String getHashLoginServiceProperties() {
-      try {
-        final String userPropertiesFile =
-            URLDecoder.decode(HttpQueryStringParameterRemoteUserExtractorTest.class
-                .getResource("/auth-users.properties").getFile(), "UTF-8");
-        assertNotNull("Could not find properties file for basic auth users", userPropertiesFile);
-        return userPropertiesFile;
-      } catch (UnsupportedEncodingException e) {
-        LOG.error("Failed to decode path to Jetty users file", e);
-        throw new RuntimeException(e);
-      }
+      return HttpAuthBase.getHashLoginServicePropertiesString();
     }
   };
 
