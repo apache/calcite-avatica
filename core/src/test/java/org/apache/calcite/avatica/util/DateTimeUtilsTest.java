@@ -481,17 +481,17 @@ public class DateTimeUtilsTest {
     //The 201st decade started on 2010/01/01. A little bit different but based on
     //https://www.postgresql.org/docs/9.1/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
     assertThat(
-        unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(2001, 1, 1)),
+        unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(2010, 1, 1)),
         is(201L));
     assertThat(
         unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(2000, 12, 31)),
         is(200L));
     assertThat(
         unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(1852, 6, 7)),
-        is(186L));
+        is(185L));
     assertThat(
         unixDateExtract(TimeUnitRange.DECADE, ymdToUnixDate(1, 2, 1)),
-        is(1L));
+        is(0L));
     // TODO: For a small time range around year 1, due to the Gregorian shift,
     // we end up in the wrong decade. Should be 1.
     assertThat(
