@@ -387,12 +387,16 @@ public class DateTimeUtilsTest {
     assertThat(unixDateExtract(TimeUnitRange.WEEK, ymdToUnixDate(1970, 1, 1)),
         is(1L)); // thu
 
+    // Based on the rule: The number of the ISO 8601 week-numbering week of the year.
+    // By definition, ISO weeks start on Mondays and the first week of a year contains
+    // January 4 of that year. In other words, the first Thursday of a year is in
+    // week 1 of that year.
     assertThat(unixDateExtract(TimeUnitRange.WEEK, -4), is(52L)); // sun
     assertThat(unixDateExtract(TimeUnitRange.WEEK, -3), is(1L)); // mon
     assertThat(unixDateExtract(TimeUnitRange.WEEK, -2), is(1L)); // tue
     assertThat(unixDateExtract(TimeUnitRange.WEEK, -1), is(1L)); // wed
     assertThat(unixDateExtract(TimeUnitRange.WEEK, 0), is(1L)); // thu
-    assertThat(unixDateExtract(TimeUnitRange.WEEK, 1), is(1L)); // fru
+    assertThat(unixDateExtract(TimeUnitRange.WEEK, 1), is(1L)); // fri
     assertThat(unixDateExtract(TimeUnitRange.WEEK, 2), is(1L)); // sat
     assertThat(unixDateExtract(TimeUnitRange.WEEK, 3), is(1L)); // sun
     assertThat(unixDateExtract(TimeUnitRange.WEEK, 4), is(2L)); // mon
