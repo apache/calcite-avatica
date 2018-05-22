@@ -34,7 +34,6 @@ import java.math.BigDecimal;
  */
 public enum TimeUnit {
   YEAR(true, ' ', BigDecimal.valueOf(12) /* months */, null),
-  ISOYEAR(true, ' ', BigDecimal.valueOf(12) /* months */, null),
   MONTH(true, '-', BigDecimal.ONE /* months */, BigDecimal.valueOf(12)),
   DAY(false, '-', BigDecimal.valueOf(DateTimeUtils.MILLIS_PER_DAY), null),
   HOUR(false, ' ', BigDecimal.valueOf(DateTimeUtils.MILLIS_PER_HOUR),
@@ -45,6 +44,7 @@ public enum TimeUnit {
       BigDecimal.valueOf(60)),
 
   QUARTER(true, '*', BigDecimal.valueOf(3) /* months */, BigDecimal.valueOf(4)),
+  ISOYEAR(true, ' ', BigDecimal.valueOf(12) /* months */, null),
   WEEK(false, '*', BigDecimal.valueOf(DateTimeUtils.MILLIS_PER_DAY * 7),
       BigDecimal.valueOf(53)),
   MILLISECOND(false, '.', BigDecimal.ONE, BigDecimal.valueOf(1000)),
