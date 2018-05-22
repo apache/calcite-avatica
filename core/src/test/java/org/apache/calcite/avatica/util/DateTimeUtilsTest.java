@@ -521,23 +521,10 @@ public class DateTimeUtilsTest {
         unixDateExtract(TimeUnitRange.MILLENNIUM, ymdToUnixDate(-2, 1, 1)),
         is(-1L));
 
-    assertThat(
-        unixDateExtract(TimeUnitRange.ISOYEAR, ymdToUnixDate(2006, 1, 1)),
-        is(2005L));
-    assertThat(
-        unixDateExtract(TimeUnitRange.ISOYEAR, ymdToUnixDate(2006, 1, 2)),
-        is(2006L));
-    assertThat(
-        unixDateExtract(TimeUnitRange.ISOYEAR, ymdToUnixDate(2012, 12, 31)),
-        is(2013L));
-    assertThat(
-        unixDateExtract(TimeUnitRange.ISOYEAR, ymdToUnixDate(2012, 12, 30)),
-        is(2012L));
-    assertThat(
-        unixDateExtract(TimeUnitRange.ISOYEAR, ymdToUnixDate(2012, 12, 29)),
-        is(2012L));
-
-
+    // The ISO 8601 week-numbering year that the date falls in (not applicable to intervals)
+    // Each ISO 8601 week-numbering year begins with the Monday of the week containing
+    // the 4th of January, so in early January or late December the ISO year may be different
+    // from the Gregorian year. See the week field for more information.
     assertThat(
         unixDateExtract(TimeUnitRange.ISOYEAR, ymdToUnixDate(2003, 1, 1)),
         is(2003L)); // wed
@@ -623,6 +610,8 @@ public class DateTimeUtilsTest {
         unixDateExtract(TimeUnitRange.ISOYEAR, ymdToUnixDate(1970, 1, 1)),
         is(1970L)); // thu
 
+    // For date and timestamp values, the number of seconds since 1970-01-01 00:00:00 UTC
+    // (can be negative); for interval values, the total number of seconds in the interval
     assertThat(
         unixDateExtract(TimeUnitRange.EPOCH, ymdToUnixDate(2001, 1, 1)),
         is(978307200L));
