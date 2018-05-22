@@ -391,6 +391,7 @@ public class DateTimeUtilsTest {
     // By definition, ISO weeks start on Mondays and the first week of a year contains
     // January 4 of that year. In other words, the first Thursday of a year is in
     // week 1 of that year.
+    // For that reason 1969-12-31, 1969-12-30 and 1969-12-29 are in the 1-st ISO week of 1970
     assertThat(unixDateExtract(TimeUnitRange.WEEK, -4), is(52L)); // sun
     assertThat(unixDateExtract(TimeUnitRange.WEEK, -3), is(1L)); // mon
     assertThat(unixDateExtract(TimeUnitRange.WEEK, -2), is(1L)); // tue
