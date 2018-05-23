@@ -62,6 +62,8 @@ public interface ConnectionConfig {
   String keyPassword();
   /** @see BuiltInConnectionProperty#HOSTNAME_VERIFICATION */
   HostnameVerification hostnameVerification();
+  /** @see BuiltInConnectionProperty#FETCH_SIZE */
+  int fetchSize();
 }
 
 // End ConnectionConfig.java
