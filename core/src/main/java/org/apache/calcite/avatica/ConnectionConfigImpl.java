@@ -133,6 +133,10 @@ public class ConnectionConfigImpl implements ConnectionConfig {
        .getBoolean();
   }
 
+  public int fetchSize() {
+    return BuiltInConnectionProperty.FETCH_SIZE.wrap(properties).getInt();
+  }
+
   /** Converts a {@link Properties} object containing (name, value)
    * pairs into a map whose keys are
    * {@link org.apache.calcite.avatica.InternalProperty} objects.

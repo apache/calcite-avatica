@@ -172,3 +172,13 @@ on-hover images for the permalink, but oh well.
 : _Default_: `null`.
 
 : _Required_: Only if `truststore` was provided.
+
+<strong><a name="fetch_size" href="#fetch_size">fetch_size</a></strong>
+
+: _Description_: The number of rows to fetch. If
+    <a href="https://docs.oracle.com/javase/8/docs/api/java/sql/Statement.html#setFetchSize-int-">
+    Statement:setFetchSize</a> is set, that value overrides fetch_size.
+
+: _Default_: `100`.
+
+: _Required_: No.

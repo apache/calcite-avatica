@@ -88,7 +88,10 @@ public enum BuiltInConnectionProperty implements ConnectionProperty {
   HOSTNAME_VERIFICATION("hostname_verification", Type.ENUM, HostnameVerification.STRICT,
       HostnameVerification.class, false),
 
-  TRANSPARENT_RECONNECTION("transparent_reconnection", Type.BOOLEAN, Boolean.FALSE, false);
+  TRANSPARENT_RECONNECTION("transparent_reconnection", Type.BOOLEAN, Boolean.FALSE, false),
+
+  /** Number of rows to fetch per call. */
+  FETCH_SIZE("fetch_size", Type.NUMBER, AvaticaStatement.DEFAULT_FETCH_SIZE, false);
 
   private final String camelName;
   private final Type type;

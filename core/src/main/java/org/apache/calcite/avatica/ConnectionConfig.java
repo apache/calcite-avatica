@@ -64,6 +64,8 @@ public interface ConnectionConfig {
   HostnameVerification hostnameVerification();
   /** @see BuiltInConnectionProperty#TRANSPARENT_RECONNECTION */
   boolean transparentReconnectionEnabled();
+  /** @see BuiltInConnectionProperty#FETCH_SIZE */
+  int fetchSize();
 }
 
 // End ConnectionConfig.java
