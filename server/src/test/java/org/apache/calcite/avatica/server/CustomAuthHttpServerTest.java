@@ -26,14 +26,18 @@ import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.UserAuthentication;
 import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.UserIdentity;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
@@ -54,34 +58,29 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
   private static HttpServer server;
   private static String url;
 
+  // Counters to keep track of number of function calls
   private static int methodCallCounter1 = 0;
   private static int methodCallCounter2 = 0;
   private static int methodCallCounter3 = 0;
 
   @Before
-  public void before() throws SQLException {
+  public void before() {
     methodCallCounter1 = 0;
     methodCallCounter2 = 0;
     methodCallCounter3 = 0;
   }
 
+  @After
+  public void stopServer() {
+    if (null != server) {
+      server.stop();
+    }
+  }
+
   @Test
   public void testCustomImpersonationConfig() throws Exception {
-    final JdbcMeta jdbcMeta = new JdbcMeta(CONNECTION_SPEC.url,
-            CONNECTION_SPEC.username, CONNECTION_SPEC.password);
-    LocalService service = new LocalService(jdbcMeta);
-
-    server = new HttpServer.Builder()
-            .withCustomAuthentication(new CustomImpersonationConfig())
-            .withHandler(service, Driver.Serialization.PROTOBUF)
-            .withPort(0)
-            .build();
-    server.start();
-    // Create and grant permissions to our users
-    createHsqldbUsers();
-
-    url = "jdbc:avatica:remote:url=http://localhost:" + server.getPort()
-            + ";authentication=BASIC;serialization=PROTOBUF";
+    AvaticaServerConfiguration configuration = new CustomImpersonationConfig();
+    createServer(configuration, false);
 
     readWriteData(url, "CUSTOM_CONFIG_1_TABLE", new Properties());
     Assert.assertEquals("supportsImpersonation should be called same number of "
@@ -90,10 +89,150 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
             + "times as getRemoteUserExtractor method", methodCallCounter1, methodCallCounter3);
   }
 
+  @Test
+  public void testCustomBasicImpersonationConfigWithAllowedUser() throws Exception {
+    AvaticaServerConfiguration configuration = new CustomBasicImpersonationConfig();
+    createServer(configuration, true);
+
+    final Properties props = new Properties();
+    props.put("avatica_user", "USER2");
+    props.put("avatica_password", "password2");
+    props.put("user", "USER2");
+    props.put("password", "password2");
+
+    readWriteData(url, "CUSTOM_CONFIG_2_ALLOWED_TABLE", props);
+    Assert.assertEquals("supportsImpersonation should be called same number of "
+            + "times as doAsRemoteUser method", methodCallCounter1, methodCallCounter2);
+    Assert.assertEquals("supportsImpersonation should be called same number of "
+            + "times as getRemoteUserExtractor method", methodCallCounter1, methodCallCounter3);
+  }
+
+  @Test
+  public void testCustomBasicImpersonationConfigWithDisallowedUser() throws Exception {
+    AvaticaServerConfiguration configuration = new CustomBasicImpersonationConfig();
+    createServer(configuration, true);
+
+    final Properties props = new Properties();
+    props.put("avatica_user", "USER1");
+    props.put("avatica_password", "password1");
+    props.put("user", "USER1");
+    props.put("password", "password1");
+
+    try {
+      readWriteData(url, "CUSTOM_CONFIG_2_DISALLOWED_TABLE", props);
+      fail("Expected an exception");
+    } catch (RuntimeException e) {
+      assertThat(e.getMessage(), containsString("Failed to execute HTTP Request, got HTTP/403"));
+    }
+  }
+
+  @Test
+  public void testCustomConfigDisallowsWithHandlerMethod() {
+    AvaticaServerConfiguration configuration = new CustomBasicImpersonationConfig();
+    server = new HttpServer.Builder()
+            .withCustomAuthentication(configuration)
+            .withHandler(Mockito.mock(AvaticaHandler.class))
+            .withPort(0)
+            .build();
+    try {
+      server.start();
+      fail("Expected an exception");
+    } catch (IllegalStateException e) {
+      String assertString = "Handlers and SSLFactory cannot be configured with "
+              + "HTTPServer Builder when using CUSTOM Authentication Type";
+      assertThat(e.getMessage(), containsString(assertString));
+    }
+  }
+
+  public static HttpServer getAvaticaServer() {
+    return server;
+  }
+
+  @SuppressWarnings("unchecked") // needed for the mocked customizers, not the builder
+  protected void createServer(AvaticaServerConfiguration config, boolean isBasicAuth)
+      throws SQLException {
+    final JdbcMeta jdbcMeta = new JdbcMeta(CONNECTION_SPEC.url,
+      CONNECTION_SPEC.username, CONNECTION_SPEC.password);
+    LocalService service = new LocalService(jdbcMeta);
+
+    ConnectorCustomizer connectorCustomizer = new ConnectorCustomizer();
+    BasicAuthHandlerCustomizer basicAuthCustomizer =
+            new BasicAuthHandlerCustomizer(config, service, isBasicAuth);
+
+    server = new HttpServer.Builder()
+            .withCustomAuthentication(config)
+            .withPort(0)
+            .withServerCustomizers(
+                    Arrays.asList(connectorCustomizer, basicAuthCustomizer), Server.class)
+            .build();
+    server.start();
+
+    // Create and grant permissions to our users
+    createHsqldbUsers();
+    url = "jdbc:avatica:remote:url=http://localhost:" + connectorCustomizer.getLocalPort()
+            + ";authentication=BASIC;serialization=PROTOBUF";
+  }
+
+  /**
+   * Customizer to add ServerConnectors to the server
+   */
+  static class ConnectorCustomizer implements ServerCustomizer<Server> {
+
+    ServerConnector connector;
+
+    @Override public void customize(Server server) {
+      HttpServer avaticaServer = getAvaticaServer();
+      connector = avaticaServer.configureConnector(avaticaServer.getServerConnector(), 0);
+      server.setConnectors(new Connector[] { connector });
+    }
+
+    public int getLocalPort() {
+      return connector.getLocalPort();
+    }
+
+  }
+
+  /**
+   * Customizer to add handlers to the server (with or without BasicAuth)
+   */
+  static class BasicAuthHandlerCustomizer implements ServerCustomizer<Server> {
+
+    AvaticaServerConfiguration configuration;
+    LocalService service;
+    boolean isBasicAuth;
+
+    public BasicAuthHandlerCustomizer(AvaticaServerConfiguration configuration
+            , LocalService service, boolean isBasicAuth) {
+      this.configuration = configuration;
+      this.service = service;
+      this.isBasicAuth = isBasicAuth;
+    }
+
+    @Override public void customize(Server server) {
+      HttpServer avaticaServer = getAvaticaServer();
+
+      HandlerFactory factory = new HandlerFactory();
+      Handler avaticaHandler = factory.getHandler(service,
+              Driver.Serialization.PROTOBUF, null, configuration);
+
+      if (isBasicAuth) {
+        ConstraintSecurityHandler securityHandler =
+                avaticaServer.configureBasicAuthentication(server, configuration);
+        securityHandler.setHandler(avaticaHandler);
+        avaticaHandler = securityHandler;
+      }
+
+      HandlerList handlerList = new HandlerList();
+      handlerList.setHandlers(new Handler[] { avaticaHandler, new DefaultHandler()});
+      server.setHandler(handlerList);
+    }
+  }
+
   /**
    * CustomImpersonationConfig doesn't authenticates the user but supports user impersonation
    */
   static class CustomImpersonationConfig implements AvaticaServerConfiguration {
+
 
     @Override public AuthenticationType getAuthenticationType() {
       return AuthenticationType.CUSTOM;
@@ -125,11 +264,10 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
     }
 
     @Override public <T> T doAsRemoteUser(String remoteUserName,
-      String remoteAddress, Callable<T> action) throws Exception {
+              String remoteAddress, Callable<T> action) throws Exception {
       methodCallCounter2++;
       return action.call();
     }
-
     @Override public RemoteUserExtractor getRemoteUserExtractor() {
       return new RemoteUserExtractor() {
         @Override public String extract(HttpServletRequest request) {
@@ -138,99 +276,14 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
         }
       };
     }
-  }
 
-  @Test
-  public void testCustomBasicImpersonationConfigWithAllowedUser() throws Exception {
-    createServerWithCustomBasicImpersonationConfig();
-
-    final Properties props = new Properties();
-    props.put("avatica_user", "USER2");
-    props.put("avatica_password", "password2");
-    props.put("user", "USER2");
-    props.put("password", "password2");
-
-    readWriteData(url, "CUSTOM_CONFIG_2_ALLOWED_TABLE", props);
-    Assert.assertEquals("supportsImpersonation should be called same number of "
-            + "times as doAsRemoteUser method", methodCallCounter1, methodCallCounter2);
-    Assert.assertEquals("supportsImpersonation should be called same number of "
-            + "times as getRemoteUserExtractor method", methodCallCounter1, methodCallCounter3);
-  }
-
-  @Test
-  public void testCustomBasicImpersonationConfigWithDisallowedUser() throws Exception {
-    createServerWithCustomBasicImpersonationConfig();
-
-    final Properties props = new Properties();
-    props.put("avatica_user", "USER1");
-    props.put("avatica_password", "password1");
-    props.put("user", "USER1");
-    props.put("password", "password1");
-
-    try {
-      readWriteData(url, "CUSTOM_CONFIG_2_DISALLOWED_TABLE", props);
-      fail("Expected an exception");
-    } catch (RuntimeException e) {
-      assertThat(e.getMessage(), containsString("Failed to execute HTTP Request, got HTTP/403"));
-    }
-  }
-
-  @SuppressWarnings("unchecked") // needed for the mocked customizers, not the builder
-  protected void createServerWithCustomBasicImpersonationConfig() throws SQLException {
-    final JdbcMeta jdbcMeta = new JdbcMeta(CONNECTION_SPEC.url,
-            CONNECTION_SPEC.username, CONNECTION_SPEC.password);
-    LocalService service = new LocalService(jdbcMeta);
-
-    AvaticaServerConfiguration configuration = new CustomBasicImpersonationConfig();
-    BasicAuthCustomizer basicAuthCustomizer = new BasicAuthCustomizer(configuration);
-    server = new HttpServer.Builder()
-            .withCustomAuthentication(configuration)
-            .withHandler(service, Driver.Serialization.PROTOBUF)
-            .withPort(0)
-            .withServerCustomizers(Arrays.asList(basicAuthCustomizer), Server.class)
-            .build();
-    server.start();
-
-    // Create and grant permissions to our users
-    createHsqldbUsers();
-    url = "jdbc:avatica:remote:url=http://localhost:" + basicAuthCustomizer.getLocalPort()
-            + ";authentication=BASIC;serialization=PROTOBUF";
-  }
-
-  /**
-   * Customizer to add BasicAuthentication connector to the server
-   */
-  static class BasicAuthCustomizer implements ServerCustomizer<Server> {
-
-    AvaticaServerConfiguration configuration;
-    ServerConnector connector;
-
-    public BasicAuthCustomizer(AvaticaServerConfiguration configuration) {
-      this.configuration = configuration;
-    }
-
-    @Override public void customize(Server server) {
-      HttpServer avaticaServer = getServer();
-      connector = avaticaServer.configureConnector(avaticaServer.getConnector(), 0);
-      server.setConnectors(new Connector[] { connector });
-      ConstraintSecurityHandler securityHandler =
-              avaticaServer.configureBasicAuthentication(server, connector, configuration);
-      avaticaServer.configureHandlers(securityHandler);
-    }
-
-    public int getLocalPort() {
-      return connector.getLocalPort();
-    }
-
-    public HttpServer getServer() {
-      return server;
-    }
   }
 
   /**
    * CustomBasicImpersonationConfig supports BasicAuthentication with user impersonation
    */
   static class CustomBasicImpersonationConfig implements AvaticaServerConfiguration {
+
 
     @Override public AuthenticationType getAuthenticationType() {
       return AuthenticationType.CUSTOM;
@@ -269,7 +322,6 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
       }
       return action.call();
     }
-
     @Override public RemoteUserExtractor getRemoteUserExtractor() {
       return new RemoteUserExtractor() {
         @Override public String extract(HttpServletRequest request)
@@ -285,13 +337,6 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
           throw new RemoteUserExtractionException("Request doesn't contain user credentials.");
         }
       };
-    }
-  }
-
-  @After
-  public void stopServer() throws Exception {
-    if (null != server) {
-      server.stop();
     }
   }
 
