@@ -1603,7 +1603,7 @@ public abstract class MetaImpl implements Meta {
         }
         try {
           // currentOffset updated after element is read from `rows` iterator
-          frame = fetch(stmt.handle, currentOffset, AvaticaStatement.DEFAULT_FETCH_SIZE);
+          frame = fetch(stmt.handle, currentOffset, stmt.getFetchSize());
         } catch (NoSuchStatementException e) {
           resetStatement();
           // re-fetch the batch where we left off

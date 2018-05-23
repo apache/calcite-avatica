@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class AvaticaStatement
     implements Statement {
+
   /** The default value for {@link Statement#getFetchSize()}. */
   public static final int DEFAULT_FETCH_SIZE = 100;
 
@@ -108,6 +109,7 @@ public abstract class AvaticaStatement
     this.resultSetType = resultSetType;
     this.resultSetConcurrency = resultSetConcurrency;
     this.resultSetHoldability = resultSetHoldability;
+    this.fetchSize = connection.config().fetchSize(); // Default to connection config fetch size.
     this.signature = signature;
     this.closed = false;
     if (h == null) {
