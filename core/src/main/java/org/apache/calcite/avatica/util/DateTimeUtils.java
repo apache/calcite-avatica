@@ -367,28 +367,24 @@ public class DateTimeUtils {
   }
 
   private static void julianToString(StringBuilder buf, int julian) {
-    // this shifts the epoch back to astronomical year -4800 instead of the
-    // start of the Christian era in year AD 1 of the proleptic Gregorian
-    // calendar.
-    int j = julian + 32044;
-    int g = j / 146097;
-    int dg = j % 146097;
-    int c = (dg / 36524 + 1) * 3 / 4;
-    int dc = dg - c * 36524;
-    int b = dc / 1461;
-    int db = dc % 1461;
-    int a = (db / 365 + 1) * 3 / 4;
-    int da = db - a * 365;
+    // Algorithm from the book "Astronomical Algorithms" by Jean Meeus, 1998
+    int b;
+    int c;
+    if (julian > 2299160) {
+      int a = julian + 32044;
+      b = (4 * a + 3) / 146097;
+      c = a - b * 146097 / 4;
+    } else {
+      b = 0;
+      c = julian + 32082;
+    }
+    int d = (4 * c + 3) / 1461;
+    int e = c - (1461 * d) / 4;
+    int m = (5 * e + 2) / 153;
+    int day = e - (153 * m + 2) / 5 + 1;
+    int month = m + 3 - 12 * (m / 10);
+    int year = b * 100 + d - 4800 + (m / 10);
 
-    // integer number of full years elapsed since March 1, 4801 BC
-    int y = g * 400 + c * 100 + b * 4 + a;
-    // integer number of full months elapsed since the last March 1
-    int m = (da * 5 + 308) / 153 - 2;
-    // number of days elapsed since day 1 of the month
-    int d = da - (m + 4) * 153 / 5 + 122;
-    int year = y - 4800 + (m + 2) / 12;
-    int month = (m + 2) % 12 + 1;
-    int day = d + 1;
     int4(buf, year);
     buf.append('-');
     int2(buf, month);
@@ -733,28 +729,24 @@ public class DateTimeUtils {
   }
 
   private static int julianExtract(TimeUnitRange range, int julian) {
-    // this shifts the epoch back to astronomical year -4800 instead of the
-    // start of the Christian era in year AD 1 of the proleptic Gregorian
-    // calendar.
-    int j = julian + 32044;
-    int g = j / 146097;
-    int dg = j % 146097;
-    int c = (dg / 36524 + 1) * 3 / 4;
-    int dc = dg - c * 36524;
-    int b = dc / 1461;
-    int db = dc % 1461;
-    int a = (db / 365 + 1) * 3 / 4;
-    int da = db - a * 365;
+    // Algorithm from the book "Astronomical Algorithms" by Jean Meeus, 1998
+    int b;
+    int c;
+    if (julian > 2299160) {
+      int a = julian + 32044;
+      b = (4 * a + 3) / 146097;
+      c = a - b * 146097 / 4;
+    } else {
+      b = 0;
+      c = julian + 32082;
+    }
+    int d = (4 * c + 3) / 1461;
+    int e = c - (1461 * d) / 4;
+    int m = (5 * e + 2) / 153;
+    int day = e - (153 * m + 2) / 5 + 1;
+    int month = m + 3 - 12 * (m / 10);
+    int year = b * 100 + d - 4800 + (m / 10);
 
-    // integer number of full years elapsed since March 1, 4801 BC
-    int y = g * 400 + c * 100 + b * 4 + a;
-    // integer number of full months elapsed since the last March 1
-    int m = (da * 5 + 308) / 153 - 2;
-    // number of days elapsed since day 1 of the month
-    int d = da - (m + 4) * 153 / 5 + 122;
-    int year = y - 4800 + (m + 2) / 12;
-    int month = (m + 2) % 12 + 1;
-    int day = d + 1;
     switch (range) {
     case YEAR:
       return year;
@@ -855,28 +847,24 @@ public class DateTimeUtils {
 
   private static int julianDateFloor(TimeUnitRange range, int julian,
       boolean floor) {
-    // this shifts the epoch back to astronomical year -4800 instead of the
-    // start of the Christian era in year AD 1 of the proleptic Gregorian
-    // calendar.
-    int j = julian + 32044;
-    int g = j / 146097;
-    int dg = j % 146097;
-    int c = (dg / 36524 + 1) * 3 / 4;
-    int dc = dg - c * 36524;
-    int b = dc / 1461;
-    int db = dc % 1461;
-    int a = (db / 365 + 1) * 3 / 4;
-    int da = db - a * 365;
+    // Algorithm from the book "Astronomical Algorithms" by Jean Meeus, 1998
+    int b;
+    int c;
+    if (julian > 2299160) {
+      int a = julian + 32044;
+      b = (4 * a + 3) / 146097;
+      c = a - b * 146097 / 4;
+    } else {
+      b = 0;
+      c = julian + 32082;
+    }
+    int d = (4 * c + 3) / 1461;
+    int e = c - (1461 * d) / 4;
+    int m = (5 * e + 2) / 153;
+    int day = e - (153 * m + 2) / 5 + 1;
+    int month = m + 3 - 12 * (m / 10);
+    int year = b * 100 + d - 4800 + (m / 10);
 
-    // integer number of full years elapsed since March 1, 4801 BC
-    int y = g * 400 + c * 100 + b * 4 + a;
-    // integer number of full months elapsed since the last March 1
-    int m = (da * 5 + 308) / 153 - 2;
-    // number of days elapsed since day 1 of the month
-    int d = da - (m + 4) * 153 / 5 + 122;
-    int year = y - 4800 + (m + 2) / 12;
-    int month = (m + 2) % 12 + 1;
-    int day = d + 1;
     switch (range) {
     case YEAR:
       if (!floor && (month > 1 || day > 1)) {

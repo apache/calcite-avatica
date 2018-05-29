@@ -128,6 +128,15 @@ public class DateTimeUtilsTest {
     assertEquals(-25508, ymdToUnixDate(1900, 3, 1));
   }
 
+  @Test public void testDateConversion() {
+    for (int i = 0; i < 4000; ++i) {
+      for (int j = 1; j <= 12; ++j) {
+        String date = String.format(Locale.ENGLISH, "%04d-%02d-28", i, j);
+        assertEquals(date, unixDateToString(ymdToUnixDate(i, j, 28)));
+      }
+    }
+  }
+
   @Test public void testDateToString() {
     checkDateString("1970-01-01", 0);
     //noinspection PointlessArithmeticExpression
@@ -410,11 +419,9 @@ public class DateTimeUtilsTest {
     assertThat(
         unixDateExtract(TimeUnitRange.CENTURY, ymdToUnixDate(1, 2, 1)),
         is(1L));
-    // TODO: For a small time range around year 1, due to the Gregorian shift,
-    // we end up in the wrong century. Should be 1.
     assertThat(
         unixDateExtract(TimeUnitRange.CENTURY, ymdToUnixDate(1, 1, 1)),
-        is(0L));
+        is(1L));
     assertThat(
         unixDateExtract(TimeUnitRange.CENTURY, ymdToUnixDate(-2, 1, 1)),
         is(-1L));
@@ -429,11 +436,9 @@ public class DateTimeUtilsTest {
     assertThat(
         unixDateExtract(TimeUnitRange.MILLENNIUM, ymdToUnixDate(1852, 6, 7)),
         is(2L));
-    // TODO: For a small time range around year 1, due to the Gregorian shift,
-    // we end up in the wrong millennium. Should be 1.
     assertThat(
         unixDateExtract(TimeUnitRange.MILLENNIUM, ymdToUnixDate(1, 1, 1)),
-        is(0L));
+        is(1L));
     assertThat(
         unixDateExtract(TimeUnitRange.MILLENNIUM, ymdToUnixDate(1, 2, 1)),
         is(1L));
