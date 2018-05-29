@@ -126,7 +126,7 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
     }
   }
 
-  @Test
+  @Test(expected = IllegalStateException.class)
   public void testCustomConfigDisallowsWithHandlerMethod() {
     AvaticaServerConfiguration configuration = new CustomBasicImpersonationConfig();
     server = new HttpServer.Builder()
@@ -134,14 +134,7 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
             .withHandler(Mockito.mock(AvaticaHandler.class))
             .withPort(0)
             .build();
-    try {
-      server.start();
-      fail("Expected an exception");
-    } catch (IllegalStateException e) {
-      String assertString = "Handlers and SSLFactory cannot be configured with "
-              + "HTTPServer Builder when using CUSTOM Authentication Type";
-      assertThat(e.getMessage(), containsString(assertString));
-    }
+    server.start();
   }
 
   public static HttpServer getAvaticaServer() {

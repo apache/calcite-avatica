@@ -220,7 +220,7 @@ public class HttpServer {
     if (null != this.config && AuthenticationType.CUSTOM == config.getAuthenticationType()) {
       if (null != handler || null != sslFactory) {
         throw new IllegalStateException("Handlers and SSLFactory cannot be configured with "
-                + "HTTPServer Builder when using CUSTOM Authentication Type.");
+                + "the HTTPServer Builder when using CUSTOM Authentication Type.");
       }
     } else {
       serverConnector = configureServerConnector();
@@ -251,7 +251,9 @@ public class HttpServer {
         throw new RuntimeException(e);
       }
     } else if (0 == server.getConnectors().length) {
-      LOG.warn("No server connectors have been configured for this Avatica server.");
+      String error = "No server connectors have been configured for this Avatica server";
+      LOG.error(error);
+      throw new RuntimeException(error);
     }
   }
 
