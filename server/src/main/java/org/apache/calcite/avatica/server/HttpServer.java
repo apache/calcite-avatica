@@ -688,6 +688,16 @@ public class HttpServer {
       return withAuthentication(AuthenticationType.DIGEST, properties, allowedRoles);
     }
 
+    /**
+     * Configures the server to use CUSTOM authentication mechanism, which can allow users to
+     * combine benefits of multiple auth methods. See <code>CustomAuthHttpServerTest</code> for
+     * examples on how to use it.
+     * Note: Default ServerConnectors and Handlers will NOT be used.
+     * Customize them directly using instances <code>{@link ServerCustomizer}</code>
+     * @param config AvaticaServerConfiguration implementation that configures various details
+     *      about the authentication mechanism for <code>{@link HttpServer}</code>
+     * @return <code>this</code>
+     */
     public Builder<T> withCustomAuthentication(AvaticaServerConfiguration config) {
       this.authenticationType = AuthenticationType.CUSTOM;
       this.serverConfig = config;
