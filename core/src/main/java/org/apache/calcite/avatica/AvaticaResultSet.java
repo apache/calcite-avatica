@@ -76,7 +76,7 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
       Meta.Signature signature,
       ResultSetMetaData resultSetMetaData,
       TimeZone timeZone,
-      Meta.Frame firstFrame) {
+      Meta.Frame firstFrame) throws SQLException {
     super(timeZone);
     this.statement = statement;
     this.state = state;
@@ -108,9 +108,15 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
         return columnMetaData.ordinal; // 0-based
       }
     }
-    throw new SQLException("column '" + columnLabel + "' not found");
+    throw AvaticaConnection.HELPER.createException("column '" + columnLabel
+        + "' not found");
   }
 
+  protected void checkOpen() throws SQLException {
+    if (isClosed()) {
+      throw AvaticaConnection.HELPER.createException("ResultSet closed");
+    }
+  }
   /**
    * Returns the accessor for column with a given index.
    *
@@ -119,10 +125,12 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
    * @throws SQLException if index is not valid
    */
   private Cursor.Accessor getAccessor(int columnIndex) throws SQLException {
+    checkOpen();
     try {
       return accessorList.get(columnIndex - 1);
     } catch (IndexOutOfBoundsException e) {
-      throw new SQLException("invalid column ordinal: " + columnIndex);
+      throw AvaticaConnection.HELPER.createException(
+          "invalid column ordinal: " + columnIndex);
     }
   }
 
@@ -134,6 +142,7 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
    * @throws SQLException if there is no column with that label
    */
   private Cursor.Accessor getAccessor(String columnLabel) throws SQLException {
+    checkOpen();
     return accessorList.get(findColumn0(columnLabel));
   }
 
@@ -201,11 +210,9 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
 
   public boolean next() throws SQLException {
     // TODO: for timeout, see IteratorResultSet.next
-    if (isClosed()) {
-      throw new SQLException("next() called on closed cursor");
-    }
+    checkOpen();
     if (null != statement && statement.cancelFlag.get()) {
-      throw new SQLException("Statement canceled");
+      throw AvaticaConnection.HELPER.createException("Statement canceled");
     }
     if (cursor.next()) {
       ++row;
@@ -219,10 +226,12 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
   }
 
   public int findColumn(String columnLabel) throws SQLException {
+    checkOpen();
     return findColumn0(columnLabel) + 1;
   }
 
   public boolean wasNull() throws SQLException {
+    checkOpen();
     return cursor.wasNull();
   }
 
@@ -258,7 +267,6 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
     return getAccessor(columnIndex).getDouble();
   }
 
-  @SuppressWarnings("deprecation")
   public BigDecimal getBigDecimal(
       int columnIndex, int scale) throws SQLException {
     return getAccessor(columnIndex).getBigDecimal(scale);
@@ -284,7 +292,6 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
     return getAccessor(columnIndex).getAsciiStream();
   }
 
-  @SuppressWarnings("deprecation")
   public InputStream getUnicodeStream(int columnIndex) throws SQLException {
     return getAccessor(columnIndex).getUnicodeStream();
   }
@@ -325,7 +332,6 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
     return getAccessor(columnLabel).getDouble();
   }
 
-  @SuppressWarnings("deprecation")
   public BigDecimal getBigDecimal(
       String columnLabel, int scale) throws SQLException {
     return getAccessor(columnLabel).getBigDecimal(scale);
@@ -351,7 +357,6 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
     return getAccessor(columnLabel).getAsciiStream();
   }
 
-  @SuppressWarnings("deprecation")
   public InputStream getUnicodeStream(String columnLabel) throws SQLException {
     return getAccessor(columnLabel).getUnicodeStream();
   }
@@ -361,18 +366,20 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
   }
 
   public SQLWarning getWarnings() throws SQLException {
+    checkOpen();
     return null; // no warnings, since warnings are not supported
   }
 
   public void clearWarnings() throws SQLException {
-    // no-op since warnings are not supported
+    checkOpen();
   }
 
   public String getCursorName() throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public ResultSetMetaData getMetaData() throws SQLException {
+    checkOpen();
     return resultSetMetaData;
   }
 
@@ -403,283 +410,297 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
   }
 
   public boolean isBeforeFirst() throws SQLException {
+    checkOpen();
     return beforeFirst;
   }
 
   public boolean isAfterLast() throws SQLException {
+    checkOpen();
     return afterLast;
   }
 
   public boolean isFirst() throws SQLException {
+    checkOpen();
     return row == 1;
   }
 
   public boolean isLast() throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void beforeFirst() throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void afterLast() throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public boolean first() throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public boolean last() throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public int getRow() throws SQLException {
+    checkOpen();
     return row;
   }
 
   public boolean absolute(int row) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public boolean relative(int rows) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public boolean previous() throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void setFetchDirection(int direction) throws SQLException {
+    checkOpen();
     this.fetchDirection = direction;
   }
 
   public int getFetchDirection() throws SQLException {
+    checkOpen();
     return fetchDirection;
   }
 
   public void setFetchSize(int fetchSize) throws SQLException {
+    checkOpen();
     this.fetchSize = fetchSize;
   }
 
   public int getFetchSize() throws SQLException {
+    checkOpen();
     return fetchSize;
   }
 
   public int getType() throws SQLException {
+    checkOpen();
     return type;
   }
 
   public int getConcurrency() throws SQLException {
+    checkOpen();
     return concurrency;
   }
 
   public boolean rowUpdated() throws SQLException {
+    checkOpen();
     return false;
   }
 
   public boolean rowInserted() throws SQLException {
+    checkOpen();
     return false;
   }
 
   public boolean rowDeleted() throws SQLException {
+    checkOpen();
     return false;
   }
 
   public void updateNull(int columnIndex) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBoolean(int columnIndex, boolean x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateByte(int columnIndex, byte x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateShort(int columnIndex, short x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateInt(int columnIndex, int x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateLong(int columnIndex, long x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateFloat(int columnIndex, float x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateDouble(int columnIndex, double x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBigDecimal(
       int columnIndex, BigDecimal x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateString(int columnIndex, String x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBytes(int columnIndex, byte[] x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateDate(int columnIndex, Date x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateTime(int columnIndex, Time x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateTimestamp(
       int columnIndex, Timestamp x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateAsciiStream(
       int columnIndex, InputStream x, int length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBinaryStream(
       int columnIndex, InputStream x, int length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateCharacterStream(
       int columnIndex, Reader x, int length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateObject(
       int columnIndex, Object x, int scaleOrLength) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateObject(int columnIndex, Object x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateNull(String columnLabel) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBoolean(
       String columnLabel, boolean x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateByte(String columnLabel, byte x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateShort(String columnLabel, short x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateInt(String columnLabel, int x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateLong(String columnLabel, long x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateFloat(String columnLabel, float x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateDouble(String columnLabel, double x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBigDecimal(
       String columnLabel, BigDecimal x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateString(String columnLabel, String x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBytes(String columnLabel, byte[] x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateDate(String columnLabel, Date x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateTime(String columnLabel, Time x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateTimestamp(
       String columnLabel, Timestamp x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateAsciiStream(
       String columnLabel, InputStream x, int length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBinaryStream(
       String columnLabel, InputStream x, int length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateCharacterStream(
       String columnLabel, Reader reader, int length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateObject(
       String columnLabel, Object x, int scaleOrLength) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateObject(String columnLabel, Object x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void insertRow() throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateRow() throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void deleteRow() throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void refreshRow() throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void cancelRowUpdates() throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void moveToInsertRow() throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void moveToCurrentRow() throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public AvaticaStatement getStatement() throws SQLException {
+    checkOpen();
     return statement;
   }
 
@@ -760,54 +781,55 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
   }
 
   public void updateRef(int columnIndex, Ref x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateRef(String columnLabel, Ref x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBlob(int columnIndex, Blob x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBlob(String columnLabel, Blob x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateClob(int columnIndex, Clob x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateClob(String columnLabel, Clob x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateArray(int columnIndex, Array x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateArray(String columnLabel, Array x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public RowId getRowId(int columnIndex) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public RowId getRowId(String columnLabel) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateRowId(int columnIndex, RowId x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateRowId(String columnLabel, RowId x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public int getHoldability() throws SQLException {
+    checkOpen();
     return holdability;
   }
 
@@ -817,21 +839,21 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
 
   public void updateNString(
       int columnIndex, String nString) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateNString(
       String columnLabel, String nString) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateNClob(int columnIndex, NClob nClob) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateNClob(
       String columnLabel, NClob nClob) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public NClob getNClob(int columnIndex) throws SQLException {
@@ -852,12 +874,12 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
 
   public void updateSQLXML(
       int columnIndex, SQLXML xmlObject) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateSQLXML(
       String columnLabel, SQLXML xmlObject) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public String getNString(int columnIndex) throws SQLException {
@@ -878,145 +900,145 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
 
   public void updateNCharacterStream(
       int columnIndex, Reader x, long length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateNCharacterStream(
       String columnLabel, Reader reader, long length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateAsciiStream(
       int columnIndex, InputStream x, long length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBinaryStream(
       int columnIndex, InputStream x, long length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateCharacterStream(
       int columnIndex, Reader x, long length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateAsciiStream(
       String columnLabel, InputStream x, long length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBinaryStream(
       String columnLabel, InputStream x, long length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateCharacterStream(
       String columnLabel, Reader reader, long length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBlob(
       int columnIndex,
       InputStream inputStream,
       long length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBlob(
       String columnLabel,
       InputStream inputStream,
       long length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateClob(
       int columnIndex, Reader reader, long length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateClob(
       String columnLabel, Reader reader, long length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateNClob(
       int columnIndex, Reader reader, long length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateNClob(
       String columnLabel, Reader reader, long length) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateNCharacterStream(
       int columnIndex, Reader x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateNCharacterStream(
       String columnLabel, Reader reader) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateAsciiStream(
       int columnIndex, InputStream x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBinaryStream(
       int columnIndex, InputStream x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateCharacterStream(
       int columnIndex, Reader x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateAsciiStream(
       String columnLabel, InputStream x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBinaryStream(
       String columnLabel, InputStream x) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateCharacterStream(
       String columnLabel, Reader reader) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBlob(
       int columnIndex, InputStream inputStream) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateBlob(
       String columnLabel, InputStream inputStream) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateClob(int columnIndex, Reader reader) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateClob(
       String columnLabel, Reader reader) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateNClob(
       int columnIndex, Reader reader) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public void updateNClob(
       String columnLabel, Reader reader) throws SQLException {
-    throw statement.connection.HELPER.unsupported();
+    throw AvaticaConnection.HELPER.unsupported();
   }
 
   public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
@@ -1032,7 +1054,7 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
     if (iface.isInstance(this)) {
       return iface.cast(this);
     }
-    throw statement.connection.HELPER.createException(
+    throw AvaticaConnection.HELPER.createException(
         "does not implement '" + iface + "'");
   }
 
