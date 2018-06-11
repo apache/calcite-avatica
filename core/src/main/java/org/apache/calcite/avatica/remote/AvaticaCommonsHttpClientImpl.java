@@ -81,7 +81,8 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
   protected final URI uri;
   protected BasicAuthCache authCache;
   protected CloseableHttpClient client;
-  PoolingHttpClientConnectionManager pool;
+  protected Registry<ConnectionSocketFactory> socketFactoryRegistry;
+  protected PoolingHttpClientConnectionManager pool;
 
   protected UsernamePasswordCredentials credentials = null;
   protected CredentialsProvider credentialsProvider = null;
@@ -102,8 +103,8 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
   }
 
   private void initializeClient() {
-    Registry<ConnectionSocketFactory> configureSocketFactory = configureSocketFactories();
-    configureConnectionPool(configureSocketFactory);
+    socketFactoryRegistry = this.configureSocketFactories();
+    configureConnectionPool(socketFactoryRegistry);
     this.authCache = new BasicAuthCache();
     // A single thread-safe HttpClient, pooling connections via the ConnectionManager
     this.client = HttpClients.custom().setConnectionManager(pool).build();
@@ -136,18 +137,7 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
     }
 
     try {
-      SSLContextBuilder sslContextBuilder = SSLContexts.custom();
-
-      if (null != truststore && null != truststorePassword) {
-        sslContextBuilder.loadTrustMaterial(truststore, truststorePassword.toCharArray());
-      }
-
-      if (null != keystore && null != keystorePassword && null != keyPassword) {
-        sslContextBuilder.loadKeyMaterial(keystore,
-                keystorePassword.toCharArray(), keyPassword.toCharArray());
-      }
-
-      SSLContext sslContext = sslContextBuilder.build();
+      SSLContext sslContext = getSSLContext();
       final HostnameVerifier verifier = getHostnameVerifier(hostnameVerification);
       SSLConnectionSocketFactory sslFactory = new SSLConnectionSocketFactory(sslContext, verifier);
       registryBuilder.register("https", sslFactory);
@@ -155,6 +145,26 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
       LOG.error("HTTPS registry configuration failed");
       throw new RuntimeException(e);
     }
+  }
+
+  private SSLContext getSSLContext() throws Exception {
+    SSLContextBuilder sslContextBuilder = SSLContexts.custom();
+    if (null != truststore && null != truststorePassword) {
+      loadTrustStore(sslContextBuilder);
+    }
+    if (null != keystore && null != keystorePassword && null != keyPassword) {
+      loadKeyStore(sslContextBuilder);
+    }
+    return sslContextBuilder.build();
+  }
+
+  protected void loadKeyStore(SSLContextBuilder sslContextBuilder) throws Exception {
+    sslContextBuilder.loadKeyMaterial(keystore,
+            keystorePassword.toCharArray(), keyPassword.toCharArray());
+  }
+
+  protected void loadTrustStore(SSLContextBuilder sslContextBuilder) throws Exception {
+    sslContextBuilder.loadTrustMaterial(truststore, truststorePassword.toCharArray());
   }
 
   protected void configureHttpRegistry(RegistryBuilder<ConnectionSocketFactory> registryBuilder) {
