@@ -66,8 +66,8 @@ import javax.net.ssl.SSLContext;
  * sent and received across the wire.
  */
 public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
-    UsernamePasswordAuthenticateable, TrustStoreConfigurable
-        , KeyStoreConfigurable, HostnameVerificationConfigurable {
+    UsernamePasswordAuthenticateable, TrustStoreConfigurable,
+        KeyStoreConfigurable, HostnameVerificationConfigurable {
   private static final Logger LOG = LoggerFactory.getLogger(AvaticaCommonsHttpClientImpl.class);
 
   // Some basic exposed configurations
