@@ -110,8 +110,8 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
     this.client = HttpClients.custom().setConnectionManager(pool).build();
   }
 
-  protected void configureConnectionPool(Registry<ConnectionSocketFactory> configureSocketFactory) {
-    pool = new PoolingHttpClientConnectionManager(configureSocketFactory);
+  protected void configureConnectionPool(Registry<ConnectionSocketFactory> registry) {
+    pool = new PoolingHttpClientConnectionManager(registry);
     // Increase max total connection to 100
     final String maxCnxns =
         System.getProperty(MAX_POOLED_CONNECTIONS_KEY,
@@ -125,8 +125,11 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
 
   protected Registry<ConnectionSocketFactory> configureSocketFactories() {
     RegistryBuilder<ConnectionSocketFactory> registryBuilder = RegistryBuilder.create();
-    configureHttpRegistry(registryBuilder);
-    configureHttpsRegistry(registryBuilder);
+    if (host.getSchemeName().equalsIgnoreCase("https")) {
+      configureHttpsRegistry(registryBuilder);
+    } else {
+      configureHttpRegistry(registryBuilder);
+    }
     return registryBuilder.build();
   }
 

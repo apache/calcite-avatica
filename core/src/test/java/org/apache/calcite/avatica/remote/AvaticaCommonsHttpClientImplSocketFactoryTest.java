@@ -21,7 +21,6 @@ import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.ssl.SSLContextBuilder;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -50,21 +49,8 @@ public class AvaticaCommonsHttpClientImplSocketFactoryTest {
   private File storeFile;
   private String password;
 
-  @Before public void beforeClass() throws Exception {
-    url = new URL("https://fake_url.com");
-    client = spy(new AvaticaCommonsHttpClientImpl(url));
-
-    // storeFile can be used as either Keystore/Truststore
-    storeFile = mock(File.class);
-    when(storeFile.exists()).thenReturn(true);
-    when(storeFile.isFile()).thenReturn(true);
-    password = new String("");
-
-    doNothing().when(client).loadTrustStore(any(SSLContextBuilder.class));
-    doNothing().when(client).loadKeyStore(any(SSLContextBuilder.class));
-  }
-
   @Test public void testPlainSocketFactory() throws Exception {
+    configureHttpClient();
     assertFalse("Https socket should not be configured"
             + " without truststore/keystore", client.configureHttpsSocket);
     verifyFactoryInstance(client, HTTP_REGISTRY, PlainConnectionSocketFactory.class);
@@ -74,9 +60,11 @@ public class AvaticaCommonsHttpClientImplSocketFactoryTest {
   }
 
   @Test public void testTrustStoreLoadedInFactory() throws Exception {
+    configureHttpsClient();
     client.setTrustStore(storeFile, password);
     assertTrue("Https socket should be configured"
             + " with truststore", client.configureHttpsSocket);
+    verifyFactoryInstance(client, HTTP_REGISTRY, null);
     verifyFactoryInstance(client, HTTPS_REGISTRY, SSLConnectionSocketFactory.class);
     verify(client, times(1)).configureSocketFactories();
     verify(client, times(1)).loadTrustStore(any(SSLContextBuilder.class));
@@ -84,13 +72,37 @@ public class AvaticaCommonsHttpClientImplSocketFactoryTest {
   }
 
   @Test public void testKeyStoreLoadedInFactory() throws Exception {
+    configureHttpsClient();
     client.setKeyStore(storeFile, password, password);
     assertTrue("Https socket should be configured"
             + " with keystore", client.configureHttpsSocket);
+    verifyFactoryInstance(client, HTTP_REGISTRY, null);
     verifyFactoryInstance(client, HTTPS_REGISTRY, SSLConnectionSocketFactory.class);
     verify(client, times(1)).configureSocketFactories();
     verify(client, times(0)).loadTrustStore(any(SSLContextBuilder.class));
     verify(client, times(1)).loadKeyStore(any(SSLContextBuilder.class));
+  }
+
+  private void configureHttpClient() throws Exception {
+    url = new URL("http://fake_url.com");
+    configureClient();
+  }
+
+  private void configureHttpsClient() throws Exception {
+    url = new URL("https://fake_url.com");
+    configureClient();
+  }
+
+  private void configureClient() throws Exception {
+    client = spy(new AvaticaCommonsHttpClientImpl(url));
+    // storeFile can be used as either Keystore/Truststore
+    storeFile = mock(File.class);
+    when(storeFile.exists()).thenReturn(true);
+    when(storeFile.isFile()).thenReturn(true);
+    password = new String("");
+
+    doNothing().when(client).loadTrustStore(any(SSLContextBuilder.class));
+    doNothing().when(client).loadKeyStore(any(SSLContextBuilder.class));
   }
 
   <T> void verifyFactoryInstance(AvaticaCommonsHttpClientImpl client,
