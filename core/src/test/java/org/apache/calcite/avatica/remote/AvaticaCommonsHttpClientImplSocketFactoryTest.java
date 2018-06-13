@@ -99,7 +99,7 @@ public class AvaticaCommonsHttpClientImplSocketFactoryTest {
     storeFile = mock(File.class);
     when(storeFile.exists()).thenReturn(true);
     when(storeFile.isFile()).thenReturn(true);
-    password = new String("");
+    password = "";
 
     doNothing().when(client).loadTrustStore(any(SSLContextBuilder.class));
     doNothing().when(client).loadKeyStore(any(SSLContextBuilder.class));
