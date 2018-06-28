@@ -225,7 +225,7 @@ public class ArrayImpl implements Array {
     ResultSet leftResultSet = left.getResultSet();
     ResultSet rightResultSet = right.getResultSet();
     while (leftResultSet.next() && rightResultSet.next()) {
-      if (!Objects.equals(leftResultSet.getObject(1), (rightResultSet.getObject(1)))) {
+      if (!Objects.equals(leftResultSet.getObject(1), rightResultSet.getObject(1))) {
         return false;
       }
     }
