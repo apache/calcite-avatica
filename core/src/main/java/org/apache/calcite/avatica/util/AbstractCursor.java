@@ -967,7 +967,7 @@ public abstract class AbstractCursor implements Cursor {
       if (v == null) {
         return null;
       }
-      return longToTimestamp(v.longValue(), calendar);
+      return new Timestamp(v.longValue());
     }
 
     @Override public String getString() throws SQLException {
@@ -1001,7 +1001,7 @@ public abstract class AbstractCursor implements Cursor {
       if (v == null) {
         return null;
       }
-      return longToTimestamp(v.longValue(), calendar);
+      return new Timestamp(v.longValue());
     }
 
     @Override public Date getDate(Calendar calendar) throws SQLException {
@@ -1022,12 +1022,29 @@ public abstract class AbstractCursor implements Cursor {
               DateTimeUtils.MILLIS_PER_DAY));
     }
 
+    @Override public float getFloat() throws SQLException {
+      throw cannotConvert("float");
+    }
+
+    @Override public double getDouble() throws SQLException {
+      throw cannotConvert("double");
+    }
+
+    @Override public BigDecimal getBigDecimal(int scale) throws SQLException {
+      throw cannotConvert("BigDecimal");
+    }
+
     @Override public String getString() throws SQLException {
       final Number v = getNumber();
       if (v == null) {
         return null;
       }
       return timestampAsString(v.longValue(), null);
+    }
+
+    private SQLException cannotConvert(String targetType) throws SQLException {
+      return new SQLDataException("cannot convert to " + targetType + " ("
+              + this + ")");
     }
   }
 
@@ -1120,14 +1137,6 @@ public abstract class AbstractCursor implements Cursor {
 
     @Override public Timestamp getTimestamp(Calendar calendar) throws SQLException {
       Timestamp timestamp  = (Timestamp) getObject();
-      if (timestamp == null) {
-        return null;
-      }
-      if (calendar != null) {
-        long v = timestamp.getTime();
-        v -= calendar.getTimeZone().getOffset(v);
-        timestamp = new Timestamp(v);
-      }
       return timestamp;
     }
 

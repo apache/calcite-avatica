@@ -55,8 +55,10 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.assertEquals;
@@ -154,14 +156,18 @@ public class AvaticaResultSetConversionsTest {
               ColumnMetaData.scalar(Types.TIMESTAMP, "TIMESTAMP",
                   ColumnMetaData.Rep.JAVA_SQL_TIMESTAMP),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("array", 11,
+          columnMetaData("timestamp_from_number", 11,
+              ColumnMetaData.scalar(Types.TIMESTAMP, "TIMESTAMP",
+                  ColumnMetaData.Rep.NUMBER),
+              DatabaseMetaData.columnNoNulls),
+          columnMetaData("array", 12,
               ColumnMetaData.array(
                   ColumnMetaData.scalar(Types.INTEGER, "INTEGER",
                       ColumnMetaData.Rep.PRIMITIVE_INT),
                   "ARRAY",
                   ColumnMetaData.Rep.ARRAY),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("struct", 12,
+          columnMetaData("struct", 13,
               ColumnMetaData.struct(
                   Arrays.asList(
                       columnMetaData("int", 0,
@@ -174,11 +180,14 @@ public class AvaticaResultSetConversionsTest {
                           DatabaseMetaData.columnNoNulls))),
               DatabaseMetaData.columnNoNulls));
 
+      // 2016-10-10 20:18:38.123Z
       List<Object> row = Collections.<Object>singletonList(
           new Object[] {
               true, (byte) 1, (short) 2, 3, 4L, 5.0f, 6.0d, "testvalue",
-              new Date(1476130718123L), new Time(1476130718123L),
+              new Date(1476130718123L),
+              new Time(1476130718123L),
               new Timestamp(1476130718123L),
+              1476130718123L,
               Arrays.asList(1, 2, 3),
               new StructImpl(Arrays.asList(42, false))
           });
@@ -980,6 +989,9 @@ public class AvaticaResultSetConversionsTest {
   }
 
   private static final Calendar DEFAULT_CALENDAR = DateTimeUtils.calendar();
+  private static final Calendar TOKYO_CALENDAR = Calendar.getInstance(
+      TimeZone.getTimeZone("Asia/Tokyo"),
+      Locale.ROOT);
 
   private static Connection connection = null;
   private static ResultSet resultSet = null;
@@ -1030,9 +1042,11 @@ public class AvaticaResultSetConversionsTest {
         new TimeAccessorTestHelper(new LabelGetter("time")),
         new TimestampAccessorTestHelper(new OrdinalGetter(11)),
         new TimestampAccessorTestHelper(new LabelGetter("timestamp")),
-        new ArrayAccessorTestHelper(new OrdinalGetter(12)),
+        new TimestampAccessorTestHelper(new OrdinalGetter(12)),
+        new TimestampAccessorTestHelper(new LabelGetter("timestamp_from_number")),
+        new ArrayAccessorTestHelper(new OrdinalGetter(13)),
         new ArrayAccessorTestHelper(new LabelGetter("array")),
-        new StructAccessorTestHelper(new OrdinalGetter(13)),
+        new StructAccessorTestHelper(new OrdinalGetter(14)),
         new StructAccessorTestHelper(new LabelGetter("struct")));
   }
 
@@ -1148,8 +1162,13 @@ public class AvaticaResultSetConversionsTest {
   }
 
   @Test
-  public void testGetTimestamp() throws SQLException {
+  public void testGetTimestampDefaultCalendar() throws SQLException {
     testHelper.testGetTimestamp(resultSet, DEFAULT_CALENDAR);
+  }
+
+  @Test
+  public void testGetTimestampNonzeroCalendar() throws SQLException {
+    testHelper.testGetTimestamp(resultSet, TOKYO_CALENDAR);
   }
 
   @Test
