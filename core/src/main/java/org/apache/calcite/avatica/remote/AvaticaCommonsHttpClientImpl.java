@@ -220,9 +220,8 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
         final int statusCode = response.getStatusLine().getStatusCode();
         if (HttpURLConnection.HTTP_OK == statusCode
             || HttpURLConnection.HTTP_INTERNAL_ERROR == statusCode) {
-          byte[] bytes = EntityUtils.toByteArray(response.getEntity());
           userToken = context.getUserToken();
-          return bytes;
+          return EntityUtils.toByteArray(response.getEntity());
         } else if (HttpURLConnection.HTTP_UNAVAILABLE == statusCode) {
           LOG.debug("Failed to connect to server (HTTP/503), retrying");
           continue;
