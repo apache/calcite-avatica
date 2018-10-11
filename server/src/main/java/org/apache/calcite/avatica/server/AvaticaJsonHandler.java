@@ -111,9 +111,11 @@ public class AvaticaJsonHandler extends AbstractAvaticaHandler {
             // Reset the offset into the buffer after we're done
             buffer.reset();
           }
+        } else {
+          rawRequest =
+                  new String(rawRequest.getBytes("ISO-8859-1"), "UTF-8");
         }
-        final String jsonRequest =
-            new String(rawRequest.getBytes("ISO-8859-1"), "UTF-8");
+        final String jsonRequest = rawRequest;
         LOG.trace("request: {}", jsonRequest);
 
         HandlerResponse<String> jsonResponse;
