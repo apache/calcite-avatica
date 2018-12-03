@@ -28,7 +28,7 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.13.0">1.13.0</a> / 2018-11-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.13.0">1.13.0</a> / 2018-12-04
 {: #v1-13-0}
 
 Apache Calcite Avatica 1.13.0 includes around 30 bugs fixes and enhancements. This release adds the ability to
