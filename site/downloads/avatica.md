@@ -51,7 +51,10 @@ Release          | Date       | Commit   | Download
 {% endcomment %}{% capture d2 %}2017-05-01{% endcapture %}{% comment %}
 {% endcomment %}{% capture d3 %}2018-03-01{% endcapture %}{% comment %}
 {% endcomment %}{% capture d4 %}2018-06-01{% endcapture %}{% comment %}
-{% endcomment %}{% if d1 > d3 %}{% comment %}
+{% endcomment %}{% capture d5 %}2018-12-01{% endcapture %}{% comment %}
+{% endcomment %}{% if d1 > d5 %}{% comment %}
+{% endcomment %}{% assign digest = "sha512" %}{% comment %}
+{% endcomment %}{% elsif d1 > d3 %}{% comment %}
 {% endcomment %}{% assign digest = "sha256" %}{% comment %}
 {% endcomment %}{% elsif d1 > d2 %}{% comment %}
 {% endcomment %}{% assign digest = "mds" %}{% comment %}
@@ -60,7 +63,7 @@ Release          | Date       | Commit   | Download
 {% endcomment %}{% endif %}{% comment %}
 {% endcomment %}<a href="{{ site.baseurl }}/docs/history.html#{{ post.tag }}">{{ post.version }}</a>{% comment %}
 {% endcomment %} | {{ post.date | date_to_string }}{% comment %}
-{% endcomment %} | <a href="https://github.com/apache/calcite-avatica/commit/{{ post.sha }}">{{ post.sha }}</a>{% comment %}
+{% endcomment %} | {{ post.sha }}{% comment %}
 {% endcomment %} | <a href="{{ p }}/{{ v }}-src.tar.gz{{ q }}">tar</a>{% comment %}
 {% endcomment %} (<a href="{{ d }}/calcite/{{ v }}/{{ v }}-src.tar.gz.{{ digest }}">{{ digest }}</a>{% comment %}
 {% endcomment %} <a href="{{ d }}/calcite/{{ v }}/{{ v }}-src.tar.gz.asc">pgp</a>){% comment %}
