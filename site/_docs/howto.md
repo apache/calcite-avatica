@@ -413,7 +413,7 @@ Thanks to everyone who has contributed to this release.
 https://github.com/apache/calcite-avatica/blob/XXXX/site/_docs/history.md
 
 The commit to be voted upon:
-http://git-wip-us.apache.org/repos/asf/calcite-avatica/commit/NNNNNN
+https://gitbox.apache.org/repos/asf/calcite-avatica/commit/NNNNNN
 
 Its hash is XXXX.
 

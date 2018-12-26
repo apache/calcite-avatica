@@ -115,8 +115,8 @@ limitations under the License.
     <url>https://builds.apache.org/job/Calcite-Avatica-Master/</url>
   </ciManagement>
   <scm>
-    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/calcite-avatica.git</connection>
-    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/calcite-avatica.git</developerConnection>
+    <connection>scm:git:https://gitbox.apache.org/repos/asf/calcite-avatica.git</connection>
+    <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/calcite-avatica.git</developerConnection>
     <url>https://github.com/apache/calcite-avatica</url>
     <tag>HEAD</tag>
   </scm>

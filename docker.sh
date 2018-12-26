@@ -195,7 +195,7 @@ set_git_credentials(){
 
     printf "\n"
 
-    echo https://$ASF_USERNAME:$ASF_PASSWORD@git-wip-us.apache.org >> /root/.git-credentials
+    echo https://$ASF_USERNAME:$ASF_PASSWORD@gitbox.apache.org >> /root/.git-credentials
     git config --global credential.helper 'store --file=/root/.git-credentials'
 
     git config --global user.name "$NAME"

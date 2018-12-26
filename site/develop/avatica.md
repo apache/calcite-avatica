@@ -34,9 +34,9 @@ You can get the source code by
 or from source control.
 
 Calcite uses git for version control.  The canonical source is in
-[Apache](https://git-wip-us.apache.org/repos/asf/calcite.git),
+[Apache](https://gitbox.apache.org/repos/asf/calcite-avatica.gitbox),
 but most people find the
-[Github mirror](https://github.com/apache/calcite-avatica) more
+[GitHub mirror](https://github.com/apache/calcite-avatica) more
 user-friendly.
 
 ## Download source, build, and run tests

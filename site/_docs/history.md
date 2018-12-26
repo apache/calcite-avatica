@@ -275,9 +275,9 @@ Web site and documentation
 {: #v1-10-0}
 
 Apache Calcite Avatica 1.10.0 is the first release since
-[Avatica's git repository](https://git-wip-us.apache.org/repos/asf/calcite-avatica.git)
+[Avatica's git repository](https://gitbox.apache.org/repos/asf/calcite-avatica.git)
 separated from
-[Calcite's repository](https://git-wip-us.apache.org/repos/asf/calcite.git) in
+[Calcite's repository](https://gitbox.apache.org/repos/asf/calcite.git) in
 [[CALCITE-1717](https://issues.apache.org/jira/browse/CALCITE-1717)].
 Avatica now runs on JDK 9 (and continues to run on JDK 7 and 8),
 and there is now a Docker image for an Avatica server.

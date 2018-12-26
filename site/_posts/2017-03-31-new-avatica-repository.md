@@ -33,5 +33,5 @@ out of the Calcite repository, given the continue maturation of Avatica. For dev
 and contributors to Avatica, nothing will functionally change, except for the location
 of the code itself.
 
-The de-facto repository can be found at the ASF's [Git hosting](https://git-wip-us.apache.org/repos/asf/calcite-avatica.git),
+The de-facto repository can be found at the ASF's [Git hosting](https://gitbox.apache.org/repos/asf/calcite-avatica.git),
 with a mirrored-copy also available on Github at [apache/calcite-avatica](https://github.com/apache/calcite-avatica).
