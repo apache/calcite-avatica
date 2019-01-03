@@ -63,7 +63,7 @@ Release          | Date       | Commit   | Download
 {% endcomment %}{% endif %}{% comment %}
 {% endcomment %}<a href="{{ site.baseurl }}/docs/go_history.html#{{ post.tag }}">{{ post.version }}</a>{% comment %}
 {% endcomment %} | {{ post.date | date_to_string }}{% comment %}
-{% endcomment %} | {{ post.sha }}{% comment %}
+{% endcomment %} | <a href="https://github.com/apache/calcite-avatica-go/commit/{{ post.sha }}">{{ post.sha }}</a>{% comment %}
 {% endcomment %}{% if d1 < d5 %}{% comment %}
 {% endcomment %} | <a href="{{ p }}/{{ f }}.tar.gz{{ q }}">tar</a>{% comment %}
 {% endcomment %} (<a href="{{ d }}/calcite/{{ v }}/{{ f }}.tar.gz.{{ digest }}">{{ digest }}</a>{% comment %}
