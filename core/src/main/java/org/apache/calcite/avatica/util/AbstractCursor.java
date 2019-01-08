@@ -202,12 +202,8 @@ public abstract class AbstractCursor implements Cursor {
             (ColumnMetaData.StructType) columnMetaData.type;
         List<Accessor> accessors = new ArrayList<>();
         for (ColumnMetaData column : structType.columns) {
-          final Getter fieldGetter =
-              structType.columns.size() == 1
-                  ? getter
-                  : new StructGetter(getter, column);
           accessors.add(
-              createAccessor(column, fieldGetter, localCalendar, factory));
+              createAccessor(column, new StructGetter(getter, column), localCalendar, factory));
         }
         return new StructAccessor(getter, accessors);
       default:
