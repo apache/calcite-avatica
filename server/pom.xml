@@ -146,6 +146,24 @@ limitations under the License.
       <artifactId>bcprov-jdk15on</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-catalyst_2.11</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-sql_2.11</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Used by Spark but wrong Jackson version -->
+      <!-- Used by Spark but dependency not detected by maven-dependency-plugin:2.8:analyze -->
+      <groupId>com.fasterxml.jackson.module</groupId>
+      <artifactId>jackson-module-scala_2.11</artifactId>
+      <version>${jackson.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -181,6 +199,7 @@ limitations under the License.
               <failOnWarning>true</failOnWarning>
               <!-- ignore "unused but declared" warnings -->
               <ignoredUnusedDeclaredDependencies>
+                <ignoredUnusedDeclaredDependency>com.fasterxml.jackson.module:jackson-module-scala_2.11</ignoredUnusedDeclaredDependency>
                 <ignoredUnusedDeclaredDependency>io.dropwizard.metrics:metrics-core</ignoredUnusedDeclaredDependency>
                 <ignoredUnusedDeclaredDependency>net.hydromatic:scott-data-hsqldb</ignoredUnusedDeclaredDependency>
                 <ignoredUnusedDeclaredDependency>org.hsqldb:hsqldb</ignoredUnusedDeclaredDependency>
