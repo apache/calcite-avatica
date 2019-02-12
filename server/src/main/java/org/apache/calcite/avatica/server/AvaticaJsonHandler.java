@@ -106,14 +106,18 @@ public class AvaticaJsonHandler extends AbstractAvaticaHandler {
           // Avoid a new buffer creation for every HTTP request
           final UnsynchronizedBuffer buffer = threadLocalBuffer.get();
           try (ServletInputStream inputStream = request.getInputStream()) {
-            rawRequest = AvaticaUtils.readFully(inputStream, buffer);
+            byte[] bytes = AvaticaUtils.readFullyToBytes(inputStream, buffer);
+            String encoding = request.getCharacterEncoding();
+            if (encoding == null) {
+              encoding = "UTF-8";
+            }
+            rawRequest = new String(bytes, encoding);
           } finally {
             // Reset the offset into the buffer after we're done
             buffer.reset();
           }
         }
-        final String jsonRequest =
-            new String(rawRequest.getBytes("ISO-8859-1"), "UTF-8");
+        final String jsonRequest = rawRequest;
         LOG.trace("request: {}", jsonRequest);
 
         HandlerResponse<String> jsonResponse;
