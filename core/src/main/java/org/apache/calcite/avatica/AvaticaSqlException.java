@@ -82,7 +82,10 @@ public class AvaticaSqlException extends SQLException {
   }
 
   void printServerStackTrace(PrintStreamOrWriter streamOrWriter) {
-    for (String serverStackTrace : this.stackTraces) {
+    List<String> traces = this.stackTraces;
+    for (int i = 0; i < traces.size(); i++) {
+      String serverStackTrace = traces.get(i);
+      streamOrWriter.println("Remote driver error #" + i + ":");
       streamOrWriter.println(serverStackTrace);
     }
   }

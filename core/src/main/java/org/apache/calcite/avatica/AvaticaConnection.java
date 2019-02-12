@@ -552,9 +552,11 @@ public abstract class AvaticaConnection implements Connection {
           statement.updateCount = metaResultSet.updateCount;
           signature2 = executeResult.resultSets.get(0).signature;
         }
+      } catch (SQLException e) {
+        // We don't add meaningful info yet, so just rethrow the original exception
+        throw e;
       } catch (Exception e) {
-        e.printStackTrace();
-        throw HELPER.createException(e.getMessage(), e);
+        throw HELPER.createException("Error while executing a prepared statement", e);
       }
 
       final TimeZone timeZone = getTimeZone();
@@ -573,9 +575,12 @@ public abstract class AvaticaConnection implements Connection {
         statement.openResultSet.execute();
         isUpdateCapable(statement);
       }
+    } catch (SQLException e) {
+      // We don't add meaningful info yet, so just rethrow the original exception
+      throw e;
     } catch (Exception e) {
       throw HELPER.createException(
-          "exception while executing query: " + e.getMessage(), e);
+          "Error while executing a resultset", e);
     }
     return statement.openResultSet;
   }

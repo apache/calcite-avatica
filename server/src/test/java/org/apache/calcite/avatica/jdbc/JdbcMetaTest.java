@@ -50,13 +50,11 @@ public class JdbcMetaTest {
   @Test public void testExceptionPropagation() throws SQLException {
     JdbcMeta meta = new JdbcMeta("url");
     final Throwable e = new Exception();
-    final RuntimeException rte;
     try {
       meta.propagate(e);
       fail("Expected an exception to be thrown");
-    } catch (RuntimeException caughtException) {
-      rte = caughtException;
-      assertThat(rte.getCause(), is(e));
+    } catch (Throwable caughtException) {
+      assertThat(caughtException, is(e));
     }
   }
 

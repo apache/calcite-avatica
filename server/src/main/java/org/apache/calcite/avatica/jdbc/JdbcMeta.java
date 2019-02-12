@@ -304,7 +304,7 @@ public class JdbcMeta implements ProtobufMeta {
       }
       return map;
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -315,7 +315,7 @@ public class JdbcMeta implements ProtobufMeta {
       try {
         propertyValue = p.method.invoke(metaData);
       } catch (IllegalAccessException | InvocationTargetException e) {
-        throw new RuntimeException(e);
+        throw propagate(e);
       }
     } else {
       propertyValue = p.defaultValue;
@@ -333,7 +333,7 @@ public class JdbcMeta implements ProtobufMeta {
       int stmtId = registerMetaStatement(rs);
       return JdbcResultSet.create(ch.id, stmtId, rs);
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -359,7 +359,7 @@ public class JdbcMeta implements ProtobufMeta {
       int stmtId = registerMetaStatement(rs);
       return JdbcResultSet.create(ch.id, stmtId, rs);
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -370,7 +370,7 @@ public class JdbcMeta implements ProtobufMeta {
       int stmtId = registerMetaStatement(rs);
       return JdbcResultSet.create(ch.id, stmtId, rs);
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -380,7 +380,7 @@ public class JdbcMeta implements ProtobufMeta {
       int stmtId = registerMetaStatement(rs);
       return JdbcResultSet.create(ch.id, stmtId, rs);
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -390,7 +390,7 @@ public class JdbcMeta implements ProtobufMeta {
       int stmtId = registerMetaStatement(rs);
       return JdbcResultSet.create(ch.id, stmtId, rs);
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -403,7 +403,7 @@ public class JdbcMeta implements ProtobufMeta {
       int stmtId = registerMetaStatement(rs);
       return JdbcResultSet.create(ch.id, stmtId, rs);
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -416,7 +416,7 @@ public class JdbcMeta implements ProtobufMeta {
       int stmtId = registerMetaStatement(rs);
       return JdbcResultSet.create(ch.id, stmtId, rs);
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -429,7 +429,7 @@ public class JdbcMeta implements ProtobufMeta {
       int stmtId = registerMetaStatement(rs);
       return JdbcResultSet.create(ch.id, stmtId, rs);
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -442,7 +442,7 @@ public class JdbcMeta implements ProtobufMeta {
       int stmtId = registerMetaStatement(rs);
       return JdbcResultSet.create(ch.id, stmtId, rs);
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -457,7 +457,7 @@ public class JdbcMeta implements ProtobufMeta {
       int stmtId = registerMetaStatement(rs);
       return JdbcResultSet.create(ch.id, stmtId, rs);
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -470,7 +470,7 @@ public class JdbcMeta implements ProtobufMeta {
       int stmtId = registerMetaStatement(rs);
       return JdbcResultSet.create(ch.id, stmtId, rs);
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -483,7 +483,7 @@ public class JdbcMeta implements ProtobufMeta {
       int stmtId = registerMetaStatement(rs);
       return JdbcResultSet.create(ch.id, stmtId, rs);
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -509,7 +509,7 @@ public class JdbcMeta implements ProtobufMeta {
       int stmtId = registerMetaStatement(rs);
       return JdbcResultSet.create(ch.id, stmtId, rs);
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -630,7 +630,7 @@ public class JdbcMeta implements ProtobufMeta {
         throw new RuntimeException("Connection already exists: " + ch.id);
       }
     } catch (SQLException e) {
-      throw new RuntimeException(e);
+      throw propagate(e);
     }
   }
 
@@ -691,14 +691,9 @@ public class JdbcMeta implements ProtobufMeta {
     }
   }
 
-  RuntimeException propagate(Throwable e) {
-    if (e instanceof RuntimeException) {
-      throw (RuntimeException) e;
-    } else if (e instanceof Error) {
-      throw (Error) e;
-    } else {
-      throw new RuntimeException(e);
-    }
+  static <E extends Throwable> RuntimeException propagate(Throwable e) throws E {
+    // We have nothing to add, so just throw the original exception
+    throw (E) e;
   }
 
   public StatementHandle prepare(ConnectionHandle ch, String sql,
