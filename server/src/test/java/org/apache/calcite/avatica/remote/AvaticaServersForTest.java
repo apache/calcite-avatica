@@ -19,6 +19,7 @@ package org.apache.calcite.avatica.remote;
 import org.apache.calcite.avatica.ConnectionSpec;
 import org.apache.calcite.avatica.Meta;
 import org.apache.calcite.avatica.jdbc.JdbcMeta;
+import org.apache.calcite.avatica.metrics.MetricsSystemConfiguration;
 import org.apache.calcite.avatica.remote.Driver.Serialization;
 import org.apache.calcite.avatica.server.AvaticaHandler;
 import org.apache.calcite.avatica.server.AvaticaJsonHandler;
@@ -35,6 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 /**
  * Utility class which encapsulates the setup required to write Avatica tests that run against
@@ -71,6 +73,23 @@ public class AvaticaServersForTest {
   }
 
   /**
+   * Starts Avatica servers for each serialization type with the properties.
+   */
+  public void startServers(Properties properties) {
+    final HandlerFactory factory = new HandlerFactory();
+
+    // Construct the JSON server
+    Service jsonService =
+            new LocalService(PropertyRemoteJdbcMetaFactory.getInstance(properties));
+    startServer(factory, jsonService, Serialization.JSON, null, null);
+
+    // Construct the Protobuf server
+    Service protobufService =
+            new LocalService(PropertyRemoteJdbcMetaFactory.getInstance(properties));
+    startServer(factory, protobufService, Serialization.PROTOBUF, null, null);
+  }
+
+  /**
    * Starts Avatica servers for each serialization type with the provided {@code serverConfig}.
    */
   public void startServers(AvaticaServerConfiguration serverConfig) {
@@ -78,21 +97,25 @@ public class AvaticaServersForTest {
 
     // Construct the JSON server
     Service jsonService = new LocalService(FullyRemoteJdbcMetaFactory.getInstance());
-    AvaticaHandler jsonHandler = factory.getHandler(jsonService, Serialization.JSON, null,
-        serverConfig);
-    final HttpServer jsonServer = new HttpServer.Builder().withHandler(jsonHandler)
-        .withPort(0).build();
-    jsonServer.start();
-    serversBySerialization.put(Serialization.JSON, jsonServer);
+    startServer(factory, jsonService, Serialization.JSON, null, serverConfig);
 
     // Construct the Protobuf server
     Service protobufService = new LocalService(FullyRemoteJdbcMetaFactory.getInstance());
-    AvaticaHandler protobufHandler = factory.getHandler(protobufService, Serialization.PROTOBUF,
-        null, serverConfig);
-    final HttpServer protobufServer = new HttpServer.Builder().withHandler(protobufHandler)
-        .withPort(0).build();
-    protobufServer.start();
-    serversBySerialization.put(Serialization.PROTOBUF, protobufServer);
+    startServer(factory, protobufService, Serialization.PROTOBUF, null, serverConfig);
+  }
+
+  /**
+   * Starts Avatica server and cache.
+   */
+  public void startServer(HandlerFactory factory, Service service, Serialization serialization,
+                          MetricsSystemConfiguration metricsConfig,
+                          AvaticaServerConfiguration serverConfig) {
+    AvaticaHandler handler = factory.getHandler(service, serialization,
+            metricsConfig, serverConfig);
+    final HttpServer server = new HttpServer.Builder().withHandler(handler)
+            .withPort(0).build();
+    server.start();
+    serversBySerialization.put(serialization, server);
   }
 
   /**
@@ -164,7 +187,7 @@ public class AvaticaServersForTest {
       if (instance == null) {
         try {
           instance = new JdbcMeta(CONNECTION_SPEC.url, CONNECTION_SPEC.username,
-              CONNECTION_SPEC.password);
+                  CONNECTION_SPEC.password);
         } catch (SQLException e) {
           throw new RuntimeException(e);
         }
@@ -174,6 +197,34 @@ public class AvaticaServersForTest {
 
     @Override public Meta create(List<String> args) {
       return getInstance();
+    }
+  }
+
+  /** Factory that provides a {@link JdbcMeta} with properties. */
+  public static class PropertyRemoteJdbcMetaFactory implements Meta.Factory {
+
+    private static Map<Properties, JdbcMeta> instances = new HashMap<>();
+
+    static JdbcMeta getInstance(Properties properties) {
+      try {
+        if (properties == null) {
+          return new JdbcMeta(CONNECTION_SPEC.url, CONNECTION_SPEC.username,
+                    CONNECTION_SPEC.password);
+        }
+        if (instances.get(properties) == null) {
+          properties.put("user", CONNECTION_SPEC.username);
+          properties.put("password", CONNECTION_SPEC.password);
+          JdbcMeta instance = new JdbcMeta(CONNECTION_SPEC.url, properties);
+          instances.put(properties, instance);
+        }
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
+      }
+      return instances.get(properties);
+    }
+
+    @Override public Meta create(List<String> args) {
+      return getInstance(new Properties());
     }
   }
 }
