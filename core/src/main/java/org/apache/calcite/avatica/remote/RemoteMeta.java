@@ -109,6 +109,7 @@ class RemoteMeta extends MetaImpl {
     connection.invokeWithRetries(
         new CallableWithoutException<Void>() {
           public Void call() {
+            propsMap.get(ch.id).setDirty(true);
             final Service.OpenConnectionResponse response =
                 service.apply(new Service.OpenConnectionRequest(ch.id, info));
             return null;
