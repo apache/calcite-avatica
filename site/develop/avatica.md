@@ -113,7 +113,7 @@ changes.
 
 Calcite has a collection of Jenkins jobs on ASF-hosted infrastructure.
 They are all organized in a single view and available at
-[https://builds.apache.org/view/A-D/view/Calcite-Avatica/](https://builds.apache.org/view/A-D/view/Calcite-Avatica/).
+[https://builds.apache.org/view/A-D/view/Calcite/job/Calcite-Avatica-Master/](https://builds.apache.org/view/A-D/view/Calcite/job/Calcite-Avatica-Master/).
 
 ## Getting started
 
