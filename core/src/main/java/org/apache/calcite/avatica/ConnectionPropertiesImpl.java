@@ -94,16 +94,16 @@ public class ConnectionPropertiesImpl implements Meta.ConnectionProperties {
     if (this == that) {
       return this;
     }
-    if (that.isAutoCommit() != null && this.autoCommit != that.isAutoCommit()) {
+    if (that.isAutoCommit() != null && !Objects.equals(this.autoCommit, that.isAutoCommit())) {
       this.autoCommit = that.isAutoCommit();
       this.isDirty = true;
     }
-    if (that.isReadOnly() != null && this.readOnly != that.isReadOnly()) {
+    if (that.isReadOnly() != null && !Objects.equals(this.readOnly, that.isReadOnly())) {
       this.readOnly = that.isReadOnly();
       this.isDirty = true;
     }
     if (that.getTransactionIsolation() != null
-        && !that.getTransactionIsolation().equals(this.transactionIsolation)) {
+        && !Objects.equals(this.transactionIsolation, that.getTransactionIsolation())) {
       this.transactionIsolation = that.getTransactionIsolation();
       this.isDirty = true;
     }
