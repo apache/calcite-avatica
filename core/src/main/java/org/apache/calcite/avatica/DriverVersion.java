@@ -96,9 +96,8 @@ public class DriverVersion {
     int minorVersion = 0;
     int databaseMajorVersion = 0;
     int databaseMinorVersion = 0;
-    try {
-      final InputStream inStream =
-          driverClass.getClassLoader().getResourceAsStream(resourceName);
+    try (final InputStream inStream =
+          driverClass.getClassLoader().getResourceAsStream(resourceName)) {
       if (inStream != null) {
         final Properties properties = new Properties();
         properties.load(inStream);
