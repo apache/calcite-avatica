@@ -96,10 +96,8 @@ public class DriverVersion {
     int minorVersion = 0;
     int databaseMajorVersion = 0;
     int databaseMinorVersion = 0;
-    InputStream inStream = null;
-    try {
-      inStream =
-          driverClass.getClassLoader().getResourceAsStream(resourceName);
+    try (final InputStream inStream =
+          driverClass.getClassLoader().getResourceAsStream(resourceName)) {
       if (inStream != null) {
         final Properties properties = new Properties();
         properties.load(inStream);
@@ -139,14 +137,6 @@ public class DriverVersion {
       }
     } catch (IOException e) {
       e.printStackTrace();
-    } finally {
-      if (inStream != null) {
-        try {
-          inStream.close();
-        } catch (IOException ignore) {
-          ignore.printStackTrace();
-        }
-      }
     }
     return new DriverVersion(
         driverName, driverVersion, productName, productVersion,
