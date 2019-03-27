@@ -89,7 +89,8 @@ public abstract class AbstractService implements Service {
       case PROTOBUF:
         return column;
       default:
-        throw new IllegalStateException("Unhadled case statement");
+        throw new IllegalStateException("Unhandled case statement with serializationType: "
+                + getSerializationType());
       }
     case Types.DECIMAL:
     case Types.NUMERIC:
