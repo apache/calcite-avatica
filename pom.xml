@@ -63,6 +63,7 @@ limitations under the License.
 
     <!-- This list is in alphabetical order. -->
     <apache-rat-plugin.version>0.13</apache-rat-plugin.version>
+    <asm.version>7.1</asm.version>
     <bouncycastle.version>1.60</bouncycastle.version>
     <build-helper-maven-plugin.version>3.0.0</build-helper-maven-plugin.version>
     <!-- Needed for JDK 10 javadoc for [LANG-1365] -->
@@ -700,8 +701,14 @@ limitations under the License.
               <groupId>com.github.spotbugs</groupId>
               <artifactId>spotbugs</artifactId>
               <version>${spotbugs.version}</version>
-    </dependency>
-  </dependencies>
+            </dependency>
+            <!-- Upgrade ASM to 7.1 to support JDK 13. Remove when spotbugs upgrades -->
+            <dependency>
+              <groupId>org.ow2.asm</groupId>
+              <artifactId>asm</artifactId>
+              <version>${asm.version}</version>
+            </dependency>
+          </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>
