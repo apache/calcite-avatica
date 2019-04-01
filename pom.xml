@@ -87,7 +87,7 @@ limitations under the License.
     <javadoc-link>https://docs.oracle.com/javase/8/docs/api/</javadoc-link>
     <jcip-annotations.version>1.0-1</jcip-annotations.version>
     <jcommander.version>1.72</jcommander.version>
-    <jetty.version>9.4.11.v20180605</jetty.version>
+    <jetty.version>9.4.15.v20190215</jetty.version>
     <junit.version>4.12</junit.version>
     <kerby.version>1.1.1</kerby.version>
     <maven-assembly-plugin.version>3.1.1</maven-assembly-plugin.version>
