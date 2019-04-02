@@ -16,7 +16,6 @@
  */
 package org.apache.calcite.avatica.server;
 
-import org.eclipse.jetty.security.SpnegoLoginService;
 import org.eclipse.jetty.security.SpnegoUserPrincipal;
 import org.eclipse.jetty.server.UserIdentity;
 import org.eclipse.jetty.util.B64Code;
@@ -36,11 +35,13 @@ import javax.security.auth.Subject;
 import javax.servlet.ServletRequest;
 
 /**
- * A customization of {@link SpnegoLoginService} which directly specifies the server's
- * principal instead of requiring a file to exist. Known to work with Jetty-9.2.x, any other
- * version would require testing/inspection to ensure the logic is still sound.
+ * A customization of {@link org.eclipse.jetty.security.SpnegoLoginService} which directly
+ * specifies the server's principal instead of requiring a file to exist. Known to work with
+ * Jetty-9.2.x, any other version would require testing/inspection to ensure the logic is still
+ * sound.
  */
-public class PropertyBasedSpnegoLoginService extends SpnegoLoginService {
+@SuppressWarnings("deprecation")
+public class PropertyBasedSpnegoLoginService extends org.eclipse.jetty.security.SpnegoLoginService {
   private static final Logger LOG = LoggerFactory.getLogger(PropertyBasedSpnegoLoginService.class);
 
   private static final String TARGET_NAME_FIELD_NAME = "_targetName";
@@ -56,7 +57,8 @@ public class PropertyBasedSpnegoLoginService extends SpnegoLoginService {
     // without the need for a one-line file to do the same thing.
     //
     // AbstractLifeCycle's doStart() method does nothing, so we aren't missing any extra logic.
-    final Field targetNameField = SpnegoLoginService.class.getDeclaredField(TARGET_NAME_FIELD_NAME);
+    final Field targetNameField = org.eclipse.jetty.security.SpnegoLoginService.class
+                                      .getDeclaredField(TARGET_NAME_FIELD_NAME);
     targetNameField.setAccessible(true);
     targetNameField.set(this, serverPrincipal);
   }

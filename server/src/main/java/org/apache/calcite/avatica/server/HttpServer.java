@@ -260,7 +260,6 @@ public class HttpServer {
   private ServerConnector configureServerConnector() {
     final ServerConnector connector = getServerConnector();
     connector.setIdleTimeout(60 * 1000);
-    connector.setSoLingerTime(-1);
     connector.setPort(port);
     server.setConnectors(new Connector[] { connector });
     return connector;
@@ -426,7 +425,6 @@ public class HttpServer {
    */
   protected ServerConnector configureConnector(ServerConnector connector, int port) {
     connector.setIdleTimeout(60 * 1000);
-    connector.setSoLingerTime(-1);
     connector.setPort(port);
     return connector;
   }
