@@ -19,7 +19,6 @@ package org.apache.calcite.avatica.server;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.security.ServerAuthException;
 import org.eclipse.jetty.security.authentication.DeferredAuthentication;
-import org.eclipse.jetty.security.authentication.SpnegoAuthenticator;
 import org.eclipse.jetty.server.Authentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,9 @@ import javax.servlet.http.HttpServletResponse;
  * Custom SpnegoAuthenticator which will still reponse with a WWW-Authentication: Negotiate
  * header if the client provides some other kind of authentication header.
  */
-public class AvaticaSpnegoAuthenticator extends SpnegoAuthenticator {
+@SuppressWarnings("deprecation")
+public class AvaticaSpnegoAuthenticator extends
+    org.eclipse.jetty.security.authentication.SpnegoAuthenticator {
   private static final Logger LOG = LoggerFactory.getLogger(AvaticaSpnegoAuthenticator.class);
 
   @Override public Authentication validateRequest(ServletRequest request,

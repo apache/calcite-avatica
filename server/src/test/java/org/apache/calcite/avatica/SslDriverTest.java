@@ -36,6 +36,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -69,6 +70,7 @@ import java.util.Objects;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 
 /**
  * Test case for Avatica with TLS connectors.
@@ -117,6 +119,14 @@ public class SslDriverTest {
     }
 
     return parameters;
+  }
+
+  @BeforeClass public static void setupClass() {
+    // Skip TLS testing on IBM Java due the combination of:
+    // - Jetty 9.4.12+ ignores SSL_* ciphers due to security - eclipse/jetty.project#2807
+    // - IBM uses SSL_* cipher names for ALL ciphers not following RFC cipher names
+    //   See eclipse/jetty.project#2807 for details
+    assumeFalse(System.getProperty("java.vendor").contains("IBM"));
   }
 
   @AfterClass public static void stopKdc() {
