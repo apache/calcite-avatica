@@ -18,6 +18,7 @@ package org.apache.calcite.avatica.server;
 
 import org.apache.calcite.avatica.remote.AuthenticationType;
 
+import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
 /**
@@ -45,6 +46,13 @@ public interface AvaticaServerConfiguration {
    * @return A Kerberos principal, or null if not applicable.
    */
   String getKerberosPrincipal();
+
+  /**
+   * Returns the Kerberos keytab that the Avatica server should use.
+   *
+   * @return The Kerberos keytab for the server login, or null if not applicable
+   */
+  Path getKerberosKeytab();
 
   /**
    * Returns the array of allowed roles for login. Only applicable when

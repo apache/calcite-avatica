@@ -39,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import java.nio.file.Path;
 import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -225,8 +226,6 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
    * CustomImpersonationConfig doesn't authenticates the user but supports user impersonation
    */
   static class CustomImpersonationConfig implements AvaticaServerConfiguration {
-
-
     @Override public AuthenticationType getAuthenticationType() {
       return AuthenticationType.CUSTOM;
     }
@@ -236,6 +235,10 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
     }
 
     @Override public String getKerberosPrincipal() {
+      return null;
+    }
+
+    @Override public Path getKerberosKeytab() {
       return null;
     }
 
@@ -269,15 +272,12 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
         }
       };
     }
-
   }
 
   /**
    * CustomBasicImpersonationConfig supports BasicAuthentication with user impersonation
    */
   static class CustomBasicImpersonationConfig implements AvaticaServerConfiguration {
-
-
     @Override public AuthenticationType getAuthenticationType() {
       return AuthenticationType.CUSTOM;
     }
@@ -287,6 +287,10 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
     }
 
     @Override public String getKerberosPrincipal() {
+      return null;
+    }
+
+    @Override public Path getKerberosKeytab() {
       return null;
     }
 

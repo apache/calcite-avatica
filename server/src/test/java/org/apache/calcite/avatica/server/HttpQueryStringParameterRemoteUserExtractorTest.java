@@ -29,6 +29,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -94,6 +95,10 @@ public class HttpQueryStringParameterRemoteUserExtractorTest extends HttpAuthBas
     }
 
     @Override public String getKerberosPrincipal() {
+      return null;
+    }
+
+    @Override public Path getKerberosKeytab() {
       return null;
     }
 

@@ -23,11 +23,14 @@ import org.apache.calcite.avatica.remote.Service;
 import org.apache.calcite.avatica.remote.Service.RpcMetadataResponse;
 
 import org.eclipse.jetty.security.Authenticator;
+import org.eclipse.jetty.security.ConfigurableSpnegoLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
+import org.eclipse.jetty.security.authentication.AuthorizationService;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.security.authentication.ConfigurableSpnegoAuthenticator;
 import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 import org.eclipse.jetty.server.AbstractConnectionFactory;
 import org.eclipse.jetty.server.Connector;
@@ -35,6 +38,7 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.UserIdentity;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.util.security.Constraint;
@@ -46,21 +50,17 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.security.Principal;
+import java.nio.file.Path;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
 import javax.security.auth.Subject;
-import javax.security.auth.kerberos.KerberosPrincipal;
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Avatica HTTP server.
@@ -328,6 +328,21 @@ public class HttpServer {
   }
 
   /**
+   * TODO
+   */
+  private static class TestAuthorizationService implements AuthorizationService {
+    /**
+     * TODO
+     * @param request TODO
+     * @param name TODO
+     * @return TODO
+     */
+    @Override public UserIdentity getUserIdentity(HttpServletRequest request, String name) {
+      return null;
+    }
+  }
+
+  /**
    * Configures the <code>connector</code> given the <code>config</code> for using SPNEGO.
    *
    * @param config The configuration
@@ -336,17 +351,23 @@ public class HttpServer {
       AvaticaServerConfiguration config) {
     final String realm = Objects.requireNonNull(config.getKerberosRealm());
     final String principal = Objects.requireNonNull(config.getKerberosPrincipal());
+    final String principalWithoutRealm = principal.split("@", 2)[0];
+    final String[] principalParts = principalWithoutRealm.split("/", 2);
+    final String serviceName = principalParts[0];
+    final String hostname = principalParts[1];
+    final Path keytabPath = config.getKerberosKeytab();
 
-    // A customization of SpnegoLoginService to explicitly set the server's principal, otherwise
-    // we would have to require a custom file to set the server's principal.
-    PropertyBasedSpnegoLoginService spnegoLoginService =
-        new PropertyBasedSpnegoLoginService(realm, principal);
+    ConfigurableSpnegoLoginService spnegoLoginService =
+        new ConfigurableSpnegoLoginService(realm, new TestAuthorizationService());
+    spnegoLoginService.setServiceName(serviceName);
+    spnegoLoginService.setHostName(hostname);
+    spnegoLoginService.setKeyTabPath(keytabPath);
 
     // Roles are "realms" for Kerberos/SPNEGO
     final String[] allowedRealms = getAllowedRealms(realm, config);
 
     return configureCommonAuthentication(Constraint.__SPNEGO_AUTH,
-        allowedRealms, new AvaticaSpnegoAuthenticator(), realm, spnegoLoginService);
+        allowedRealms, new ConfigurableSpnegoAuthenticator(), realm, spnegoLoginService);
   }
 
   protected String[] getAllowedRealms(String serverRealm, AvaticaServerConfiguration config) {
@@ -782,13 +803,6 @@ public class HttpServer {
         if (usingTLS) {
           throw new IllegalArgumentException("TLS has not been tested wtih SPNEGO");
         }
-        if (null != keytab) {
-          LOG.debug("Performing Kerberos login with {} as {}", keytab, kerberosPrincipal);
-          subject = loginViaKerberos(this);
-        } else {
-          LOG.debug("Not performing Kerberos login");
-          subject = null;
-        }
         serverConfig = buildSpnegoConfiguration(this);
         handler = buildHandler(this, serverConfig);
         break;
@@ -856,6 +870,7 @@ public class HttpServer {
     private AvaticaServerConfiguration buildSpnegoConfiguration(Builder b) {
       final String principal = b.kerberosPrincipal;
       final String realm = b.kerberosRealm;
+      final File keytab = b.keytab;
       final String[] additionalAllowedRealms = b.loginServiceAllowedRoles;
       final DoAsRemoteUserCallback callback = b.remoteUserCallback;
       final RemoteUserExtractor remoteUserExtractor = b.remoteUserExtractor;
@@ -871,6 +886,10 @@ public class HttpServer {
 
         @Override public String getKerberosPrincipal() {
           return principal;
+        }
+
+        @Override public Path getKerberosKeytab() {
+          return keytab != null ? keytab.toPath().toAbsolutePath() : null;
         }
 
         @Override public boolean supportsImpersonation() {
@@ -934,6 +953,10 @@ public class HttpServer {
           return null;
         }
 
+        @Override public Path getKerberosKeytab() {
+          return null;
+        }
+
         @Override public boolean supportsImpersonation() {
           return false;
         }
@@ -947,25 +970,6 @@ public class HttpServer {
           return remoteUserExtractor;
         }
       };
-    }
-
-    private Subject loginViaKerberos(Builder b) {
-      Set<Principal> principals = new HashSet<Principal>();
-      principals.add(new KerberosPrincipal(b.kerberosPrincipal));
-
-      Subject subject = new Subject(false, principals, new HashSet<Object>(),
-          new HashSet<Object>());
-
-      ServerKeytabJaasConf conf = new ServerKeytabJaasConf(b.kerberosPrincipal,
-          b.keytab.toString());
-      String confName = "NotUsed";
-      try {
-        LoginContext loginContext = new LoginContext(confName, subject, null, conf);
-        loginContext.login();
-        return loginContext.getSubject();
-      } catch (LoginException e) {
-        throw new RuntimeException(e);
-      }
     }
   }
 }
