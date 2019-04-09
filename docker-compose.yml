@@ -16,7 +16,7 @@
 version: '3'
 services:
   dry-run:
-    image: maven:alpine
+    image: maven
     working_dir: /src
     command: sh -c "./docker.sh dry-run"
     volumes:
@@ -24,7 +24,7 @@ services:
       - maven-repo:/root/.m2
 
   release:
-    image: maven:alpine
+    image: maven
     working_dir: /src
     command: sh -c "./docker.sh release"
     volumes:
@@ -32,7 +32,7 @@ services:
       - maven-repo:/root/.m2
 
   clean:
-    image: maven:alpine
+    image: maven
     working_dir: /src
     command: sh -c "./docker.sh clean"
     volumes:
@@ -40,7 +40,7 @@ services:
       - maven-repo:/root/.m2
 
   test:
-    image: maven:alpine
+    image: maven
     working_dir: /src
     command: sh -c "./docker.sh test"
     volumes:

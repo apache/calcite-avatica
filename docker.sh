@@ -24,19 +24,7 @@ trap terminate SIGINT
 
 KEYS=()
 
-init_glibc(){
-    apk --no-cache add ca-certificates wget
-    echo "Installing glibc..."
-    wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://alpine-pkgs.sgerrand.com/sgerrand.rsa.pub
-    wget -q -O /tmp/glibc.apk https://github.com/sgerrand/alpine-pkg-glibc/releases/download/2.28-r0/glibc-2.28-r0.apk
-    apk add /tmp/glibc.apk
-}
-
-init_release(){
-    apk --no-cache add git gnupg
-}
-
-GPG_COMMAND="gpg2"
+GPG_COMMAND="gpg"
 
 get_gpg_keys(){
     GPG_KEYS=$($GPG_COMMAND --list-keys --with-colons --keyid-format LONG)
@@ -49,7 +37,7 @@ get_gpg_keys(){
 
         IFS=':' read -ra PART <<< "$line"
 
-        if [ ${PART[0]} == "pub" ]; then
+        if [[ ${PART[0]} == "pub" ]]; then
 
             if [ -n "$KEY_DETAILS" ]; then
                 KEYS[$KEY_NUM]=$KEY_DETAILS
@@ -61,13 +49,13 @@ get_gpg_keys(){
             KEY_DETAILS=${PART[4]}
         fi
 
-        if [ ${PART[0]} == "uid" ]; then
+        if [[ ${PART[0]} == "uid" ]]; then
             KEY_DETAILS="$KEY_DETAILS - ${PART[9]}"
         fi
 
     done <<< "$GPG_KEYS"
 
-    if [ -n "$KEY_DETAILS" ]; then
+    if [[ -n "$KEY_DETAILS" ]]; then
         KEYS[$KEY_NUM]=$KEY_DETAILS
     fi
 }
@@ -75,7 +63,7 @@ get_gpg_keys(){
 mount_gpg_keys(){
     mkdir -p /.gnupg
 
-    if [ -z "$(ls -A /.gnupg)" ]; then
+    if [[ -z "$(ls -A /.gnupg)" ]]; then
         echo "Please mount the contents of your .gnupg folder into /.gnupg. Exiting..."
         exit 1
     fi
@@ -106,7 +94,7 @@ select_gpg_key(){
 
     while $INVALID_KEY_SELECTED; do
 
-        if [ "${#KEYS[@]}" -le 0 ]; then
+        if [[ "${#KEYS[@]}" -le 0 ]]; then
             echo "You do not have any GPG keys available. Exiting..."
             exit 1
         fi
@@ -121,7 +109,7 @@ select_gpg_key(){
 
         SELECTED_GPG_KEY=$(sed 's/ -.*//' <<< ${KEYS[$KEY_INDEX]})
 
-        if [ -z $SELECTED_GPG_KEY ]; then
+        if [[ -z $SELECTED_GPG_KEY ]]; then
             echo "Selected key is invalid, please try again."
             continue
         fi
@@ -130,7 +118,7 @@ select_gpg_key(){
 
         echo "test" | $GPG_COMMAND --local-user $SELECTED_GPG_KEY --output /dev/null --sign -
 
-        if [ $? != 0 ]; then
+        if [[ $? != 0 ]]; then
             echo "Invalid GPG passphrase or GPG error. Please try again."
             continue
         fi
@@ -236,8 +224,6 @@ EOF
 
 case $1 in
     dry-run)
-        init_glibc
-        init_release
         mount_gpg_keys
         select_gpg_key
         get_build_configuration
@@ -246,8 +232,6 @@ case $1 in
         ;;
 
     release)
-        init_glibc
-        init_release
         mount_gpg_keys
         select_gpg_key
         get_build_configuration
@@ -263,7 +247,6 @@ case $1 in
         ;;
 
     test)
-        init_glibc
         mvn clean verify -Dcheckstyle.skip
         ;;
 
