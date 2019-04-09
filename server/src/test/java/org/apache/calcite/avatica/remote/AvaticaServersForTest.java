@@ -35,6 +35,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Utility class which encapsulates the setup required to write Avatica tests that run against
@@ -163,8 +165,12 @@ public class AvaticaServersForTest {
     static JdbcMeta getInstance() {
       if (instance == null) {
         try {
-          instance = new JdbcMeta(CONNECTION_SPEC.url, CONNECTION_SPEC.username,
-              CONNECTION_SPEC.password);
+          Properties info = new Properties();
+          info.put(JdbcMeta.ConnectionCacheSettings.EXPIRY_DURATION.key(), "10");
+          info.put(JdbcMeta.ConnectionCacheSettings.EXPIRY_UNIT.key(), TimeUnit.SECONDS.name());
+          info.put("user", CONNECTION_SPEC.username);
+          info.put("password", CONNECTION_SPEC.password);
+          instance = new JdbcMeta(CONNECTION_SPEC.url, info);
         } catch (SQLException e) {
           throw new RuntimeException(e);
         }
