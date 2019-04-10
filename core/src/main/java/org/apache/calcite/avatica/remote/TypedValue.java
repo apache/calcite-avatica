@@ -359,6 +359,12 @@ public class TypedValue {
           copy.add(serialToJdbc(componentRep, null, o, calendar));
         }
       }
+      if (componentRep == null && list.size() > 0) {
+        componentRep = ((TypedValue) list.get(0)).type;
+        if (componentRep == null) {
+          throw new RuntimeException("ComponentRep of element must not be null for ARRAYs");
+        }
+      }
       AvaticaType elementType = new AvaticaType(componentRep.typeId, componentRep.name(),
           componentRep);
       return new ArrayFactoryImpl(calendar.getTimeZone()).createArray(elementType, copy);

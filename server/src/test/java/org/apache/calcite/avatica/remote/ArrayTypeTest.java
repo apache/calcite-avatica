@@ -474,6 +474,59 @@ public class ArrayTypeTest {
     }
   }
 
+  @Test public void testBatchInsert() throws Exception {
+    try (Connection conn = DriverManager.getConnection(url)) {
+      ScalarType component = ColumnMetaData.scalar(Types.VARCHAR, "VARCHAR", Rep.STRING);
+      List<Array> arrays = new ArrayList<>();
+      // Construct the data
+      for (int i = 0; i < 5; i++) {
+        List<String> elements = new ArrayList<>();
+        for (int j = 0; j < 5; j++) {
+          elements.add(i + "_" + j);
+        }
+        arrays.add(createArray("VARCHAR", component, elements));
+      }
+
+      String tableName = "test_batch_insert";
+      // Drop and create the table
+      try (Statement stmt = conn.createStatement()) {
+        assertFalse(stmt.execute(Unsafe.formatLocalString("DROP TABLE IF EXISTS %s", tableName)));
+        String createTableSql = Unsafe.formatLocalString(
+                "CREATE TABLE %s (id integer, vals %s ARRAY)", tableName, "VARCHAR");
+        assertFalse(stmt.execute(createTableSql));
+      }
+
+      // Insert records, each with an array
+      final String dml = Unsafe.formatLocalString("INSERT INTO %s VALUES (?, ?)", tableName);
+      try (PreparedStatement stmt = conn.prepareStatement(dml)) {
+        int i = 0;
+        for (Array inputArray : arrays)  {
+          stmt.setInt(1, i);
+          stmt.setArray(2, inputArray);
+          stmt.addBatch();
+          i++;
+        }
+        assertEquals(i, stmt.executeBatch().length);
+      }
+
+      // Read the records
+      try (Statement stmt = conn.createStatement()) {
+        ResultSet results = stmt.executeQuery(
+                Unsafe.formatLocalString("SELECT * FROM %s", tableName));
+        assertNotNull("Expected a ResultSet", results);
+        int i = 0;
+        for (Array expectedArray : arrays) {
+          assertTrue(results.next());
+          assertEquals(i++, results.getInt(1));
+          Array actualArray = results.getArray(2);
+
+          PRIMITIVE_LIST_VALIDATOR.validate(expectedArray, actualArray);
+        }
+        assertFalse("Expected no more records", results.next());
+      }
+    }
+  }
+
   /**
    * Creates a JDBC {@link Array} from a list of values.
    *
