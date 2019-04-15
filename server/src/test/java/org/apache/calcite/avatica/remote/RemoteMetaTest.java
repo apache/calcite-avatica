@@ -713,40 +713,6 @@ public class RemoteMetaTest {
       assertEquals(props, originalProps);
     }
   }
-
-  @Test public void testConnectionPropertiesSync() throws Exception {
-    ConnectionSpec.getDatabaseLock().lock();
-    try {
-      final String t = AvaticaUtils.unique("TEST_CONNECTION_PROPERTIES");
-      AvaticaConnection conn = (AvaticaConnection) DriverManager.getConnection(url);
-      conn.setAutoCommit(false);
-
-      Statement statement = conn.createStatement();
-      final String create =
-              String.format(Locale.ROOT, "create table if not exists %s ("
-                      + "  id int not null, msg varchar(255) not null)", t);
-      int status = statement.executeUpdate(create);
-      assertEquals(status, 0);
-
-      Thread.sleep(10000);
-      statement = conn.createStatement();
-      String update = String.format(Locale.ROOT, "insert into %s values ('%d', '%s')",
-              t, 1, UUID.randomUUID());
-      statement.executeUpdate(update);
-
-      final String query = String.format(Locale.ROOT, "SELECT id FROM  %s ", t);
-      ResultSet rs = statement.executeQuery(query);
-      assertTrue(rs.next());
-      assertEquals(1, rs.getInt(1));
-
-      Thread.sleep(10000);
-      statement = conn.createStatement();
-      rs = statement.executeQuery(query);
-      assertFalse(rs.next());
-    } finally {
-      ConnectionSpec.getDatabaseLock().unlock();
-    }
-  }
 }
 
 // End RemoteMetaTest.java

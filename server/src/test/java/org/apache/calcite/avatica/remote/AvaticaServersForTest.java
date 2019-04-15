@@ -73,6 +73,31 @@ public class AvaticaServersForTest {
   }
 
   /**
+   * Starts Avatica servers for each serialization type with the provided properties {@code properties}.
+   */
+  public void startServers(Properties properties) {
+    final HandlerFactory factory = new HandlerFactory();
+
+    // Construct the JSON server
+    Service jsonService = new LocalService(FullyRemoteJdbcMetaFactory.getInstance(properties));
+    AvaticaHandler jsonHandler = factory.getHandler(jsonService, Serialization.JSON, null,
+            null);
+    final HttpServer jsonServer = new HttpServer.Builder().withHandler(jsonHandler)
+            .withPort(0).build();
+    jsonServer.start();
+    serversBySerialization.put(Serialization.JSON, jsonServer);
+
+    // Construct the Protobuf server
+    Service protobufService = new LocalService(FullyRemoteJdbcMetaFactory.getInstance(properties));
+    AvaticaHandler protobufHandler = factory.getHandler(protobufService, Serialization.PROTOBUF,
+            null, null);
+    final HttpServer protobufServer = new HttpServer.Builder().withHandler(protobufHandler)
+            .withPort(0).build();
+    protobufServer.start();
+    serversBySerialization.put(Serialization.PROTOBUF, protobufServer);
+  }
+
+  /**
    * Starts Avatica servers for each serialization type with the provided {@code serverConfig}.
    */
   public void startServers(AvaticaServerConfiguration serverConfig) {
@@ -165,12 +190,21 @@ public class AvaticaServersForTest {
     static JdbcMeta getInstance() {
       if (instance == null) {
         try {
-          Properties info = new Properties();
-          info.put(JdbcMeta.ConnectionCacheSettings.EXPIRY_DURATION.key(), "10");
-          info.put(JdbcMeta.ConnectionCacheSettings.EXPIRY_UNIT.key(), TimeUnit.SECONDS.name());
-          info.put("user", CONNECTION_SPEC.username);
-          info.put("password", CONNECTION_SPEC.password);
-          instance = new JdbcMeta(CONNECTION_SPEC.url, info);
+          instance = new JdbcMeta(CONNECTION_SPEC.url, CONNECTION_SPEC.username,
+                  CONNECTION_SPEC.password);
+        } catch (SQLException e) {
+          throw new RuntimeException(e);
+        }
+      }
+      return instance;
+    }
+
+    static JdbcMeta getInstance(Properties properties) {
+      if (instance == null) {
+        try {
+          properties.put("user", CONNECTION_SPEC.username);
+          properties.put("password", CONNECTION_SPEC.password);
+          instance = new JdbcMeta(CONNECTION_SPEC.url, properties);
         } catch (SQLException e) {
           throw new RuntimeException(e);
         }
