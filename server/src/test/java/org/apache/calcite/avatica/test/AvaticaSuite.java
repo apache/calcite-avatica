@@ -19,8 +19,8 @@ package org.apache.calcite.avatica.test;
 import org.apache.calcite.avatica.RemoteDriverTest;
 
 import org.apache.calcite.avatica.remote.ConnectionPropertiesTest;
-import org.junit.runner.RunWith;
 
+import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**

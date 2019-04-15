@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Utility class which encapsulates the setup required to write Avatica tests that run against
@@ -73,7 +72,7 @@ public class AvaticaServersForTest {
   }
 
   /**
-   * Starts Avatica servers for each serialization type with the provided properties {@code properties}.
+   * Starts Avatica servers for each serialization type with the properties.
    */
   public void startServers(Properties properties) {
     final HandlerFactory factory = new HandlerFactory();
