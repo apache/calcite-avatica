@@ -79,11 +79,13 @@ public class AvaticaServersForTest {
     final HandlerFactory factory = new HandlerFactory();
 
     // Construct the JSON server
-    Service jsonService = new LocalService(PropertyRemoteJdbcMetaFactory.getInstance(properties));
+    Service jsonService =
+            new LocalService(PropertyRemoteJdbcMetaFactory.getInstance(properties));
     startServer(factory, jsonService, Serialization.JSON, null, null);
 
     // Construct the Protobuf server
-    Service protobufService = new LocalService(PropertyRemoteJdbcMetaFactory.getInstance(properties));
+    Service protobufService =
+            new LocalService(PropertyRemoteJdbcMetaFactory.getInstance(properties));
     startServer(factory, protobufService, Serialization.PROTOBUF, null, null);
   }
 
@@ -107,8 +109,9 @@ public class AvaticaServersForTest {
    */
   public void startServer(HandlerFactory factory, Service service, Serialization serialization,
                           MetricsSystemConfiguration metricsConfig,
-                          AvaticaServerConfiguration serverConfig){
-    AvaticaHandler handler = factory.getHandler(service, serialization, metricsConfig, serverConfig);
+                          AvaticaServerConfiguration serverConfig) {
+    AvaticaHandler handler = factory.getHandler(service, serialization,
+            metricsConfig, serverConfig);
     final HttpServer server = new HttpServer.Builder().withHandler(handler)
             .withPort(0).build();
     server.start();

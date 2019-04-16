@@ -41,7 +41,8 @@ import static org.junit.Assert.assertFalse;
 @RunWith(Parameterized.class)
 public class ConnectionPropertiesTest {
   private static final AvaticaServersForTest SERVERS = new AvaticaServersForTest();
-  private static final Properties prop = new Properties();
+  private static final Properties PROPERTIES = new Properties();
+
 
   private final HttpServer server;
   private final String url;
@@ -50,9 +51,9 @@ public class ConnectionPropertiesTest {
 
   @Parameterized.Parameters(name = "{0}")
   public static List<Object[]> parameters() throws Exception {
-    prop.put(JdbcMeta.ConnectionCacheSettings.EXPIRY_DURATION.key(), "1");
-    prop.put(JdbcMeta.ConnectionCacheSettings.EXPIRY_UNIT.key(), TimeUnit.SECONDS.name());
-    SERVERS.startServers(prop);
+    PROPERTIES.put(JdbcMeta.ConnectionCacheSettings.EXPIRY_DURATION.key(), "1");
+    PROPERTIES.put(JdbcMeta.ConnectionCacheSettings.EXPIRY_UNIT.key(), TimeUnit.SECONDS.name());
+    SERVERS.startServers(PROPERTIES);
     return SERVERS.getJUnitParameters();
   }
 
@@ -75,7 +76,7 @@ public class ConnectionPropertiesTest {
       // sync connection properties
       conn.createStatement();
       Connection remoteConn = getConnection(
-              AvaticaServersForTest.PropertyRemoteJdbcMetaFactory.getInstance(prop), conn.id);
+              AvaticaServersForTest.PropertyRemoteJdbcMetaFactory.getInstance(PROPERTIES), conn.id);
 
       assertFalse(remoteConn.getAutoCommit());
       assertEquals(remoteConn.getTransactionIsolation(),
@@ -86,7 +87,7 @@ public class ConnectionPropertiesTest {
 
       conn.createStatement();
       Connection remoteConn1 = getConnection(
-              AvaticaServersForTest.PropertyRemoteJdbcMetaFactory.getInstance(prop), conn.id);
+              AvaticaServersForTest.PropertyRemoteJdbcMetaFactory.getInstance(PROPERTIES), conn.id);
 
       assertFalse(remoteConn1.getAutoCommit());
       assertEquals(remoteConn1.getTransactionIsolation(),
