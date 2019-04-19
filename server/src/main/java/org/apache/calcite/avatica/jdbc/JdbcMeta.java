@@ -1003,7 +1003,7 @@ public class JdbcMeta implements ProtobufMeta {
      *
      * <p>Used in conjunction with {@link #EXPIRY_UNIT}.</p>
      */
-    EXPIRY_DURATION(STMT_CACHE_KEY_BASE + ".expirydiration", "5"),
+    EXPIRY_DURATION(STMT_CACHE_KEY_BASE + ".expiryduration", "5"),
 
     /** JDBC connection property for setting connection cache expiration unit.
      *
