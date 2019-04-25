@@ -28,6 +28,59 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.14.0">1.14.0</a> / 2019-04-XX
+{: #v1-14-0}
+
+Apache Calcite Avatica 1.14.0 includes around 13 bugs fixes and enhancements. Jetty was upgraded to 9.4.15v20190215,
+which fixes a vulnerability of moderate severity: [CVE-2018-12545](https://nvd.nist.gov/vuln/detail/CVE-2018-12545).
+
+Compatibility: This release is tested
+on Linux, macOS, Microsoft Windows;
+using Oracle JDK 8, 9, 10, 11, 12, 13;
+using IBM Java 8;
+Guava versions 14.0 to 23.0;
+other software versions as specified in `pom.xml`.
+
+Features and bug fixes
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2789">CALCITE-2789</a>]
+  Bump version dependencies Jan 2019
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2845">CALCITE-2845</a>]
+  Avoid duplication of exception messages
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2950">CALCITE-2950</a>]
+  Avatica DriverVersion.load leaks InputStream
+* Improve exception message in AbstractService
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2776">CALCITE-2776</a>]
+  Fix wrong value when accessing struct types with one attribute
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2269">CALCITE-2269</a>]
+  Enable Error Prone checking
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2945">CALCITE-2945</a>]
+  Use Boolean#equals in Boolean object compare
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2972">CALCITE-2972</a>]
+  Upgrade jetty to 9.4.15.v20190215
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2987">CALCITE-2987</a>]
+  Use maven image instead of maven:alpine when building release using docker
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2882">CALCITE-2882</a>]
+  Connection properties are lost after timeout (Bake)
+* Fix misspelled JDBC connection max duration property: expiryduration (Lanny)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2939">CALCITE-2939</a>]
+  Fix NPE when executeBatch is array type (Bake)
+
+Tests
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2728">CALCITE-2728</a>]
+  Update appveyor.yml to enable Appveyor testing against JDK 11
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2961">CALCITE-2961</a>]
+  Enable Travis to test against JDK 13
+  
+Website and Documentation
+
+* Update to new git URL (switch to gitbox)
+* Add links to git commits back to download pages
+* Switch from maven:alpine to maven docker image for generating javadoc when publishing the site
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2922">CALCITE-2922</a>]
+  Update link to Apache Jenkins Calcite-Avatica job
+
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.13.0">1.13.0</a> / 2018-12-04
 {: #v1-13-0}
 
