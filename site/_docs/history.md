@@ -28,7 +28,7 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.14.0">1.14.0</a> / 2019-04-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.14.0">1.14.0</a> / 2019-04-29
 {: #v1-14-0}
 
 Apache Calcite Avatica 1.14.0 includes around 13 bugs fixes and enhancements. Jetty was upgraded to 9.4.15v20190215,
