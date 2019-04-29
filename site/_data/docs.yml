@@ -35,6 +35,7 @@
 - title: Avatica Go Client Reference
   docs:
   - go_client_reference
+  - go_howto
 
 - title: Avatica Meta
   docs:
