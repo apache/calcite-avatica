@@ -324,6 +324,7 @@ Verify the staged artifacts in the Nexus repository:
   https://repository.apache.org/content/repositories/orgapachecalcite-1000
   (or a similar URL)
 
+### To upload the artifacts directly in your environment:
 Upload the artifacts via subversion to a staging area,
 https://dist.apache.org/repos/dist/dev/calcite/apache-calcite-avatica-X.Y.Z-rcN:
 
@@ -344,6 +345,16 @@ cd ~/dist/dev/calcite
 svn add apache-calcite-avatica-X.Y.Z-rcN
 svn ci
 {% endhighlight %}
+
+### To upload the artifacts using docker:
+This assumes that a release was built and the artifacts are in the `target` folder.
+
+{% highlight bash %}
+docker-compose run publish-release-for-voting
+{% endhighlight %}
+
+The automated process also generates a vote email that can be sent to the list. Please check the email and amend the
+contents as necessary.
 
 ## Cleaning up after a failed release attempt (for Calcite committers)
 
@@ -511,8 +522,10 @@ Promote the staged nexus artifacts.
 
 Tip: Push the git tag only after the staged nexus artifacts are promoted in the repository. This is because pushing the
 tag triggers Docker Hub to start building the docker images immediately and the build will pull in the promoted artifacts.
-If the artifacts are not yet available, the build on Docker Hub will fail.
+If the artifacts are not yet available, the build on Docker Hub will fail. It's best to continue with the following steps
+after you have confirmed that the nexus artifacts were promoted properly.
  
+### Publishing directly in your environment:
 Copy the Git tag:
 
 {% highlight bash %}
@@ -555,6 +568,22 @@ svn ci
 The old releases will remain available in the
 [release archive](http://archive.apache.org/dist/calcite/).
 
+Merge the release branch back to master and push it:
+
+{% highlight bash %}
+git checkout master
+git merge branch-X.Y --ff-only
+git push origin master
+{% endhighlight %}
+
+### Publishing a release using docker:
+This assumes that a rc release was tagged and pushed to the git repository.
+
+{% highlight bash %}
+docker-compose run promote-release
+{% endhighlight %}
+
+## Add release notes and announce the release
 Add a release note by copying
 [site/_posts/2016-11-01-release-1.9.0.md]({{ site.sourceRoot }}/site/_posts/2016-11-01-release-1.9.0.md),
 generate the javadoc and copy to `site/target/avatica/apidocs`
