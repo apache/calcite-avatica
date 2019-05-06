@@ -16,6 +16,8 @@
  */
 package org.apache.calcite.avatica.util;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
@@ -953,6 +955,47 @@ public class DateTimeUtils {
         - 32045;
   }
 
+  /**
+   * Returns a Unix timestamp in seconds since '1970-01-01 00:00:00' UTC as an unsigned
+   * integer.
+   */
+  public static long unixTimestamp() {
+    return  System.currentTimeMillis() / 1000;
+  }
+
+  /**
+   * Returns the value of the timestamp to seconds since '1970-01-01 00:00:00' UTC.
+   */
+  public static long unixTimestamp(long ts) {
+    return ts / 1000;
+  }
+
+  /**
+   * Returns the value of the argument as an unsigned integer in seconds since
+   * '1970-01-01 00:00:00' UTC.
+   */
+  public static long unixTimestamp(String dateStr, TimeZone tz) {
+    long ts = parseToTimeMillis(dateStr, tz);
+    if (ts == Long.MIN_VALUE) {
+      return Long.MIN_VALUE;
+    } else {
+      return ts / 1000;
+    }
+  }
+
+  /**
+   * Returns the value of the argument as an unsigned integer in seconds since
+   * '1970-01-01 00:00:00' UTC.
+   */
+  public static long unixTimestamp(String dateStr, String format, TimeZone tz) {
+    long ts = parseToTimeMillis(dateStr, format, tz);
+    if (ts == Long.MIN_VALUE) {
+      return Long.MIN_VALUE;
+    } else {
+      return ts / 1000;
+    }
+  }
+
   public static long unixTimestamp(int year, int month, int day, int hour,
       int minute, int second) {
     final int date = ymdToUnixDate(year, month, day);
@@ -960,6 +1003,43 @@ public class DateTimeUtils {
         + (long) hour * MILLIS_PER_HOUR
         + (long) minute * MILLIS_PER_MINUTE
         + (long) second * MILLIS_PER_SECOND;
+  }
+
+  /**
+   * Convert unix timestamp (seconds since '1970-01-01 00:00:00' UTC) to datetime string
+   * in the "yyyy-MM-dd HH:mm:ss" format.
+   */
+  public static String fromUnixTimestamp(long unixTimestamp, TimeZone tz) {
+    return fromUnixTimestamp(unixTimestamp, TIMESTAMP_FORMAT_STRING, tz);
+
+  }
+
+  public static String fromUnixTimestamp(double unixTimestamp, TimeZone tz) {
+    return fromUnixTimestamp(Double.valueOf(unixTimestamp).longValue(), tz);
+  }
+
+  public static String fromUnixTimestamp(BigInteger unixTimestamp, TimeZone tz) {
+    return fromUnixTimestamp(unixTimestamp.longValue(), tz);
+  }
+
+  public static String fromUnixTimestamp(BigDecimal unixTimestamp, TimeZone tz) {
+    return fromUnixTimestamp(unixTimestamp.longValue(), tz);
+  }
+
+  /**
+   * Convert unix timestamp (seconds since '1970-01-01 00:00:00' UTC) to datetime string
+   * in the given format.
+   */
+  public static String fromUnixTimestamp(long unixTimestamp, String format, TimeZone tz) {
+    try {
+      SimpleDateFormat formatter =
+          new SimpleDateFormat(format, Locale.getDefault(Locale.Category.FORMAT));
+      formatter.setTimeZone(tz);
+      Date date = new Date(unixTimestamp * 1000);
+      return formatter.format(date);
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   /** Adds a given number of months to a timestamp, represented as the number
@@ -1148,6 +1228,59 @@ public class DateTimeUtils {
       return o.toString();
     }
   }
+
+  /**
+   * Parses a given datetime string to milli seconds since 1970-01-01 00:00:00 UTC
+   * using the default format "yyyy-MM-dd" or "yyyy-MM-dd HH:mm:ss" depends on the string length.
+   */
+  private static long parseToTimeMillis(String dateStr, TimeZone tz) {
+    String format;
+    if (dateStr.length() <= 10) {
+      format = DATE_FORMAT_STRING;
+    } else {
+      format = TIMESTAMP_FORMAT_STRING;
+    }
+    return parseToTimeMillis(dateStr, format, tz) + getMillis(dateStr);
+  }
+
+  /**
+   * Parses a given datetime string to milli seconds since 1970-01-01 00:00:00 UTC
+   * using user's format "MM-dd-yyyy" or "MM-dd-yyyy HH:mm:ss".
+   */
+  private static long parseToTimeMillis(String dateStr, String format, TimeZone tz) {
+    try {
+      SimpleDateFormat formatter =
+          new SimpleDateFormat(format, Locale.getDefault(Locale.Category.FORMAT));
+      formatter.setTimeZone(tz);
+      Date date = formatter.parse(dateStr);
+      return date.getTime();
+    } catch (Exception e) {
+      return Long.MIN_VALUE;
+    }
+  }
+
+  /**
+   * Returns the milli second part of the datetime.
+   */
+  private static int getMillis(String dateStr) {
+    int length = dateStr.length();
+    if (length == 19) {
+      // "1999-12-31 12:34:56", no milli second left
+      return 0;
+    } else if (length == 21) {
+      // "1999-12-31 12:34:56.7", return 7
+      return Integer.parseInt(dateStr.substring(20)) * 100;
+    } else if (length == 22) {
+      // "1999-12-31 12:34:56.78", return 78
+      return Integer.parseInt(dateStr.substring(20)) * 10;
+    } else if (length >= 23 && length <= 26) {
+      // "1999-12-31 12:34:56.123" ~ "1999-12-31 12:34:56.123456"
+      return Integer.parseInt(dateStr.substring(20, 23)) * 10;
+    } else {
+      return 0;
+    }
+  }
+
 }
 
 // End DateTimeUtils.java

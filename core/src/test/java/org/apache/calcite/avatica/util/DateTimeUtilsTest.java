@@ -19,16 +19,19 @@ package org.apache.calcite.avatica.util;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
 import static org.apache.calcite.avatica.util.DateTimeUtils.EPOCH_JULIAN;
+import static org.apache.calcite.avatica.util.DateTimeUtils.UTC_ZONE;
 import static org.apache.calcite.avatica.util.DateTimeUtils.addMonths;
 import static org.apache.calcite.avatica.util.DateTimeUtils.dateStringToUnixDate;
 import static org.apache.calcite.avatica.util.DateTimeUtils.digitCount;
 import static org.apache.calcite.avatica.util.DateTimeUtils.floorDiv;
 import static org.apache.calcite.avatica.util.DateTimeUtils.floorMod;
+import static org.apache.calcite.avatica.util.DateTimeUtils.fromUnixTimestamp;
 import static org.apache.calcite.avatica.util.DateTimeUtils.intervalDayTimeToString;
 import static org.apache.calcite.avatica.util.DateTimeUtils.intervalYearMonthToString;
 import static org.apache.calcite.avatica.util.DateTimeUtils.subtractMonths;
@@ -49,6 +52,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -861,6 +865,30 @@ public class DateTimeUtilsTest {
     assertThat(unixTimestamp(2016, 2, 28, 0, 0, 0), is(y2016));
     assertThat(unixTimestamp(2016, 2, 29, 0, 0, 0), is(y2016 + day));
     assertThat(unixTimestamp(2016, 3, 1, 0, 0, 0), is(y2016 + day + day));
+
+    assertThat(unixTimestamp(), is(System.currentTimeMillis() / 1000));
+    assertThat(unixTimestamp(System.currentTimeMillis()), is(System.currentTimeMillis() / 1000));
+    // string data to unix timestamp
+    assertThat(unixTimestamp("1970-01-01 00:00:00", UTC_ZONE), is(0L));
+    assertThat(unixTimestamp("2019-05-06 09:16:38", UTC_ZONE), is(1557134198L));
+    assertThat(unixTimestamp("2019-05 09:16:38", UTC_ZONE), is(Long.MIN_VALUE));
+    assertThat(unixTimestamp("05-06-2019 09:16:38", "MM-dd-yyyy HH:mm:ss", UTC_ZONE),
+        is(1557134198L));
+    assertThat(unixTimestamp("2019-05-06 09:16:38", "yyyyMMdd HH:mm:ss", UTC_ZONE),
+        is(Long.MIN_VALUE));
+  }
+
+  @Test public void testFromUnixTimestamp() {
+    assertThat(fromUnixTimestamp(0L, UTC_ZONE), is("1970-01-01 00:00:00"));
+    assertThat(fromUnixTimestamp(1557134198, UTC_ZONE), is("2019-05-06 09:16:38"));
+    assertThat(fromUnixTimestamp(1557134198.000, UTC_ZONE), is("2019-05-06 09:16:38"));
+    assertThat(fromUnixTimestamp(new BigInteger("1557134198"), UTC_ZONE),
+        is("2019-05-06 09:16:38"));
+    assertThat(fromUnixTimestamp(new BigDecimal("1557134198"), UTC_ZONE),
+        is("2019-05-06 09:16:38"));
+    assertThat(fromUnixTimestamp(1557134198L, "MM-dd-yyyy HH:mm:ss", UTC_ZONE),
+        is("05-06-2019 09:16:38"));
+    assertNull(fromUnixTimestamp(1557134198L, "bb-MM-yyyy", UTC_ZONE));
   }
 
   @Test public void testParse() {
@@ -868,7 +896,7 @@ public class DateTimeUtilsTest {
         new SimpleDateFormat(DateTimeUtils.DATE_FORMAT_STRING, Locale.ROOT);
     final Calendar c =
         DateTimeUtils.parseDateFormat("1234-04-12", formatD,
-            DateTimeUtils.UTC_ZONE);
+            UTC_ZONE);
     assertThat(c, notNullValue());
     assertThat(c.get(Calendar.YEAR), is(1234));
     assertThat(c.get(Calendar.MONTH), is(Calendar.APRIL));
@@ -879,7 +907,7 @@ public class DateTimeUtilsTest {
             Locale.ROOT);
     final DateTimeUtils.PrecisionTime pt =
         DateTimeUtils.parsePrecisionDateTimeLiteral(
-            "1234-04-12 01:23:45.06789", formatTs, DateTimeUtils.UTC_ZONE, -1);
+            "1234-04-12 01:23:45.06789", formatTs, UTC_ZONE, -1);
     assertThat(pt, notNullValue());
     assertThat(pt.getCalendar().get(Calendar.YEAR), is(1234));
     assertThat(pt.getCalendar().get(Calendar.MONTH), is(Calendar.APRIL));
@@ -894,7 +922,7 @@ public class DateTimeUtilsTest {
     // as above, but limit to 2 fractional digits
     final DateTimeUtils.PrecisionTime pt2 =
         DateTimeUtils.parsePrecisionDateTimeLiteral(
-            "1234-04-12 01:23:45.06789", formatTs, DateTimeUtils.UTC_ZONE, 2);
+            "1234-04-12 01:23:45.06789", formatTs, UTC_ZONE, 2);
     assertThat(pt2, notNullValue());
     assertThat(pt2.getCalendar().get(Calendar.MILLISECOND), is(60));
     assertThat(pt2.getFraction(), is("06"));
