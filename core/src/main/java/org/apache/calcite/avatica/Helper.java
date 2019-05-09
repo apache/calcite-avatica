@@ -50,10 +50,7 @@ public class Helper {
       if (null != rte.getRpcMetadata()) {
         serverAddress = rte.getRpcMetadata().serverAddress;
       }
-      // Note: we don't add "e" as a cause, so we add its message to the message of
-      // the newly created exception
-      return new AvaticaSqlException(message + ". " + e.getMessage(),
-          rte.getSqlState(), rte.getErrorCode(),
+      return new AvaticaSqlException(message, rte.getSqlState(), rte.getErrorCode(),
           rte.getServerExceptions(), serverAddress);
     }
     return new SQLException(message, e);
