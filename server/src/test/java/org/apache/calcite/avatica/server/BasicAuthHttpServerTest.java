@@ -149,8 +149,10 @@ public class BasicAuthHttpServerTest extends HttpAuthBase {
       readWriteData(url, "DISALLOWED_DB_USER", props);
       fail("Expected an exception");
     } catch (RuntimeException e) {
-      assertEquals("Remote driver error: "
-          + "SQLInvalidAuthorizationSpecException: invalid authorization specification - "
+      assertEquals("Remote driver error: RuntimeException: "
+          + "java.sql.SQLInvalidAuthorizationSpecException: invalid authorization specification"
+          + " - not found: USER1"
+          + " -> SQLInvalidAuthorizationSpecException: invalid authorization specification - "
           + "not found: USER1"
           + " -> HsqlException: invalid authorization specification - not found: USER1",
           e.getMessage());

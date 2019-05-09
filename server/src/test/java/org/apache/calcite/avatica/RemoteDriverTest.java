@@ -67,12 +67,11 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 
-import static org.apache.calcite.avatica.test.StringContainsOnce.containsStringOnce;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -915,9 +914,8 @@ public class RemoteDriverTest {
       fail("expected error, got " + resultSet);
     } catch (SQLException e) {
       LOG.info("Caught expected error", e);
-      String message = ExceptionUtils.toString(e);
-      assertThat(message,
-          containsStringOnce("unbound parameter"));
+      assertThat(e.getMessage(),
+          containsString("exception while executing query: unbound parameter"));
     }
 
     final ParameterMetaData parameterMetaData = ps.getParameterMetaData();
@@ -1844,9 +1842,8 @@ public class RemoteDriverTest {
 
     @Override public Response _apply(Request request) {
       final RequestLogger logger = THREAD_LOG.get();
-      String jsonRequest = null;
       try {
-        jsonRequest = JsonService.MAPPER.writeValueAsString(request);
+        String jsonRequest = JsonService.MAPPER.writeValueAsString(request);
         logger.requestStart(jsonRequest);
 
         Response response = super._apply(request);
@@ -1856,7 +1853,7 @@ public class RemoteDriverTest {
 
         return response;
       } catch (Exception e) {
-        throw new RuntimeException("Request " + jsonRequest + " failed", e);
+        throw new RuntimeException(e);
       }
     }
   }

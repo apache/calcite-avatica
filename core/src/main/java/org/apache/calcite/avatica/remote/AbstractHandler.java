@@ -145,7 +145,7 @@ public abstract class AbstractHandler<T> implements Handler<T> {
    * @param e The Exception to summarize.
    * @return A summary message for the Exception.
    */
-  private String getCausalChain(Throwable e) {
+  private String getCausalChain(Exception e) {
     StringBuilder sb = new StringBuilder(16);
     Throwable curr = e;
     // Could use Guava, but that would increase dependency set unnecessarily.
@@ -156,17 +156,6 @@ public abstract class AbstractHandler<T> implements Handler<T> {
       String message = curr.getMessage();
       sb.append(curr.getClass().getSimpleName()).append(": ");
       sb.append(null == message ? NULL_EXCEPTION_MESSAGE : message);
-      Throwable[] suppressed = curr.getSuppressed();
-      if (suppressed.length > 0) {
-        sb.append(", suppressed: [");
-        String sep = "";
-        for (Throwable throwable : suppressed) {
-          sb.append(sep);
-          sb.append(getCausalChain(throwable));
-          sep = ", ";
-        }
-        sb.append("]");
-      }
       curr = curr.getCause();
     }
     if (sb.length() == 0) {

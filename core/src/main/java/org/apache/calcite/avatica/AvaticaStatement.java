@@ -160,8 +160,8 @@ public abstract class AvaticaStatement
         }
       }
     } catch (RuntimeException e) {
-      throw AvaticaConnection.HELPER.createException(
-              "Error while executing SQL \"" + sql + "\"", e);
+      throw AvaticaConnection.HELPER.createException("Error while executing SQL \"" + sql + "\": "
+          + e.getMessage(), e);
     }
 
     throw new RuntimeException("Failed to successfully execute query after "
@@ -231,8 +231,8 @@ public abstract class AvaticaStatement
       }
       return openResultSet;
     } catch (RuntimeException e) {
-      throw AvaticaConnection.HELPER.createException(
-              "Error while executing SQL \"" + sql + "\"", e);
+      throw AvaticaConnection.HELPER.createException("Error while executing SQL \"" + sql + "\": "
+          + e.getMessage(), e);
     }
   }
 
