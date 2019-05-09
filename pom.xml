@@ -59,7 +59,7 @@ limitations under the License.
     <top.dir>${project.basedir}</top.dir>
     <avatica.release.version>${project.version}</avatica.release.version>
     <version.major>1</version.major>
-    <version.minor>14</version.minor>
+    <version.minor>15</version.minor>
 
     <!-- This list is in alphabetical order. -->
     <apache-rat-plugin.version>0.13</apache-rat-plugin.version>

@@ -28,6 +28,31 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.15.0">1.15.0</a> / 2019-05-XX
+{: #v1-15-0}
+
+Apache Calcite Avatica 1.15.0 is a small release that reverts CALCITE-2845 due to some incompatibilities with downstream
+clients.
+
+Compatibility: This release is tested
+on Linux, macOS, Microsoft Windows;
+using Oracle JDK 8, 9, 10, 11, 12, 13;
+using IBM Java 8;
+Guava versions 14.0 to 23.0;
+other software versions as specified in `pom.xml`.
+
+Features and bug fixes
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3043">CALCITE-3043</a>]
+  Add the ability to publish and promote releases using docker
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3040">CALCITE-3040</a>]
+  Revert CALCITE-2845 due to incompatibilities with downstream clients
+
+Website and Documentation
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3033">CALCITE-3033</a>]
+  Add navigation item for avatica-go HOWTO documentation
+
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.14.0">1.14.0</a> / 2019-04-29
 {: #v1-14-0}
 
