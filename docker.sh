@@ -407,7 +407,7 @@ Here is my vote:
 
 +1 (binding)
 
-$NAME
+$FIRST_NAME
 "
 }
 
@@ -440,7 +440,7 @@ promote_release(){
     [[ $TAG_WITHOUT_RC =~ ([[:digit:]]+\.[[:digit:]]+)\.[[:digit:]]+$ ]]
     BRANCH_VERSION=${BASH_REMATCH[1]}
     git checkout master
-    git merge branch-$TAG_WITHOUT_RC --ff-only
+    git merge branch-avatica-$BRANCH_VERSION --ff-only
     git push $GITBOX_URL master
 
     svn checkout $RELEASE_REPO /tmp/release
