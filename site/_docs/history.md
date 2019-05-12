@@ -28,7 +28,7 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.15.0">1.15.0</a> / 2019-05-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.15.0">1.15.0</a> / 2019-05-13
 {: #v1-15-0}
 
 Apache Calcite Avatica 1.15.0 is a small release that reverts CALCITE-2845 due to some incompatibilities with downstream
