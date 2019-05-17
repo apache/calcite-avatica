@@ -993,7 +993,7 @@ public class DateTimeUtils {
     return DateTimeUtils.ymdToUnixDate(y0, m0, d0);
   }
 
-  private static int lastDay(int y, int m) {
+  public static int lastDay(int y, int m) {
     switch (m) {
     case 2:
       return y % 4 == 0
