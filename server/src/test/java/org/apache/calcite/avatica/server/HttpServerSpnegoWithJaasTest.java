@@ -82,7 +82,7 @@ public class HttpServerSpnegoWithJaasTest {
 
   @BeforeClass public static void setupKdc() throws Exception {
     kdc = new SimpleKdcServer();
-    File target = new File(System.getProperty("user.dir"), "target");
+    File target = SpnegoTestUtil.TARGET_DIR;
     assertTrue(target.exists());
 
     File kdcDir = new File(target, HttpServerSpnegoWithJaasTest.class.getSimpleName());

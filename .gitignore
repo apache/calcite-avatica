@@ -1,6 +1,5 @@
 *~
-target
-.idea
+/.idea
 *.iml
 settings.xml
 .classpath.txt
@@ -13,4 +12,12 @@ settings.xml
 .settings
 .checkstyle
 
-.mvn/wrapper/maven-wrapper.jar
+/.mvn/wrapper/maven-wrapper.jar
+
+/.gradle
+/build/
+/*/build/
+/shaded/*/build/
+/target/
+/*/target/
+/shaded/*/target/

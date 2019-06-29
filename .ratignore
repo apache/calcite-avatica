@@ -1,0 +1,34 @@
+**/.gitattributes
+**/.gitignore
+.ratignore
+# Third-party license files
+src/main/config/licenses/
+#
+**/META-INF/services/
+# Site
+site/_includes/anchor_links.html
+site/_includes/docs_contents.html
+site/_includes/docs_contents_mobile.html
+site/_includes/docs_option.html
+site/_includes/docs_ul.html
+site/_includes/footer.html
+site/_includes/header.html
+site/_includes/news_contents.html
+site/_includes/news_contents_mobile.html
+site/_includes/news_item.html
+site/_includes/primary-nav-items.html
+site/_includes/section_nav.html
+site/_includes/top.html
+site/_layouts/default.html
+site/_layouts/docs.html
+site/_layouts/external.html
+site/_layouts/news.html
+site/_layouts/news_item.html
+site/_layouts/page.html
+site/_sass/**
+site/css/screen.scss
+site/fonts/**
+site/js/**
+# Images
+site/img/*.png
+site/favicon.ico

@@ -27,13 +27,13 @@ import org.junit.runners.Parameterized.Parameters;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -47,14 +47,14 @@ public class SslDriverTest extends HttpBaseTest {
   }
 
   @Parameters public static List<Object[]> parameters() throws Exception {
-    if (System.getProperty("java.vendor").contains("IBM")) {
-      // Skip TLS testing on IBM Java due the combination of:
-      // - Jetty 9.4.12+ ignores SSL_* ciphers due to security - eclipse/jetty.project#2807
-      // - IBM uses SSL_* cipher names for ALL ciphers not following RFC cipher names
-      //   See eclipse/jetty.project#2807 for details
-      LOG.info("Skipping HTTPS test on IBM Java");
-      return Arrays.asList(new Object[][] {{null}, {null}});
-    }
+    // Skip TLS testing on IBM Java due the combination of:
+    // - Jetty 9.4.12+ ignores SSL_* ciphers due to security - eclipse/jetty.project#2807
+    // - IBM uses SSL_* cipher names for ALL ciphers not following RFC cipher names
+    //   See eclipse/jetty.project#2807 for details
+    assumeFalse(
+        "Skip TLS testing on IBM Java due eclipse/jetty.project#2807",
+        System.getProperty("java.vendor").contains("IBM")
+    );
 
     final ArrayList<Object[]> parameters = new ArrayList<>();
     setupClass();

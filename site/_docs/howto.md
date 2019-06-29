@@ -30,8 +30,7 @@ Here's some miscellaneous documentation about using Avatica.
 
 ## Building from a source distribution
 
-Prerequisites are maven (3.2.1 or later)
-and Java (JDK 8 or later) on your path.
+Prerequisites are Java (JDK 8 or later) on your path.
 
 Unpack the source distribution `.tar.gz` file,
 `cd` to the root directory of the unpacked source,
@@ -40,26 +39,29 @@ then build using maven:
 {% highlight bash %}
 $ tar xvfz apache-calcite-avatica-1.15.0-src.tar.gz
 $ cd apache-calcite-avatica-1.15.0-src
-$ ./mvnw install
+$ ./gradlew build
 {% endhighlight %}
 
 [Running tests](#running-tests) describes how to run more or fewer
 tests.
 
-## Building from git
+## Building from Git
 
-Prerequisites are git, maven (3.2.1 or later)
+Prerequisites are Git,
 and Java (JDK 8 or later) on your path.
 
-Create a local copy of the github repository,
+Create a local copy of the GitHub repository,
 `cd` to its root directory,
 then build using maven:
 
 {% highlight bash %}
 $ git clone git://github.com/apache/calcite-avatica.git avatica
 $ cd avatica
-$ ./mvnw install
+$ ./gradlew build
 {% endhighlight %}
+
+Note: [gdub](https://github.com/dougborg/gdub) simplifies `./gradlew build` to `gw build`,
+and it simplifies cases like `../../gradlew ...` to `gw ...` as well.
 
 [Running tests](#running-tests) describes how to run more or fewer
 tests.
@@ -67,17 +69,17 @@ tests.
 ## Running tests
 
 The test suite will run by default when you build, unless you specify
-`-DskipTests`.
-
-### Running tests in your environment
+`-x test`
 
 {% highlight bash %}
-$ ./mvnw clean verify -Dcheckstyle.skip
+$ ./gradlew assemble # build the artifacts
+$ ./gradlew build -x test # build the artifacts, verify code style, skip tests
+$ ./gradlew check # verify code style, execute tests
+$ ./gradlew test # execute tests
+$ ./gradlew checkstyleMain checkstyleTest # verify code style
 {% endhighlight %}
 
-By default, invoking the `verify` Maven lifecycle phase will also cause checkstyle
-rules to be run. It is expected that contributions pass the checkstyle rules; however,
-it is common to ignore these while working on a feature/bug and fix them at the end.
+You can use `./gradlew assemble` to build the artifacts and skip all tests and verifications.
 
 ### To run tests in docker:
 
@@ -150,7 +152,26 @@ to guarantee that your credentials will be cached for the duration of the build.
 
 ## Set up Maven repository credentials (for Calcite committers)
 
-Follow the instructions [here](http://www.apache.org/dev/publishing-maven-artifacts.html#dev-env) to add your credentials to your maven configuration.
+Gradle provides multiple ways to [configure project properties](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties).
+For instance, you could update `$HOME/.gradle/gradle.properties`.
+
+Note: the build script would print the missing properties, so you can try running it and let it complain on the missing ones.
+
+The following options are used:
+
+{% highlight properties %}
+asfCommitterId=
+asfNexusUsername=
+asfNexusPassword=
+asfSvnUsername=
+asfSvnPassword=
+{% endhighlight %}
+
+Note: when https://github.com/vlsi/asflike-release-environment is used, the credentials are takend from
+`asfTest...` (e.g. `asfTestNexusUsername=test`)
+
+Note: if you want to uses `gpg-agent`, you need to pass `useGpgCmd` property, and specify the key id
+via `signing.gnupg.keyName`.
 
 ## Making a snapshot (for Calcite committers)
 
@@ -163,12 +184,10 @@ Before you start:
 # Make sure that there are no junk files in the sandbox
 git clean -xn
 
-./mvnw -Papache-release clean install
+./gradlew -Pasf publish
 {% endhighlight %}
 
-When the dry-run has succeeded, change `install` to `deploy`.
-
-## Making a release (for Calcite committers)
+## Making a release candidate (for Calcite committers)
 
 Before you start:
 
@@ -176,63 +195,46 @@ Before you start:
 * Make sure you are using JDK 8 (not 9 or 10).
 * Check that `README`, `site/_docs/howto.md`, `site/_docs/docker_images.md` have the correct version number.
 * Check that `NOTICE` has the current copyright year.
-* Set `version.major` and `version.minor` in `pom.xml`.
+* Check that `calcite.avatica.version` has the proper value in `/gradle.properties`.
 * Add release notes to `site/_docs/history.md`. Include the commit history,
   and say which versions of Java, Guava and operating systems the release is
   tested against.
 * Generate a report of vulnerabilities that occur among dependencies,
-  using `./mvnw verify -Ppedantic`.
+  using `./gradlew dependencyCheckUpdate dependencyCheckAggregate`.
 * Make sure that
   <a href="https://issues.apache.org/jira/issues/?jql=project%20%3D%20CALCITE%20AND%20status%20%3D%20Resolved%20and%20fixVersion%20is%20null">
   every "resolved" JIRA case</a> (including duplicates) has
   a fix version assigned (most likely the version we are
   just about to release)
 
-Create a release branch named after the release, e.g.
-`branch-avatica-1.9`, and push it to Apache.
+The release candidate process does not add commits,
+so there's no harm if it fails. It might leave `-rc` tag behind
+which can be removed if required.
 
-{% highlight bash %}
-$ git checkout -b branch-avatica-X.Y
-$ git push -u origin branch-avatica-X.Y
-{% endhighlight %}
+You can perform a dry-run release with a help of https://github.com/vlsi/asflike-release-environment
+That would perform the same steps, however it would push changes to the mock Nexus, Git, and SVN servers.
 
-We will use the branch for the entire the release process. Meanwhile,
-we do not allow commits to the master branch. After the release is
-final, we can use `git merge --ff-only` to append the changes on the
-release branch onto the master branch. (Apache does not allow reverts
-to the master branch, which makes it difficult to clean up the kind of
-messy commits that inevitably happen while you are trying to finalize
-a release.)
-
-Now, set up your environment and do a dry run. The dry run will not
-commit any changes back to git and gives you the opportunity to verify
-that the release process will complete as expected.
-
-If any of the steps fail, clean up (see below), fix the problem, and
+If any of the steps fail, fix the problem, and
 start again from the top.
 
-To perform the dry-run, you can either use your environment or the release script and docker.
+### To prepare a release candidate directly in your environment:
 
-### To perform the dry-run directly in your environment:
+Pick a release candidate index and ensure it does not interfere with previous candidates for the version.
 
 {% highlight bash %}
 # Make sure that there are no junk files in the sandbox
 git clean -xn
 
-# Do a dry run of the release:prepare step, which sets version numbers.
-# Typically we increment minor version: If X.Y.Z is 1.15.0, X2.Y2.Z2 is 1.16.0.
-# Note X.Y.Z is the current version we're trying to release, and X2.Y2.Z2 is the next development version.
+# Dry run the release candidate (push to asf-like-environment)
+./gradlew prepareVote -Prc=1
 
-# For example, if I am currently building a release for 1.15.0, X.Y.Z would be 1.15.0 and X2.Y2.Z2 would be 1.16.0.
-./mvnw -DdryRun=true -DreleaseVersion=X.Y.Z -DdevelopmentVersion=X2.Y2.Z2-SNAPSHOT -Dtag=avatica-X.Y.Z-rcN -Papache-release -Duser.name=${asf.username} release:prepare
-
-# If you have multiple GPG keys, you can select the key used to sign the release by appending `-Dgpg.keyname=${your.key.id}` to `-Darguments`:
-./mvnw -DdryRun=true -DreleaseVersion=X.Y.Z -DdevelopmentVersion=X2.Y2.Z2-SNAPSHOT -Dtag=avatica-X.Y.Z-rcN -Papache-release -Duser.name=${asf.username} release:prepare -Darguments=-Dgpg.keyname=${your.key.id}
+# Push release candidate to ASF servers
+./gradlew prepareVote -Prc=1 -Pasf
 {% endhighlight %}
 
-### To perform the dry-run in docker:
+### To prepare a release candidate in Docker:
 
-* You will need to have [docker](https://docs.docker.com/install/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
+* You will need to have [Docker](https://docs.docker.com/install/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
 
 * The script expects you to mount your `~/.gnupg` directory into the `/.gnupg` directory in the container. Once mounted into the container,
 the script will make a copy of the contents and move it to a different location, so that it will not modify the contents of your original
@@ -246,12 +248,11 @@ docker-compose run -v ~/.gnupg:/.gnupg dry-run
 docker-compose run -v /c/Users/username/AppData/Roaming/gnupg:/.gnupg dry-run
 {% endhighlight %}
 
-Check the artifacts:
+## Checking the artifacts
 
-* In the `target` directory should be these 4 files, among others:
+* In the `release/build/distributions` directory should be these 3 files, among others:
   * apache-calcite-avatica-X.Y.Z-src.tar.gz
   * apache-calcite-avatica-X.Y.Z-src.tar.gz.asc
-  * apache-calcite-avatica-X.Y.Z-src.tar.gz.asc.sha512
   * apache-calcite-avatica-X.Y.Z-src.tar.gz.sha512
 * Note that the file names start `apache-calcite-avatica-`.
 * In the source distro `.tar.gz` (currently there is
@@ -261,57 +262,13 @@ Check the artifacts:
   `README`, `README.md`
   * Check that the version in `README` is correct
 * Make sure that there is no `KEYS` file in the source distros
-* For each .jar (for example `core/target/avatica-core-X.Y.Z.jar`
-  and `server/target/avatica-server-X.Y.Z-sources.jar`),
+* For each .jar (for example `core/build/libs/avatica-core-X.Y.Z.jar`
+  and `server/build/libs/avatica-server-X.Y.Z-sources.jar`),
   verify that the `META-INF` directory contains the correct
   contents for `DEPENDENCIES`, `LICENSE` and `NOTICE` per the
   source/classes contained. Refer to the ASF licensing documentation on
   what is required.
 * Check PGP, per [this](https://httpd.apache.org/dev/verification.html)
-
-If something is not correct, you can invoke the `release:clean` mojo to remove the
-generated files from your workspace:
-
-### If you are building directly in your environment:
-
-{% highlight bash %}
-./mvnw release:clean
-{% endhighlight %}
-
-### If you are building using docker:
-
-{% highlight bash %}
-docker-compose run clean
-{% endhighlight %}
-
-If successful, remove the `-DdryRun` flag and run the release for real.
-
-### To build directly in your environment:
-
-{% highlight bash %}
-# Prepare sets the version numbers, creates a tag, and pushes it to git.
-# Typically we increment minor version: If X.Y.Z is 1.15.0, X2.Y2.Z2 is 1.16.0.
-# Note X.Y.Z is the current version we're trying to release, and X2.Y2.Z2 is the next development version.
-# For example, if I am currently building a release for 1.15.0, X.Y.Z would be 1.15.0 and X2.Y2.Z2 would be 1.16.0.
-./mvnw -DreleaseVersion=X.Y.Z -DdevelopmentVersion=X2.Y2.Z2-SNAPSHOT -Dtag=avatica-X.Y.Z-rcN -Papache-release -Duser.name=${asf.username} release:prepare
-
-# If you have multiple GPG keys, you can select the key used to sign the release by appending `-Darguments=-Dgpg.keyname=${your.key.id}`:
-./mvnw -DreleaseVersion=X.Y.Z -DdevelopmentVersion=X2.Y2.Z2-SNAPSHOT -Dtag=avatica-X.Y.Z-rcN -Papache-release -Duser.name=${asf.username} release:prepare -Darguments=-Dgpg.keyname=${your.key.id}
-
-# Perform checks out the tagged version, builds, and deploys to the staging repository
-./mvnw -Papache-release -Duser.name=${asf.username} release:perform -Darguments="-DskipTests"
-{% endhighlight %}
-
-### To build using docker:
-
-{% highlight bash %}
-# On Linux:
-docker-compose run -v ~/.gnupg:/.gnupg release
-
-# On Windows
-docker-compose run -v /c/Users/username/AppData/Roaming/gnupg:/.gnupg release
-{% endhighlight %}
-
 
 Verify the staged artifacts in the Nexus repository:
 
@@ -324,57 +281,10 @@ Verify the staged artifacts in the Nexus repository:
   https://repository.apache.org/content/repositories/orgapachecalcite-1000
   (or a similar URL)
 
-### To upload the artifacts directly in your environment:
-Upload the artifacts via subversion to a staging area,
-https://dist.apache.org/repos/dist/dev/calcite/apache-calcite-avatica-X.Y.Z-rcN:
-
-{% highlight bash %}
-# Create a subversion workspace, if you haven't already
-mkdir -p ~/dist/dev
-pushd ~/dist/dev
-svn co https://dist.apache.org/repos/dist/dev/calcite
-popd
-
-# Move the files into a directory
-cd target
-mkdir ~/dist/dev/calcite/apache-calcite-avatica-X.Y.Z-rcN
-mv apache-calcite-avatica-* ~/dist/dev/calcite/apache-calcite-avatica-X.Y.Z-rcN
-
-# Check in
-cd ~/dist/dev/calcite
-svn add apache-calcite-avatica-X.Y.Z-rcN
-svn ci
-{% endhighlight %}
-
-### To upload the artifacts using docker:
-This assumes that a release was built and the artifacts are in the `target` folder.
-
-{% highlight bash %}
-docker-compose run publish-release-for-voting
-{% endhighlight %}
-
-The automated process also generates a vote email that can be sent to the list. Please check the email and amend the
-contents as necessary.
-
 ## Cleaning up after a failed release attempt (for Calcite committers)
 
-{% highlight bash %}
-# Make sure that the tag you are about to generate does not already
-# exist (due to a failed release attempt)
-git tag
-
-# If the tag exists, delete it locally and remotely
-git tag -d avatica-X.Y.Z
-git push origin :refs/tags/avatica-X.Y.Z
-
-# Remove modified files
-./mvnw release:clean
-
-# Check whether there are modified files and if so, go back to the
-# original git commit
-git status
-git reset --hard HEAD
-{% endhighlight %}
+If something is not correct, you can fix it, commit it, and prepare the next candidate.
+The release candidate tags might be kept for a while.
 
 ## Validate a release
 
@@ -410,7 +320,9 @@ checkHash apache-calcite-avatica-X.Y.Z-rcN
 
 ## Get approval for a release via Apache voting process (for Calcite committers)
 
-Release vote on dev list
+Release vote on dev list.
+Note: the draft mail is printed as the final step of `prepareVote` task,
+and you can find the draft in `/build/prepareVote/mail.txt`
 
 {% highlight text %}
 To: dev@calcite.apache.org
@@ -513,7 +425,7 @@ with a change comment
 (fill in release number and date appropriately).
 Uncheck "Send mail for this update".
 
-Promote the staged nexus artifacts.
+Promote the staged nexus artifacts (this is automatic, however, the instructions are here just in case).
 
 * Go to [https://repository.apache.org/](https://repository.apache.org/) and login
 * Under "Build Promotion" click "Staging Repositories"
@@ -526,55 +438,24 @@ If the artifacts are not yet available, the build on Docker Hub will fail. It's 
 after you have confirmed that the nexus artifacts were promoted properly.
 
 ### Publishing directly in your environment:
-Copy the Git tag:
 
 {% highlight bash %}
-git tag rel/avatica-X.Y.X avatica-X.Y.Z-rcN
-git push origin rel/avatica-X.Y.Z
+# Dry run publishing the release (push to asf-like-environment)
+./gradlew publishDist -Prc=1
+
+# Publish the release to ASF servers
+./gradlew publishDist -Prc=1 -Pasf
 {% endhighlight %}
 
-Check the artifacts into svn.
+If there are more than 2 releases in SVN (see https://dist.apache.org/repos/dist/release/calcite),
+clear out the oldest ones:
 
 {% highlight bash %}
-# Get the release candidate.
-mkdir -p ~/dist/dev
-cd ~/dist/dev
-svn co https://dist.apache.org/repos/dist/dev/calcite
-
-# Copy the artifacts. Note that the copy does not have '-rcN' suffix.
-mkdir -p ~/dist/release
-cd ~/dist/release
-svn co https://dist.apache.org/repos/dist/release/calcite
-cd calcite
-cp -rp ../../dev/calcite/apache-calcite-avatica-X.Y.Z-rcN apache-calcite-avatica-X.Y.Z
-svn add apache-calcite-avatica-X.Y.Z
-
-# Check in.
-svn ci
-{% endhighlight %}
-
-Svnpubsub will publish to the
-[release repo](https://dist.apache.org/repos/dist/release/calcite) and propagate to the
-[mirrors](http://www.apache.org/dyn/closer.cgi/calcite) within 24 hours.
-
-If there are now more than 2 releases, clear out the oldest ones:
-
-{% highlight bash %}
-cd ~/dist/release/calcite
-svn rm apache-calcite-avatica-X.Y.Z
-svn ci
+svn rm https://dist.apache.org/repos/dist/release/calcite/apache-calcite-avatica-X.Y.Z
 {% endhighlight %}
 
 The old releases will remain available in the
 [release archive](http://archive.apache.org/dist/calcite/).
-
-Merge the release branch back to master and push it:
-
-{% highlight bash %}
-git checkout master
-git merge branch-X.Y --ff-only
-git push origin master
-{% endhighlight %}
 
 ### Publishing a release using docker:
 This assumes that a rc release was tagged and pushed to the git repository.

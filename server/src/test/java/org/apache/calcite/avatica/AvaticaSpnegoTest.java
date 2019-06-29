@@ -71,7 +71,7 @@ public class AvaticaSpnegoTest extends HttpBaseTest {
       return;
     }
     kdc = new SimpleKdcServer();
-    File target = new File(System.getProperty("user.dir"), "target");
+    File target = SpnegoTestUtil.TARGET_DIR;
     assertTrue(target.exists());
 
     File kdcDir = new File(target, AvaticaSpnegoTest.class.getSimpleName());

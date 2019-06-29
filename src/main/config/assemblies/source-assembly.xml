@@ -66,6 +66,12 @@ limitations under the License.
         <exclude>%regex[(?!((?!${project.build.directory}/)[^/]+/)*src/)(.*/)?\.wtpmodules(/.*)?]
         </exclude>
 
+        <!-- Gradle -->
+
+        <exclude>.gradle/**</exclude>
+        <exclude>build/**</exclude>
+        <exclude>shaded/*/build/**</exclude>
+        <exclude>*/build/**</exclude>
 
         <!-- scm -->
         <exclude>%regex[(?!((?!${project.build.directory}/)[^/]+/)*src/)(.*/)?\.gitignore(/.*)?]

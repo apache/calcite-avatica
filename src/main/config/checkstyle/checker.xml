@@ -276,4 +276,8 @@ limitations under the License.
   </module>
 
   <module name="net.hydromatic.toolbox.checkstyle.HydromaticFileSetCheck"/>
+
+  <module name="SuppressionFilter">
+    <property name="file" value="${checkstyle.suppressions.file}"/>
+  </module>
 </module>

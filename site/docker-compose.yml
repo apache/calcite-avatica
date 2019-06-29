@@ -30,7 +30,7 @@ services:
   generate-javadoc:
     image: maven
     working_dir: /usr/src/calcite-avatica
-    command: sh -c "mvn -DskipTests -P!compile-protobuf site; rm -rf site/target/avatica/apidocs site/target/avatica/testapidocs; mkdir -p site/target/avatica; mv target/site/apidocs target/site/testapidocs site/target/avatica"
+    command: sh -c "./gradlew javadocAggregate; rm -rf site/target/avatica/apidocs site/target/avatica/testapidocs; mkdir -p site/target/avatica; mv build/docs/javadocAggregate site/target/avatica"
     volumes:
       - ../:/usr/src/calcite-avatica
       - maven-repo:/root/.m2

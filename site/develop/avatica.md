@@ -50,34 +50,13 @@ then build using maven:
 {% highlight bash %}
 $ git clone git://github.com/apache/calcite-avatica.git avatica
 $ cd avatica
-$ ./mvnw install
+$ ./gradlew build
 {% endhighlight %}
 
 The HOWTO describes how to
 [build from a source distribution]({{ site.baseurl }}/docs/howto.html#building-from-a-source-distribution),
 [run more or fewer tests]({{ site.baseurl }}/docs/howto.html#running-tests) and
 [run integration tests]({{ site.baseurl }}/docs/howto.html#running-integration-tests).
-
-### Disabling protobuf generation
-
-On older operating systems, developers trying to build Avatica may experience
-issues with the Xolstice maven-protobuf-plugin, similar to the following:
-
-```
-[INFO] Compiling 3 proto file(s) to /avatica/core/src/main/java
-[ERROR] PROTOC FAILED: /avatica/core/target/protoc-plugins/protoc-3.1.0-linux-x86_64.exe: /lib64/libc.so.6: version `GLIBC_2.14' not found (required by /avatica/core/target/protoc-plugins/protoc-3.1.0-linux-x86_64.exe)
-[ERROR] /avatica/core/src/main/protobuf/common.proto [0:0]: /avatica/core/target/protoc-plugins/protoc-3.1.0-linux-x86_64.exe: /lib64/libc.so.6: version `GLIBC_2.14' not found (required by /avatica/core/target/protoc-plugins/protoc-3.1.0-linux-x86_64.exe)
-[ERROR] /avatica/core/src/main/protobuf/responses.proto [0:0]: /avatica/core/target/protoc-plugins/protoc-3.1.0-linux-x86_64.exe: /lib64/libc.so.6: version `GLIBC_2.14' not found (required by /avatica/core/target/protoc-plugins/protoc-3.1.0-linux-x86_64.exe)
-[ERROR] /avatica/core/src/main/protobuf/requests.proto [0:0]: /avatica/core/target/protoc-plugins/protoc-3.1.0-linux-x86_64.exe: /lib64/libc.so.6: version `GLIBC_2.14' not found (required by /avatica/core/target/protoc-plugins/protoc-3.1.0-linux-x86_64.exe)
-```
-
-In most cases, it is unnecessary to re-generate the Protobuf messages into Java code. Developers
-can side-step this issue by disabling the `compile-protobuf` profile in their Maven execution.
-
-{% highlight bash %}
-$ ./mvnw package -P!compile-protobuf
-{% endhighlight %}
-
 
 ## Contributing
 
@@ -91,7 +70,7 @@ proposed feature or start a discussion on the dev list.
 Fork the github repository, and create a branch for your feature.
 
 Develop your feature and test cases, and make sure that
-`./mvnw install` succeeds. (Run extra tests if your change warrants it.)
+`./gradlew build` succeeds. (Run extra tests if your change warrants it.)
 
 Commit your change to your branch, and use a comment that starts with
 the JIRA case number, like this:

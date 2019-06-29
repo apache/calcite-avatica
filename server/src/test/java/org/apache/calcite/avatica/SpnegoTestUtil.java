@@ -59,6 +59,9 @@ public class SpnegoTestUtil {
   public static final String CLIENT_PRINCIPAL = "client@" + REALM;
   public static final String SERVER_PRINCIPAL = "HTTP/" + KDC_HOST + "@" + REALM;
 
+  private static final String TARGET_DIR_NAME = System.getProperty("target.dir", "target");
+  public static final File TARGET_DIR = new File(System.getProperty("user.dir"), TARGET_DIR_NAME);
+
   private SpnegoTestUtil() {}
 
   public static int getFreePort() throws IOException {

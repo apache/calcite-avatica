@@ -74,7 +74,9 @@ public abstract class HttpBaseTest {
   protected static final ConnectionSpec CONNECTION_SPEC = ConnectionSpec.HSQLDB;
   protected static final List<HttpServer> SERVERS_TO_STOP = new ArrayList<>();
 
-  protected static final File TARGET_DIR = new File(System.getProperty("user.dir"), "target");
+  protected static final String TARGET_DIR_NAME = System.getProperty("target.dir", "target");
+  protected static final File TARGET_DIR =
+          new File(System.getProperty("user.dir"), TARGET_DIR_NAME);
   protected static final File KEYSTORE = new File(TARGET_DIR, "avatica-test.jks");
   protected static LocalService localService;
 
@@ -82,7 +84,7 @@ public abstract class HttpBaseTest {
 
   public static void setupClass() throws SQLException {
     // Create a self-signed cert
-    File target = new File(System.getProperty("user.dir"), "target");
+    File target = SpnegoTestUtil.TARGET_DIR;
     File keystore = new File(target, "avatica-test.jks");
     if (keystore.isFile()) {
       assertTrue("Failed to delete keystore: " + keystore, keystore.delete());
