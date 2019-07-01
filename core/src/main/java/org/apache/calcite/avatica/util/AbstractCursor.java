@@ -1318,8 +1318,9 @@ public abstract class AbstractCursor implements Cursor {
         return componentAccessor.getInt();
       case Types.BIGINT:
         return componentAccessor.getLong();
-      case Types.FLOAT:
+      case Types.REAL:
         return componentAccessor.getFloat();
+      case Types.FLOAT:
       case Types.DOUBLE:
         return componentAccessor.getDouble();
       case Types.ARRAY:
