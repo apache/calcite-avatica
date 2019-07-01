@@ -100,7 +100,7 @@ limitations under the License.
     <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
     <mockito.version>2.23.4</mockito.version>
     <os-maven-plugin.version>1.6.1</os-maven-plugin.version>
-    <owasp-dependency-check.version>4.0.2</owasp-dependency-check.version>
+    <owasp-dependency-check.version>5.0.0</owasp-dependency-check.version>
     <protobuf.version>3.6.1</protobuf.version>
     <protobuf-maven-plugin.version>0.6.1</protobuf-maven-plugin.version>
     <scott-data-hsqldb.version>0.1</scott-data-hsqldb.version>
