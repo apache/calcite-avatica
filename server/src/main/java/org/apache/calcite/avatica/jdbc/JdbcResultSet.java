@@ -32,7 +32,6 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Struct;
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -226,8 +225,8 @@ class JdbcResultSet extends Meta.MetaResultSet {
       try {
         // Recursively extracts an Array using its ResultSet-representation
         return extractUsingResultSet(array, calendar);
-      } catch (UnsupportedOperationException | SQLFeatureNotSupportedException e) {
-        // Not every database might implement Array.getResultSet(). This call
+      } catch (Exception e) {
+        // Not every database might implement Array.getResultSet() using the expected structure. This call
         // assumes a non-nested array (depends on the db if that's a valid assumption)
         return extractUsingArray(array, calendar);
       }
