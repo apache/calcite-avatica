@@ -226,8 +226,8 @@ class JdbcResultSet extends Meta.MetaResultSet {
         // Recursively extracts an Array using its ResultSet-representation
         return extractUsingResultSet(array, calendar);
       } catch (Exception e) {
-        // Not every database might implement Array.getResultSet() using the expected structure. This call
-        // assumes a non-nested array (depends on the db if that's a valid assumption)
+        // Not every database might implement Array.getResultSet() using the expected structure.
+        // This call assumes a non-nested array (depends on the db if that's a valid assumption)
         return extractUsingArray(array, calendar);
       }
     case Types.STRUCT:
