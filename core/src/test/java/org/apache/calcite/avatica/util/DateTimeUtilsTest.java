@@ -34,7 +34,9 @@ import static org.apache.calcite.avatica.util.DateTimeUtils.intervalYearMonthToS
 import static org.apache.calcite.avatica.util.DateTimeUtils.subtractMonths;
 import static org.apache.calcite.avatica.util.DateTimeUtils.timeStringToUnixDate;
 import static org.apache.calcite.avatica.util.DateTimeUtils.timestampStringToUnixDate;
+import static org.apache.calcite.avatica.util.DateTimeUtils.unixDateCeil;
 import static org.apache.calcite.avatica.util.DateTimeUtils.unixDateExtract;
+import static org.apache.calcite.avatica.util.DateTimeUtils.unixDateFloor;
 import static org.apache.calcite.avatica.util.DateTimeUtils.unixDateToString;
 import static org.apache.calcite.avatica.util.DateTimeUtils.unixTimeExtract;
 import static org.apache.calcite.avatica.util.DateTimeUtils.unixTimeToString;
@@ -898,6 +900,19 @@ public class DateTimeUtilsTest {
     assertThat(pt2, notNullValue());
     assertThat(pt2.getCalendar().get(Calendar.MILLISECOND), is(60));
     assertThat(pt2.getFraction(), is("06"));
+  }
+
+  @Test public void testUnixDateFloorCeil() {
+    final long y1900 = -(70 * 365 + 70 / 4);
+    final long y1900_0102 = y1900 + 1;
+    final long y1899 = y1900 - 365;
+    final long y1901 = y1900 + 365;
+    checkDateString("1900-01-01", (int) y1900);
+    checkDateString("1900-01-02", (int) y1900_0102);
+    checkDateString("1899-01-01", (int) y1899);
+    checkDateString("1901-01-01", (int) y1901);
+    assertThat(unixDateFloor(TimeUnitRange.YEAR, y1900_0102), is(y1900));
+    assertThat(unixDateCeil(TimeUnitRange.YEAR, y1900_0102), is(y1901));
   }
 }
 
