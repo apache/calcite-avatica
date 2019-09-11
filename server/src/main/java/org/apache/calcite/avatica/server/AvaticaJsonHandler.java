@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import javax.servlet.ServletException;
@@ -68,8 +67,11 @@ public class AvaticaJsonHandler extends AbstractAvaticaHandler {
 
   public AvaticaJsonHandler(Service service, MetricsSystem metrics,
       AvaticaServerConfiguration serverConfig) {
-    this.service = Objects.requireNonNull(service);
-    this.metrics = Objects.requireNonNull(metrics);
+    if (service == null || metrics == null) {
+      throw new NullPointerException();
+    }
+    this.service = service;
+    this.metrics = metrics;
     // Avatica doesn't have a Guava dependency
     this.jsonHandler = new JsonHandler(service, this.metrics);
 
@@ -89,7 +91,8 @@ public class AvaticaJsonHandler extends AbstractAvaticaHandler {
   public void handle(String target, Request baseRequest,
       HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
-    try (final Context ctx = requestTimer.start()) {
+    final Context ctx = requestTimer.start();
+    try {
       if (!isUserPermitted(serverConfig, baseRequest, request, response)) {
         LOG.debug("HTTP request from {} is unauthenticated and authentication is required",
             request.getRemoteAddr());
@@ -105,11 +108,13 @@ public class AvaticaJsonHandler extends AbstractAvaticaHandler {
         if (rawRequest == null) {
           // Avoid a new buffer creation for every HTTP request
           final UnsynchronizedBuffer buffer = threadLocalBuffer.get();
-          try (ServletInputStream inputStream = request.getInputStream()) {
+          ServletInputStream inputStream = request.getInputStream();
+          try {
             rawRequest = AvaticaUtils.readFully(inputStream, buffer);
           } finally {
             // Reset the offset into the buffer after we're done
             buffer.reset();
+            inputStream.close();
           }
         }
         final String jsonRequest =
@@ -146,6 +151,8 @@ public class AvaticaJsonHandler extends AbstractAvaticaHandler {
         response.setStatus(jsonResponse.getStatusCode());
         response.getWriter().println(jsonResponse.getResponse());
       }
+    } finally {
+      ctx.close();
     }
   }
 

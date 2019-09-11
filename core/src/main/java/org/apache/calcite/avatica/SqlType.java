@@ -355,7 +355,7 @@ public enum SqlType {
   /** Class used to serialize values of this type as JSON. */
   public final Class serial;
 
-  private static final Map<Integer, SqlType> BY_ID = new HashMap<>();
+  private static final Map<Integer, SqlType> BY_ID = new HashMap();
   static {
     for (SqlType sqlType : values()) {
       BY_ID.put(sqlType.id, sqlType);
@@ -392,10 +392,10 @@ public enum SqlType {
 
   /** Returns the entries in JDBC table B-5. */
   public static Iterable<Map.Entry<Class, SqlType>> getSetConversions() {
-    final ArrayList<Map.Entry<Class, SqlType>> list = new ArrayList<>();
+    final ArrayList<Map.Entry<Class, SqlType>> list = new ArrayList();
     for (Map.Entry<Class, EnumSet<SqlType>> entry : SET_LIST.entrySet()) {
       for (SqlType sqlType : entry.getValue()) {
-        list.add(new AbstractMap.SimpleEntry<>(entry.getKey(), sqlType));
+        list.add(new AbstractMap.SimpleEntry(entry.getKey(), sqlType));
       }
     }
     return list;
@@ -405,8 +405,8 @@ public enum SqlType {
   public static final Map<Method, EnumSet<SqlType>> GET_LIST;
 
   static {
-    SET_LIST = new HashMap<>();
-    GET_LIST = new HashMap<>();
+    SET_LIST = new HashMap();
+    GET_LIST = new HashMap();
 
     EnumSet<SqlType> numericTypes = EnumSet.of(TINYINT, SMALLINT, INTEGER,
         BIGINT, REAL, FLOAT, DOUBLE, DECIMAL, NUMERIC, BIT, BOOLEAN);
@@ -490,9 +490,8 @@ public enum SqlType {
     GET_LIST.put(Method.GET_SQLXML, EnumSet.of(SQLXML));
   }
 
-  @SafeVarargs
   private static <E extends Enum<E>> EnumSet<E> concat(Collection<E>... ess) {
-    final List<E> list = new ArrayList<>();
+    final List<E> list = new ArrayList();
     for (Collection<E> es : ess) {
       list.addAll(es);
     }

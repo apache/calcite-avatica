@@ -20,7 +20,6 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * A client-facing {@link SQLException} which encapsulates errors from the remote Avatica server.
@@ -45,7 +44,10 @@ public class AvaticaSqlException extends SQLException {
       List<String> stackTraces, String remoteServer) {
     super("Error " + errorCode + " (" + sqlState + ") : " + errorMessage, sqlState, errorCode);
     this.errorMessage = errorMessage;
-    this.stackTraces = Objects.requireNonNull(stackTraces);
+    if (stackTraces == null) {
+      throw new NullPointerException();
+    }
+    this.stackTraces = stackTraces;
     this.remoteServer = remoteServer;
   }
 

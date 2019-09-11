@@ -26,7 +26,6 @@ import java.sql.Types;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /** Implementation of JDBC {@link Array}. */
 public class ArrayImpl implements Array {
@@ -230,7 +229,9 @@ public class ArrayImpl implements Array {
     ResultSet leftResultSet = left.getResultSet();
     ResultSet rightResultSet = right.getResultSet();
     while (leftResultSet.next() && rightResultSet.next()) {
-      if (!Objects.equals(leftResultSet.getObject(1), rightResultSet.getObject(1))) {
+      if (!(leftResultSet.getObject(1) == rightResultSet.getObject(1)
+              || leftResultSet.getObject(1) != null
+              && leftResultSet.getObject(1).equals(rightResultSet.getObject(1)))) {
         return false;
       }
     }

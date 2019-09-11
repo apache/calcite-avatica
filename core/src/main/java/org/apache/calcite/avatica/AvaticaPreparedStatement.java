@@ -81,7 +81,7 @@ public abstract class AvaticaPreparedStatement
     this.slots = new TypedValue[signature.parameters.size()];
     this.resultSetMetaData =
         connection.factory.newResultSetMetaData(this, signature);
-    this.parameterValueBatch = new ArrayList<>();
+    this.parameterValueBatch = new ArrayList();
   }
 
   @Override protected List<TypedValue> getParameterValues() {
@@ -95,7 +95,7 @@ public abstract class AvaticaPreparedStatement
     // For implementing batch update, we need to make a copy of slots, not just a thin reference
     // to it as as list. Otherwise, subsequent setFoo(..) calls will alter the underlying array
     // and modify our cached TypedValue list.
-    List<TypedValue> copy = new ArrayList<>(slots.length);
+    List<TypedValue> copy = new ArrayList(slots.length);
     for (TypedValue value : slots) {
       copy.add(value);
     }

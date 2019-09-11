@@ -16,7 +16,7 @@
  */
 package org.apache.calcite.avatica.remote;
 
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 
 /**
  * Implementation of {@link org.apache.calcite.avatica.remote.Service}
@@ -31,8 +31,8 @@ public class RemoteService extends JsonService {
   }
 
   @Override public String apply(String request) {
-    byte[] response = client.send(request.getBytes(StandardCharsets.UTF_8));
-    return new String(response, StandardCharsets.UTF_8);
+    byte[] response = client.send(request.getBytes(Charset.forName("UTF-8")));
+    return new String(response, Charset.forName("UTF-8"));
   }
 }
 

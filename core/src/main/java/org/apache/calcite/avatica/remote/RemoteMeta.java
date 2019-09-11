@@ -41,7 +41,7 @@ import java.util.Map;
  */
 class RemoteMeta extends MetaImpl {
   final Service service;
-  final Map<String, ConnectionPropertiesImpl> propsMap = new HashMap<>();
+  final Map<String, ConnectionPropertiesImpl> propsMap = new HashMap();
   private Map<DatabaseProperty, Object> databaseProperties;
 
   RemoteMeta(AvaticaConnection connection, Service service) {
@@ -281,7 +281,7 @@ class RemoteMeta extends MetaImpl {
                   }
                 }
                 callback.execute();
-                List<MetaResultSet> metaResultSets = new ArrayList<>();
+                List<MetaResultSet> metaResultSets = new ArrayList();
                 for (Service.ResultSetResponse result : response.results) {
                   metaResultSets.add(toResultSet(null, result));
                 }
@@ -349,7 +349,7 @@ class RemoteMeta extends MetaImpl {
                 throw new RuntimeException(new NoSuchStatementException(h));
               }
 
-              List<MetaResultSet> metaResultSets = new ArrayList<>();
+              List<MetaResultSet> metaResultSets = new ArrayList();
               for (Service.ResultSetResponse result : response.results) {
                 metaResultSets.add(toResultSet(null, result));
               }

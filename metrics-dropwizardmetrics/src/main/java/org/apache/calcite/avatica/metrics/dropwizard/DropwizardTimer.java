@@ -18,8 +18,6 @@ package org.apache.calcite.avatica.metrics.dropwizard;
 
 import com.codahale.metrics.Timer;
 
-import java.util.Objects;
-
 /**
  * Dropwizard Metrics implementation of {@link org.apache.calcite.avatica.metrics.Timer}.
  */
@@ -28,7 +26,10 @@ public class DropwizardTimer implements org.apache.calcite.avatica.metrics.Timer
   private final Timer timer;
 
   public DropwizardTimer(Timer timer) {
-    this.timer = Objects.requireNonNull(timer);
+    if (timer == null) {
+      throw new NullPointerException();
+    }
+    this.timer = timer;
   }
 
   @Override public DropwizardContext start() {
@@ -42,7 +43,10 @@ public class DropwizardTimer implements org.apache.calcite.avatica.metrics.Timer
     private final com.codahale.metrics.Timer.Context context;
 
     public DropwizardContext(com.codahale.metrics.Timer.Context context) {
-      this.context = Objects.requireNonNull(context);
+      if (context == null) {
+        throw new NullPointerException();
+      }
+      this.context = context;
     }
 
     @Override public void close() {

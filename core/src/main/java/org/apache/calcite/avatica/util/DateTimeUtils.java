@@ -89,7 +89,7 @@ public class DateTimeUtils {
   /**
    * The number of seconds in a day.
    */
-  public static final long SECONDS_PER_DAY = 86_400; // = 24 * 60 * 60
+  public static final long SECONDS_PER_DAY = 86400; // = 24 * 60 * 60
 
   /**
    * Calendar set to the epoch (1970-01-01 00:00:00 UTC). Useful for

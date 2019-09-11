@@ -29,7 +29,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * A struct used to encapsulate the necessary information to reconstitute a ResultSet in the
@@ -100,8 +99,11 @@ public class QueryState {
    * @param args The arguments to the method being invoked.
    */
   public QueryState(MetaDataOperation op, Object... args) {
-    this.metaDataOperation = Objects.requireNonNull(op);
-    this.operationArgs = Arrays.copyOf(Objects.requireNonNull(args), args.length);
+    if (op == null || args == null) {
+      throw new NullPointerException();
+    }
+    this.metaDataOperation = op;
+    this.operationArgs = Arrays.copyOf(args, args.length);
     this.type = StateType.METADATA;
 
     // Null out the members we won't use
@@ -112,10 +114,16 @@ public class QueryState {
    * Not intended for external use. For Jackson-databind only.
    */
   public QueryState(StateType type, String sql, MetaDataOperation op, Object... args) {
-    this.type = Objects.requireNonNull(type);
+    if (type == null) {
+      throw new NullPointerException();
+    }
+    this.type = type;
     switch (type) {
     case SQL:
-      this.sql = Objects.requireNonNull(sql);
+      if (sql == null) {
+        throw new NullPointerException();
+      }
+      this.sql = sql;
       if (null != op) {
         throw new IllegalArgumentException("Expected null MetaDataOperation, but got " + op);
       }
@@ -127,8 +135,11 @@ public class QueryState {
       this.operationArgs = null;
       break;
     case METADATA:
-      this.metaDataOperation = Objects.requireNonNull(op);
-      this.operationArgs = Objects.requireNonNull(args);
+      if (op == null || args == null) {
+        throw new NullPointerException();
+      }
+      this.metaDataOperation = op;
+      this.operationArgs = args;
       if (null != sql) {
         throw new IllegalArgumentException("Expected null SQl but got " + sql);
       }
@@ -183,7 +194,10 @@ public class QueryState {
   public ResultSet invoke(Connection conn, Statement statement) throws SQLException {
     switch (type) {
     case SQL:
-      boolean ret = Objects.requireNonNull(statement).execute(sql);
+      if (statement == null) {
+        throw new NullPointerException();
+      }
+      boolean ret = statement.execute(sql);
       ResultSet results = statement.getResultSet();
 
       // Either execute(sql) returned true or the resultSet was null
@@ -191,7 +205,10 @@ public class QueryState {
 
       return results;
     case METADATA:
-      DatabaseMetaData metadata = Objects.requireNonNull(conn).getMetaData();
+      if (conn == null) {
+        throw new NullPointerException();
+      }
+      DatabaseMetaData metadata = conn.getMetaData();
       switch (metaDataOperation) {
       case GET_ATTRIBUTES:
         verifyOpArgs(4);
@@ -204,8 +221,8 @@ public class QueryState {
         return metadata.getBestRowIdentifier((String) operationArgs[0],
             (String) operationArgs[1],
             (String) operationArgs[2],
-            (int) operationArgs[3],
-            (boolean) operationArgs[4]);
+            (Integer) operationArgs[3],
+            (Boolean) operationArgs[4]);
       case GET_CATALOGS:
         verifyOpArgs(0);
         return metadata.getCatalogs();
@@ -255,8 +272,8 @@ public class QueryState {
         return metadata.getIndexInfo((String) operationArgs[0],
             (String) operationArgs[1],
             (String) operationArgs[2],
-            (boolean) operationArgs[3],
-            (boolean) operationArgs[4]);
+            (Boolean) operationArgs[3],
+            (Boolean) operationArgs[4]);
       case GET_PRIMARY_KEYS:
         verifyOpArgs(3);
         return metadata.getPrimaryKeys((String) operationArgs[0],
@@ -376,10 +393,10 @@ public class QueryState {
           builder.addArgs(argBuilder.setType(ArgumentType.STRING)
               .setStringValue((String) arg).build());
         } else if (arg instanceof Integer) {
-          builder.addArgs(argBuilder.setType(ArgumentType.INT).setIntValue((int) arg).build());
+          builder.addArgs(argBuilder.setType(ArgumentType.INT).setIntValue((Integer) arg).build());
         } else if (arg instanceof Boolean) {
           builder.addArgs(
-              argBuilder.setType(ArgumentType.BOOL).setBoolValue((boolean) arg).build());
+              argBuilder.setType(ArgumentType.BOOL).setBoolValue((Boolean) arg).build());
         } else if (arg instanceof String[]) {
           argBuilder.setType(ArgumentType.REPEATED_STRING);
           for (String strArg : (String[]) arg) {
@@ -451,7 +468,8 @@ public class QueryState {
   }
 
   @Override public int hashCode() {
-    return Objects.hash(metaDataOperation, Arrays.hashCode(operationArgs), sql);
+    Object[] objects = {metaDataOperation, Arrays.hashCode(operationArgs), sql};
+    return Arrays.hashCode(objects);
   }
 
   @Override public boolean equals(Object o) {
@@ -459,7 +477,7 @@ public class QueryState {
         || o instanceof QueryState
         && metaDataOperation == ((QueryState) o).metaDataOperation
         && Arrays.deepEquals(operationArgs, ((QueryState) o).operationArgs)
-        && Objects.equals(sql, ((QueryState) o).sql);
+        && sql == ((QueryState) o).sql || sql != null && sql.equals(((QueryState) o).sql);
   }
 }
 

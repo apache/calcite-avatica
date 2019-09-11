@@ -43,9 +43,12 @@ public class AvaticaHttpClientImpl implements AvaticaHttpClient {
         connection.setRequestMethod("POST");
         connection.setDoInput(true);
         connection.setDoOutput(true);
-        try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
+        DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
+        try {
           wr.write(request);
           wr.flush();
+          wr.close();
+        } finally {
           wr.close();
         }
         final int responseCode = connection.getResponseCode();

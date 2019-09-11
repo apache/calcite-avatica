@@ -116,7 +116,7 @@ public class TestRunner implements Runnable {
       ImmutableSet<ClassInfo> classes =
           cp.getTopLevelClasses("org.apache.calcite.avatica.tck.tests");
 
-      List<Class<?>> testClasses = new ArrayList<>(classes.size());
+      List<Class<?>> testClasses = new ArrayList(classes.size());
       for (ClassInfo classInfo : classes) {
         if (classInfo.getSimpleName().equals("package-info")) {
           continue;
@@ -212,7 +212,7 @@ public class TestRunner implements Runnable {
     private int numRun = 0;
     private int numFailed = 0;
     private int numIgnored = 0;
-    private List<Failure> failures = new ArrayList<>();
+    private List<Failure> failures = new ArrayList();
 
     /**
      * Updates the current state of <code>this</code> with the <code>result</code>.

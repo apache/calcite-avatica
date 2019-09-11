@@ -26,7 +26,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -68,7 +68,7 @@ public abstract class AbstractCursor implements Cursor {
 
   public List<Accessor> createAccessors(List<ColumnMetaData> types,
       Calendar localCalendar, ArrayImpl.Factory factory) {
-    List<Accessor> accessors = new ArrayList<>();
+    List<Accessor> accessors = new ArrayList();
     for (ColumnMetaData type : types) {
       accessors.add(
           createAccessor(type, accessors.size(), localCalendar, factory));
@@ -200,7 +200,7 @@ public abstract class AbstractCursor implements Cursor {
       case OBJECT:
         final ColumnMetaData.StructType structType =
             (ColumnMetaData.StructType) columnMetaData.type;
-        List<Accessor> accessors = new ArrayList<>();
+        List<Accessor> accessors = new ArrayList();
         for (ColumnMetaData column : structType.columns) {
           accessors.add(
               createAccessor(column, new StructGetter(getter, column), localCalendar, factory));
@@ -837,7 +837,7 @@ public abstract class AbstractCursor implements Cursor {
         return null;
       }
       if (o instanceof byte[]) {
-        return new String((byte[]) o, StandardCharsets.UTF_8);
+        return new String((byte[]) o, Charset.forName("UTF-8"));
       } else if (o instanceof ByteString) {
         return ((ByteString) o).toString();
       }
@@ -886,7 +886,7 @@ public abstract class AbstractCursor implements Cursor {
         return null;
       }
       // Need to base64 decode the string.
-      return new String(bytes, StandardCharsets.UTF_8);
+      return new String(bytes, Charset.forName("UTF-8"));
     }
   }
 
@@ -1289,7 +1289,7 @@ public abstract class AbstractCursor implements Cursor {
       } else if (object instanceof List) {
         List<?> list = (List<?>) object;
         // Run the array values through the component accessor
-        List<Object> convertedValues = new ArrayList<>(list.size());
+        List<Object> convertedValues = new ArrayList(list.size());
         for (Object val : list) {
           if (null == val) {
             convertedValues.add(null);
@@ -1401,7 +1401,7 @@ public abstract class AbstractCursor implements Cursor {
       } else if (o instanceof List) {
         return new StructImpl((List) o);
       } else {
-        final List<Object> list = new ArrayList<>();
+        final List<Object> list = new ArrayList();
         for (Accessor fieldAccessor : fieldAccessors) {
           list.add(fieldAccessor.getObject());
         }
@@ -1469,7 +1469,9 @@ public abstract class AbstractCursor implements Cursor {
         }
         final Field field = o.getClass().getField(columnMetaData.label);
         return field.get(getter.getObject());
-      } catch (IllegalAccessException | NoSuchFieldException e) {
+      } catch (IllegalAccessException e) {
+        throw new SQLException(e);
+      } catch (NoSuchFieldException e) {
         throw new SQLException(e);
       }
     }

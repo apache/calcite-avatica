@@ -49,7 +49,7 @@ public abstract class AbstractService implements Service {
    * or a float which is a whole number, as an integer. Thus the accessors need
    * be prepared to accept any numeric type. */
   Meta.Signature finagle(Meta.Signature signature) {
-    final List<ColumnMetaData> columns = new ArrayList<>();
+    final List<ColumnMetaData> columns = new ArrayList();
     for (ColumnMetaData column : signature.columns) {
       columns.add(finagle(column));
     }
@@ -136,7 +136,7 @@ public abstract class AbstractService implements Service {
     if (r.missingStatement) {
       return r;
     }
-    final List<ResultSetResponse> results = new ArrayList<>();
+    final List<ResultSetResponse> results = new ArrayList();
     int changeCount = 0;
     for (ResultSetResponse result : r.results) {
       ResultSetResponse result2 = finagle(result);

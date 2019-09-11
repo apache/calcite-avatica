@@ -40,7 +40,7 @@ public enum AvaticaRemoteConnectionProperty implements ConnectionProperty {
   private static final Map<String, AvaticaRemoteConnectionProperty> NAME_TO_PROPS;
 
   static {
-    NAME_TO_PROPS = new HashMap<>();
+    NAME_TO_PROPS = new HashMap();
     for (AvaticaRemoteConnectionProperty p
         : AvaticaRemoteConnectionProperty.values()) {
       NAME_TO_PROPS.put(p.camelName.toUpperCase(Locale.ROOT), p);

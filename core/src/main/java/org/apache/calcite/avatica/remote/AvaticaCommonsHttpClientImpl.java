@@ -56,7 +56,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Objects;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -98,7 +97,10 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
 
   public AvaticaCommonsHttpClientImpl(URL url) {
     this.host = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
-    this.uri = toURI(Objects.requireNonNull(url));
+    if (url == null) {
+      throw new NullPointerException();
+    }
+    this.uri = toURI(url);
     initializeClient();
   }
 
@@ -216,7 +218,9 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
       HttpPost post = new HttpPost(uri);
       post.setEntity(entity);
 
-      try (CloseableHttpResponse response = execute(post, context)) {
+      CloseableHttpResponse response = null;
+      try {
+        response = execute(post, context);
         final int statusCode = response.getStatusLine().getStatusCode();
         if (HttpURLConnection.HTTP_OK == statusCode
             || HttpURLConnection.HTTP_INTERNAL_ERROR == statusCode) {
@@ -237,6 +241,14 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
       } catch (Exception e) {
         LOG.debug("Failed to execute HTTP request", e);
         throw new RuntimeException(e);
+      } finally {
+        try {
+          if (response != null) {
+            response.close();
+          }
+        } catch (Exception e) {
+          //
+        }
       }
     }
   }
@@ -249,8 +261,11 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
 
   @Override public void setUsernamePassword(AuthenticationType authType, String username,
       String password) {
+    if (username == null || password == null) {
+      throw new NullPointerException();
+    }
     this.credentials = new UsernamePasswordCredentials(
-        Objects.requireNonNull(username), Objects.requireNonNull(password));
+            username, password);
 
     this.credentialsProvider = new BasicCredentialsProvider();
     credentialsProvider.setCredentials(AuthScope.ANY, credentials);
@@ -278,28 +293,44 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
   }
 
   @Override public void setTrustStore(File truststore, String password) {
-    this.truststore = Objects.requireNonNull(truststore);
+    if (truststore == null) {
+      throw new NullPointerException();
+    }
+    this.truststore = truststore;
     if (!truststore.exists() || !truststore.isFile()) {
       throw new IllegalArgumentException(
           "Truststore is must be an existing, regular file: " + truststore);
     }
-    this.truststorePassword = Objects.requireNonNull(password);
+    if (password == null) {
+      throw new NullPointerException();
+    }
+    this.truststorePassword = password;
     initializeClient();
   }
 
   @Override public void setKeyStore(File keystore, String keystorepassword, String keypassword) {
-    this.keystore = Objects.requireNonNull(keystore);
+    if (keystore == null) {
+      throw new NullPointerException();
+    }
+    this.keystore = keystore;
     if (!keystore.exists() || !keystore.isFile()) {
       throw new IllegalArgumentException(
               "Keystore is must be an existing, regular file: " + keystore);
     }
-    this.keystorePassword = Objects.requireNonNull(keystorepassword);
-    this.keyPassword = Objects.requireNonNull(keypassword);
+
+    if (keystorepassword == null || keypassword == null) {
+      throw new NullPointerException();
+    }
+    this.keystorePassword = keystorepassword;
+    this.keyPassword = keypassword;
     initializeClient();
   }
 
   @Override public void setHostnameVerification(HostnameVerification verification) {
-    this.hostnameVerification = Objects.requireNonNull(verification);
+    if (verification == null) {
+      throw new NullPointerException();
+    }
+    this.hostnameVerification = verification;
     initializeClient();
   }
 }

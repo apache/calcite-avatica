@@ -18,6 +18,7 @@ package org.apache.calcite.avatica.util;
 
 import org.apache.calcite.avatica.ColumnMetaData;
 
+import java.io.Closeable;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -41,7 +42,7 @@ import java.util.Map;
  * Interface to an iteration that is similar to, and can easily support,
  * a JDBC {@link java.sql.ResultSet}, but is simpler to implement.
  */
-public interface Cursor extends AutoCloseable {
+public interface Cursor extends Closeable {
   /**
    * Creates a list of accessors, one per column.
    *

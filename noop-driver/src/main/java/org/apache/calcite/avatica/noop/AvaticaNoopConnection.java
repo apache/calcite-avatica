@@ -234,20 +234,20 @@ public class AvaticaNoopConnection implements Connection {
     throw unsupported();
   }
 
-  @Override public void setSchema(String schema) throws SQLException {}
+  public void setSchema(String schema) throws SQLException {}
 
-  @Override public String getSchema() throws SQLException {
+  public String getSchema() throws SQLException {
     return null;
   }
 
-  @Override public void abort(Executor executor) throws SQLException {
+  public void abort(Executor executor) throws SQLException {
     throw unsupported();
   }
 
-  @Override public void setNetworkTimeout(Executor executor, int milliseconds)
+  public void setNetworkTimeout(Executor executor, int milliseconds)
       throws SQLException {}
 
-  @Override public int getNetworkTimeout() throws SQLException {
+  public int getNetworkTimeout() throws SQLException {
     throw unsupported();
   }
 

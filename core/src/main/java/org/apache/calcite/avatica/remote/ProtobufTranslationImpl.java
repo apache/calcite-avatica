@@ -72,13 +72,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Implementation of {@link ProtobufTranslationImpl} that translates
@@ -141,7 +140,7 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
   private static final Map<Class<?>, ByteString> MESSAGE_CLASSES;
 
   static {
-    Map<String, RequestTranslator> reqParsers = new ConcurrentHashMap<>();
+    Map<String, RequestTranslator> reqParsers = new ConcurrentHashMap();
     reqParsers.put(CatalogsRequest.class.getName(),
         new RequestTranslator(CatalogsRequest.parser(), new Service.CatalogsRequest()));
     reqParsers.put(OpenConnectionRequest.class.getName(),
@@ -193,7 +192,7 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
 
     REQUEST_PARSERS = Collections.unmodifiableMap(reqParsers);
 
-    Map<String, ResponseTranslator> respParsers = new ConcurrentHashMap<>();
+    Map<String, ResponseTranslator> respParsers = new ConcurrentHashMap();
     respParsers.put(OpenConnectionResponse.class.getName(),
         new ResponseTranslator(OpenConnectionResponse.parser(),
             new Service.OpenConnectionResponse()));
@@ -235,7 +234,7 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
 
     RESPONSE_PARSERS = Collections.unmodifiableMap(respParsers);
 
-    Map<Class<?>, ByteString> messageClassNames = new ConcurrentHashMap<>();
+    Map<Class<?>, ByteString> messageClassNames = new ConcurrentHashMap();
     for (Class<?> msgClz : getAllMessageClasses()) {
       messageClassNames.put(msgClz, wrapClassName(msgClz));
     }
@@ -243,7 +242,7 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
   }
 
   private static List<Class<?>> getAllMessageClasses() {
-    List<Class<?>> messageClasses = new ArrayList<>();
+    List<Class<?>> messageClasses = new ArrayList();
     messageClasses.add(CatalogsRequest.class);
     messageClasses.add(CloseConnectionRequest.class);
     messageClasses.add(CloseStatementRequest.class);
@@ -287,7 +286,7 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
   }
 
   private static ByteString wrapClassName(Class<?> clz) {
-    return UnsafeByteOperations.unsafeWrap(clz.getName().getBytes(UTF_8));
+    return UnsafeByteOperations.unsafeWrap(clz.getName().getBytes(Charset.forName("UTF-8")));
   }
 
   private final ThreadLocal<UnsynchronizedBuffer> threadLocalBuffer =

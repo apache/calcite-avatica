@@ -25,7 +25,6 @@ import java.security.Principal;
 import java.util.AbstractMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -71,9 +70,12 @@ public class KerberosConnection {
    * @param keytab The keytab containing keys for the Kerberos principal
    */
   public KerberosConnection(String principal, File keytab) {
-    this.principal = Objects.requireNonNull(principal);
+    if (principal == null || keytab == null) {
+      throw new NullPointerException();
+    }
+    this.principal = principal;
     this.jaasConf = new ClientKeytabJaasConf(principal,
-        Objects.requireNonNull(keytab).getAbsolutePath());
+            keytab.getAbsolutePath());
   }
 
   public synchronized Subject getSubject() {
@@ -151,7 +153,7 @@ public class KerberosConnection {
     }
 
     // Send it back to the caller to use with launchRenewalThread
-    return new AbstractMap.SimpleEntry<>(loginContext, loggedInSubject);
+    return new AbstractMap.SimpleEntry(loginContext, loggedInSubject);
   }
 
   // Enables mocking for unit tests
@@ -183,7 +185,7 @@ public class KerberosConnection {
     });
     t.setName(RENEWAL_THREAD_NAME);
 
-    return new AbstractMap.SimpleEntry<>(task, t);
+    return new AbstractMap.SimpleEntry(task, t);
   }
 
   /**
@@ -249,10 +251,13 @@ public class KerberosConnection {
 
     RenewalTask(KerberosConnection utilInstance, LoginContext context, Subject subject,
         Configuration conf, long renewalPeriod) {
-      this.utilInstance = Objects.requireNonNull(utilInstance);
-      this.context = Objects.requireNonNull(context);
-      this.subject = Objects.requireNonNull(subject);
-      this.conf = Objects.requireNonNull(conf);
+      if (utilInstance == null || context == null || subject == null || conf == null) {
+        throw new NullPointerException();
+      }
+      this.utilInstance = utilInstance;
+      this.context = context;
+      this.subject = subject;
+      this.conf = conf;
       this.renewalPeriod = renewalPeriod;
     }
 

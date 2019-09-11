@@ -1794,7 +1794,7 @@ public enum SqlState {
   public static final Map<String, SqlState> BY_CODE;
 
   static {
-    Map<String, SqlState> m = new HashMap<>();
+    Map<String, SqlState> m = new HashMap();
     for (SqlState s : values()) {
       m.put(s.code, s);
     }

@@ -19,7 +19,6 @@ package org.apache.calcite.avatica.util;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /** A range of time units. The first is more significant than the
  * other (e.g. year-to-day) or the same as the other (e.g. month). */
@@ -78,13 +77,13 @@ public enum TimeUnitRange {
    * @return Time unit range, or null if not valid
    */
   public static TimeUnitRange of(TimeUnit startUnit, TimeUnit endUnit) {
-    return MAP.get(new Pair<>(startUnit, endUnit));
+    return MAP.get(new Pair(startUnit, endUnit));
   }
 
   private static Map<Pair<TimeUnit>, TimeUnitRange> createMap() {
-    Map<Pair<TimeUnit>, TimeUnitRange> map = new HashMap<>();
+    Map<Pair<TimeUnit>, TimeUnitRange> map = new HashMap();
     for (TimeUnitRange value : values()) {
-      map.put(new Pair<>(value.startUnit, value.endUnit), value);
+      map.put(new Pair(value.startUnit, value.endUnit), value);
     }
     return Collections.unmodifiableMap(map);
   }
@@ -114,8 +113,8 @@ public enum TimeUnitRange {
     @Override public boolean equals(Object obj) {
       return obj == this
           || obj instanceof Pair
-          && Objects.equals(left, ((Pair) obj).left)
-          && Objects.equals(right, ((Pair) obj).right);
+          && left == ((Pair) obj).left || left != null && left.equals(((Pair) obj).left)
+          && right == ((Pair) obj).right || right != null && right.equals(((Pair) obj).right);
     }
   }
 }

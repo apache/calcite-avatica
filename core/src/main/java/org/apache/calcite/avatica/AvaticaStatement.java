@@ -27,7 +27,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -104,7 +103,10 @@ public abstract class AvaticaStatement
   protected AvaticaStatement(AvaticaConnection connection,
       Meta.StatementHandle h, int resultSetType, int resultSetConcurrency,
       int resultSetHoldability, Meta.Signature signature) {
-    this.connection = Objects.requireNonNull(connection);
+    if (connection == null) {
+      throw new NullPointerException();
+    }
+    this.connection = connection;
     this.resultSetType = resultSetType;
     this.resultSetConcurrency = resultSetConcurrency;
     this.resultSetHoldability = resultSetHoldability;
@@ -116,11 +118,11 @@ public abstract class AvaticaStatement
     }
     connection.statementMap.put(h.id, this);
     this.handle = h;
-    this.batchedSql = new ArrayList<>();
+    this.batchedSql = new ArrayList();
     try {
       this.cancelFlag = connection.getCancelFlag(h);
     } catch (NoSuchStatementException e) {
-      throw new AssertionError("no statement", e);
+      throw new AssertionError(e);
     }
   }
 
@@ -428,7 +430,10 @@ public abstract class AvaticaStatement
   public void addBatch(String sql) throws SQLException {
     checkOpen();
     checkNotPreparedOrCallable("addBatch(String)");
-    this.batchedSql.add(Objects.requireNonNull(sql));
+    if (sql == null) {
+      throw new NullPointerException();
+    }
+    this.batchedSql.add(sql);
   }
 
   public void clearBatch() throws SQLException {

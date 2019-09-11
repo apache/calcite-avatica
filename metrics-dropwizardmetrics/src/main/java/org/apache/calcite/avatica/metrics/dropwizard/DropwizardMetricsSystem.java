@@ -25,8 +25,6 @@ import org.apache.calcite.avatica.metrics.Timer;
 
 import com.codahale.metrics.MetricRegistry;
 
-import java.util.Objects;
-
 /**
  * Dropwizard Metrics implementation of {@link MetricsSystem}.
  */
@@ -35,7 +33,10 @@ public class DropwizardMetricsSystem implements MetricsSystem {
   private final MetricRegistry registry;
 
   public DropwizardMetricsSystem(MetricRegistry registry) {
-    this.registry = Objects.requireNonNull(registry);
+    if (registry == null) {
+      throw new NullPointerException();
+    }
+    this.registry = registry;
   }
 
   @Override public Timer getTimer(String name) {

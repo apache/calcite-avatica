@@ -652,11 +652,11 @@ public class AvaticaNoopResultSet implements ResultSet {
 
   @Override public void updateNClob(String columnLabel, Reader reader) throws SQLException {}
 
-  @Override public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
+  public <T> T getObject(int columnIndex, Class<T> type) throws SQLException {
     throw unsupported();
   }
 
-  @Override public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
+  public <T> T getObject(String columnLabel, Class<T> type) throws SQLException {
     throw unsupported();
   }
 

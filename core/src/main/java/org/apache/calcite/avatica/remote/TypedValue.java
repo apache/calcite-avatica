@@ -34,6 +34,7 @@ import com.google.protobuf.UnsafeByteOperations;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.Charset;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -43,9 +44,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /** Value and type.
  *
@@ -346,7 +344,7 @@ public class TypedValue {
         return null;
       }
       final List<?> list = (List<?>) value;
-      final List<Object> copy = new ArrayList<>(list.size());
+      final List<Object> copy = new ArrayList(list.size());
       // Copy the list from the serial representation to a JDBC representation
       for (Object o : list) {
         if (null == o) {
@@ -414,14 +412,16 @@ public class TypedValue {
       }
     case ARRAY:
       Array array = (Array) value;
-      Objects.requireNonNull(componentType, "Component Type must not be null for ARRAYs");
+      if (componentType == null) {
+        throw new NullPointerException("Component Type must not be null for ARRAYs");
+      }
       try {
         switch (componentType) {
         case BINARY:
         case VARBINARY:
         case LONGVARBINARY:
           Object[] byteStrings = (Object[]) array.getArray();
-          List<String> convertedStrings = new ArrayList<>(byteStrings.length);
+          List<String> convertedStrings = new ArrayList(byteStrings.length);
           for (Object byteString : byteStrings) {
             convertedStrings.add(
                 (String) jdbcToSerial(Rep.BYTE_STRING, byteString, calendar, null));
@@ -430,15 +430,15 @@ public class TypedValue {
         case DATE:
         case TIME:
           Object[] dates = (Object[]) array.getArray();
-          List<Integer> serializedDates = new ArrayList<>(dates.length);
+          List<Integer> serializedDates = new ArrayList(dates.length);
           for (Object obj : dates) {
             Date date = (Date) obj;
             if (null == obj) {
               serializedDates.add(null);
             } else if (componentType == SqlType.DATE) {
-              serializedDates.add((int) jdbcToSerial(Rep.JAVA_SQL_DATE, date, calendar, null));
+              serializedDates.add((Integer) jdbcToSerial(Rep.JAVA_SQL_DATE, date, calendar, null));
             } else if (componentType == SqlType.TIME) {
-              serializedDates.add((int) jdbcToSerial(Rep.JAVA_SQL_TIME, date, calendar, null));
+              serializedDates.add((Integer) jdbcToSerial(Rep.JAVA_SQL_TIME, date, calendar, null));
             } else {
               throw new RuntimeException("Unexpected type: " + componentType);
             }
@@ -446,14 +446,14 @@ public class TypedValue {
           return serializedDates;
         case TIMESTAMP:
           Object[] timestamps = (Object[]) array.getArray();
-          List<Long> serializedTimestamps = new ArrayList<>(timestamps.length);
+          List<Long> serializedTimestamps = new ArrayList(timestamps.length);
           for (Object obj : timestamps) {
             Timestamp timestamp = (Timestamp) obj;
             if (null == obj) {
               serializedTimestamps.add(null);
             } else {
               serializedTimestamps.add(
-                  (long) jdbcToSerial(Rep.JAVA_SQL_TIMESTAMP, timestamp, calendar, null));
+                  (Long) jdbcToSerial(Rep.JAVA_SQL_TIMESTAMP, timestamp, calendar, null));
             }
           }
           return serializedTimestamps;
@@ -482,7 +482,7 @@ public class TypedValue {
 
   /** Converts a list of {@code TypedValue} to a list of values. */
   public static List<Object> values(List<TypedValue> typedValues) {
-    final List<Object> list = new ArrayList<>();
+    final List<Object> list = new ArrayList();
     for (TypedValue typedValue : typedValues) {
       list.add(typedValue.toLocal());
     }
@@ -556,7 +556,7 @@ public class TypedValue {
     switch (type) {
     case BOOLEAN:
     case PRIMITIVE_BOOLEAN:
-      builder.setBoolValue((boolean) o);
+      builder.setBoolValue((Boolean) o);
       return;
     case BYTE_STRING:
       byte[] bytes;
@@ -581,35 +581,36 @@ public class TypedValue {
       } else {
         s = (String) o;
       }
-      builder.setStringValueBytes(UnsafeByteOperations.unsafeWrap(s.getBytes(UTF_8)));
+      byte[] uft8Bytes = s.getBytes(Charset.forName("UTF-8"));
+      builder.setStringValueBytes(UnsafeByteOperations.unsafeWrap(uft8Bytes));
       return;
     case PRIMITIVE_CHAR:
     case CHARACTER:
-      builder.setStringValue(Character.toString((char) o));
+      builder.setStringValue(Character.toString((Character) o));
       return;
     case BYTE:
     case PRIMITIVE_BYTE:
-      builder.setNumberValue(Byte.valueOf((byte) o).longValue());
+      builder.setNumberValue(Byte.valueOf((Byte) o).longValue());
       return;
     case DOUBLE:
     case PRIMITIVE_DOUBLE:
-      builder.setDoubleValue((double) o);
+      builder.setDoubleValue((Double) o);
       return;
     case FLOAT:
     case PRIMITIVE_FLOAT:
-      builder.setNumberValue(Float.floatToIntBits((float) o));
+      builder.setNumberValue(Float.floatToIntBits((Float) o));
       return;
     case INTEGER:
     case PRIMITIVE_INT:
-      builder.setNumberValue(Integer.valueOf((int) o).longValue());
+      builder.setNumberValue(Integer.valueOf((Integer) o).longValue());
       return;
     case PRIMITIVE_SHORT:
     case SHORT:
-      builder.setNumberValue(Short.valueOf((short) o).longValue());
+      builder.setNumberValue(Short.valueOf((Short) o).longValue());
       return;
     case LONG:
     case PRIMITIVE_LONG:
-      builder.setNumberValue((long) o);
+      builder.setNumberValue((Long) o);
       return;
     case JAVA_SQL_DATE:
     case JAVA_SQL_TIME:
@@ -621,7 +622,7 @@ public class TypedValue {
       } else if (o instanceof Integer) {
         sqlDateOrTime = ((Integer) o).longValue();
       } else {
-        sqlDateOrTime = (long) o;
+        sqlDateOrTime = (Long) o;
       }
       // Persisted as numbers
       builder.setNumberValue(sqlDateOrTime);
@@ -634,7 +635,7 @@ public class TypedValue {
       } else if (o instanceof java.util.Date) {
         sqlTimestampOrUtilDate = ((java.util.Date) o).getTime();
       } else {
-        sqlTimestampOrUtilDate = (long) o;
+        sqlTimestampOrUtilDate = (Long) o;
       }
       // Persisted as longs
       builder.setNumberValue(sqlTimestampOrUtilDate);
@@ -753,7 +754,7 @@ public class TypedValue {
       return null;
     case ARRAY:
       final List<Common.TypedValue> protoList = protoValue.getArrayValueList();
-      final List<Object> list = new ArrayList<>(protoList.size());
+      final List<Object> list = new ArrayList(protoList.size());
       for (Common.TypedValue protoElement : protoList) {
         // Deserialize the TypedValue protobuf into the JDBC type
         TypedValue listElement = TypedValue.fromProto(protoElement);
@@ -893,7 +894,10 @@ public class TypedValue {
    * @return The JDBC representation of this TypedValue
    */
   public static Object protoToJdbc(Common.TypedValue protoValue, Calendar calendar) {
-    Object o = getSerialFromProto(Objects.requireNonNull(protoValue));
+    if (protoValue == null) {
+      throw new NullPointerException();
+    }
+    Object o = getSerialFromProto(protoValue);
     // Shortcircuit the null
     if (null == o) {
       return o;

@@ -46,7 +46,6 @@ import java.sql.Struct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -92,9 +91,9 @@ public abstract class AvaticaConnection implements Connection {
   protected final Properties info;
   protected final Meta meta;
   protected final AvaticaSpecificDatabaseMetaData metaData;
-  public final Map<InternalProperty, Object> properties = new HashMap<>();
-  public final Map<Integer, AvaticaStatement> statementMap = new ConcurrentHashMap<>();
-  final Map<Integer, AtomicBoolean> flagMap = new ConcurrentHashMap<>();
+  public final Map<InternalProperty, Object> properties = new HashMap();
+  public final Map<Integer, AvaticaStatement> statementMap = new ConcurrentHashMap();
+  final Map<Integer, AtomicBoolean> flagMap = new ConcurrentHashMap();
   protected final long maxRetriesPerExecute;
 
   /**
@@ -133,7 +132,10 @@ public abstract class AvaticaConnection implements Connection {
    * {@link AvaticaStatement#executeInternal(Meta.Signature, boolean)}
    * should retry before failing. */
   long getNumStatementRetries(Properties props) {
-    return Long.parseLong(Objects.requireNonNull(props)
+    if (props == null) {
+      throw new NullPointerException();
+    }
+    return Long.parseLong(props
         .getProperty(NUM_EXECUTE_RETRIES_KEY, NUM_EXECUTE_RETRIES_DEFAULT));
   }
 
@@ -689,9 +691,6 @@ public abstract class AvaticaConnection implements Connection {
     // These are all the metadata operations, no updates
     ResultSet resultSet = executeQueryInternal(statement, metaResultSet.signature.sanitize(),
         metaResultSet.firstFrame, state, false);
-    if (metaResultSet.ownStatement) {
-      resultSet.getStatement().closeOnCompletion();
-    }
     return resultSet;
   }
 
@@ -702,8 +701,11 @@ public abstract class AvaticaConnection implements Connection {
     if (statement != null) {
       return statement;
     }
+    if (h == null) {
+      throw new NullPointerException();
+    }
     //noinspection MagicConstant
-    return factory.newStatement(this, Objects.requireNonNull(h),
+    return factory.newStatement(this, h,
         ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, holdability);
   }
 
@@ -809,7 +811,10 @@ public abstract class AvaticaConnection implements Connection {
   }
 
   public void setKerberosConnection(KerberosConnection kerberosConnection) {
-    this.kerberosConnection = Objects.requireNonNull(kerberosConnection);
+    if (kerberosConnection == null) {
+      throw new NullPointerException();
+    }
+    this.kerberosConnection = kerberosConnection;
   }
 
   public KerberosConnection getKerberosConnection() {
@@ -822,7 +827,10 @@ public abstract class AvaticaConnection implements Connection {
   }
 
   public void setService(Service service) {
-    this.service = Objects.requireNonNull(service);
+    if (service == null) {
+      throw new NullPointerException();
+    }
+    this.service = service;
   }
 }
 

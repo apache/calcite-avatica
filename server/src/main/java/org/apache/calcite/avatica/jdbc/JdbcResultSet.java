@@ -130,14 +130,14 @@ class JdbcResultSet extends Meta.MetaResultSet {
     final ResultSetMetaData metaData = resultSet.getMetaData();
     final int columnCount = metaData.getColumnCount();
     final int[] types = new int[columnCount];
-    Set<Integer> arrayOffsets = new HashSet<>();
+    Set<Integer> arrayOffsets = new HashSet();
     for (int i = 0; i < types.length; i++) {
       types[i] = metaData.getColumnType(i + 1);
       if (Types.ARRAY == types[i]) {
         arrayOffsets.add(i);
       }
     }
-    final List<Object> rows = new ArrayList<>();
+    final List<Object> rows = new ArrayList();
     // Meta prepare/prepareAndExecute 0 return 0 row and done
     boolean done = fetchMaxRowCount == 0;
     for (int i = 0; fetchMaxRowCount < 0 || i < fetchMaxRowCount; i++) {
@@ -232,9 +232,9 @@ class JdbcResultSet extends Meta.MetaResultSet {
         return extractUsingArray(array, calendar);
       }
     case Types.STRUCT:
-      Struct struct = resultSet.getObject(j + 1, Struct.class);
+      Struct struct = (Struct) resultSet.getObject(j + 1);
       Object[] attrs = struct.getAttributes();
-      List<Object> list = new ArrayList<>(attrs.length);
+      List<Object> list = new ArrayList(attrs.length);
       for (Object o : attrs) {
         list.add(o);
       }
@@ -250,7 +250,7 @@ class JdbcResultSet extends Meta.MetaResultSet {
    */
   static List<?> extractUsingResultSet(Array array, Calendar calendar) throws SQLException {
     ResultSet arrayValues = array.getResultSet();
-    TreeMap<Integer, Object> map = new TreeMap<>();
+    TreeMap<Integer, Object> map = new TreeMap();
     while (arrayValues.next()) {
       // column 1 is the index in the array, column 2 is the value.
       // Recurse on `getValue` to unwrap nested types correctly.
@@ -259,7 +259,7 @@ class JdbcResultSet extends Meta.MetaResultSet {
     }
     // If the result set is not in the same order as the actual Array, TreeMap fixes that.
     // Need to make a concrete list to ensure Jackson serialization.
-    return new ArrayList<>(map.values());
+    return new ArrayList(map.values());
   }
 
   /**

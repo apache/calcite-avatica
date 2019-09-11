@@ -113,7 +113,7 @@ public class HandlerFactory {
    */
   MetricsSystem loadMetricsSystem(MetricsSystemConfiguration<?> config) {
     ServiceLoader<MetricsSystemFactory> loader = ServiceLoader.load(MetricsSystemFactory.class);
-    List<MetricsSystemFactory> availableFactories = new ArrayList<>();
+    List<MetricsSystemFactory> availableFactories = new ArrayList();
     for (MetricsSystemFactory factory : loader) {
       availableFactories.add(factory);
     }

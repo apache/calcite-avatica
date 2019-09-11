@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Objects;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +46,10 @@ public class DelegatingAvaticaHandler implements AvaticaHandler {
   private final Handler handler;
 
   public DelegatingAvaticaHandler(Handler handler) {
-    this.handler = Objects.requireNonNull(handler);
+    if (handler == null) {
+      throw new NullPointerException();
+    }
+    this.handler = handler;
   }
 
   @Override public void handle(String target, Request baseRequest, HttpServletRequest request,

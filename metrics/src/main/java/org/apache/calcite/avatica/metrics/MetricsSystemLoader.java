@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.ServiceLoader;
 
 /**
@@ -44,7 +43,10 @@ public class MetricsSystemLoader {
    * @return A {@link MetricsSystem} implementation.
    */
   public static MetricsSystem load(MetricsSystemConfiguration<?> config) {
-    return INSTANCE._load(Objects.requireNonNull(config));
+    if (config == null) {
+      throw new NullPointerException();
+    }
+    return INSTANCE._load(config);
   }
 
   MetricsSystem _load(MetricsSystemConfiguration<?> config) {
@@ -76,7 +78,7 @@ public class MetricsSystemLoader {
 
   List<MetricsSystemFactory> getFactories() {
     ServiceLoader<MetricsSystemFactory> loader = ServiceLoader.load(MetricsSystemFactory.class);
-    List<MetricsSystemFactory> availableFactories = new ArrayList<>();
+    List<MetricsSystemFactory> availableFactories = new ArrayList();
     for (MetricsSystemFactory factory : loader) {
       availableFactories.add(factory);
     }

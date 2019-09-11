@@ -38,7 +38,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 import java.util.TimeZone;
 
 /**
@@ -48,7 +47,10 @@ public class ArrayFactoryImpl implements ArrayImpl.Factory {
   private TimeZone timeZone;
 
   public ArrayFactoryImpl(TimeZone timeZone) {
-    this.timeZone = Objects.requireNonNull(timeZone);
+    if (timeZone == null) {
+      throw new NullPointerException();
+    }
+    this.timeZone = timeZone;
   }
 
   @Override public ResultSet create(AvaticaType elementType, Iterable<Object> elements)
@@ -62,7 +64,8 @@ public class ArrayFactoryImpl implements ArrayImpl.Factory {
     // `(List<Object>) rows` is a compile error.
     @SuppressWarnings({ "unchecked", "rawtypes" })
     List<Object> untypedRows = (List<Object>) ((List) rows);
-    try (ListIteratorCursor cursor = new ListIteratorCursor(rows.iterator())) {
+    ListIteratorCursor cursor = new ListIteratorCursor(rows.iterator());
+    try {
       final String sql = "MOCKED";
       QueryState state = new QueryState(sql);
       Meta.Signature signature = new Meta.Signature(types, sql,
@@ -75,6 +78,8 @@ public class ArrayFactoryImpl implements ArrayImpl.Factory {
           timeZone, frame);
       resultSet.execute2(cursor, types);
       return resultSet;
+    } finally {
+      cursor.close();
     }
   }
 
@@ -86,15 +91,18 @@ public class ArrayFactoryImpl implements ArrayImpl.Factory {
     if (elements instanceof List) {
       elementList = (List<Object>) elements;
     } else {
-      elementList = new ArrayList<>();
+      elementList = new ArrayList();
       for (Object element : elements) {
         elementList.add(element);
       }
     }
-    try (ListIteratorCursor cursor = new ListIteratorCursor(createRowForArrayData(elementList))) {
+    ListIteratorCursor cursor = new ListIteratorCursor(createRowForArrayData(elementList));
+    try {
       List<Accessor> accessor = cursor.createAccessors(types, Unsafe.localCalendar(), this);
       assert 1 == accessor.size();
       return new ArrayImpl(elementList, (ArrayAccessor) accessor.get(0));
+    } finally {
+      cursor.close();
     }
   }
 
@@ -114,7 +122,7 @@ public class ArrayFactoryImpl implements ArrayImpl.Factory {
    * @param elements The elements of an array.
    */
   private List<List<Object>> createResultSetRowsForArrayData(Iterable<Object> elements) {
-    List<List<Object>> rows = new ArrayList<>();
+    List<List<Object>> rows = new ArrayList();
     int i = 0;
     for (Object element : elements) {
       rows.add(Arrays.asList(i + 1, element));

@@ -18,8 +18,6 @@ package org.apache.calcite.avatica.metrics.dropwizard;
 
 import com.codahale.metrics.Histogram;
 
-import java.util.Objects;
-
 /**
  * Dropwizard metrics implementation of {@link org.apache.calcite.avatica.metrics.Histogram}.
  */
@@ -28,7 +26,10 @@ public class DropwizardHistogram implements org.apache.calcite.avatica.metrics.H
   private final Histogram histogram;
 
   public DropwizardHistogram(Histogram histogram) {
-    this.histogram = Objects.requireNonNull(histogram);
+    if (histogram == null) {
+      throw new NullPointerException();
+    }
+    this.histogram = histogram;
   }
 
   @Override public void update(int value) {

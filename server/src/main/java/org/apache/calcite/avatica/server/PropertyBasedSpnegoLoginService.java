@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.util.Objects;
 
 import javax.security.auth.Subject;
 import javax.servlet.ServletRequest;
@@ -49,7 +48,10 @@ public class PropertyBasedSpnegoLoginService extends org.eclipse.jetty.security.
 
   public PropertyBasedSpnegoLoginService(String realm, String serverPrincipal) {
     super(realm);
-    this.serverPrincipal = Objects.requireNonNull(serverPrincipal);
+    if (serverPrincipal == null) {
+      throw new NullPointerException();
+    }
+    this.serverPrincipal = serverPrincipal;
   }
 
   @Override protected void doStart() throws Exception {

@@ -24,7 +24,7 @@ import com.google.protobuf.Descriptors.FieldDescriptor;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Objects;
+import java.util.Arrays;
 
 /** Concrete implementation of {@link Meta.ConnectionProperties}. Provides additional state
  * tracking to enable {@code RemoteMeta} to lazily push changes up to a query server.
@@ -94,16 +94,22 @@ public class ConnectionPropertiesImpl implements Meta.ConnectionProperties {
     if (this == that) {
       return this;
     }
-    if (that.isAutoCommit() != null && !Objects.equals(this.autoCommit, that.isAutoCommit())) {
+
+    if (that.isAutoCommit() != null && !(autoCommit == that.isAutoCommit()
+            || autoCommit != null && autoCommit.equals(that.isAutoCommit()))) {
       this.autoCommit = that.isAutoCommit();
       this.isDirty = true;
     }
-    if (that.isReadOnly() != null && !Objects.equals(this.readOnly, that.isReadOnly())) {
+
+    if (that.isReadOnly() != null && !(readOnly == that.isReadOnly()
+            || readOnly != null && readOnly.equals(that.isReadOnly()))) {
       this.readOnly = that.isReadOnly();
       this.isDirty = true;
     }
     if (that.getTransactionIsolation() != null
-        && !Objects.equals(this.transactionIsolation, that.getTransactionIsolation())) {
+            && !(transactionIsolation == that.getTransactionIsolation()
+            || transactionIsolation != null
+            && transactionIsolation.equals(that.getTransactionIsolation()))) {
       this.transactionIsolation = that.getTransactionIsolation();
       this.isDirty = true;
     }
@@ -189,20 +195,26 @@ public class ConnectionPropertiesImpl implements Meta.ConnectionProperties {
   }
 
   @Override public int hashCode() {
-    return Objects.hash(autoCommit, catalog, isDirty, readOnly, schema,
-        transactionIsolation);
+    Object[] objects = {autoCommit, catalog, isDirty, readOnly, schema,
+        transactionIsolation};
+    return Arrays.hashCode(objects);
   }
 
   @Override public boolean equals(Object o) {
     return o == this
-        || o instanceof ConnectionPropertiesImpl
-        && Objects.equals(autoCommit, ((ConnectionPropertiesImpl) o).autoCommit)
-        && Objects.equals(catalog, ((ConnectionPropertiesImpl) o).catalog)
-        && isDirty == ((ConnectionPropertiesImpl) o).isDirty
-        && Objects.equals(readOnly, ((ConnectionPropertiesImpl) o).readOnly)
-        && Objects.equals(schema, ((ConnectionPropertiesImpl) o).schema)
-        && Objects.equals(transactionIsolation,
-            ((ConnectionPropertiesImpl) o).transactionIsolation);
+            || o instanceof ConnectionPropertiesImpl
+            && autoCommit == ((ConnectionPropertiesImpl) o).autoCommit
+            || autoCommit != null && autoCommit.equals(((ConnectionPropertiesImpl) o).autoCommit)
+            && catalog == ((ConnectionPropertiesImpl) o).catalog
+            || catalog != null && catalog.equals(((ConnectionPropertiesImpl) o).catalog)
+            && isDirty == ((ConnectionPropertiesImpl) o).isDirty
+            && readOnly == ((ConnectionPropertiesImpl) o).readOnly
+            || readOnly != null && readOnly.equals(((ConnectionPropertiesImpl) o).readOnly)
+            && schema == ((ConnectionPropertiesImpl) o).schema
+            || schema != null && schema.equals(((ConnectionPropertiesImpl) o).schema)
+            && transactionIsolation == ((ConnectionPropertiesImpl) o).transactionIsolation
+            || transactionIsolation != null
+            && transactionIsolation.equals(((ConnectionPropertiesImpl) o).transactionIsolation);
   }
 
   public Common.ConnectionProperties toProto() {

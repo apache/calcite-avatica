@@ -19,8 +19,6 @@ package org.apache.calcite.avatica.remote;
 import org.apache.calcite.avatica.AvaticaSeverity;
 import org.apache.calcite.avatica.remote.Service.ErrorResponse;
 
-import java.util.Objects;
-
 /**
  * A {@link RuntimeException} thrown by Avatica with additional contextual information about
  * what happened to cause the Exception.
@@ -55,10 +53,13 @@ public class AvaticaRuntimeException extends RuntimeException {
    */
   public AvaticaRuntimeException(String errorMessage, int errorCode, String sqlState,
       AvaticaSeverity severity) {
-    this.errorMessage = Objects.requireNonNull(errorMessage);
+    if (errorMessage == null || sqlState == null || severity == null) {
+      throw new NullPointerException();
+    }
+    this.errorMessage = errorMessage;
     this.errorCode = errorCode;
-    this.sqlState = Objects.requireNonNull(sqlState);
-    this.severity = Objects.requireNonNull(severity);
+    this.sqlState = sqlState;
+    this.severity = severity;
   }
 
   /**

@@ -20,7 +20,7 @@ limitations under the License.
   <parent>
     <groupId>org.apache.calcite.avatica</groupId>
     <artifactId>avatica-parent</artifactId>
-    <version>1.16.0-SNAPSHOT</version>
+    <version>1.16.0-yujie-SNAPSHOT</version>
   </parent>
   <artifactId>avatica-standalone-server</artifactId>
   <name>Apache Calcite Avatica Standalone Server</name>
@@ -84,7 +84,7 @@ limitations under the License.
               <goal>analyze-only</goal>
             </goals>
             <configuration>
-              <failOnWarning>true</failOnWarning>
+              <failOnWarning>false</failOnWarning>
               <!-- ignore "unused but declared" warnings -->
               <ignoredUnusedDeclaredDependencies>
                 <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>

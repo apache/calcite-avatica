@@ -28,7 +28,6 @@ import org.apache.calcite.avatica.metrics.noop.NoopMetricsSystem;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static org.apache.calcite.avatica.remote.MetricsHelper.concat;
 
@@ -53,7 +52,10 @@ public class LocalService implements Service {
 
   public LocalService(Meta meta, MetricsSystem metrics) {
     this.meta = meta;
-    this.metrics = Objects.requireNonNull(metrics);
+    if (metrics == null) {
+      throw new NullPointerException();
+    }
+    this.metrics = metrics;
 
     this.executeTimer = this.metrics.getTimer(name("Execute"));
     this.commitTimer = this.metrics.getTimer(name("Commit"));
@@ -67,14 +69,17 @@ public class LocalService implements Service {
   }
 
   @Override public void setRpcMetadata(RpcMetadataResponse serverLevelRpcMetadata) {
-    this.serverLevelRpcMetadata = Objects.requireNonNull(serverLevelRpcMetadata);
+    if (serverLevelRpcMetadata == null) {
+      throw new NullPointerException();
+    }
+    this.serverLevelRpcMetadata = serverLevelRpcMetadata;
   }
 
   private static <E> List<E> list(Iterable<E> iterable) {
     if (iterable instanceof List) {
       return (List<E>) iterable;
     }
-    final List<E> rowList = new ArrayList<>();
+    final List<E> rowList = new ArrayList();
     for (E row : iterable) {
       rowList.add(row);
     }
@@ -188,17 +193,21 @@ public class LocalService implements Service {
   }
 
   public PrepareResponse apply(PrepareRequest request) {
-    try (final Context ignore = prepareTimer.start()) {
+    final Context ignore = prepareTimer.start();
+    try {
       final Meta.ConnectionHandle ch =
           new Meta.ConnectionHandle(request.connectionId);
       final Meta.StatementHandle h =
           meta.prepare(ch, request.sql, request.maxRowCount);
       return new PrepareResponse(h, serverLevelRpcMetadata);
+    } finally {
+      ignore.close();
     }
   }
 
   public ExecuteResponse apply(PrepareAndExecuteRequest request) {
-    try (final Context ignore = prepareAndExecuteTimer.start()) {
+    final Context ignore = prepareAndExecuteTimer.start();
+    try {
       final Meta.StatementHandle sh =
           new Meta.StatementHandle(request.connectionId, request.statementId, null);
       try {
@@ -219,7 +228,7 @@ public class LocalService implements Service {
                   @Override public void execute() {
                   }
                 });
-        final List<ResultSetResponse> results = new ArrayList<>();
+        final List<ResultSetResponse> results = new ArrayList();
         for (Meta.MetaResultSet metaResultSet : executeResult.resultSets) {
           results.add(toResponse(metaResultSet));
         }
@@ -228,6 +237,8 @@ public class LocalService implements Service {
         // The Statement doesn't exist anymore, bubble up this information
         return new ExecuteResponse(null, true, serverLevelRpcMetadata);
       }
+    } finally {
+      ignore.close();
     }
   }
 
@@ -240,7 +251,10 @@ public class LocalService implements Service {
               request.offset,
               request.fetchMaxRowCount);
       return new FetchResponse(frame, false, false, serverLevelRpcMetadata);
-    } catch (NullPointerException | NoSuchStatementException e) {
+    } catch (NullPointerException e) {
+      // The Statement doesn't exist anymore, bubble up this information
+      return new FetchResponse(null, true, true, serverLevelRpcMetadata);
+    } catch (NoSuchStatementException e) {
       // The Statement doesn't exist anymore, bubble up this information
       return new FetchResponse(null, true, true, serverLevelRpcMetadata);
     } catch (MissingResultsException e) {
@@ -249,12 +263,13 @@ public class LocalService implements Service {
   }
 
   public ExecuteResponse apply(ExecuteRequest request) {
-    try (final Context ignore = executeTimer.start()) {
+    final Context ignore = executeTimer.start();
+    try {
       try {
         final Meta.ExecuteResult executeResult = meta.execute(request.statementHandle,
             request.parameterValues, AvaticaUtils.toSaturatedInt(request.maxRowCount));
 
-        final List<ResultSetResponse> results = new ArrayList<>(executeResult.resultSets.size());
+        final List<ResultSetResponse> results = new ArrayList(executeResult.resultSets.size());
         for (Meta.MetaResultSet metaResultSet : executeResult.resultSets) {
           results.add(toResponse(metaResultSet));
         }
@@ -262,6 +277,8 @@ public class LocalService implements Service {
       } catch (NoSuchStatementException e) {
         return new ExecuteResponse(null, true, serverLevelRpcMetadata);
       }
+    } finally {
+      ignore.close();
     }
   }
 
@@ -294,12 +311,15 @@ public class LocalService implements Service {
   }
 
   public ConnectionSyncResponse apply(ConnectionSyncRequest request) {
-    try (final Context ignore = connectionSyncTimer.start()) {
+    final Context ignore = connectionSyncTimer.start();
+    try {
       final Meta.ConnectionHandle ch =
           new Meta.ConnectionHandle(request.connectionId);
       final Meta.ConnectionProperties connProps =
           meta.connectionSync(ch, request.connProps);
       return new ConnectionSyncResponse(connProps, serverLevelRpcMetadata);
+    } finally {
+      ignore.close();
     }
   }
 
@@ -326,11 +346,14 @@ public class LocalService implements Service {
   }
 
   public CommitResponse apply(CommitRequest request) {
-    try (final Context ignore = commitTimer.start()) {
+    final Context ignore = commitTimer.start();
+    try {
       meta.commit(new Meta.ConnectionHandle(request.connectionId));
 
       // If commit() errors, let the ErrorResponse be sent back via an uncaught Exception.
       return new CommitResponse();
+    } finally {
+      ignore.close();
     }
   }
 

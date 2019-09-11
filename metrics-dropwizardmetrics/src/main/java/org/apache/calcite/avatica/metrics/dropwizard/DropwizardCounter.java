@@ -18,8 +18,6 @@ package org.apache.calcite.avatica.metrics.dropwizard;
 
 import com.codahale.metrics.Counter;
 
-import java.util.Objects;
-
 /**
  * Dropwizard Metrics implementation of {@link org.apache.calcite.avatica.metrics.Counter}.
  */
@@ -28,7 +26,10 @@ public class DropwizardCounter implements org.apache.calcite.avatica.metrics.Cou
   private final Counter counter;
 
   public DropwizardCounter(Counter counter) {
-    this.counter = Objects.requireNonNull(counter);
+    if (counter == null) {
+      throw new NullPointerException();
+    }
+    this.counter = counter;
   }
 
   @Override public void increment() {

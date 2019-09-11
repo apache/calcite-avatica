@@ -40,6 +40,7 @@ import com.google.protobuf.UnsafeByteOperations;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,10 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Properties;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * API for request-response calls to an Avatica server.
@@ -230,7 +228,9 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof CatalogsRequest
-          && Objects.equals(connectionId, ((CatalogsRequest) o).connectionId);
+              && connectionId == ((CatalogsRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((CatalogsRequest) o).connectionId);
     }
   }
 
@@ -287,8 +287,10 @@ public interface Service {
 
     @Override public boolean equals(Object o) {
       return o == this
-          || o instanceof DatabasePropertyRequest
-          && Objects.equals(connectionId, ((DatabasePropertyRequest) o).connectionId);
+              || o instanceof DatabasePropertyRequest
+              && connectionId == ((DatabasePropertyRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((DatabasePropertyRequest) o).connectionId);
     }
   }
 
@@ -372,10 +374,15 @@ public interface Service {
 
     @Override public boolean equals(Object o) {
       return o == this
-          || o instanceof SchemasRequest
-          && Objects.equals(connectionId, ((SchemasRequest) o).connectionId)
-          && Objects.equals(catalog, ((SchemasRequest) o).catalog)
-          && Objects.equals(schemaPattern, ((SchemasRequest) o).schemaPattern);
+              || o instanceof SchemasRequest
+              && connectionId == ((SchemasRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((SchemasRequest) o).connectionId)
+              && catalog == ((SchemasRequest) o).catalog
+              || catalog != null && catalog.equals(((SchemasRequest) o).catalog)
+              && connectionId == ((SchemasRequest) o).schemaPattern
+              || schemaPattern != null
+              && schemaPattern.equals(((SchemasRequest) o).schemaPattern);
     }
   }
 
@@ -494,12 +501,22 @@ public interface Service {
 
     @Override public boolean equals(Object o) {
       return o == this
-          || o instanceof TablesRequest
-          && Objects.equals(connectionId, ((TablesRequest) o).connectionId)
-          && Objects.equals(catalog, ((TablesRequest) o).catalog)
-          && Objects.equals(schemaPattern, ((TablesRequest) o).schemaPattern)
-          && Objects.equals(tableNamePattern, ((TablesRequest) o).tableNamePattern)
-          && Objects.equals(typeList, ((TablesRequest) o).typeList);
+              || o instanceof TablesRequest
+              && (connectionId == ((TablesRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((TablesRequest) o).connectionId))
+              && (catalog == ((TablesRequest) o).catalog
+              || catalog != null
+              && catalog.equals(((TablesRequest) o).catalog))
+              && (schemaPattern == ((TablesRequest) o).schemaPattern
+              || schemaPattern != null
+              && schemaPattern.equals(((TablesRequest) o).schemaPattern))
+              && (tableNamePattern == ((TablesRequest) o).tableNamePattern
+              || tableNamePattern != null
+              && tableNamePattern.equals(((TablesRequest) o).tableNamePattern))
+              && (typeList == ((TablesRequest) o).typeList
+              || typeList != null
+              && typeList.equals(((TablesRequest) o).typeList));
     }
   }
 
@@ -553,8 +570,10 @@ public interface Service {
 
     @Override public boolean equals(Object o) {
       return o == this
-          || o instanceof TableTypesRequest
-          && Objects.equals(connectionId, ((TableTypesRequest) o).connectionId);
+              || o instanceof TableTypesRequest
+              && (connectionId == ((TablesRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((TablesRequest) o).connectionId));
     }
   }
 
@@ -672,11 +691,20 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof ColumnsRequest
-          && Objects.equals(connectionId, ((ColumnsRequest) o).connectionId)
-          && Objects.equals(catalog, ((ColumnsRequest) o).catalog)
-          && Objects.equals(schemaPattern, ((ColumnsRequest) o).schemaPattern)
-          && Objects.equals(tableNamePattern, ((ColumnsRequest) o).tableNamePattern)
-          && Objects.equals(columnNamePattern, ((ColumnsRequest) o).columnNamePattern);
+              && (connectionId == ((ColumnsRequest) o).connectionId
+              || connectionId != null && connectionId.equals(((ColumnsRequest) o).connectionId))
+              && (catalog == ((ColumnsRequest) o).catalog
+              || catalog != null
+              && catalog.equals(((ColumnsRequest) o).catalog))
+              && (schemaPattern == ((ColumnsRequest) o).schemaPattern
+              || schemaPattern != null
+              && schemaPattern.equals(((ColumnsRequest) o).schemaPattern))
+              && (tableNamePattern == ((ColumnsRequest) o).tableNamePattern
+              || tableNamePattern != null
+              && tableNamePattern.equals(((ColumnsRequest) o).tableNamePattern))
+              && (columnNamePattern == ((ColumnsRequest) o).columnNamePattern
+              || columnNamePattern != null
+              && columnNamePattern.equals(((ColumnsRequest) o).columnNamePattern));
     }
   }
 
@@ -730,7 +758,9 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof TypeInfoRequest
-          && Objects.equals(connectionId, ((TypeInfoRequest) o).connectionId);
+              && connectionId == ((TypeInfoRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((TypeInfoRequest) o).connectionId);
     }
   }
 
@@ -862,14 +892,22 @@ public interface Service {
 
     @Override public boolean equals(Object o) {
       return o == this
-          || o instanceof ResultSetResponse
-          && statementId == ((ResultSetResponse) o).statementId
-          && ownStatement == ((ResultSetResponse) o).ownStatement
-          && updateCount == ((ResultSetResponse) o).updateCount
-          && Objects.equals(connectionId, ((ResultSetResponse) o).connectionId)
-          && Objects.equals(firstFrame, ((ResultSetResponse) o).firstFrame)
-          && Objects.equals(signature, ((ResultSetResponse) o).signature)
-          && Objects.equals(rpcMetadata, ((ResultSetResponse) o).rpcMetadata);
+              || o instanceof ResultSetResponse
+              && statementId == ((ResultSetResponse) o).statementId
+              && ownStatement == ((ResultSetResponse) o).ownStatement
+              && updateCount == ((ResultSetResponse) o).updateCount
+              && connectionId == ((ResultSetResponse) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((ResultSetResponse) o).connectionId)
+              && firstFrame == ((ResultSetResponse) o).firstFrame
+              || firstFrame != null
+              && firstFrame.equals(((ResultSetResponse) o).firstFrame)
+              && signature == ((ResultSetResponse) o).signature
+              || signature != null
+              && signature.equals(((ResultSetResponse) o).signature)
+              && rpcMetadata == ((ResultSetResponse) o).rpcMetadata
+              || rpcMetadata != null
+              && rpcMetadata.equals(((ResultSetResponse) o).rpcMetadata);
     }
   }
 
@@ -991,8 +1029,11 @@ public interface Service {
           && statementId == ((PrepareAndExecuteRequest) o).statementId
           && maxRowCount == ((PrepareAndExecuteRequest) o).maxRowCount
           && maxRowsInFirstFrame == ((PrepareAndExecuteRequest) o).maxRowsInFirstFrame
-          && Objects.equals(connectionId, ((PrepareAndExecuteRequest) o).connectionId)
-          && Objects.equals(sql, ((PrepareAndExecuteRequest) o).sql);
+          && connectionId == ((PrepareAndExecuteRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((PrepareAndExecuteRequest) o).connectionId)
+              && sql == ((PrepareAndExecuteRequest) o).sql
+              || sql != null && sql.equals(((PrepareAndExecuteRequest) o).sql);
     }
   }
 
@@ -1042,7 +1083,7 @@ public interface Service {
 
       List<TypedValue> values = null;
       if (msg.getHasParameterValues()) {
-        values = new ArrayList<>(msg.getParameterValuesCount());
+        values = new ArrayList(msg.getParameterValuesCount());
         for (Common.TypedValue valueProto : msg.getParameterValuesList()) {
           if (TypedValue.PROTO_IMPLICIT_NULL.equals(valueProto)) {
             values.add(null);
@@ -1103,8 +1144,12 @@ public interface Service {
       return o == this
           || o instanceof ExecuteRequest
           && maxRowCount == ((ExecuteRequest) o).maxRowCount
-          && Objects.equals(statementHandle, ((ExecuteRequest) o).statementHandle)
-          && Objects.equals(parameterValues, ((ExecuteRequest) o).parameterValues);
+              && statementHandle == ((ExecuteRequest) o).statementHandle
+              || statementHandle != null
+              && statementHandle.equals(((ExecuteRequest) o).statementHandle)
+              && parameterValues == ((ExecuteRequest) o).parameterValues
+              || parameterValues != null
+              && parameterValues.equals(((ExecuteRequest) o).parameterValues);
     }
   }
 
@@ -1136,7 +1181,7 @@ public interface Service {
           Responses.ExecuteResponse.class);
 
       List<Responses.ResultSetResponse> msgResults = msg.getResultsList();
-      List<ResultSetResponse> copiedResults = new ArrayList<>(msgResults.size());
+      List<ResultSetResponse> copiedResults = new ArrayList(msgResults.size());
 
       for (Responses.ResultSetResponse msgResult : msgResults) {
         copiedResults.add(ResultSetResponse.fromProto(msgResult));
@@ -1176,8 +1221,12 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof ExecuteResponse
-          && Objects.equals(results, ((ExecuteResponse) o).results)
-          && Objects.equals(rpcMetadata, ((ExecuteResponse) o).rpcMetadata);
+              && results == ((ExecuteResponse) o).results
+              || results != null
+              && results.equals(((ExecuteResponse) o).results)
+              && rpcMetadata == ((ExecuteResponse) o).rpcMetadata
+              || rpcMetadata != null
+              && rpcMetadata.equals(((ExecuteResponse) o).rpcMetadata);
     }
   }
 
@@ -1265,8 +1314,12 @@ public interface Service {
       return o == this
           || o instanceof PrepareRequest
           && maxRowCount == ((PrepareRequest) o).maxRowCount
-          && Objects.equals(connectionId, ((PrepareRequest) o).connectionId)
-          && Objects.equals(sql, ((PrepareRequest) o).sql);
+              && connectionId == ((PrepareRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((PrepareRequest) o).connectionId)
+              && sql == ((PrepareRequest) o).sql
+              || sql != null
+              && sql.equals(((PrepareRequest) o).sql);
     }
   }
 
@@ -1327,8 +1380,12 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof PrepareResponse
-          && Objects.equals(statement, ((PrepareResponse) o).statement)
-          && Objects.equals(rpcMetadata, ((PrepareResponse) o).rpcMetadata);
+              && statement == ((PrepareResponse) o).statement
+              || statement != null
+              && statement.equals(((PrepareResponse) o).statement)
+              && rpcMetadata == ((PrepareResponse) o).rpcMetadata
+              || rpcMetadata != null
+              && rpcMetadata.equals(((PrepareResponse) o).rpcMetadata);
     }
   }
 
@@ -1418,7 +1475,9 @@ public interface Service {
           && statementId == ((FetchRequest) o).statementId
           && offset == ((FetchRequest) o).offset
           && fetchMaxRowCount == ((FetchRequest) o).fetchMaxRowCount
-          && Objects.equals(connectionId, ((FetchRequest) o).connectionId);
+              && connectionId == ((FetchRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((FetchRequest) o).connectionId);
     }
   }
 
@@ -1485,10 +1544,13 @@ public interface Service {
 
     @Override public boolean equals(Object o) {
       return o == this
-          || o instanceof FetchResponse
-          && Objects.equals(frame, ((FetchResponse) o).frame)
-          && Objects.equals(rpcMetadata, ((FetchResponse) o).rpcMetadata)
-          && missingStatement == ((FetchResponse) o).missingStatement;
+              || o instanceof FetchResponse
+              && frame == ((FetchResponse) o).frame
+              || frame != null && frame.equals(((FetchResponse) o).frame)
+              && rpcMetadata == ((FetchResponse) o).rpcMetadata
+              || rpcMetadata != null
+              && rpcMetadata.equals(((FetchResponse) o).rpcMetadata)
+              && missingStatement == ((FetchResponse) o).missingStatement;
     }
   }
 
@@ -1546,7 +1608,9 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof CreateStatementRequest
-          && Objects.equals(connectionId, ((CreateStatementRequest) o).connectionId);
+              && connectionId == ((CreateStatementRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((CreateStatementRequest) o).connectionId);
     }
   }
 
@@ -1624,8 +1688,12 @@ public interface Service {
       return o == this
           || o instanceof CreateStatementResponse
           && statementId == ((CreateStatementResponse) o).statementId
-          && Objects.equals(connectionId, ((CreateStatementResponse) o).connectionId)
-          && Objects.equals(rpcMetadata, ((CreateStatementResponse) o).rpcMetadata);
+              && connectionId == ((CreateStatementResponse) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((CreateStatementResponse) o).connectionId)
+              && rpcMetadata == ((CreateStatementResponse) o).rpcMetadata
+              || rpcMetadata != null
+              && rpcMetadata.equals(((CreateStatementResponse) o).rpcMetadata);
     }
   }
 
@@ -1688,7 +1756,9 @@ public interface Service {
       return o == this
           || o instanceof CloseStatementRequest
           && statementId == ((CloseStatementRequest) o).statementId
-          && Objects.equals(connectionId, ((CloseStatementRequest) o).connectionId);
+              && connectionId == ((CloseStatementRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((CloseStatementRequest) o).connectionId);
     }
   }
 
@@ -1741,7 +1811,9 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof CloseStatementResponse
-          && Objects.equals(rpcMetadata, ((CloseStatementResponse) o).rpcMetadata);
+              && rpcMetadata == ((CloseStatementResponse) o).rpcMetadata
+              || rpcMetadata != null
+              && rpcMetadata.equals(((CloseStatementResponse) o).rpcMetadata);
     }
   }
 
@@ -1777,7 +1849,7 @@ public interface Service {
      * @return A representation of the Properties as a Map.
      */
     public static Map<String, String> serializeProperties(Properties props) {
-      Map<String, String> infoAsString = new HashMap<>();
+      Map<String, String> infoAsString = new HashMap();
       for (Map.Entry<Object, Object> entry : props.entrySet()) {
         // Determine if this is a property we want to forward to the server
         if (!BuiltInConnectionProperty.isLocalProperty(entry.getKey())) {
@@ -1826,8 +1898,11 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof OpenConnectionRequest
-          && Objects.equals(connectionId, ((OpenConnectionRequest) o).connectionId)
-          && Objects.equals(info, ((OpenConnectionRequest) o).info);
+              && connectionId == ((OpenConnectionRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((OpenConnectionRequest) o).connectionId)
+              && info == ((OpenConnectionRequest) o).info
+              || info != null && info.equals(((OpenConnectionRequest) o).info);
     }
   }
 
@@ -1880,7 +1955,9 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof OpenConnectionResponse
-          && Objects.equals(rpcMetadata, ((OpenConnectionResponse) o).rpcMetadata);
+              && rpcMetadata == ((OpenConnectionResponse) o).rpcMetadata
+              || rpcMetadata != null
+              && rpcMetadata.equals(((OpenConnectionResponse) o).rpcMetadata);
     }
   }
 
@@ -1937,7 +2014,9 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof CloseConnectionRequest
-          && Objects.equals(connectionId, ((CloseConnectionRequest) o).connectionId);
+              && connectionId == ((CloseConnectionRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((CloseConnectionRequest) o).connectionId);
     }
   }
 
@@ -1991,7 +2070,9 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof CloseConnectionResponse
-          && Objects.equals(rpcMetadata, ((CloseConnectionResponse) o).rpcMetadata);
+              && rpcMetadata == ((CloseConnectionResponse) o).rpcMetadata
+              || rpcMetadata != null
+              && rpcMetadata.equals(((CloseConnectionResponse) o).rpcMetadata);
     }
   }
 
@@ -2064,8 +2145,12 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof ConnectionSyncRequest
-          && Objects.equals(connectionId, ((ConnectionSyncRequest) o).connectionId)
-          && Objects.equals(connProps, ((ConnectionSyncRequest) o).connProps);
+              && connectionId == ((ConnectionSyncRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((ConnectionSyncRequest) o).connectionId)
+              && connProps == ((ConnectionSyncRequest) o).connProps
+              || connProps != null
+              && connProps.equals(((ConnectionSyncRequest) o).connProps);
     }
   }
 
@@ -2126,8 +2211,12 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof ConnectionSyncResponse
-          && Objects.equals(connProps, ((ConnectionSyncResponse) o).connProps)
-          && Objects.equals(rpcMetadata, ((ConnectionSyncResponse) o).rpcMetadata);
+              && connProps == ((ConnectionSyncResponse) o).connProps
+              || connProps != null
+              && connProps.equals(((ConnectionSyncResponse) o).connProps)
+              && rpcMetadata == ((ConnectionSyncResponse) o).rpcMetadata
+              || rpcMetadata != null
+              && rpcMetadata.equals(((ConnectionSyncResponse) o).rpcMetadata);
     }
   }
 
@@ -2155,7 +2244,7 @@ public interface Service {
     @Override DatabasePropertyResponse deserialize(Message genericMsg) {
       final Responses.DatabasePropertyResponse msg = ProtobufService.castProtobufMessage(genericMsg,
           Responses.DatabasePropertyResponse.class);
-      HashMap<Meta.DatabaseProperty, Object> properties = new HashMap<>();
+      HashMap<Meta.DatabaseProperty, Object> properties = new HashMap();
       for (Responses.DatabasePropertyElement property : msg.getPropsList()) {
         final Meta.DatabaseProperty dbProp = Meta.DatabaseProperty.fromProto(property.getKey());
         final Common.TypedValue value = property.getValue();
@@ -2278,8 +2367,12 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof DatabasePropertyResponse
-          && Objects.equals(map, ((DatabasePropertyResponse) o).map)
-          && Objects.equals(rpcMetadata, ((DatabasePropertyResponse) o).rpcMetadata);
+              && map == ((DatabasePropertyResponse) o).map
+              || map != null
+              && map.equals(((DatabasePropertyResponse) o).map)
+              && rpcMetadata == ((DatabasePropertyResponse) o).rpcMetadata
+              || rpcMetadata != null
+              && rpcMetadata.equals(((DatabasePropertyResponse) o).rpcMetadata);
     }
   }
 
@@ -2357,7 +2450,7 @@ public interface Service {
     }
 
     static List<String> toStackTraces(Exception e) {
-      List<String> stackTraces = new ArrayList<>();
+      List<String> stackTraces = new ArrayList();
       stackTraces.add(toString(e));
       if (e instanceof SQLException) {
         SQLException next = ((SQLException) e).getNextException();
@@ -2370,8 +2463,10 @@ public interface Service {
     }
 
     static String toString(Exception e) {
+      if (e == null) {
+        throw new NullPointerException();
+      }
       //noinspection ThrowableResultOfMethodCallIgnored
-      Objects.requireNonNull(e);
       StringWriter sw = new StringWriter();
       e.printStackTrace(new PrintWriter(sw));
       return sw.toString();
@@ -2465,10 +2560,18 @@ public interface Service {
           || o instanceof ErrorResponse
           && errorCode == ((ErrorResponse) o).errorCode
           && severity == ((ErrorResponse) o).severity
-          && Objects.equals(exceptions, ((ErrorResponse) o).exceptions)
-          && Objects.equals(errorMessage, ((ErrorResponse) o).errorMessage)
-          && Objects.equals(sqlState, ((ErrorResponse) o).sqlState)
-          && Objects.equals(rpcMetadata, ((ErrorResponse) o).rpcMetadata);
+              && exceptions == ((ErrorResponse) o).exceptions
+              || exceptions != null
+              && exceptions.equals(((ErrorResponse) o).exceptions)
+              && errorMessage == ((ErrorResponse) o).errorMessage
+              || errorMessage != null
+              && errorMessage.equals(((ErrorResponse) o).errorMessage)
+              && sqlState == ((ErrorResponse) o).sqlState
+              || sqlState != null
+              && sqlState.equals(((ErrorResponse) o).sqlState)
+              && rpcMetadata == ((ErrorResponse) o).rpcMetadata
+              || rpcMetadata != null
+              && rpcMetadata.equals(((ErrorResponse) o).rpcMetadata);
     }
 
     public AvaticaClientRuntimeException toException() {
@@ -2573,8 +2676,11 @@ public interface Service {
           || o instanceof SyncResultsRequest
           && statementId == ((SyncResultsRequest) o).statementId
           && offset == ((SyncResultsRequest) o).offset
-          && Objects.equals(connectionId, ((SyncResultsRequest) o).connectionId)
-          && Objects.equals(state, ((SyncResultsRequest) o).state);
+              && connectionId == ((SyncResultsRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((SyncResultsRequest) o).connectionId)
+              && state == ((SyncResultsRequest) o).state
+              || state != null && state.equals(((SyncResultsRequest) o).state);
     }
   }
 
@@ -2636,7 +2742,9 @@ public interface Service {
           || o instanceof SyncResultsResponse
           && missingStatement == ((SyncResultsResponse) o).missingStatement
           && moreResults == ((SyncResultsResponse) o).moreResults
-          && Objects.equals(rpcMetadata, ((SyncResultsResponse) o).rpcMetadata);
+              && rpcMetadata == ((SyncResultsResponse) o).rpcMetadata
+              || rpcMetadata != null
+              && rpcMetadata.equals(((SyncResultsResponse) o).rpcMetadata);
     }
   }
 
@@ -2659,7 +2767,8 @@ public interface Service {
 
     public RpcMetadataResponse(@JsonProperty("serverAddress") String serverAddress) {
       this.serverAddress = serverAddress;
-      this.serverAddressAsBytes = UnsafeByteOperations.unsafeWrap(serverAddress.getBytes(UTF_8));
+      byte[] utf8Bytes = serverAddress.getBytes(Charset.forName("UTF-8"));
+      this.serverAddressAsBytes = UnsafeByteOperations.unsafeWrap(utf8Bytes);
     }
 
     @Override RpcMetadataResponse deserialize(Message genericMsg) {
@@ -2691,7 +2800,9 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return this == o
           || o instanceof RpcMetadataResponse
-          && Objects.equals(serverAddress, ((RpcMetadataResponse) o).serverAddress);
+              && serverAddress == ((RpcMetadataResponse) o).serverAddress
+              || serverAddress != null
+              && serverAddress.equals(((RpcMetadataResponse) o).serverAddress);
     }
   }
 
@@ -2746,7 +2857,9 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return this == o
           || o instanceof CommitRequest
-          && Objects.equals(connectionId, ((CommitRequest) o).connectionId);
+              && connectionId == ((CommitRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((CommitRequest) o).connectionId);
     }
   }
 
@@ -2832,7 +2945,9 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return this == o
           || o instanceof RollbackRequest
-          && Objects.equals(connectionId, ((RollbackRequest) o).connectionId);
+              && connectionId == ((RollbackRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((RollbackRequest) o).connectionId);
     }
   }
 
@@ -2913,7 +3028,7 @@ public interface Service {
           ProtobufService.castProtobufMessage(genericMsg,
               Requests.PrepareAndExecuteBatchRequest.class);
 
-      List<String> sqlCommands = new ArrayList<>(msg.getSqlCommandsList());
+      List<String> sqlCommands = new ArrayList(msg.getSqlCommandsList());
 
       return new PrepareAndExecuteBatchRequest(msg.getConnectionId(), msg.getStatementId(),
           sqlCommands);
@@ -2930,9 +3045,13 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return this == o
           || o instanceof PrepareAndExecuteBatchRequest
-          && Objects.equals(connectionId, ((PrepareAndExecuteBatchRequest) o).connectionId)
-          && statementId == ((PrepareAndExecuteBatchRequest) o).statementId
-          && Objects.equals(sqlCommands, ((PrepareAndExecuteBatchRequest) o).sqlCommands);
+              && connectionId == ((PrepareAndExecuteBatchRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((PrepareAndExecuteBatchRequest) o).connectionId)
+              && statementId == ((PrepareAndExecuteBatchRequest) o).statementId
+              && sqlCommands == ((PrepareAndExecuteBatchRequest) o).sqlCommands
+              || sqlCommands != null
+              && sqlCommands.equals(((PrepareAndExecuteBatchRequest) o).sqlCommands);
     }
   }
 
@@ -3035,10 +3154,16 @@ public interface Service {
     @Override public boolean equals(Object o) {
       return this == o
           || o instanceof ExecuteBatchRequest
-          && Objects.equals(connectionId, ((ExecuteBatchRequest) o).connectionId)
-          && statementId == ((ExecuteBatchRequest) o).statementId
-          && Objects.equals(protoParameterValues, ((ExecuteBatchRequest) o).protoParameterValues)
-          && Objects.equals(parameterValues, ((ExecuteBatchRequest) o).parameterValues);
+              && connectionId == ((ExecuteBatchRequest) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((ExecuteBatchRequest) o).connectionId)
+              && statementId == ((ExecuteBatchRequest) o).statementId
+              && protoParameterValues == ((ExecuteBatchRequest) o).protoParameterValues
+              || protoParameterValues != null
+              && protoParameterValues.equals(((ExecuteBatchRequest) o).protoParameterValues)
+              && parameterValues == ((ExecuteBatchRequest) o).parameterValues
+              || parameterValues != null
+              && parameterValues.equals(((ExecuteBatchRequest) o).parameterValues);
     }
   }
 
@@ -3089,7 +3214,9 @@ public interface Service {
       return this == o
           || o instanceof ExecuteBatchResponse
           && Arrays.equals(updateCounts, ((ExecuteBatchResponse) o).updateCounts)
-          && Objects.equals(connectionId, ((ExecuteBatchResponse) o).connectionId)
+              && connectionId == ((ExecuteBatchResponse) o).connectionId
+              || connectionId != null
+              && connectionId.equals(((ExecuteBatchResponse) o).connectionId)
           && statementId == ((ExecuteBatchResponse) o).statementId
           && missingStatement == ((ExecuteBatchResponse) o).missingStatement;
     }

@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.net.URL;
-import java.util.Objects;
 
 /**
  * Default implementation of {@link AvaticaHttpClientFactory} which chooses an implementation
@@ -133,7 +132,10 @@ public class AvaticaHttpClientFactoryImpl implements AvaticaHttpClientFactory {
     try {
       Class<?> clz = Class.forName(className);
       Constructor<?> constructor = clz.getConstructor(URL.class);
-      Object instance = constructor.newInstance(Objects.requireNonNull(url));
+      if (url == null) {
+        throw new NullPointerException();
+      }
+      Object instance = constructor.newInstance(url);
       return AvaticaHttpClient.class.cast(instance);
     } catch (Exception e) {
       throw new RuntimeException("Failed to construct AvaticaHttpClient implementation "

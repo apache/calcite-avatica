@@ -46,7 +46,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.Principal;
-import java.util.Objects;
 
 /**
  * Implementation of an AvaticaHttpClient which uses SPNEGO.
@@ -89,7 +88,10 @@ public class AvaticaCommonsHttpClientSpnegoImpl implements AvaticaHttpClient {
    * @param credential The GSS credentials
    */
   public AvaticaCommonsHttpClientSpnegoImpl(URL url, GSSCredential credential) {
-    this.url = Objects.requireNonNull(url);
+    if (url == null) {
+      throw new NullPointerException();
+    }
+    this.url = url;
 
     pool = new PoolingHttpClientConnectionManager();
     // Increase max total connection to 100
@@ -137,8 +139,9 @@ public class AvaticaCommonsHttpClientSpnegoImpl implements AvaticaHttpClient {
     // Create the client with the AuthSchemeRegistry and manager
     HttpPost post = new HttpPost(toURI(url));
     post.setEntity(entity);
-
-    try (CloseableHttpResponse response = client.execute(post, context)) {
+    CloseableHttpResponse response = null;
+    try {
+      response = client.execute(post, context);
       final int statusCode = response.getStatusLine().getStatusCode();
       if (HttpURLConnection.HTTP_OK == statusCode
           || HttpURLConnection.HTTP_INTERNAL_ERROR == statusCode) {
@@ -151,6 +154,14 @@ public class AvaticaCommonsHttpClientSpnegoImpl implements AvaticaHttpClient {
     } catch (Exception e) {
       LOG.debug("Failed to execute HTTP request", e);
       throw new RuntimeException(e);
+    } finally {
+      if (response != null) {
+        try {
+          response.close();
+        } catch (Exception e) {
+          //
+        }
+      }
     }
   }
 

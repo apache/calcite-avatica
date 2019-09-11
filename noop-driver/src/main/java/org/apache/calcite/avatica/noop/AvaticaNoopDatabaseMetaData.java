@@ -757,12 +757,12 @@ public class AvaticaNoopDatabaseMetaData implements DatabaseMetaData {
     return AvaticaNoopResultSet.getInstance();
   }
 
-  @Override public ResultSet getPseudoColumns(String catalog, String schemaPattern,
+  public ResultSet getPseudoColumns(String catalog, String schemaPattern,
       String tableNamePattern, String columnNamePattern) throws SQLException {
     return AvaticaNoopResultSet.getInstance();
   }
 
-  @Override public boolean generatedKeyAlwaysReturned() throws SQLException {
+  public boolean generatedKeyAlwaysReturned() throws SQLException {
     return false;
   }
 }

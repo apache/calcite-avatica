@@ -20,8 +20,6 @@ import org.apache.calcite.avatica.metrics.MetricsSystemConfiguration;
 
 import com.codahale.metrics.MetricRegistry;
 
-import java.util.Objects;
-
 /**
  * A container which provides a {@link MetricRegistry} to a {@link DropwizardMetricsSystem}.
  */
@@ -31,7 +29,10 @@ public class DropwizardMetricsSystemConfiguration implements
   private final MetricRegistry registry;
 
   public DropwizardMetricsSystemConfiguration(MetricRegistry registry) {
-    this.registry = Objects.requireNonNull(registry);
+    if (registry == null) {
+      throw new NullPointerException();
+    }
+    this.registry = registry;
   }
 
   @Override public MetricRegistry get() {

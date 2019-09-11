@@ -35,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Objects;
 import java.util.concurrent.Callable;
 
 import javax.servlet.ServletException;
@@ -68,8 +67,11 @@ public class AvaticaProtobufHandler extends AbstractAvaticaHandler {
 
   public AvaticaProtobufHandler(Service service, MetricsSystem metrics,
       AvaticaServerConfiguration serverConfig) {
-    this.service = Objects.requireNonNull(service);
-    this.metrics = Objects.requireNonNull(metrics);
+    if (service == null || metrics == null) {
+      throw new NullPointerException();
+    }
+    this.service = service;
+    this.metrics = metrics;
 
     this.requestTimer = this.metrics.getTimer(
         MetricsHelper.concat(AvaticaProtobufHandler.class,
@@ -90,7 +92,8 @@ public class AvaticaProtobufHandler extends AbstractAvaticaHandler {
   public void handle(String target, Request baseRequest,
       HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
-    try (final Context ctx = this.requestTimer.start()) {
+    final Context ctx = this.requestTimer.start();
+    try {
       // Check if the user is OK to proceed.
       if (!isUserPermitted(serverConfig, baseRequest, request, response)) {
         LOG.debug("HTTP request from {} is unauthenticated and authentication is required",
@@ -104,10 +107,12 @@ public class AvaticaProtobufHandler extends AbstractAvaticaHandler {
         final byte[] requestBytes;
         // Avoid a new buffer creation for every HTTP request
         final UnsynchronizedBuffer buffer = threadLocalBuffer.get();
-        try (ServletInputStream inputStream = request.getInputStream()) {
+        ServletInputStream inputStream = request.getInputStream();
+        try {
           requestBytes = AvaticaUtils.readFullyToBytes(inputStream, buffer);
         } finally {
           buffer.reset();
+          inputStream.close();
         }
 
         HandlerResponse<byte[]> handlerResponse;
@@ -142,6 +147,8 @@ public class AvaticaProtobufHandler extends AbstractAvaticaHandler {
         response.setStatus(handlerResponse.getStatusCode());
         response.getOutputStream().write(handlerResponse.getResponse());
       }
+    } finally {
+      ctx.close();
     }
   }
 

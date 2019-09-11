@@ -316,7 +316,7 @@ public class ConnectionConfigImpl implements ConnectionConfig {
       };
 
   static final Map<String, BigDecimal> MULTIPLIER_MAP =
-      new LinkedHashMap<>();
+      new LinkedHashMap();
   static {
     MULTIPLIER_MAP.put("k", new BigDecimal(1024));
     MULTIPLIER_MAP.put("K", new BigDecimal(1024));

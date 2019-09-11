@@ -35,11 +35,11 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Metadata for a column.
@@ -225,35 +225,45 @@ public class ColumnMetaData {
   }
 
   @Override public int hashCode() {
-    return Objects.hash(autoIncrement, caseSensitive, catalogName,
+    Object[] objects = {autoIncrement, caseSensitive, catalogName,
         columnClassName, columnName, currency, definitelyWritable, displaySize,
-        label, nullable, ordinal, precision, readOnly, scale, schemaName,
-        searchable, signed, tableName, type, writable);
+                        label, nullable, ordinal, precision, readOnly, scale, schemaName,
+                           searchable, signed, tableName, type, writable};
+    return Arrays.hashCode(objects);
   }
 
   @Override public boolean equals(Object o) {
     return o == this
-        || o instanceof ColumnMetaData
-        && autoIncrement == ((ColumnMetaData) o).autoIncrement
-        && caseSensitive == ((ColumnMetaData) o).caseSensitive
-        && Objects.equals(catalogName, ((ColumnMetaData) o).catalogName)
-        && Objects.equals(columnClassName, ((ColumnMetaData) o).columnClassName)
-        && Objects.equals(columnName, ((ColumnMetaData) o).columnName)
-        && currency == ((ColumnMetaData) o).currency
-        && definitelyWritable == ((ColumnMetaData) o).definitelyWritable
-        && displaySize == ((ColumnMetaData) o).displaySize
-        && Objects.equals(label, ((ColumnMetaData) o).label)
-        && nullable == ((ColumnMetaData) o).nullable
-        && ordinal == ((ColumnMetaData) o).ordinal
-        && precision == ((ColumnMetaData) o).precision
-        && readOnly == ((ColumnMetaData) o).readOnly
-        && scale == ((ColumnMetaData) o).scale
-        && Objects.equals(schemaName, ((ColumnMetaData) o).schemaName)
-        && searchable == ((ColumnMetaData) o).searchable
-        && signed == ((ColumnMetaData) o).signed
-        && Objects.equals(tableName, ((ColumnMetaData) o).tableName)
-        && Objects.equals(type, ((ColumnMetaData) o).type)
-        && writable == ((ColumnMetaData) o).writable;
+            || o instanceof ColumnMetaData
+            && autoIncrement == ((ColumnMetaData) o).autoIncrement
+            && caseSensitive == ((ColumnMetaData) o).caseSensitive
+            && catalogName == ((ColumnMetaData) o).catalogName
+            || catalogName != null && catalogName.equals(((ColumnMetaData) o).catalogName)
+            && columnClassName == ((ColumnMetaData) o).columnClassName
+            || columnClassName != null
+            && columnClassName.equals(((ColumnMetaData) o).columnClassName)
+            && columnName == ((ColumnMetaData) o).columnName
+            || columnName != null && columnName.equals(((ColumnMetaData) o).columnName)
+            && currency == ((ColumnMetaData) o).currency
+            && definitelyWritable == ((ColumnMetaData) o).definitelyWritable
+            && displaySize == ((ColumnMetaData) o).displaySize
+            && label == ((ColumnMetaData) o).label
+            || label != null && label.equals(((ColumnMetaData) o).label)
+            && nullable == ((ColumnMetaData) o).nullable
+            && ordinal == ((ColumnMetaData) o).ordinal
+            && precision == ((ColumnMetaData) o).precision
+            && readOnly == ((ColumnMetaData) o).readOnly
+            && scale == ((ColumnMetaData) o).scale
+            && schemaName == ((ColumnMetaData) o).schemaName
+            || schemaName != null && schemaName.equals(((ColumnMetaData) o).schemaName)
+            && searchable == ((ColumnMetaData) o).searchable
+            && signed == ((ColumnMetaData) o).signed
+            && tableName == ((ColumnMetaData) o).tableName
+            || tableName != null
+            && tableName.equals(((ColumnMetaData) o).tableName)
+            && type == ((ColumnMetaData) o).type || type != null
+            && type.equals(((ColumnMetaData) o).type)
+            && writable == ((ColumnMetaData) o).writable;
   }
 
   private static <T> T first(T t0, T t1) {
@@ -355,7 +365,7 @@ public class ColumnMetaData {
     public static final Map<Class, Rep> VALUE_MAP;
 
     static {
-      Map<Class, Rep> builder = new HashMap<>();
+      Map<Class, Rep> builder = new HashMap();
       for (Rep rep : values()) {
         builder.put(rep.clazz, rep);
       }
@@ -421,7 +431,7 @@ public class ColumnMetaData {
       case ARRAY:
         return resultSet.getArray(i);
       case STRUCT:
-        return resultSet.getObject(i, Struct.class);
+        return (Struct) resultSet.getObject(i);
       default:
         return resultSet.getObject(i);
       }
@@ -525,8 +535,11 @@ public class ColumnMetaData {
 
     public AvaticaType(int id, String name, Rep rep) {
       this.id = id;
-      this.name = Objects.requireNonNull(name);
-      this.rep = Objects.requireNonNull(rep);
+      if (name == null || rep == null) {
+        throw new NullPointerException();
+      }
+      this.name = name;
+      this.rep = rep;
     }
 
     public String columnClassName() {
@@ -563,7 +576,7 @@ public class ColumnMetaData {
         type = ColumnMetaData.array(nestedType, proto.getName(), rep);
       } else if (proto.getColumnsCount() > 0) {
         // StructType
-        List<ColumnMetaData> columns = new ArrayList<>(proto.getColumnsCount());
+        List<ColumnMetaData> columns = new ArrayList(proto.getColumnsCount());
         for (Common.ColumnMetaData protoColumn : proto.getColumnsList()) {
           columns.add(ColumnMetaData.fromProto(protoColumn));
         }
@@ -577,14 +590,15 @@ public class ColumnMetaData {
     }
 
     @Override public int hashCode() {
-      return Objects.hash(id, name, rep);
+      Object[] objects = {id, name, rep};
+      return Arrays.hashCode(objects);
     }
 
     @Override public boolean equals(Object o) {
       return o == this
           || o instanceof AvaticaType
           && id == ((AvaticaType) o).id
-          && Objects.equals(name, ((AvaticaType) o).name)
+          && name == ((ArrayType) o).name || name != null && name.equals(((ArrayType) o).name)
           && rep == ((AvaticaType) o).rep;
     }
   }
@@ -622,14 +636,16 @@ public class ColumnMetaData {
     }
 
     @Override public int hashCode() {
-      return Objects.hash(id, name, rep, columns);
+      Object[] objects = {id, name, rep, columns};
+      return Arrays.hashCode(objects);
     }
 
     @Override public boolean equals(Object o) {
       return o == this
-          || o instanceof StructType
-          && super.equals(o)
-          && Objects.equals(columns, ((StructType) o).columns);
+              || o instanceof StructType
+              && super.equals(o)
+              && columns == ((StructType) o).columns
+              || columns != null && columns.equals(((StructType) o).columns);
     }
   }
 
@@ -653,7 +669,10 @@ public class ColumnMetaData {
      * at initial construction of this object.
      */
     public void updateComponentType(AvaticaType component) {
-      this.component = Objects.requireNonNull(component);
+      if (component == null) {
+        throw new NullPointerException();
+      }
+      this.component = component;
     }
 
     public AvaticaType getComponent() {
@@ -669,14 +688,16 @@ public class ColumnMetaData {
     }
 
     @Override public int hashCode() {
-      return Objects.hash(id, name, rep, component);
+      Object[] objects = {id, name, rep, component};
+      return Arrays.hashCode(objects);
     }
 
     @Override public boolean equals(Object o) {
       return o == this
-          || o instanceof ArrayType
-          && super.equals(o)
-          && Objects.equals(component, ((ArrayType) o).component);
+              || o instanceof ArrayType
+              && super.equals(o)
+              && component == ((ArrayType) o).component
+              || component != null && component.equals(((ArrayType) o).component);
     }
   }
 }

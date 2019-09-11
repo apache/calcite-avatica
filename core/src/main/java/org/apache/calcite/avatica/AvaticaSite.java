@@ -24,7 +24,7 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -480,7 +480,7 @@ public class AvaticaSite {
       return (byte[]) x;
     }
     if (x instanceof String) {
-      return ((String) x).getBytes(StandardCharsets.UTF_8);
+      return ((String) x).getBytes(Charset.forName("UTF-8"));
     }
     throw unsupportedCast(x.getClass(), byte[].class);
   }

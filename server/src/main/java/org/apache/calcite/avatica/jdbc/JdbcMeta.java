@@ -234,7 +234,7 @@ public class JdbcMeta implements ProtobufMeta {
     if (metaData == null) {
       return Collections.emptyList();
     }
-    final List<ColumnMetaData> columns = new ArrayList<>();
+    final List<ColumnMetaData> columns = new ArrayList();
     for (int i = 1; i <= metaData.getColumnCount(); i++) {
       final SqlType sqlType = SqlType.valueOf(metaData.getColumnType(i));
       final ColumnMetaData.Rep rep = ColumnMetaData.Rep.of(sqlType.internal);
@@ -270,7 +270,7 @@ public class JdbcMeta implements ProtobufMeta {
     if (metaData == null) {
       return Collections.emptyList();
     }
-    final List<AvaticaParameter> params = new ArrayList<>();
+    final List<AvaticaParameter> params = new ArrayList();
     for (int i = 1; i <= metaData.getParameterCount(); i++) {
       params.add(
           new AvaticaParameter(metaData.isSigned(i), metaData.getPrecision(i),
@@ -296,7 +296,7 @@ public class JdbcMeta implements ProtobufMeta {
 
   public Map<DatabaseProperty, Object> getDatabaseProperties(ConnectionHandle ch) {
     try {
-      final Map<DatabaseProperty, Object> map = new HashMap<>();
+      final Map<DatabaseProperty, Object> map = new HashMap();
       final Connection conn = getConnection(ch.id);
       final DatabaseMetaData metaData = conn.getMetaData();
       for (DatabaseProperty p : DatabaseProperty.values()) {
@@ -748,7 +748,7 @@ public class JdbcMeta implements ProtobufMeta {
       info.setResultSet(statement.getResultSet());
       // Either execute(sql) returned true or the resultSet was null
       assert ret || null == info.getResultSet();
-      final List<MetaResultSet> resultSets = new ArrayList<>();
+      final List<MetaResultSet> resultSets = new ArrayList();
       if (null == info.getResultSet()) {
         // Create a special result set that just carries update count
         resultSets.add(

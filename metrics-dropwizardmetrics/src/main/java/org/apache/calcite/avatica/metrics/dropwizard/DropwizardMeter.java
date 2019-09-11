@@ -18,8 +18,6 @@ package org.apache.calcite.avatica.metrics.dropwizard;
 
 import com.codahale.metrics.Meter;
 
-import java.util.Objects;
-
 /**
  * Dropwizard metrics implementation of {@link org.apache.calcite.avatica.metrics.Meter}.
  */
@@ -28,7 +26,10 @@ public class DropwizardMeter implements org.apache.calcite.avatica.metrics.Meter
   private final Meter meter;
 
   public DropwizardMeter(Meter meter) {
-    this.meter = Objects.requireNonNull(meter);
+    if (meter == null) {
+      throw new NullPointerException();
+    }
+    this.meter = meter;
   }
 
   @Override public void mark() {

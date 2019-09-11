@@ -190,9 +190,9 @@ public class AvaticaNoopPreparedStatement implements PreparedStatement {
     return true;
   }
 
-  @Override public void closeOnCompletion() throws SQLException {}
+  public void closeOnCompletion() throws SQLException {}
 
-  @Override public boolean isCloseOnCompletion() throws SQLException {
+  public boolean isCloseOnCompletion() throws SQLException {
     throw unsupported();
   }
 

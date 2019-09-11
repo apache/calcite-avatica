@@ -20,11 +20,9 @@ import org.apache.calcite.avatica.util.UnsynchronizedBuffer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
+import java.lang.reflect.Method;
+import java.nio.charset.Charset;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -39,17 +37,16 @@ import java.util.Set;
 public class AvaticaUtils {
 
   private static final Map<Class, Class> BOX;
+  private static final Method SET_LARGE_MAX_ROWS =
+          method(void.class, Statement.class, "setLargeMaxRows", long.class);
+  private static final Method GET_LARGE_MAX_ROWS =
+          method(long.class, Statement.class, "getLargeMaxRows");
+  private static final Method GET_LARGE_UPDATE_COUNT =
+          method(void.class, Statement.class, "getLargeUpdateCount");
+  private static final Method EXECUTE_LARGE_BATCH =
+          method(long[].class, Statement.class, "executeLargeBatch");
 
-  private static final MethodHandle SET_LARGE_MAX_ROWS =
-      method(void.class, Statement.class, "setLargeMaxRows", long.class);
-  private static final MethodHandle GET_LARGE_MAX_ROWS =
-      method(long.class, Statement.class, "getLargeMaxRows");
-  private static final MethodHandle GET_LARGE_UPDATE_COUNT =
-      method(void.class, Statement.class, "getLargeUpdateCount");
-  private static final MethodHandle EXECUTE_LARGE_BATCH =
-      method(long[].class, Statement.class, "executeLargeBatch");
-
-  private static final Set<String> UNIQUE_STRINGS = new HashSet<>();
+  private static final Set<String> UNIQUE_STRINGS = new HashSet();
 
   private static final ThreadLocal<byte[]> PER_THREAD_BUFFER  = new ThreadLocal<byte[]>() {
     @Override protected byte[] initialValue() {
@@ -60,7 +57,7 @@ public class AvaticaUtils {
   private AvaticaUtils() {}
 
   static {
-    BOX = new HashMap<>();
+    BOX = new HashMap();
     BOX.put(boolean.class, Boolean.class);
     BOX.put(byte.class, Byte.class);
     BOX.put(char.class, Character.class);
@@ -71,16 +68,12 @@ public class AvaticaUtils {
     BOX.put(double.class, Double.class);
   }
 
-  private static MethodHandle method(Class returnType, Class targetType,
-      String name, Class... argTypes) {
-    final MethodHandles.Lookup lookup = MethodHandles.lookup();
+  private static Method method(Class returnType, Class targetType,
+                               String name, Class... argTypes) {
     try {
-      return lookup.findVirtual(targetType, name,
-          MethodType.methodType(returnType, targetType, argTypes));
+      return targetType.getClass().getDeclaredMethod(name, argTypes);
     } catch (NoSuchMethodException e) {
       return null;
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
     }
   }
 
@@ -252,7 +245,7 @@ public class AvaticaUtils {
       throws IOException {
     // Variant that lets us use a pooled Buffer
     final byte[] bytes = _readFully(inputStream, buffer);
-    return new String(bytes, 0, bytes.length, StandardCharsets.UTF_8);
+    return new String(bytes, 0, bytes.length, Charset.forName("UTF-8"));
   }
 
   /** Reads the contents of an input stream and returns as a string. */
@@ -294,11 +287,13 @@ public class AvaticaUtils {
     if (SET_LARGE_MAX_ROWS != null) {
       try {
         // Call Statement.setLargeMaxRows
-        SET_LARGE_MAX_ROWS.invokeExact(n);
+        SET_LARGE_MAX_ROWS.invoke(Statement.class.newInstance());
         return;
       } catch (UnsupportedOperationException e) {
         // ignore, and fall through to call Statement.setMaxRows
-      } catch (Error | RuntimeException | SQLException e) {
+      } catch (Error e) {
+        throw e;
+      } catch (RuntimeException e) {
         throw e;
       } catch (Throwable e) {
         throw new RuntimeException(e);
@@ -315,10 +310,12 @@ public class AvaticaUtils {
     if (GET_LARGE_MAX_ROWS != null) {
       try {
         // Call Statement.getLargeMaxRows
-        return (long) GET_LARGE_MAX_ROWS.invokeExact();
+        return (Long) GET_LARGE_MAX_ROWS.invoke(Statement.class.newInstance());
       } catch (UnsupportedOperationException e) {
         // ignore, and fall through to call Statement.getMaxRows
-      } catch (Error | RuntimeException | SQLException e) {
+      } catch (Error e) {
+        throw e;
+      } catch (RuntimeException e) {
         throw e;
       } catch (Throwable e) {
         throw new RuntimeException(e);
@@ -335,10 +332,12 @@ public class AvaticaUtils {
     if (GET_LARGE_UPDATE_COUNT != null) {
       try {
         // Call Statement.getLargeUpdateCount
-        return (long) GET_LARGE_UPDATE_COUNT.invokeExact();
+        return (Long) GET_LARGE_UPDATE_COUNT.invoke(Statement.class.newInstance());
       } catch (UnsupportedOperationException e) {
         // ignore, and fall through to call Statement.getUpdateCount
-      } catch (Error | RuntimeException | SQLException e) {
+      } catch (Error e) {
+        throw e;
+      } catch (RuntimeException e) {
         throw e;
       } catch (Throwable e) {
         throw new RuntimeException(e);
@@ -355,10 +354,12 @@ public class AvaticaUtils {
     if (EXECUTE_LARGE_BATCH != null) {
       try {
         // Call Statement.executeLargeBatch
-        return (long[]) EXECUTE_LARGE_BATCH.invokeExact();
+        return (long[]) EXECUTE_LARGE_BATCH.invoke(Statement.class.newInstance());
       } catch (UnsupportedOperationException e) {
         // ignore, and fall through to call Statement.executeBatch
-      } catch (Error | RuntimeException | SQLException e) {
+      } catch (Error e) {
+        throw e;
+      } catch (RuntimeException e) {
         throw e;
       } catch (Throwable e) {
         throw new RuntimeException(e);

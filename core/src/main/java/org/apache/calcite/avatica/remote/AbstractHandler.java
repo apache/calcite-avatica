@@ -92,7 +92,7 @@ public abstract class AbstractHandler<T> implements Handler<T> {
     try {
       final Service.Request request = decode(serializedRequest);
       final Service.Response response = request.accept(service);
-      return new HandlerResponse<>(encode(response), HTTP_OK);
+      return new HandlerResponse(encode(response), HTTP_OK);
     } catch (Exception e) {
       return convertToErrorResponse(e);
     }
@@ -126,7 +126,7 @@ public abstract class AbstractHandler<T> implements Handler<T> {
   private HandlerResponse<T> createErrorResponse(Exception e, int statusCode) {
     ErrorResponse errorResp = unwrapException(e);
     try {
-      return new HandlerResponse<>(encode(errorResp), statusCode);
+      return new HandlerResponse(encode(errorResp), statusCode);
     } catch (IOException e1) {
       // TODO provide a canned ErrorResponse
 

@@ -43,7 +43,7 @@ public class MockProtobufService extends ProtobufService {
   }
 
   private Map<Request, Response> createMapping() {
-    HashMap<Request, Response> mappings = new HashMap<>();
+    HashMap<Request, Response> mappings = new HashMap();
 
     // Add in mappings
 

@@ -18,8 +18,6 @@ package org.apache.calcite.avatica;
 
 import org.apache.calcite.avatica.proto.Common;
 
-import java.util.Objects;
-
 /**
  * An enumeration that denotes the severity of a given unexpected state.
  */
@@ -72,7 +70,10 @@ public enum AvaticaSeverity {
   }
 
   public static AvaticaSeverity fromProto(Common.Severity proto) {
-    switch (Objects.requireNonNull(proto)) {
+    if (proto == null) {
+      throw new NullPointerException();
+    }
+    switch (proto) {
     case UNKNOWN_SEVERITY:
       return AvaticaSeverity.UNKNOWN;
     case FATAL_SEVERITY:

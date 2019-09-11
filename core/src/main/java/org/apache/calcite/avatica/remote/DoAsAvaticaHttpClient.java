@@ -17,7 +17,6 @@
 package org.apache.calcite.avatica.remote;
 
 import java.security.PrivilegedAction;
-import java.util.Objects;
 
 import javax.security.auth.Subject;
 
@@ -30,8 +29,11 @@ public class DoAsAvaticaHttpClient implements AvaticaHttpClient {
   private final KerberosConnection kerberosUtil;
 
   public DoAsAvaticaHttpClient(AvaticaHttpClient wrapped, KerberosConnection kerberosUtil) {
-    this.wrapped = Objects.requireNonNull(wrapped);
-    this.kerberosUtil = Objects.requireNonNull(kerberosUtil);
+    if (wrapped == null || kerberosUtil == null) {
+      throw new NullPointerException();
+    }
+    this.wrapped = wrapped;
+    this.kerberosUtil = kerberosUtil;
   }
 
   @Override public byte[] send(final byte[] request) {

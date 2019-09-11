@@ -16,8 +16,6 @@
  */
 package org.apache.calcite.avatica.server;
 
-import java.util.Objects;
-
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -27,7 +25,10 @@ public class HttpQueryStringParameterRemoteUserExtractor implements RemoteUserEx
   private final String parameter;
 
   public HttpQueryStringParameterRemoteUserExtractor(String parameter) {
-    this.parameter = Objects.requireNonNull(parameter);
+    if (parameter == null) {
+      throw new NullPointerException();
+    }
+    this.parameter = parameter;
   }
 
   @Override public String extract(HttpServletRequest request) throws RemoteUserExtractionException {

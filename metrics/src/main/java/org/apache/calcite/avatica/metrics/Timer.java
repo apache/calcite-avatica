@@ -16,6 +16,8 @@
  */
 package org.apache.calcite.avatica.metrics;
 
+import java.io.Closeable;
+
 /**
  * A metric which encompasses a {@link Histogram} and {@link Meter}.
  */
@@ -26,7 +28,7 @@ public interface Timer extends Metric {
   /**
    * A object that tracks an active timing state.
    */
-  public interface Context extends AutoCloseable {
+  public interface Context extends Closeable {
     /**
      * Stops the timer.
      */

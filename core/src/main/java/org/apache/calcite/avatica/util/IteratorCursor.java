@@ -16,6 +16,7 @@
  */
 package org.apache.calcite.avatica.util;
 
+import java.io.Closeable;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -55,9 +56,9 @@ public abstract class IteratorCursor<E> extends PositionedCursor<E> {
   public void close() {
     current = null;
     position = Position.CLOSED;
-    if (iterator instanceof AutoCloseable) {
+    if (iterator instanceof Closeable) {
       try {
-        ((AutoCloseable) iterator).close();
+        ((Closeable) iterator).close();
       } catch (RuntimeException e) {
         throw e;
       } catch (Exception e) {

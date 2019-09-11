@@ -53,7 +53,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -334,8 +333,11 @@ public class HttpServer {
    */
   protected ConstraintSecurityHandler configureSpnego(Server server,
       AvaticaServerConfiguration config) {
-    final String realm = Objects.requireNonNull(config.getKerberosRealm());
-    final String principal = Objects.requireNonNull(config.getKerberosPrincipal());
+    if (config.getKerberosRealm() == null || config.getKerberosPrincipal() == null) {
+      throw new NullPointerException();
+    }
+    final String realm = config.getKerberosRealm();
+    final String principal = config.getKerberosPrincipal();
 
     // A customization of SpnegoLoginService to explicitly set the server's principal, otherwise
     // we would have to require a custom file to set the server's principal.
@@ -504,7 +506,7 @@ public class HttpServer {
      * @return A typed Builder
      */
     public static <T> Builder<T> newBuilder() {
-      return new Builder<>();
+      return new Builder();
     }
 
     public Builder<T> withPort(int port) {
@@ -521,8 +523,11 @@ public class HttpServer {
      * @return <code>this</code>
      */
     public Builder<T> withHandler(Service service, Serialization serialization) {
-      this.service = Objects.requireNonNull(service);
-      this.serialization = Objects.requireNonNull(serialization);
+      if (service == null || serialization == null) {
+        throw new NullPointerException();
+      }
+      this.service = service;
+      this.serialization = serialization;
       return this;
     }
 
@@ -534,7 +539,10 @@ public class HttpServer {
      * @return <code>this</code>
      */
     public Builder<T> withHandler(AvaticaHandler handler) {
-      this.handler = Objects.requireNonNull(handler);
+      if (handler == null) {
+        throw new NullPointerException();
+      }
+      this.handler = handler;
       return this;
     }
 
@@ -545,7 +553,10 @@ public class HttpServer {
      * @return <code>this</code>
      */
     public Builder<T> withMetricsConfiguration(MetricsSystemConfiguration<?> metricsConfig) {
-      this.metricsConfig = Objects.requireNonNull(metricsConfig);
+      if (metricsConfig == null) {
+        throw new NullPointerException();
+      }
+      this.metricsConfig = metricsConfig;
       return this;
     }
 
@@ -574,7 +585,10 @@ public class HttpServer {
      * @return <code>this</code>
      */
     public Builder<T> withSpnego(String principal, String[] additionalAllowedRealms) {
-      int index = Objects.requireNonNull(principal).lastIndexOf('@');
+      if (principal == null) {
+        throw new NullPointerException();
+      }
+      int index = principal.lastIndexOf('@');
       if (-1 == index) {
         throw new IllegalArgumentException("Could not find '@' symbol in '" + principal
             + "' to parse the Kerberos realm from the principal");
@@ -614,8 +628,11 @@ public class HttpServer {
      */
     public Builder<T> withSpnego(String principal, String realm, String[] additionalAllowedRealms) {
       this.authenticationType = AuthenticationType.SPNEGO;
-      this.kerberosPrincipal = Objects.requireNonNull(principal);
-      this.kerberosRealm = Objects.requireNonNull(realm);
+      if (principal == null || realm == null) {
+        throw new NullPointerException();
+      }
+      this.kerberosPrincipal = principal;
+      this.kerberosRealm = realm;
       this.loginServiceAllowedRoles = additionalAllowedRealms;
       return this;
     }
@@ -627,7 +644,10 @@ public class HttpServer {
      * @return <code>this</code>
      */
     public Builder<T> withAutomaticLogin(File keytab) {
-      this.keytab = Objects.requireNonNull(keytab);
+      if (keytab == null) {
+        throw new NullPointerException();
+      }
+      this.keytab = keytab;
       return this;
     }
 
@@ -639,7 +659,10 @@ public class HttpServer {
      * @return <code>this</code>
      */
     public Builder<T> withImpersonation(DoAsRemoteUserCallback remoteUserCallback) {
-      this.remoteUserCallback = Objects.requireNonNull(remoteUserCallback);
+      if (remoteUserCallback == null) {
+        throw new NullPointerException();
+      }
+      this.remoteUserCallback = remoteUserCallback;
       return this;
     }
 
@@ -652,7 +675,10 @@ public class HttpServer {
      */
 
     public Builder withRemoteUserExtractor(RemoteUserExtractor remoteUserExtractor) {
-      this.remoteUserExtractor = Objects.requireNonNull(remoteUserExtractor);
+      if (remoteUserExtractor == null) {
+        throw new NullPointerException();
+      }
+      this.remoteUserExtractor = remoteUserExtractor;
       return this;
     }
 
@@ -707,8 +733,11 @@ public class HttpServer {
         String[] allowedRoles) {
       this.loginServiceRealm = "Avatica";
       this.authenticationType = authType;
-      this.loginServiceProperties = Objects.requireNonNull(properties);
-      this.loginServiceAllowedRoles = Objects.requireNonNull(allowedRoles);
+      if (properties == null || allowedRoles == null) {
+        throw new NullPointerException();
+      }
+      this.loginServiceProperties = properties;
+      this.loginServiceAllowedRoles = allowedRoles;
       return this;
     }
 
@@ -724,10 +753,13 @@ public class HttpServer {
     public Builder<T> withTLS(File keystore, String keystorePassword, File truststore,
         String truststorePassword) {
       this.usingTLS = true;
-      this.keystore = Objects.requireNonNull(keystore);
-      this.keystorePassword = Objects.requireNonNull(keystorePassword);
-      this.truststore = Objects.requireNonNull(truststore);
-      this.truststorePassword = Objects.requireNonNull(truststorePassword);
+      if (keystore == null || keystorePassword == null || truststore == null || truststorePassword == null) {
+        throw new NullPointerException();
+      }
+      this.keystore = keystore;
+      this.keystorePassword = keystorePassword;
+      this.truststore = truststore;
+      this.truststorePassword = truststorePassword;
       return this;
     }
 
@@ -740,11 +772,16 @@ public class HttpServer {
      */
     public Builder<T> withServerCustomizers(List<ServerCustomizer<T>> serverCustomizers,
         Class<T> clazz) {
-      Objects.requireNonNull(clazz);
+      if (clazz == null) {
+        throw new NullPointerException();
+      }
       if (!clazz.isAssignableFrom(Server.class)) {
         throw new IllegalArgumentException("Only Jetty Server customizers are supported");
       }
-      this.serverCustomizers = Objects.requireNonNull(serverCustomizers);
+      if (clazz == null) {
+        throw new NullPointerException();
+      }
+      this.serverCustomizers = serverCustomizers;
       return this;
     }
 
@@ -804,7 +841,7 @@ public class HttpServer {
 
       SslContextFactory sslFactory = buildSSLContextFactory();
 
-      List<ServerCustomizer<Server>> jettyCustomizers = new ArrayList<>();
+      List<ServerCustomizer<Server>> jettyCustomizers = new ArrayList();
       for (ServerCustomizer<?> customizer : this.serverCustomizers) {
         // Type checked in withServerCustomizers
         jettyCustomizers.add((ServerCustomizer<Server>) customizer);

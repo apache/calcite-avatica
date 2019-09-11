@@ -18,8 +18,6 @@ package org.apache.calcite.avatica.remote;
 
 import org.apache.calcite.avatica.remote.Service.RpcMetadataResponse;
 
-import java.util.Objects;
-
 /**
  * API for text request-response calls to an Avatica server.
  *
@@ -41,7 +39,10 @@ public interface Handler<T> {
     private final int statusCode;
 
     public HandlerResponse(T response, int statusCode) {
-      this.response = Objects.requireNonNull(response);
+      if (response == null) {
+        throw new NullPointerException();
+      }
+      this.response = response;
       this.statusCode = statusCode;
     }
 

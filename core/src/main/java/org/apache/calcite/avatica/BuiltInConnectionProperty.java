@@ -102,13 +102,13 @@ public enum BuiltInConnectionProperty implements ConnectionProperty {
   private static final Set<String> LOCAL_PROPS;
 
   static {
-    NAME_TO_PROPS = new HashMap<>();
+    NAME_TO_PROPS = new HashMap();
     for (BuiltInConnectionProperty p : BuiltInConnectionProperty.values()) {
       NAME_TO_PROPS.put(p.camelName.toUpperCase(Locale.ROOT), p);
       NAME_TO_PROPS.put(p.name(), p);
     }
 
-    LOCAL_PROPS = new HashSet<>();
+    LOCAL_PROPS = new HashSet();
     for (BuiltInConnectionProperty p : BuiltInConnectionProperty.values()) {
       LOCAL_PROPS.add(p.camelName());
     }

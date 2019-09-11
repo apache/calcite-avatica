@@ -66,7 +66,7 @@ public class AvaticaNoopDriver implements Driver {
     return true;
   }
 
-  @Override public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+  public Logger getParentLogger() throws SQLFeatureNotSupportedException {
     return Logger.getLogger("");
   }
 }

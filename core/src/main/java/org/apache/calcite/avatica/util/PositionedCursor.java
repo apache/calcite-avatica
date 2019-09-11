@@ -128,7 +128,9 @@ public abstract class PositionedCursor<T> extends AbstractCursor {
       Object o;
       try {
         o = field.get(current());
-      } catch (IllegalAccessException | RuntimeException e) {
+      } catch (IllegalAccessException e) {
+        throw new SQLException(e);
+      } catch (RuntimeException e) {
         throw new SQLException(e);
       }
       wasNull[0] = o == null;

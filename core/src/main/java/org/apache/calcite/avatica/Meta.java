@@ -39,7 +39,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -190,7 +189,7 @@ public interface Meta {
       Pat functionNamePattern,
       Pat columnNamePattern);
 
-  /** Per {@link DatabaseMetaData#getPseudoColumns(String, String, String, String)}. */
+  /** Per . */
   MetaResultSet getPseudoColumns(ConnectionHandle ch,
       String catalog,
       Pat schemaPattern,
@@ -536,7 +535,10 @@ public interface Meta {
     public final long[] updateCounts;
 
     public ExecuteBatchResult(long[] updateCounts) {
-      this.updateCounts = Objects.requireNonNull(updateCounts);
+      if (updateCounts == null) {
+        throw new NullPointerException();
+      }
+      this.updateCounts = updateCounts;
     }
   }
 
@@ -573,8 +575,11 @@ public interface Meta {
 
     public static MetaResultSet create(String connectionId, int statementId,
         boolean ownStatement, Signature signature, Frame firstFrame) {
+      if (signature == null) {
+        throw new NullPointerException();
+      }
       return new MetaResultSet(connectionId, statementId, ownStatement,
-          Objects.requireNonNull(signature), firstFrame, -1L);
+              signature, firstFrame, -1L);
     }
 
     public static MetaResultSet count(String connectionId, int statementId,
@@ -604,7 +609,10 @@ public interface Meta {
       assert (fieldNames != null)
           == (style == Style.RECORD_PROJECTION || style == Style.MAP);
       assert (fields != null) == (style == Style.RECORD_PROJECTION);
-      this.style = Objects.requireNonNull(style);
+      if (style == null) {
+        throw new NullPointerException();
+      }
+      this.style = style;
       this.clazz = clazz;
       this.fields = fields;
       this.fieldNames = fieldNames;
@@ -648,7 +656,7 @@ public interface Meta {
     public static CursorFactory record(Class resultClass, List<Field> fields,
         List<String> fieldNames) {
       if (fields == null) {
-        fields = new ArrayList<>();
+        fields = new ArrayList();
         for (String fieldName : fieldNames) {
           try {
             fields.add(resultClass.getField(fieldName));
@@ -713,16 +721,20 @@ public interface Meta {
     }
 
     @Override public int hashCode() {
-      return Objects.hash(clazz, fieldNames, fields, style);
+      Object[] objects = {clazz, fieldNames, fields, style};
+      return Arrays.hashCode(objects);
     }
 
     @Override public boolean equals(Object o) {
       return o == this
-          || o instanceof CursorFactory
-          && Objects.equals(clazz, ((CursorFactory) o).clazz)
-          && Objects.equals(fieldNames, ((CursorFactory) o).fieldNames)
-          && Objects.equals(fields, ((CursorFactory) o).fields)
-          && style == ((CursorFactory) o).style;
+              || o instanceof CursorFactory
+              && clazz == ((CursorFactory) o).clazz
+              || clazz != null && clazz.equals(((CursorFactory) o).clazz)
+              && fieldNames == ((CursorFactory) o).fieldNames
+              || fieldNames != null && fieldNames.equals(((CursorFactory) o).fieldNames)
+              && fields == ((CursorFactory) o).fields
+              || fields != null && fields.equals(((CursorFactory) o).fields)
+              && style == ((CursorFactory) o).style;
     }
   }
 
@@ -840,12 +852,12 @@ public interface Meta {
     }
 
     public static Signature fromProto(Common.Signature protoSignature) {
-      List<ColumnMetaData> metadata = new ArrayList<>(protoSignature.getColumnsCount());
+      List<ColumnMetaData> metadata = new ArrayList(protoSignature.getColumnsCount());
       for (Common.ColumnMetaData protoMetadata : protoSignature.getColumnsList()) {
         metadata.add(ColumnMetaData.fromProto(protoMetadata));
       }
 
-      List<AvaticaParameter> parameters = new ArrayList<>(protoSignature.getParametersCount());
+      List<AvaticaParameter> parameters = new ArrayList(protoSignature.getParametersCount());
       for (Common.AvaticaParameter protoParam : protoSignature.getParametersList()) {
         parameters.add(AvaticaParameter.fromProto(protoParam));
       }
@@ -866,16 +878,21 @@ public interface Meta {
     }
 
     @Override public int hashCode() {
-      return Objects.hash(columns, cursorFactory, parameters, sql);
+      Object[] objects = {columns, cursorFactory, parameters, sql};
+      return Arrays.hashCode(objects);
     }
 
     @Override public boolean equals(Object o) {
       return o == this
-          || o instanceof Signature
-          && Objects.equals(columns, ((Signature) o).columns)
-          && Objects.equals(cursorFactory, ((Signature) o).cursorFactory)
-          && Objects.equals(parameters, ((Signature) o).parameters)
-          && Objects.equals(sql, ((Signature) o).sql);
+              || o instanceof Signature
+              && columns == ((Signature) o).columns
+              || columns != null && columns.equals(((Signature) o).columns)
+              && cursorFactory == ((Signature) o).cursorFactory
+              || cursorFactory != null && cursorFactory.equals(((Signature) o).cursorFactory)
+              && parameters == ((Signature) o).parameters
+              || parameters != null && parameters.equals(((Signature) o).parameters)
+              && sql == ((Signature) o).sql
+              || sql != null && sql.equals(((Signature) o).sql);
     }
   }
 
@@ -988,9 +1005,9 @@ public interface Meta {
     }
 
     public static Frame fromProto(Common.Frame proto) {
-      List<Object> parsedRows = new ArrayList<>(proto.getRowsCount());
+      List<Object> parsedRows = new ArrayList(proto.getRowsCount());
       for (Common.Row protoRow : proto.getRowsList()) {
-        ArrayList<Object> row = new ArrayList<>(protoRow.getValueCount());
+        ArrayList<Object> row = new ArrayList(protoRow.getValueCount());
         for (Common.ColumnValue protoColumn : protoRow.getValueList()) {
           final Object value;
           if (!isNewStyleColumn(protoColumn)) {
@@ -1033,7 +1050,7 @@ public interface Meta {
      */
     static Object parseOldStyleColumn(Common.ColumnValue column) {
       if (column.getValueCount() > 1) {
-        List<Object> array = new ArrayList<>(column.getValueCount());
+        List<Object> array = new ArrayList(column.getValueCount());
         for (Common.TypedValue columnValue : column.getValueList()) {
           array.add(deserializeScalarValue(columnValue));
         }
@@ -1055,7 +1072,7 @@ public interface Meta {
 
       if (!column.hasField(SCALAR_VALUE_DESCRIPTOR)) {
         // The column in this row is an Array (has multiple values)
-        List<Object> array = new ArrayList<>(column.getArrayValueCount());
+        List<Object> array = new ArrayList(column.getArrayValueCount());
         for (Common.TypedValue arrayValue : column.getArrayValueList()) {
           // Duplicative because of the ColumnValue/TypedValue difference.
           if (Common.Rep.ARRAY == arrayValue.getType()) {
@@ -1077,7 +1094,7 @@ public interface Meta {
      * Recursively parses a TypedValue while it is an array.
      */
     static Object parseArray(Common.TypedValue array) {
-      List<Object> convertedArray = new ArrayList<>(array.getArrayValueCount());
+      List<Object> convertedArray = new ArrayList(array.getArrayValueCount());
       for (Common.TypedValue arrayElement : array.getArrayValueList()) {
         if (Common.Rep.ARRAY == arrayElement.getType()) {
           // Recurse
@@ -1120,7 +1137,8 @@ public interface Meta {
     }
 
     @Override public int hashCode() {
-      return Objects.hash(done, offset, rows);
+      Object[] objects = {done, offset, rows};
+      return Arrays.hashCode(objects);
     }
 
     @Override public boolean equals(Object o) {
@@ -1248,15 +1266,18 @@ public interface Meta {
     }
 
     @Override public int hashCode() {
-      return Objects.hash(connectionId, id, signature);
+      Object[] objects = {connectionId, id, signature};
+      return Arrays.hashCode(objects);
     }
 
     @Override public boolean equals(Object o) {
       return o == this
-          || o instanceof StatementHandle
-          && Objects.equals(connectionId, ((StatementHandle) o).connectionId)
-          && Objects.equals(signature, ((StatementHandle) o).signature)
-          && id == ((StatementHandle) o).id;
+              || o instanceof StatementHandle
+              && connectionId == ((StatementHandle) o).connectionId
+              || connectionId != null && connectionId.equals(((StatementHandle) o).connectionId)
+              && signature == ((StatementHandle) o).signature
+              || signature != null && signature.equals(((StatementHandle) o).signature)
+              && id == ((StatementHandle) o).id;
     }
   }
 

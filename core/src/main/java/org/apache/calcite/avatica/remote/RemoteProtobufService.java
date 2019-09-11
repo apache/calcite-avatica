@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 
 /**
  * ProtobufService implementation that queries against a remote implementation, using
@@ -52,7 +52,7 @@ public class RemoteProtobufService extends ProtobufService {
       resp = translation.parseResponse(response);
     } catch (IOException e) {
       LOG.debug("Failed to deserialize reponse to {}. '{}'", request,
-          new String(response, StandardCharsets.UTF_8));
+          new String(response, Charset.forName("UTF-8")));
       // Not a protobuf that we could parse.
       throw new RuntimeException(e);
     }

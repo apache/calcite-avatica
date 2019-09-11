@@ -72,17 +72,17 @@ public final class Requests {
             case 0:
               done = true;
               break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              connectionId_ = s;
-              break;
-            }
             default: {
               if (!parseUnknownFieldProto3(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
+              break;
+            }
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              connectionId_ = s;
               break;
             }
           }
@@ -102,7 +102,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_CatalogsRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_CatalogsRequest_fieldAccessorTable
@@ -145,7 +144,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -155,7 +153,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -164,7 +161,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -279,7 +275,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -287,7 +282,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.CatalogsRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -315,7 +309,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CatalogsRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CatalogsRequest_fieldAccessorTable
@@ -338,7 +331,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -346,18 +338,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CatalogsRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CatalogsRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.CatalogsRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CatalogsRequest build() {
         org.apache.calcite.avatica.proto.Requests.CatalogsRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -366,7 +355,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CatalogsRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.CatalogsRequest result = new org.apache.calcite.avatica.proto.Requests.CatalogsRequest(this);
         result.connectionId_ = connectionId_;
@@ -374,39 +362,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.CatalogsRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.CatalogsRequest)other);
@@ -427,12 +408,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -519,13 +498,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -547,7 +524,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<CatalogsRequest>
         PARSER = new com.google.protobuf.AbstractParser<CatalogsRequest>() {
-      @java.lang.Override
       public CatalogsRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -565,7 +541,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.CatalogsRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -630,17 +605,17 @@ public final class Requests {
             case 0:
               done = true;
               break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              connectionId_ = s;
-              break;
-            }
             default: {
               if (!parseUnknownFieldProto3(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
+              break;
+            }
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              connectionId_ = s;
               break;
             }
           }
@@ -660,7 +635,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_DatabasePropertyRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_DatabasePropertyRequest_fieldAccessorTable
@@ -703,7 +677,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -713,7 +686,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -722,7 +694,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -837,7 +808,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -845,7 +815,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.DatabasePropertyRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -873,7 +842,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_DatabasePropertyRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_DatabasePropertyRequest_fieldAccessorTable
@@ -896,7 +864,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -904,18 +871,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_DatabasePropertyRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.DatabasePropertyRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.DatabasePropertyRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.DatabasePropertyRequest build() {
         org.apache.calcite.avatica.proto.Requests.DatabasePropertyRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -924,7 +888,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.DatabasePropertyRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.DatabasePropertyRequest result = new org.apache.calcite.avatica.proto.Requests.DatabasePropertyRequest(this);
         result.connectionId_ = connectionId_;
@@ -932,39 +895,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.DatabasePropertyRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.DatabasePropertyRequest)other);
@@ -985,12 +941,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1077,13 +1031,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1105,7 +1057,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<DatabasePropertyRequest>
         PARSER = new com.google.protobuf.AbstractParser<DatabasePropertyRequest>() {
-      @java.lang.Override
       public DatabasePropertyRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1123,7 +1074,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.DatabasePropertyRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -1210,6 +1160,13 @@ public final class Requests {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -1226,13 +1183,6 @@ public final class Requests {
               java.lang.String s = input.readStringRequireUtf8();
 
               connectionId_ = s;
-              break;
-            }
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
               break;
             }
           }
@@ -1252,7 +1202,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_SchemasRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_SchemasRequest_fieldAccessorTable
@@ -1363,7 +1312,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1373,7 +1321,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getCatalogBytes().isEmpty()) {
@@ -1388,7 +1335,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -1517,7 +1463,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -1525,7 +1470,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.SchemasRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -1553,7 +1497,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_SchemasRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_SchemasRequest_fieldAccessorTable
@@ -1576,7 +1519,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         catalog_ = "";
@@ -1588,18 +1530,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_SchemasRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.SchemasRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.SchemasRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.SchemasRequest build() {
         org.apache.calcite.avatica.proto.Requests.SchemasRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -1608,7 +1547,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.SchemasRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.SchemasRequest result = new org.apache.calcite.avatica.proto.Requests.SchemasRequest(this);
         result.catalog_ = catalog_;
@@ -1618,39 +1556,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.SchemasRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.SchemasRequest)other);
@@ -1679,12 +1610,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1909,13 +1838,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -1937,7 +1864,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<SchemasRequest>
         PARSER = new com.google.protobuf.AbstractParser<SchemasRequest>() {
-      @java.lang.Override
       public SchemasRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1955,7 +1881,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.SchemasRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -2084,6 +2009,13 @@ public final class Requests {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -2122,13 +2054,6 @@ public final class Requests {
               connectionId_ = s;
               break;
             }
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -2149,7 +2074,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_TablesRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_TablesRequest_fieldAccessorTable
@@ -2337,7 +2261,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -2347,7 +2270,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getCatalogBytes().isEmpty()) {
@@ -2371,7 +2293,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -2530,7 +2451,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -2538,7 +2458,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.TablesRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -2567,7 +2486,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_TablesRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_TablesRequest_fieldAccessorTable
@@ -2590,7 +2508,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         catalog_ = "";
@@ -2608,18 +2525,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_TablesRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.TablesRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.TablesRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.TablesRequest build() {
         org.apache.calcite.avatica.proto.Requests.TablesRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -2628,7 +2542,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.TablesRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.TablesRequest result = new org.apache.calcite.avatica.proto.Requests.TablesRequest(this);
         int from_bitField0_ = bitField0_;
@@ -2648,39 +2561,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.TablesRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.TablesRequest)other);
@@ -2726,12 +2632,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3158,13 +3062,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -3186,7 +3088,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<TablesRequest>
         PARSER = new com.google.protobuf.AbstractParser<TablesRequest>() {
-      @java.lang.Override
       public TablesRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3204,7 +3105,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.TablesRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -3269,17 +3169,17 @@ public final class Requests {
             case 0:
               done = true;
               break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              connectionId_ = s;
-              break;
-            }
             default: {
               if (!parseUnknownFieldProto3(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
+              break;
+            }
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              connectionId_ = s;
               break;
             }
           }
@@ -3299,7 +3199,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_TableTypesRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_TableTypesRequest_fieldAccessorTable
@@ -3342,7 +3241,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -3352,7 +3250,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -3361,7 +3258,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -3476,7 +3372,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -3484,7 +3379,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.TableTypesRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -3512,7 +3406,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_TableTypesRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_TableTypesRequest_fieldAccessorTable
@@ -3535,7 +3428,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -3543,18 +3435,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_TableTypesRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.TableTypesRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.TableTypesRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.TableTypesRequest build() {
         org.apache.calcite.avatica.proto.Requests.TableTypesRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -3563,7 +3452,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.TableTypesRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.TableTypesRequest result = new org.apache.calcite.avatica.proto.Requests.TableTypesRequest(this);
         result.connectionId_ = connectionId_;
@@ -3571,39 +3459,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.TableTypesRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.TableTypesRequest)other);
@@ -3624,12 +3505,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3716,13 +3595,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -3744,7 +3621,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<TableTypesRequest>
         PARSER = new com.google.protobuf.AbstractParser<TableTypesRequest>() {
-      @java.lang.Override
       public TableTypesRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3762,7 +3638,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.TableTypesRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -3872,6 +3747,13 @@ public final class Requests {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -3902,13 +3784,6 @@ public final class Requests {
               connectionId_ = s;
               break;
             }
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -3926,7 +3801,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_ColumnsRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_ColumnsRequest_fieldAccessorTable
@@ -4105,7 +3979,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -4115,7 +3988,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getCatalogBytes().isEmpty()) {
@@ -4136,7 +4008,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -4279,7 +4150,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -4287,7 +4157,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.ColumnsRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -4316,7 +4185,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_ColumnsRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_ColumnsRequest_fieldAccessorTable
@@ -4339,7 +4207,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         catalog_ = "";
@@ -4355,18 +4222,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_ColumnsRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.ColumnsRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.ColumnsRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.ColumnsRequest build() {
         org.apache.calcite.avatica.proto.Requests.ColumnsRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -4375,7 +4239,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.ColumnsRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.ColumnsRequest result = new org.apache.calcite.avatica.proto.Requests.ColumnsRequest(this);
         result.catalog_ = catalog_;
@@ -4387,39 +4250,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.ColumnsRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.ColumnsRequest)other);
@@ -4456,12 +4312,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4824,13 +4678,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -4852,7 +4704,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<ColumnsRequest>
         PARSER = new com.google.protobuf.AbstractParser<ColumnsRequest>() {
-      @java.lang.Override
       public ColumnsRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -4870,7 +4721,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.ColumnsRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -4935,17 +4785,17 @@ public final class Requests {
             case 0:
               done = true;
               break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              connectionId_ = s;
-              break;
-            }
             default: {
               if (!parseUnknownFieldProto3(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
+              break;
+            }
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              connectionId_ = s;
               break;
             }
           }
@@ -4965,7 +4815,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_TypeInfoRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_TypeInfoRequest_fieldAccessorTable
@@ -5008,7 +4857,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -5018,7 +4866,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -5027,7 +4874,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -5142,7 +4988,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -5150,7 +4995,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.TypeInfoRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -5178,7 +5022,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_TypeInfoRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_TypeInfoRequest_fieldAccessorTable
@@ -5201,7 +5044,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -5209,18 +5051,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_TypeInfoRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.TypeInfoRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.TypeInfoRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.TypeInfoRequest build() {
         org.apache.calcite.avatica.proto.Requests.TypeInfoRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -5229,7 +5068,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.TypeInfoRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.TypeInfoRequest result = new org.apache.calcite.avatica.proto.Requests.TypeInfoRequest(this);
         result.connectionId_ = connectionId_;
@@ -5237,39 +5075,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.TypeInfoRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.TypeInfoRequest)other);
@@ -5290,12 +5121,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -5382,13 +5211,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -5410,7 +5237,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<TypeInfoRequest>
         PARSER = new com.google.protobuf.AbstractParser<TypeInfoRequest>() {
-      @java.lang.Override
       public TypeInfoRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -5428,7 +5254,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.TypeInfoRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -5540,6 +5365,13 @@ public final class Requests {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -5572,13 +5404,6 @@ public final class Requests {
               firstFrameMaxSize_ = input.readInt32();
               break;
             }
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -5596,7 +5421,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareAndExecuteRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareAndExecuteRequest_fieldAccessorTable
@@ -5721,7 +5545,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -5731,7 +5554,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -5755,7 +5577,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -5911,7 +5732,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -5919,7 +5739,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -5947,7 +5766,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareAndExecuteRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareAndExecuteRequest_fieldAccessorTable
@@ -5970,7 +5788,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -5988,18 +5805,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareAndExecuteRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteRequest build() {
         org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -6008,7 +5822,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteRequest result = new org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteRequest(this);
         result.connectionId_ = connectionId_;
@@ -6021,39 +5834,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteRequest)other);
@@ -6090,12 +5896,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -6391,13 +6195,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -6419,7 +6221,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<PrepareAndExecuteRequest>
         PARSER = new com.google.protobuf.AbstractParser<PrepareAndExecuteRequest>() {
-      @java.lang.Override
       public PrepareAndExecuteRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -6437,7 +6238,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -6533,6 +6333,13 @@ public final class Requests {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -6555,13 +6362,6 @@ public final class Requests {
               maxRowsTotal_ = input.readInt64();
               break;
             }
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -6579,7 +6379,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareRequest_fieldAccessorTable
@@ -6682,7 +6481,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -6692,7 +6490,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -6710,7 +6507,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -6850,7 +6646,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -6858,7 +6653,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.PrepareRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -6886,7 +6680,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareRequest_fieldAccessorTable
@@ -6909,7 +6702,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -6923,18 +6715,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.PrepareRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.PrepareRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.PrepareRequest build() {
         org.apache.calcite.avatica.proto.Requests.PrepareRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -6943,7 +6732,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.PrepareRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.PrepareRequest result = new org.apache.calcite.avatica.proto.Requests.PrepareRequest(this);
         result.connectionId_ = connectionId_;
@@ -6954,39 +6742,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.PrepareRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.PrepareRequest)other);
@@ -7017,12 +6798,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -7254,13 +7033,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -7282,7 +7059,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<PrepareRequest>
         PARSER = new com.google.protobuf.AbstractParser<PrepareRequest>() {
-      @java.lang.Override
       public PrepareRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -7300,7 +7076,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.PrepareRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -7393,6 +7168,13 @@ public final class Requests {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -7419,13 +7201,6 @@ public final class Requests {
               frameMaxSize_ = input.readInt32();
               break;
             }
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -7443,7 +7218,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_FetchRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_FetchRequest_fieldAccessorTable
@@ -7526,7 +7300,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -7536,7 +7309,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -7557,7 +7329,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -7705,7 +7476,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -7713,7 +7483,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.FetchRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -7741,7 +7510,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_FetchRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_FetchRequest_fieldAccessorTable
@@ -7764,7 +7532,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -7780,18 +7547,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_FetchRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.FetchRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.FetchRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.FetchRequest build() {
         org.apache.calcite.avatica.proto.Requests.FetchRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -7800,7 +7564,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.FetchRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.FetchRequest result = new org.apache.calcite.avatica.proto.Requests.FetchRequest(this);
         result.connectionId_ = connectionId_;
@@ -7812,39 +7575,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.FetchRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.FetchRequest)other);
@@ -7877,12 +7633,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -8085,13 +7839,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -8113,7 +7865,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<FetchRequest>
         PARSER = new com.google.protobuf.AbstractParser<FetchRequest>() {
-      @java.lang.Override
       public FetchRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -8131,7 +7882,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.FetchRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -8196,17 +7946,17 @@ public final class Requests {
             case 0:
               done = true;
               break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              connectionId_ = s;
-              break;
-            }
             default: {
               if (!parseUnknownFieldProto3(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
+              break;
+            }
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              connectionId_ = s;
               break;
             }
           }
@@ -8226,7 +7976,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_CreateStatementRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_CreateStatementRequest_fieldAccessorTable
@@ -8269,7 +8018,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -8279,7 +8027,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -8288,7 +8035,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -8403,7 +8149,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -8411,7 +8156,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.CreateStatementRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -8439,7 +8183,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CreateStatementRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CreateStatementRequest_fieldAccessorTable
@@ -8462,7 +8205,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -8470,18 +8212,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CreateStatementRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CreateStatementRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.CreateStatementRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CreateStatementRequest build() {
         org.apache.calcite.avatica.proto.Requests.CreateStatementRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -8490,7 +8229,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CreateStatementRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.CreateStatementRequest result = new org.apache.calcite.avatica.proto.Requests.CreateStatementRequest(this);
         result.connectionId_ = connectionId_;
@@ -8498,39 +8236,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.CreateStatementRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.CreateStatementRequest)other);
@@ -8551,12 +8282,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -8643,13 +8372,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -8671,7 +8398,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<CreateStatementRequest>
         PARSER = new com.google.protobuf.AbstractParser<CreateStatementRequest>() {
-      @java.lang.Override
       public CreateStatementRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -8689,7 +8415,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.CreateStatementRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -8760,6 +8485,13 @@ public final class Requests {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -8769,13 +8501,6 @@ public final class Requests {
             case 16: {
 
               statementId_ = input.readUInt32();
-              break;
-            }
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
               break;
             }
           }
@@ -8795,7 +8520,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_CloseStatementRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_CloseStatementRequest_fieldAccessorTable
@@ -8847,7 +8571,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -8857,7 +8580,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -8869,7 +8591,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -8992,7 +8713,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -9000,7 +8720,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.CloseStatementRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -9028,7 +8747,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CloseStatementRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CloseStatementRequest_fieldAccessorTable
@@ -9051,7 +8769,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -9061,18 +8778,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CloseStatementRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CloseStatementRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.CloseStatementRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CloseStatementRequest build() {
         org.apache.calcite.avatica.proto.Requests.CloseStatementRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -9081,7 +8795,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CloseStatementRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.CloseStatementRequest result = new org.apache.calcite.avatica.proto.Requests.CloseStatementRequest(this);
         result.connectionId_ = connectionId_;
@@ -9090,39 +8803,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.CloseStatementRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.CloseStatementRequest)other);
@@ -9146,12 +8852,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -9264,13 +8968,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -9292,7 +8994,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<CloseStatementRequest>
         PARSER = new com.google.protobuf.AbstractParser<CloseStatementRequest>() {
-      @java.lang.Override
       public CloseStatementRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -9310,7 +9011,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.CloseStatementRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -9409,6 +9109,13 @@ public final class Requests {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -9426,13 +9133,6 @@ public final class Requests {
                   InfoDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
               info_.getMutableMap().put(
                   info__.getKey(), info__.getValue());
-              break;
-            }
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
               break;
             }
           }
@@ -9453,7 +9153,6 @@ public final class Requests {
     }
 
     @SuppressWarnings({"rawtypes"})
-    @java.lang.Override
     protected com.google.protobuf.MapField internalGetMapField(
         int number) {
       switch (number) {
@@ -9464,7 +9163,6 @@ public final class Requests {
               "Invalid map field number: " + number);
       }
     }
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_OpenConnectionRequest_fieldAccessorTable
@@ -9584,7 +9282,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -9594,7 +9291,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -9609,7 +9305,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -9740,7 +9435,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -9748,7 +9442,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.OpenConnectionRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -9798,7 +9491,6 @@ public final class Requests {
                 "Invalid map field number: " + number);
         }
       }
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_OpenConnectionRequest_fieldAccessorTable
@@ -9821,7 +9513,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -9830,18 +9521,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_OpenConnectionRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.OpenConnectionRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.OpenConnectionRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.OpenConnectionRequest build() {
         org.apache.calcite.avatica.proto.Requests.OpenConnectionRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -9850,7 +9538,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.OpenConnectionRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.OpenConnectionRequest result = new org.apache.calcite.avatica.proto.Requests.OpenConnectionRequest(this);
         int from_bitField0_ = bitField0_;
@@ -9863,39 +9550,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.OpenConnectionRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.OpenConnectionRequest)other);
@@ -9918,12 +9598,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10134,13 +9812,11 @@ public final class Requests {
             .putAll(values);
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -10162,7 +9838,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<OpenConnectionRequest>
         PARSER = new com.google.protobuf.AbstractParser<OpenConnectionRequest>() {
-      @java.lang.Override
       public OpenConnectionRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10180,7 +9855,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.OpenConnectionRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -10245,17 +9919,17 @@ public final class Requests {
             case 0:
               done = true;
               break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              connectionId_ = s;
-              break;
-            }
             default: {
               if (!parseUnknownFieldProto3(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
+              break;
+            }
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              connectionId_ = s;
               break;
             }
           }
@@ -10275,7 +9949,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_CloseConnectionRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_CloseConnectionRequest_fieldAccessorTable
@@ -10318,7 +9991,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -10328,7 +10000,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -10337,7 +10008,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -10452,7 +10122,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -10460,7 +10129,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.CloseConnectionRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -10488,7 +10156,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CloseConnectionRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CloseConnectionRequest_fieldAccessorTable
@@ -10511,7 +10178,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -10519,18 +10185,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CloseConnectionRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CloseConnectionRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.CloseConnectionRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CloseConnectionRequest build() {
         org.apache.calcite.avatica.proto.Requests.CloseConnectionRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -10539,7 +10202,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CloseConnectionRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.CloseConnectionRequest result = new org.apache.calcite.avatica.proto.Requests.CloseConnectionRequest(this);
         result.connectionId_ = connectionId_;
@@ -10547,39 +10209,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.CloseConnectionRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.CloseConnectionRequest)other);
@@ -10600,12 +10255,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10692,13 +10345,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -10720,7 +10371,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<CloseConnectionRequest>
         PARSER = new com.google.protobuf.AbstractParser<CloseConnectionRequest>() {
-      @java.lang.Override
       public CloseConnectionRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -10738,7 +10388,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.CloseConnectionRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -10812,6 +10461,13 @@ public final class Requests {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -10831,13 +10487,6 @@ public final class Requests {
 
               break;
             }
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -10855,7 +10504,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_ConnectionSyncRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_ConnectionSyncRequest_fieldAccessorTable
@@ -10919,7 +10567,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -10929,7 +10576,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -10941,7 +10587,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -11069,7 +10714,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -11077,7 +10721,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.ConnectionSyncRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -11101,7 +10744,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_ConnectionSyncRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_ConnectionSyncRequest_fieldAccessorTable
@@ -11124,7 +10766,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -11138,18 +10779,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_ConnectionSyncRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.ConnectionSyncRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.ConnectionSyncRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.ConnectionSyncRequest build() {
         org.apache.calcite.avatica.proto.Requests.ConnectionSyncRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -11158,7 +10796,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.ConnectionSyncRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.ConnectionSyncRequest result = new org.apache.calcite.avatica.proto.Requests.ConnectionSyncRequest(this);
         result.connectionId_ = connectionId_;
@@ -11171,39 +10808,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.ConnectionSyncRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.ConnectionSyncRequest)other);
@@ -11227,12 +10857,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -11436,13 +11064,11 @@ public final class Requests {
         }
         return connPropsBuilder_;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -11464,7 +11090,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<ConnectionSyncRequest>
         PARSER = new com.google.protobuf.AbstractParser<ConnectionSyncRequest>() {
-      @java.lang.Override
       public ConnectionSyncRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -11482,7 +11107,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.ConnectionSyncRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -11600,6 +11224,13 @@ public final class Requests {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
               org.apache.calcite.avatica.proto.Common.StatementHandle.Builder subBuilder = null;
               if (statementHandle_ != null) {
@@ -11637,13 +11268,6 @@ public final class Requests {
               firstFrameMaxSize_ = input.readInt32();
               break;
             }
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -11664,7 +11288,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_ExecuteRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_ExecuteRequest_fieldAccessorTable
@@ -11765,7 +11388,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -11775,7 +11397,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (statementHandle_ != null) {
@@ -11796,7 +11417,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -11953,7 +11573,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -11961,7 +11580,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.ExecuteRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -11989,7 +11607,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_ExecuteRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_ExecuteRequest_fieldAccessorTable
@@ -12013,7 +11630,6 @@ public final class Requests {
           getParameterValuesFieldBuilder();
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (statementHandleBuilder_ == null) {
@@ -12037,18 +11653,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_ExecuteRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.ExecuteRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.ExecuteRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.ExecuteRequest build() {
         org.apache.calcite.avatica.proto.Requests.ExecuteRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -12057,7 +11670,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.ExecuteRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.ExecuteRequest result = new org.apache.calcite.avatica.proto.Requests.ExecuteRequest(this);
         int from_bitField0_ = bitField0_;
@@ -12084,39 +11696,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.ExecuteRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.ExecuteRequest)other);
@@ -12171,12 +11776,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -12654,13 +12257,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -12682,7 +12283,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<ExecuteRequest>
         PARSER = new com.google.protobuf.AbstractParser<ExecuteRequest>() {
-      @java.lang.Override
       public ExecuteRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -12700,7 +12300,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.ExecuteRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -12786,6 +12385,13 @@ public final class Requests {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -12815,13 +12421,6 @@ public final class Requests {
               offset_ = input.readUInt64();
               break;
             }
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
@@ -12839,7 +12438,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_SyncResultsRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_SyncResultsRequest_fieldAccessorTable
@@ -12921,7 +12519,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -12931,7 +12528,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -12949,7 +12545,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -13094,7 +12689,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -13102,7 +12696,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.SyncResultsRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -13126,7 +12719,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_SyncResultsRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_SyncResultsRequest_fieldAccessorTable
@@ -13149,7 +12741,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -13167,18 +12758,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_SyncResultsRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.SyncResultsRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.SyncResultsRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.SyncResultsRequest build() {
         org.apache.calcite.avatica.proto.Requests.SyncResultsRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -13187,7 +12775,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.SyncResultsRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.SyncResultsRequest result = new org.apache.calcite.avatica.proto.Requests.SyncResultsRequest(this);
         result.connectionId_ = connectionId_;
@@ -13202,39 +12789,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.SyncResultsRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.SyncResultsRequest)other);
@@ -13264,12 +12844,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -13525,13 +13103,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -13553,7 +13129,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<SyncResultsRequest>
         PARSER = new com.google.protobuf.AbstractParser<SyncResultsRequest>() {
-      @java.lang.Override
       public SyncResultsRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -13571,7 +13146,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.SyncResultsRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -13636,17 +13210,17 @@ public final class Requests {
             case 0:
               done = true;
               break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              connectionId_ = s;
-              break;
-            }
             default: {
               if (!parseUnknownFieldProto3(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
+              break;
+            }
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              connectionId_ = s;
               break;
             }
           }
@@ -13666,7 +13240,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_CommitRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_CommitRequest_fieldAccessorTable
@@ -13709,7 +13282,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -13719,7 +13291,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -13728,7 +13299,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -13843,7 +13413,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -13851,7 +13420,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.CommitRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -13879,7 +13447,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CommitRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CommitRequest_fieldAccessorTable
@@ -13902,7 +13469,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -13910,18 +13476,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_CommitRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CommitRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.CommitRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CommitRequest build() {
         org.apache.calcite.avatica.proto.Requests.CommitRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -13930,7 +13493,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.CommitRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.CommitRequest result = new org.apache.calcite.avatica.proto.Requests.CommitRequest(this);
         result.connectionId_ = connectionId_;
@@ -13938,39 +13500,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.CommitRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.CommitRequest)other);
@@ -13991,12 +13546,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -14083,13 +13636,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -14111,7 +13662,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<CommitRequest>
         PARSER = new com.google.protobuf.AbstractParser<CommitRequest>() {
-      @java.lang.Override
       public CommitRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -14129,7 +13679,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.CommitRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -14194,17 +13743,17 @@ public final class Requests {
             case 0:
               done = true;
               break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              connectionId_ = s;
-              break;
-            }
             default: {
               if (!parseUnknownFieldProto3(
                   input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
+              break;
+            }
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              connectionId_ = s;
               break;
             }
           }
@@ -14224,7 +13773,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_RollbackRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_RollbackRequest_fieldAccessorTable
@@ -14267,7 +13815,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -14277,7 +13824,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -14286,7 +13832,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -14401,7 +13946,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -14409,7 +13953,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.RollbackRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -14437,7 +13980,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_RollbackRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_RollbackRequest_fieldAccessorTable
@@ -14460,7 +14002,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -14468,18 +14009,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_RollbackRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.RollbackRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.RollbackRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.RollbackRequest build() {
         org.apache.calcite.avatica.proto.Requests.RollbackRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -14488,7 +14026,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.RollbackRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.RollbackRequest result = new org.apache.calcite.avatica.proto.Requests.RollbackRequest(this);
         result.connectionId_ = connectionId_;
@@ -14496,39 +14033,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.RollbackRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.RollbackRequest)other);
@@ -14549,12 +14079,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -14641,13 +14169,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -14669,7 +14195,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<RollbackRequest>
         PARSER = new com.google.protobuf.AbstractParser<RollbackRequest>() {
-      @java.lang.Override
       public RollbackRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -14687,7 +14212,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.RollbackRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -14778,6 +14302,13 @@ public final class Requests {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -14796,13 +14327,6 @@ public final class Requests {
                 mutable_bitField0_ |= 0x00000004;
               }
               sqlCommands_.add(s);
-              break;
-            }
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
               break;
             }
           }
@@ -14825,7 +14349,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareAndExecuteBatchRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareAndExecuteBatchRequest_fieldAccessorTable
@@ -14907,7 +14430,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -14917,7 +14439,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -14932,7 +14453,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -15069,7 +14589,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -15077,7 +14596,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteBatchRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -15105,7 +14623,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareAndExecuteBatchRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareAndExecuteBatchRequest_fieldAccessorTable
@@ -15128,7 +14645,6 @@ public final class Requests {
                 .alwaysUseFieldBuilders) {
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -15140,18 +14656,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_PrepareAndExecuteBatchRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteBatchRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteBatchRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteBatchRequest build() {
         org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteBatchRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -15160,7 +14673,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteBatchRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteBatchRequest result = new org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteBatchRequest(this);
         int from_bitField0_ = bitField0_;
@@ -15177,39 +14689,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteBatchRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteBatchRequest)other);
@@ -15243,12 +14748,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -15456,13 +14959,11 @@ public final class Requests {
         onChanged();
         return this;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -15484,7 +14985,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<PrepareAndExecuteBatchRequest>
         PARSER = new com.google.protobuf.AbstractParser<PrepareAndExecuteBatchRequest>() {
-      @java.lang.Override
       public PrepareAndExecuteBatchRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -15502,7 +15002,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.PrepareAndExecuteBatchRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -15581,6 +15080,13 @@ public final class Requests {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
               if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
                 parameterValues_ = new java.util.ArrayList<org.apache.calcite.avatica.proto.Common.TypedValue>();
@@ -15588,13 +15094,6 @@ public final class Requests {
               }
               parameterValues_.add(
                   input.readMessage(org.apache.calcite.avatica.proto.Common.TypedValue.parser(), extensionRegistry));
-              break;
-            }
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
               break;
             }
           }
@@ -15617,7 +15116,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_UpdateBatch_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_UpdateBatch_fieldAccessorTable
@@ -15661,7 +15159,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -15671,7 +15168,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < parameterValues_.size(); i++) {
@@ -15680,7 +15176,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -15798,7 +15293,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -15806,7 +15300,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.UpdateBatch prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -15834,7 +15327,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_UpdateBatch_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_UpdateBatch_fieldAccessorTable
@@ -15858,7 +15350,6 @@ public final class Requests {
           getParameterValuesFieldBuilder();
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         if (parameterValuesBuilder_ == null) {
@@ -15870,18 +15361,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_UpdateBatch_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.UpdateBatch getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.UpdateBatch.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.UpdateBatch build() {
         org.apache.calcite.avatica.proto.Requests.UpdateBatch result = buildPartial();
         if (!result.isInitialized()) {
@@ -15890,7 +15378,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.UpdateBatch buildPartial() {
         org.apache.calcite.avatica.proto.Requests.UpdateBatch result = new org.apache.calcite.avatica.proto.Requests.UpdateBatch(this);
         int from_bitField0_ = bitField0_;
@@ -15907,39 +15394,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.UpdateBatch) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.UpdateBatch)other);
@@ -15982,12 +15462,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -16246,13 +15724,11 @@ public final class Requests {
         }
         return parameterValuesBuilder_;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -16274,7 +15750,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<UpdateBatch>
         PARSER = new com.google.protobuf.AbstractParser<UpdateBatch>() {
-      @java.lang.Override
       public UpdateBatch parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -16292,7 +15767,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.UpdateBatch getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
@@ -16404,6 +15878,13 @@ public final class Requests {
             case 0:
               done = true;
               break;
+            default: {
+              if (!parseUnknownFieldProto3(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
@@ -16422,13 +15903,6 @@ public final class Requests {
               }
               updates_.add(
                   input.readMessage(org.apache.calcite.avatica.proto.Requests.UpdateBatch.parser(), extensionRegistry));
-              break;
-            }
-            default: {
-              if (!parseUnknownFieldProto3(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
               break;
             }
           }
@@ -16451,7 +15925,6 @@ public final class Requests {
       return org.apache.calcite.avatica.proto.Requests.internal_static_ExecuteBatchRequest_descriptor;
     }
 
-    @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.apache.calcite.avatica.proto.Requests.internal_static_ExecuteBatchRequest_fieldAccessorTable
@@ -16559,7 +16032,6 @@ public final class Requests {
     }
 
     private byte memoizedIsInitialized = -1;
-    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -16569,7 +16041,6 @@ public final class Requests {
       return true;
     }
 
-    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (!getConnectionIdBytes().isEmpty()) {
@@ -16584,7 +16055,6 @@ public final class Requests {
       unknownFields.writeTo(output);
     }
 
-    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSize;
       if (size != -1) return size;
@@ -16717,7 +16187,6 @@ public final class Requests {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
@@ -16725,7 +16194,6 @@ public final class Requests {
     public static Builder newBuilder(org.apache.calcite.avatica.proto.Requests.ExecuteBatchRequest prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
-    @java.lang.Override
     public Builder toBuilder() {
       return this == DEFAULT_INSTANCE
           ? new Builder() : new Builder().mergeFrom(this);
@@ -16749,7 +16217,6 @@ public final class Requests {
         return org.apache.calcite.avatica.proto.Requests.internal_static_ExecuteBatchRequest_descriptor;
       }
 
-      @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_ExecuteBatchRequest_fieldAccessorTable
@@ -16773,7 +16240,6 @@ public final class Requests {
           getUpdatesFieldBuilder();
         }
       }
-      @java.lang.Override
       public Builder clear() {
         super.clear();
         connectionId_ = "";
@@ -16789,18 +16255,15 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.apache.calcite.avatica.proto.Requests.internal_static_ExecuteBatchRequest_descriptor;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.ExecuteBatchRequest getDefaultInstanceForType() {
         return org.apache.calcite.avatica.proto.Requests.ExecuteBatchRequest.getDefaultInstance();
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.ExecuteBatchRequest build() {
         org.apache.calcite.avatica.proto.Requests.ExecuteBatchRequest result = buildPartial();
         if (!result.isInitialized()) {
@@ -16809,7 +16272,6 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public org.apache.calcite.avatica.proto.Requests.ExecuteBatchRequest buildPartial() {
         org.apache.calcite.avatica.proto.Requests.ExecuteBatchRequest result = new org.apache.calcite.avatica.proto.Requests.ExecuteBatchRequest(this);
         int from_bitField0_ = bitField0_;
@@ -16830,39 +16292,32 @@ public final class Requests {
         return result;
       }
 
-      @java.lang.Override
       public Builder clone() {
         return (Builder) super.clone();
       }
-      @java.lang.Override
       public Builder setField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
-      @java.lang.Override
       public Builder clearField(
           com.google.protobuf.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
-      @java.lang.Override
       public Builder clearOneof(
           com.google.protobuf.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
-      @java.lang.Override
       public Builder setRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
-      @java.lang.Override
       public Builder addRepeatedField(
           com.google.protobuf.Descriptors.FieldDescriptor field,
           java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.apache.calcite.avatica.proto.Requests.ExecuteBatchRequest) {
           return mergeFrom((org.apache.calcite.avatica.proto.Requests.ExecuteBatchRequest)other);
@@ -16912,12 +16367,10 @@ public final class Requests {
         return this;
       }
 
-      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
-      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -17343,13 +16796,11 @@ public final class Requests {
         }
         return updatesBuilder_;
       }
-      @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.setUnknownFieldsProto3(unknownFields);
       }
 
-      @java.lang.Override
       public final Builder mergeUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
@@ -17371,7 +16822,6 @@ public final class Requests {
 
     private static final com.google.protobuf.Parser<ExecuteBatchRequest>
         PARSER = new com.google.protobuf.AbstractParser<ExecuteBatchRequest>() {
-      @java.lang.Override
       public ExecuteBatchRequest parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -17389,7 +16839,6 @@ public final class Requests {
       return PARSER;
     }
 
-    @java.lang.Override
     public org.apache.calcite.avatica.proto.Requests.ExecuteBatchRequest getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
