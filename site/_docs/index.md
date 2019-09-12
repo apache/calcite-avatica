@@ -174,3 +174,10 @@ highly welcomed!
 * *License*: [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 * Avatica version 1.2.0 to 1.6.0
 * *Maintainer*: Lukáš Lalinský
+
+### JavaScript binding to Calcite Avatica Server
+* [Home page](https://https://github.com/waylayio/avatica-js)
+* Language: JavaScript
+* *License*: [MIT](https://opensource.org/licenses/MIT)
+* Any Avatica version
+* *Maintainer*: Waylay.io
