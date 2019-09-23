@@ -102,7 +102,7 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
     initializeClient();
   }
 
-  private void initializeClient() {
+  protected void initializeClient() {
     socketFactoryRegistry = this.configureSocketFactories();
     configureConnectionPool(socketFactoryRegistry);
     this.authCache = new BasicAuthCache();
@@ -147,10 +147,10 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
 
   private SSLContext getSSLContext() throws Exception {
     SSLContextBuilder sslContextBuilder = SSLContexts.custom();
-    if (null != truststore && null != truststorePassword) {
+    if (null != truststore) {
       loadTrustStore(sslContextBuilder);
     }
-    if (null != keystore && null != keystorePassword && null != keyPassword) {
+    if (null != keystore) {
       loadKeyStore(sslContextBuilder);
     }
     return sslContextBuilder.build();
@@ -193,7 +193,7 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
     }
   }
 
-  public byte[] send(byte[] request) {
+  @Override public byte[] send(byte[] request) {
     while (true) {
       HttpClientContext context = HttpClientContext.create();
 
