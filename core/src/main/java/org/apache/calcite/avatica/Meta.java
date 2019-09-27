@@ -577,6 +577,12 @@ public interface Meta {
           Objects.requireNonNull(signature), firstFrame, -1L);
     }
 
+    public static MetaResultSet create(String connectionId, int statementId,
+        boolean ownStatement, Signature signature, Frame firstFrame, long updateCount) {
+      return new MetaResultSet(connectionId, statementId, ownStatement,
+          Objects.requireNonNull(signature), firstFrame, updateCount);
+    }
+
     public static MetaResultSet count(String connectionId, int statementId,
         long updateCount) {
       assert updateCount >= 0
