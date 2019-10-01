@@ -152,6 +152,16 @@ public class AvaticaSpnegoTest extends HttpBaseTest {
     for (boolean tls : new Boolean[] {false, true}) {
       for (Driver.Serialization serialization : new Driver.Serialization[] {
           Driver.Serialization.JSON, Driver.Serialization.PROTOBUF}) {
+        if (tls && System.getProperty("java.vendor").contains("IBM")) {
+          // Skip TLS testing on IBM Java due the combination of:
+          // - Jetty 9.4.12+ ignores SSL_* ciphers due to security - eclipse/jetty.project#2807
+          // - IBM uses SSL_* cipher names for ALL ciphers not following RFC cipher names
+          //   See eclipse/jetty.project#2807 for details
+          LOG.info("Skipping HTTPS test on IBM Java");
+          parameters.add(new Object[] {null});
+          continue;
+        }
+
         // Build and start the server
         HttpServer.Builder httpServerBuilder = new HttpServer.Builder();
         if (tls) {

@@ -38,7 +38,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import org.junit.AfterClass;
-
+import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,10 +60,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Objects;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeFalse;
+import static org.junit.Assume.assumeNotNull;
 
 /**
  * Common Base for HTTP End2End Tests
@@ -82,12 +81,6 @@ public abstract class HttpBaseTest {
   protected final String jdbcUrl;
 
   public static void setupClass() throws SQLException {
-    // Skip TLS testing on IBM Java due the combination of:
-    // - Jetty 9.4.12+ ignores SSL_* ciphers due to security - eclipse/jetty.project#2807
-    // - IBM uses SSL_* cipher names for ALL ciphers not following RFC cipher names
-    //   See eclipse/jetty.project#2807 for details
-    assumeFalse(System.getProperty("java.vendor").contains("IBM"));
-
     // Create a self-signed cert
     File target = new File(System.getProperty("user.dir"), "target");
     File keystore = new File(target, "avatica-test.jks");
@@ -111,8 +104,13 @@ public abstract class HttpBaseTest {
     SERVERS_TO_STOP.clear();
   }
 
+  @Before public void checkUrl() {
+    //We signal that we skip the test because of the IBM Java issue by specifying a Null URL
+    assumeNotNull(jdbcUrl);
+  }
+
   public HttpBaseTest(String jdbcUrl) {
-    this.jdbcUrl = Objects.requireNonNull(jdbcUrl);
+    this.jdbcUrl = jdbcUrl;
   }
 
   /**
