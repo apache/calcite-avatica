@@ -66,9 +66,6 @@ public class AvaticaHttpClientFactoryImpl implements AvaticaHttpClientFactory {
     }
 
     AvaticaHttpClient client = instantiateClient(className, url);
-    if (null != kerberosUtil) {
-      client = new DoAsAvaticaHttpClient(client, kerberosUtil);
-    }
 
     if (client instanceof TrustStoreConfigurable) {
       File truststore = config.truststore();
@@ -124,6 +121,10 @@ public class AvaticaHttpClientFactoryImpl implements AvaticaHttpClientFactory {
       } else {
         LOG.debug("{} is not capable of username/password authentication.", authType);
       }
+    }
+
+    if (null != kerberosUtil) {
+      client = new DoAsAvaticaHttpClient(client, kerberosUtil);
     }
 
     return client;

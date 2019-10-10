@@ -16,9 +16,7 @@
  */
 package org.apache.calcite.avatica;
 
-import org.apache.calcite.avatica.jdbc.JdbcMeta;
 import org.apache.calcite.avatica.remote.Driver;
-import org.apache.calcite.avatica.remote.LocalService;
 import org.apache.calcite.avatica.server.AvaticaJaasKrbUtil;
 import org.apache.calcite.avatica.server.HttpServer;
 
@@ -32,6 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +42,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import javax.security.auth.Subject;
 
@@ -55,11 +53,8 @@ import static org.junit.Assert.assertTrue;
  * End to end test case for SPNEGO with Avatica.
  */
 @RunWith(Parameterized.class)
-public class AvaticaSpnegoTest {
+public class AvaticaSpnegoTest extends HttpBaseTest {
   private static final Logger LOG = LoggerFactory.getLogger(AvaticaSpnegoTest.class);
-
-  private static final ConnectionSpec CONNECTION_SPEC = ConnectionSpec.HSQLDB;
-  private static final List<HttpServer> SERVERS_TO_STOP = new ArrayList<>();
 
   private static SimpleKdcServer kdc;
   private static KrbConfig clientConfig;
@@ -72,6 +67,9 @@ public class AvaticaSpnegoTest {
   private static boolean isKdcStarted = false;
 
   private static void setupKdc() throws Exception {
+    if (isKdcStarted) {
+      return;
+    }
     kdc = new SimpleKdcServer();
     File target = new File(System.getProperty("user.dir"), "target");
     assertTrue(target.exists());
@@ -114,12 +112,7 @@ public class AvaticaSpnegoTest {
     //System.setProperty("sun.security.krb5.debug", "true");
   }
 
-  @AfterClass public static void stopKdc() throws Exception {
-    for (HttpServer server : SERVERS_TO_STOP) {
-      server.stop();
-    }
-    SERVERS_TO_STOP.clear();
-
+  @AfterClass public static void stopKdc() throws KrbException {
     if (isKdcStarted) {
       LOG.info("Stopping KDC on {}", kdcPort);
       kdc.stop();
@@ -151,40 +144,57 @@ public class AvaticaSpnegoTest {
   @Parameters public static List<Object[]> parameters() throws Exception {
     final ArrayList<Object[]> parameters = new ArrayList<>();
 
+    setupClass();
+
     // Start the KDC
     setupKdc();
 
-    // Create a LocalService around HSQLDB
-    final JdbcMeta jdbcMeta = new JdbcMeta(CONNECTION_SPEC.url,
-        CONNECTION_SPEC.username, CONNECTION_SPEC.password);
-    final LocalService localService = new LocalService(jdbcMeta);
+    for (boolean tls : new Boolean[] {false, true}) {
+      for (Driver.Serialization serialization : new Driver.Serialization[] {
+          Driver.Serialization.JSON, Driver.Serialization.PROTOBUF}) {
+        if (tls && System.getProperty("java.vendor").contains("IBM")) {
+          // Skip TLS testing on IBM Java due the combination of:
+          // - Jetty 9.4.12+ ignores SSL_* ciphers due to security - eclipse/jetty.project#2807
+          // - IBM uses SSL_* cipher names for ALL ciphers not following RFC cipher names
+          //   See eclipse/jetty.project#2807 for details
+          LOG.info("Skipping HTTPS test on IBM Java");
+          parameters.add(new Object[] {null});
+          continue;
+        }
 
-    for (Driver.Serialization serialization : new Driver.Serialization[] {
-        Driver.Serialization.JSON, Driver.Serialization.PROTOBUF}) {
-      // Build and start the server
-      HttpServer httpServer = new HttpServer.Builder()
-          .withPort(0)
-          .withAutomaticLogin(serverKeytab)
-          .withSpnego(SpnegoTestUtil.SERVER_PRINCIPAL, SpnegoTestUtil.REALM)
-          .withHandler(localService, serialization)
-          .build();
-      httpServer.start();
-      SERVERS_TO_STOP.add(httpServer);
+        // Build and start the server
+        HttpServer.Builder httpServerBuilder = new HttpServer.Builder();
+        if (tls) {
+          httpServerBuilder = httpServerBuilder
+              .withTLS(KEYSTORE, KEYSTORE_PASSWORD, KEYSTORE, KEYSTORE_PASSWORD);
+        }
+        HttpServer httpServer = httpServerBuilder
+            .withPort(0)
+            .withAutomaticLogin(serverKeytab)
+            .withSpnego(SpnegoTestUtil.SERVER_PRINCIPAL, SpnegoTestUtil.REALM)
+            .withHandler(localService, serialization)
+            .build();
+        httpServer.start();
+        SERVERS_TO_STOP.add(httpServer);
 
-      final String url = "jdbc:avatica:remote:url=http://" + SpnegoTestUtil.KDC_HOST + ":"
-          + httpServer.getPort() + ";authentication=SPNEGO;serialization=" + serialization;
-      LOG.info("JDBC URL {}", url);
+        String url = "jdbc:avatica:remote:url=" + (tls ? "https://" : "http://")
+            + SpnegoTestUtil.KDC_HOST + ":" + httpServer.getPort()
+            + ";authentication=SPNEGO;serialization=" + serialization;
+        if (tls) {
+          url += ";truststore=" + KEYSTORE.getAbsolutePath()
+              + ";truststore_password=" + KEYSTORE_PASSWORD;
+        }
+        LOG.info("JDBC URL {}", url);
 
-      parameters.add(new Object[] {url});
+        parameters.add(new Object[] {url});
+      }
     }
 
     return parameters;
   }
 
-  private final String jdbcUrl;
-
   public AvaticaSpnegoTest(String jdbcUrl) {
-    this.jdbcUrl = Objects.requireNonNull(jdbcUrl);
+    super(jdbcUrl);
   }
 
   @Test public void testAuthenticatedClient() throws Exception {
@@ -240,6 +250,7 @@ public class AvaticaSpnegoTest {
       assertEquals(3, results.getInt(1));
     }
   }
+
 }
 
 // End AvaticaSpnegoTest.java
