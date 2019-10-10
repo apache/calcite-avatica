@@ -81,7 +81,7 @@ limitations under the License.
     <httpclient.version>4.5.9</httpclient.version>
     <httpcore.version>4.4.11</httpcore.version>
     <hydromatic-toolbox.version>0.3</hydromatic-toolbox.version>
-    <jackson.version>2.9.9</jackson.version>
+    <jackson.version>2.10.0</jackson.version>
     <!-- Default to html4 for JDK 8 but html5 on jdk9+ -->
     <javadoc-additionalOptions />
     <javadoc-link>https://docs.oracle.com/javase/8/docs/api/</javadoc-link>
