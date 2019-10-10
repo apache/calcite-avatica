@@ -147,10 +147,10 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient,
 
   private SSLContext getSSLContext() throws Exception {
     SSLContextBuilder sslContextBuilder = SSLContexts.custom();
-    if (null != truststore) {
+    if (null != truststore && null != truststorePassword) {
       loadTrustStore(sslContextBuilder);
     }
-    if (null != keystore) {
+    if (null != keystore && null != keystorePassword && null != keyPassword) {
       loadKeyStore(sslContextBuilder);
     }
     return sslContextBuilder.build();
