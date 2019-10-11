@@ -70,6 +70,7 @@ public abstract class HttpBaseTest {
   protected static final Logger LOG = LoggerFactory.getLogger(HttpBaseTest.class);
 
   protected static final String KEYSTORE_PASSWORD = "avaticasecret";
+  protected static final String KEYSTORE_EMPTY_PASSWORD = "";
   protected static final ConnectionSpec CONNECTION_SPEC = ConnectionSpec.HSQLDB;
   protected static final List<HttpServer> SERVERS_TO_STOP = new ArrayList<>();
 
@@ -77,22 +78,26 @@ public abstract class HttpBaseTest {
   protected static final File TARGET_DIR =
           new File(System.getProperty("user.dir"), TARGET_DIR_NAME);
   protected static final File KEYSTORE = new File(TARGET_DIR, "avatica-test.jks");
+  protected static final File EMPTY_PW_KEYSTORE = new File(TARGET_DIR, "avatica-test-emptypw.jks");
+
   protected static LocalService localService;
 
   protected final String jdbcUrl;
 
   public static void setupClass() throws SQLException {
     // Create a self-signed cert
-    File target = SpnegoTestUtil.TARGET_DIR;
-    File keystore = new File(target, "avatica-test.jks");
-    if (keystore.isFile()) {
-      assertTrue("Failed to delete keystore: " + keystore, keystore.delete());
+    if (KEYSTORE.isFile()) {
+      assertTrue("Failed to delete keystore: " + KEYSTORE, KEYSTORE.delete());
     }
-    new CertTool().createSelfSignedCert(keystore, "avatica", KEYSTORE_PASSWORD);
+    new CertTool().createSelfSignedCert(KEYSTORE, "avatica", KEYSTORE_PASSWORD);
+
+    if (EMPTY_PW_KEYSTORE.isFile()) {
+      assertTrue("Failed to delete keystore: " + EMPTY_PW_KEYSTORE, EMPTY_PW_KEYSTORE.delete());
+    }
+    new CertTool().createSelfSignedCert(EMPTY_PW_KEYSTORE, "avatica", KEYSTORE_EMPTY_PASSWORD);
 
     // Create a LocalService around HSQLDB
     JdbcMeta jdbcMeta;
-    jdbcMeta = null;
     jdbcMeta = new JdbcMeta(CONNECTION_SPEC.url,
         CONNECTION_SPEC.username, CONNECTION_SPEC.password);
     localService = new LocalService(jdbcMeta);

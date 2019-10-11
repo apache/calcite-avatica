@@ -24,6 +24,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -60,21 +61,27 @@ public class SslDriverTest extends HttpBaseTest {
     setupClass();
     for (Driver.Serialization serialization : new Driver.Serialization[] {
         Driver.Serialization.JSON, Driver.Serialization.PROTOBUF}) {
-      // Build and start the server, using TLS
-      HttpServer httpServer = new HttpServer.Builder()
-          .withPort(0)
-          .withTLS(KEYSTORE, KEYSTORE_PASSWORD, KEYSTORE, KEYSTORE_PASSWORD)
-          .withHandler(localService, serialization)
-          .build();
-      httpServer.start();
-      SERVERS_TO_STOP.add(httpServer);
+      for (boolean emptyPassword : new boolean[] {true, false}) {
+        File keyStore = emptyPassword ? EMPTY_PW_KEYSTORE : KEYSTORE;
+        String password = emptyPassword ? KEYSTORE_EMPTY_PASSWORD : KEYSTORE_PASSWORD;
+        // Build and start the server, using TLS
+        HttpServer httpServer = new HttpServer.Builder()
+            .withPort(0)
+            .withTLS(keyStore, password, keyStore, password)
+            .withHandler(localService, serialization)
+            .build();
+        httpServer.start();
+        SERVERS_TO_STOP.add(httpServer);
 
-      final String url = "jdbc:avatica:remote:url=https://localhost:" + httpServer.getPort()
-          + ";serialization=" + serialization + ";truststore=" + KEYSTORE.getAbsolutePath()
-          + ";truststore_password=" + KEYSTORE_PASSWORD;
-      LOG.info("JDBC URL {}", url);
+        String url = "jdbc:avatica:remote:url=https://localhost:" + httpServer.getPort()
+            + ";serialization=" + serialization + ";truststore=" + keyStore.getAbsolutePath();
+        if (!emptyPassword) {
+          url += ";truststore_password=" + password;
+        }
+        LOG.info("JDBC URL {}", url);
 
-      parameters.add(new Object[] {url});
+        parameters.add(new Object[] {url});
+      }
     }
 
     return parameters;
