@@ -74,16 +74,16 @@ public enum BuiltInConnectionProperty implements ConnectionProperty {
   TRUSTSTORE("truststore", Type.STRING, null, false),
 
   /** Password for the truststore */
-  TRUSTSTORE_PASSWORD("truststore_password", Type.STRING, null, false),
+  TRUSTSTORE_PASSWORD("truststore_password", Type.STRING, "", false),
 
   /** Keystore for MTLS authentication */
   KEYSTORE("keystore", Type.STRING, null, false),
 
   /** Password for the keystore */
-  KEYSTORE_PASSWORD("keystore_password", Type.STRING, null, false),
+  KEYSTORE_PASSWORD("keystore_password", Type.STRING, "", false),
 
   /** Password for the key inside keystore */
-  KEY_PASSWORD("key_password", Type.STRING, null, false),
+  KEY_PASSWORD("key_password", Type.STRING, "", false),
 
   HOSTNAME_VERIFICATION("hostname_verification", Type.ENUM, HostnameVerification.STRICT,
       HostnameVerification.class, false);
