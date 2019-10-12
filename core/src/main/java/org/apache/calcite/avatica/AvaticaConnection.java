@@ -691,6 +691,9 @@ public abstract class AvaticaConnection implements Connection {
     // These are all the metadata operations, no updates
     ResultSet resultSet = executeQueryInternal(statement, metaResultSet.signature.sanitize(),
         metaResultSet.firstFrame, state, false);
+    if (metaResultSet.ownStatement && resultSet.getStatement() instanceof AvaticaStatement) {
+      ((AvaticaStatement) resultSet.getStatement()).closeOnCompletion();
+    }
     return resultSet;
   }
 
