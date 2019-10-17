@@ -97,7 +97,7 @@ Tests
   Update appveyor.yml to enable Appveyor testing against JDK 11
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-2961">CALCITE-2961</a>]
   Enable Travis to test against JDK 13
-  
+
 Website and Documentation
 
 * Update to new git URL (switch to gitbox)

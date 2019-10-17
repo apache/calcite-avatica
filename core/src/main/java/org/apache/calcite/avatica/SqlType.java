@@ -195,7 +195,6 @@ import java.util.Map;
  *
  * <p><a id="B5">TABLE B-5</a>: Conversions performed by {@code setObject} and
  * {@code setNull} between Java object types and target JDBC types
- *
  * <!--
  * CHECKSTYLE: OFF
  * -->
@@ -244,7 +243,6 @@ import java.util.Map;
  *
  * <p><a id="B6">TABLE B-6</a>: Use of {@code ResultSet} getter methods to
  * retrieve JDBC data types
- *
  * <!--
  * CHECKSTYLE: OFF
  * -->

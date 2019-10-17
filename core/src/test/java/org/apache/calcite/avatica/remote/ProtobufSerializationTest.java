@@ -96,22 +96,24 @@ public class ProtobufSerializationTest {
     final long maxRowCount = 200L;
 
     // The "current" serialization strategy.
-    Requests.PrepareRequest protoPrepare = Requests.PrepareRequest.newBuilder().
-        setConnectionId(connectionId).setSql(sql).setMaxRowsTotal(maxRowCount).build();
+    Requests.PrepareRequest protoPrepare = Requests.PrepareRequest.newBuilder()
+        .setConnectionId(connectionId).setSql(sql).setMaxRowsTotal(maxRowCount)
+        .build();
 
     Service.PrepareRequest prepareReq = new Service.PrepareRequest().deserialize(protoPrepare);
     assertEquals(maxRowCount, prepareReq.maxRowCount);
 
     // The "old" serialization strategy.
-    protoPrepare = Requests.PrepareRequest.newBuilder().
-        setConnectionId(connectionId).setSql(sql).setMaxRowCount(maxRowCount).build();
+    protoPrepare = Requests.PrepareRequest.newBuilder()
+        .setConnectionId(connectionId).setSql(sql).setMaxRowCount(maxRowCount)
+        .build();
 
     prepareReq = new Service.PrepareRequest().deserialize(protoPrepare);
     assertEquals(maxRowCount, prepareReq.maxRowCount);
 
     // Both the new and old provided should default to the new
-    protoPrepare = Requests.PrepareRequest.newBuilder().
-        setConnectionId(connectionId).setSql(sql).setMaxRowCount(500L)
+    protoPrepare = Requests.PrepareRequest.newBuilder()
+        .setConnectionId(connectionId).setSql(sql).setMaxRowCount(500L)
         .setMaxRowsTotal(maxRowCount).build();
 
     prepareReq = new Service.PrepareRequest().deserialize(protoPrepare);
@@ -162,18 +164,19 @@ public class ProtobufSerializationTest {
     final int maxRowsInFirstFrame = 50;
 
     // The "current" serialization strategy (maxRowsTotal and firstFrameMaxSize)
-    Requests.PrepareAndExecuteRequest protoPrepare = Requests.PrepareAndExecuteRequest.newBuilder().
-        setConnectionId(connectionId).setSql(sql).setMaxRowsTotal(maxRowCount).
-        setFirstFrameMaxSize(maxRowsInFirstFrame).build();
+    Requests.PrepareAndExecuteRequest protoPrepare = Requests.PrepareAndExecuteRequest.newBuilder()
+        .setConnectionId(connectionId).setSql(sql).setMaxRowsTotal(maxRowCount)
+        .setFirstFrameMaxSize(maxRowsInFirstFrame).build();
 
-    Service.PrepareAndExecuteRequest prepareAndExecuteReq = new Service.PrepareAndExecuteRequest().
-        deserialize(protoPrepare);
+    Service.PrepareAndExecuteRequest prepareAndExecuteReq = new Service.PrepareAndExecuteRequest()
+        .deserialize(protoPrepare);
     assertEquals(maxRowCount, prepareAndExecuteReq.maxRowCount);
     assertEquals(maxRowsInFirstFrame, prepareAndExecuteReq.maxRowsInFirstFrame);
 
     // The "old" serialization strategy (maxRowCount)
-    protoPrepare = Requests.PrepareAndExecuteRequest.newBuilder().
-        setConnectionId(connectionId).setSql(sql).setMaxRowCount(maxRowCount).build();
+    protoPrepare = Requests.PrepareAndExecuteRequest.newBuilder()
+        .setConnectionId(connectionId).setSql(sql).setMaxRowCount(maxRowCount)
+        .build();
 
     prepareAndExecuteReq = new Service.PrepareAndExecuteRequest().deserialize(protoPrepare);
     assertEquals(maxRowCount, prepareAndExecuteReq.maxRowCount);
@@ -182,8 +185,8 @@ public class ProtobufSerializationTest {
 
     // Both the new and old provided should default to the new (firstFrameMaxSize should be the
     // the same as what ultimately is set to maxRowCount)
-    protoPrepare = Requests.PrepareAndExecuteRequest.newBuilder().
-        setConnectionId(connectionId).setSql(sql).setMaxRowCount(500L)
+    protoPrepare = Requests.PrepareAndExecuteRequest.newBuilder()
+        .setConnectionId(connectionId).setSql(sql).setMaxRowCount(500L)
         .setMaxRowsTotal(maxRowCount).build();
 
     prepareAndExecuteReq = new Service.PrepareAndExecuteRequest().deserialize(protoPrepare);
@@ -192,8 +195,8 @@ public class ProtobufSerializationTest {
         prepareAndExecuteReq.maxRowsInFirstFrame);
 
     // Same as previous example, but explicitly setting maxRowsInFirstFrame too
-    protoPrepare = Requests.PrepareAndExecuteRequest.newBuilder().
-        setConnectionId(connectionId).setSql(sql).setMaxRowCount(500L)
+    protoPrepare = Requests.PrepareAndExecuteRequest.newBuilder()
+        .setConnectionId(connectionId).setSql(sql).setMaxRowCount(500L)
         .setMaxRowsTotal(maxRowCount).setFirstFrameMaxSize(maxRowsInFirstFrame).build();
 
     prepareAndExecuteReq = new Service.PrepareAndExecuteRequest().deserialize(protoPrepare);
@@ -225,25 +228,26 @@ public class ProtobufSerializationTest {
     final int maxSize = 200;
 
     // The "current" serialization strategy.
-    Requests.FetchRequest protoFetch = Requests.FetchRequest.newBuilder().
-        setConnectionId(connectionId).setStatementId(statementId).
-        setOffset(offset).setFrameMaxSize(maxSize).build();
+    Requests.FetchRequest protoFetch = Requests.FetchRequest.newBuilder()
+        .setConnectionId(connectionId).setStatementId(statementId)
+        .setOffset(offset).setFrameMaxSize(maxSize).build();
 
     Service.FetchRequest fetchReq = new Service.FetchRequest().deserialize(protoFetch);
     assertEquals(maxSize, fetchReq.fetchMaxRowCount);
 
     // The "old" serialization strategy.
-    protoFetch = Requests.FetchRequest.newBuilder().
-        setConnectionId(connectionId).setStatementId(statementId).
-        setOffset(offset).setFetchMaxRowCount(maxSize).build();
+    protoFetch = Requests.FetchRequest.newBuilder()
+        .setConnectionId(connectionId).setStatementId(statementId)
+        .setOffset(offset).setFetchMaxRowCount(maxSize).build();
 
     fetchReq = new Service.FetchRequest().deserialize(protoFetch);
     assertEquals(maxSize, fetchReq.fetchMaxRowCount);
 
     // Both the new and old provided should default to the new
-    protoFetch = Requests.FetchRequest.newBuilder().
-        setConnectionId(connectionId).setStatementId(statementId).
-        setOffset(offset).setFetchMaxRowCount(100).setFrameMaxSize(maxSize).build();
+    protoFetch = Requests.FetchRequest.newBuilder()
+        .setConnectionId(connectionId).setStatementId(statementId)
+        .setOffset(offset).setFetchMaxRowCount(100).setFrameMaxSize(maxSize)
+        .build();
 
     fetchReq = new Service.FetchRequest().deserialize(protoFetch);
     assertEquals(maxSize, fetchReq.fetchMaxRowCount);

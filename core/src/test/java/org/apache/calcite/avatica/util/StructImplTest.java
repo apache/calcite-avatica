@@ -47,17 +47,20 @@ public class StructImplTest {
    */
   private static class ColumnInputBundle<T> {
     private final ColumnMetaData metaData;
+
     /**
      * The input values for the given column.
      *
-     * These values are used to construct the rows of a ResultSet.
+     * <p>These values are used to construct the rows of a ResultSet.
      */
     private final List<Object> inputValues;
+
     /**
      * The expected values for the given column.
      *
-     * These values are used to verify that the result obtained from a ResultSet is correct. Note,
-     * that inputValues and expectedValues are not necessarily equal.
+     * <p>These values are used to verify that the result obtained from a
+     * ResultSet is correct. Note that inputValues and expectedValues are not
+     * necessarily equal.
      */
     private final List<T> expectedValues;
 
@@ -88,9 +91,7 @@ public class StructImplTest {
         0,
         ColumnMetaData.struct(
             Arrays.asList(
-                MetaImpl.columnMetaData("INT", 0, int.class, false)
-            )
-        ),
+                MetaImpl.columnMetaData("INT", 0, int.class, false))),
         false);
 
     ColumnMetaData twoAttrStructMeta = MetaImpl.columnMetaData(
@@ -99,9 +100,7 @@ public class StructImplTest {
         ColumnMetaData.struct(
             Arrays.asList(
                 MetaImpl.columnMetaData("INT", 0, int.class, false),
-                MetaImpl.columnMetaData("INT", 1, int.class, false)
-            )
-        ),
+                MetaImpl.columnMetaData("INT", 1, int.class, false))),
         false);
 
     List<Struct> oneAttrStructData = new ArrayList<>(numRows);

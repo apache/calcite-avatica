@@ -40,10 +40,12 @@ import org.slf4j.LoggerFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.Principal;
+
 /**
  * Implementation of an AvaticaHttpClient which uses SPNEGO.
  *
- * ( at this point it could probably be just merged back into AvaticaCommonsHttpClientImpl)
+ * <p>(At this point it could probably be just merged back into
+ * {@link AvaticaCommonsHttpClientImpl}.)
  */
 public class AvaticaCommonsHttpClientSpnegoImpl extends AvaticaCommonsHttpClientImpl {
   private static final Logger LOG = LoggerFactory

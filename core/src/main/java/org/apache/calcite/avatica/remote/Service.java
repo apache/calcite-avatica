@@ -238,8 +238,8 @@ public interface Service {
    * {@link org.apache.calcite.avatica.Meta#getDatabaseProperties(Meta.ConnectionHandle)}. */
   class DatabasePropertyRequest extends Request {
     private static final FieldDescriptor CONNECTION_ID_DESCRIPTOR =
-        Requests.DatabasePropertyRequest.getDescriptor().
-        findFieldByNumber(Requests.DatabasePropertyRequest.CONNECTION_ID_FIELD_NUMBER);
+        Requests.DatabasePropertyRequest.getDescriptor()
+            .findFieldByNumber(Requests.DatabasePropertyRequest.CONNECTION_ID_FIELD_NUMBER);
 
     public final String connectionId;
 

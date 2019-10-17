@@ -112,8 +112,8 @@ public class JdbcMetaTest {
     Mockito.when(statementCache.getIfPresent(statementId)).thenReturn(statementInfo);
     Mockito.when(statement.getResultSet()).thenReturn(null);
     // The real methods
-    Mockito.when(meta.prepareAndExecute(statementHandle, sql, maxRows, 50, null)).
-        thenCallRealMethod();
+    Mockito.when(meta.prepareAndExecute(statementHandle, sql, maxRows, 50, null))
+        .thenCallRealMethod();
     Mockito.doCallRealMethod().when(meta).setMaxRows(statement, maxRows);
 
     // Call our method
