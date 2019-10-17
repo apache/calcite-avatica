@@ -926,11 +926,35 @@ public class DateTimeUtils {
         ++year;
       }
       return ymdToUnixDate(year, 1, 1);
+    case QUARTER:
+      final int q = (month - 1) / 3;
+      if (!floor) {
+        if (month - 1 > q * 3 || day > 1) {
+          if (q == 3) {
+            ++year;
+            month = 1;
+          } else {
+            month = q * 3 + 4;
+          }
+        }
+      } else {
+        month = q * 3 + 1;
+      }
+      return ymdToUnixDate(year, month, 1);
     case MONTH:
       if (!floor && day > 1) {
         ++month;
       }
       return ymdToUnixDate(year, month, 1);
+    case WEEK:
+      final int dow = (int) floorMod(julian + 1, 7); // sun=0, sat=6
+      int offset = dow;
+      if (!floor && offset > 0) {
+        offset -= 7;
+      }
+      return ymdToUnixDate(year, month, day) - offset;
+    case DAY:
+      return ymdToUnixDate(year, month, day);
     default:
       throw new AssertionError(range);
     }
