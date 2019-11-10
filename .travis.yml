@@ -23,6 +23,14 @@ matrix:
     - install: true
       script:
         - ./gradlew $GRADLE_ARGS build
+    - name: Calcite/master
+      install:
+        - ./gradlew publishToMavenLocal -Pcalcite.avatica.version=42.0
+      script:
+        - cd ..
+        - git clone --depth 100 https://github.com/apache/calcite.git
+        - cd calcite
+        - mvn install -Davatica.version=42.0-SNAPSHOT
 
 branches:
   only:
