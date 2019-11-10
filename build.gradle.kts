@@ -333,6 +333,7 @@ allprojects {
             withType<Test>().configureEach {
                 testLogging {
                     exceptionFormat = TestExceptionFormat.FULL
+                    showStandardStreams = true
                 }
             }
             withType<SpotBugsTask>().configureEach {
