@@ -114,6 +114,8 @@ val buildVersion = "calcite.avatica".v + releaseParams.snapshotSuffix
 
 println("Building Apache Calcite Avatica $buildVersion")
 
+val isReleaseVersion = rootProject.releaseParams.release.get()
+
 releaseArtifacts {
     fromProject(":release")
 }
@@ -247,9 +249,11 @@ allprojects {
         apply(plugin = "de.thetaphi.forbiddenapis")
         apply(plugin = "maven-publish")
 
-        configure<SigningExtension> {
-            // Sign all the publications
-            sign(publishing.publications)
+        if (isReleaseVersion) {
+            configure<SigningExtension> {
+                // Sign all the publications
+                sign(publishing.publications)
+            }
         }
 
         if (enableSpotBugs) {
