@@ -26,11 +26,12 @@ matrix:
     - name: Calcite/master
       install:
         - ./gradlew publishToMavenLocal -PskipJavadoc -Pcalcite.avatica.version=42.0
-      script:
         - cd ..
         - git clone --depth 10000 https://github.com/apache/calcite.git
         - cd calcite
-        - mvn install -Davatica.version=42.0-SNAPSHOT
+        - ./mvnw install -Davatica.version=42.0-SNAPSHOT -Dcheckstyle.skip -DskipTests=true -Dmaven.javadoc.skip=true -Djavax.net.ssl.trustStorePassword=changeit -B -V
+      script:
+        - ./mvnw test -Davatica.version=42.0-SNAPSHOT -DskipSlowTests -Dcheckstyle.skip -Dsurefire.useFile=false -Dsurefire.threadCount=1 -Dsurefire.perCoreThreadCount=false -Djavax.net.ssl.trustStorePassword=changeit -Dmaven.javadoc.skip=true
 
 branches:
   only:
@@ -45,6 +46,7 @@ git:
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -fr $HOME/.m2/repository/org/apache/calcite
 cache:
   directories:
     - $HOME/.m2
