@@ -26,7 +26,7 @@ a sub-directory of the
 
 You can build the site manually using your environment or use the docker compose file.
 
-## Manually
+## Building website on a host system
 
 ### Setup your environment
 
@@ -36,18 +36,19 @@ Similar to the instructions to
 Site generation currently works best with ruby-2.5.1.
 
 1. `cd site`
-2. `svn co https://svn.apache.org/repos/asf/calcite/site/avatica target/avatica`
+2. `git clone https://gitbox.apache.org/repos/asf/calcite-site.git target`.
+The site will be generated to target/avatica, so it will be ready for commit.
 3. `sudo apt-get install rubygems ruby2.5-dev zlib1g-dev` (linux)
 4. `sudo gem install bundler`
 5. Add avatica-go content: `./add-avatica-go-docs.sh`
 6. `bundle install`
 
-### Add javadoc
+### Build javadoc
 
-1. `cd avatica`
-2. `./gradlew javadocAggregate`
+1. `cd $avatica_project_directory`
+2. `./gradlew javadocAggregate # the result is placed to build/docs/javadocAggregate`
 
-### Running locally
+### Running website locally
 
 Before opening a pull request, you can preview your contributions by
 running from within the directory:
@@ -55,7 +56,12 @@ running from within the directory:
 1. `bundle exec jekyll serve`
 2. Open [http://localhost:4000/avatica/](http://localhost:4000/avatica/) (note the trailing slash)
 
-## Using docker
+### Building the website
+
+1. `bundle exec jekyll build`
+2. The result is produced to `target/avatica`
+
+## Building website with Docker
 
 ### Setup your environment
 
