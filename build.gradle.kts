@@ -80,6 +80,10 @@ val skipCheckstyle by extra {
     boolProp("skipCheckstyle") ?: false
 }
 
+val skipJavadoc by extra {
+    boolProp("skipJavadoc") ?: false
+}
+
 // By default use Java implementation to sign artifacts
 // When useGpgCmd=true, then gpg command line tool is used for signing
 val useGpgCmd by extra {
@@ -417,10 +421,12 @@ allprojects {
                     description = project.description
                     from(components["java"])
 
-                    // Eager task creation is required due to
-                    // https://github.com/gradle/gradle/issues/6246
-                    artifact(sourcesJar.get())
-                    artifact(javadocJar.get())
+                    if (!skipJavadoc) {
+                        // Eager task creation is required due to
+                        // https://github.com/gradle/gradle/issues/6246
+                        artifact(sourcesJar.get())
+                        artifact(javadocJar.get())
+                    }
 
                     // Use the resolved versions in pom.xml
                     // Gradle might have different resolution rules, so we set the versions
