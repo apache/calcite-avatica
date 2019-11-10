@@ -216,6 +216,9 @@ allprojects {
             (options as StandardJavadocDocletOptions).apply {
                 noTimestamp.value = true
                 showFromProtected()
+                // javadoc: error - The code being documented uses modules but the packages
+                // defined in https://docs.oracle.com/javase/9/docs/api/ are in the unnamed module
+                source = "1.8"
                 docEncoding = "UTF-8"
                 charSet = "UTF-8"
                 encoding = "UTF-8"

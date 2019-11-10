@@ -24,6 +24,7 @@ public interface MetricsSystemFactory {
   /**
    * Creates an instance of a {@link MetricsSystem}.
    *
+   * @param config the metrics system configuration.
    * @return A new {@link MetricsSystem}.
    */
   MetricsSystem create(MetricsSystemConfiguration<?> config);

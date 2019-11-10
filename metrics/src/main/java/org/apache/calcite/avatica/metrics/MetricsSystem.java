@@ -60,6 +60,7 @@ public interface MetricsSystem {
    *
    * @param name The name of the Gauge.
    * @param gauge A callback to compute the current value.
+   * @param <T> The type of the Gauge.
    */
   <T> void register(String name, Gauge<T> gauge);
 
