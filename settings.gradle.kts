@@ -62,17 +62,14 @@ project(":shaded:avatica").projectDir = file("shaded/core")
 org.apache.tools.ant.DirectoryScanner.removeDefaultExclude("**/.gitattributes")
 org.apache.tools.ant.DirectoryScanner.removeDefaultExclude("**/.gitignore")
 
-fun String?.toBool(nullAs: Boolean, blankAs: Boolean, default: Boolean) =
-    when {
-        this == null -> nullAs
-        isBlank() -> blankAs
-        default -> !equals("false", ignoreCase = true)
-        else -> equals("true", ignoreCase = true)
+fun property(name: String) =
+    when (extra.has(name)) {
+        true -> extra.get(name) as? String
+        else -> null
     }
 
-if (startParameter.projectProperties["localReleasePlugins"]
-        .toBool(nullAs = false, blankAs = true, default = false)
-) {
-        // This enables to use local clone of vlsi-release-plugins for debugging purposes
-        includeBuild("../vlsi-release-plugins")
+// This enables to use local clone of vlsi-release-plugins for debugging purposes
+property("localReleasePlugins")?.ifBlank { "../vlsi-release-plugins" }?.let {
+    println("Importing project '$it'")
+    includeBuild(it)
 }
