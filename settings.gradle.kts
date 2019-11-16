@@ -36,7 +36,7 @@ pluginManagement {
 
 // This is the name of a current project
 // Note: it cannot be inferred from the directory name as developer might clone Avatica to avatica_tmp folder
-rootProject.name = "avatica-parent"
+rootProject.name = "calcite-avatica"
 
 include(
         "bom",
