@@ -84,6 +84,14 @@ val skipJavadoc by extra {
     boolProp("skipJavadoc") ?: false
 }
 
+val enableMavenLocal by extra {
+    boolProp("enableMavenLocal") ?: false
+}
+
+val enableGradleMetadata by extra {
+    boolProp("enableGradleMetadata") ?: false
+}
+
 // By default use Java implementation to sign artifacts
 // When useGpgCmd=true, then gpg command line tool is used for signing
 val useGpgCmd by extra {
@@ -252,6 +260,9 @@ allprojects {
         }
 
         repositories {
+            if (enableMavenLocal) {
+                mavenLocal()
+            }
             mavenCentral()
         }
         val sourceSets: SourceSetContainer by project
@@ -259,6 +270,12 @@ allprojects {
         apply(plugin = "signing")
         apply(plugin = "de.thetaphi.forbiddenapis")
         apply(plugin = "maven-publish")
+
+        if (!enableGradleMetadata) {
+            tasks.withType<GenerateModuleMetadata> {
+                enabled = false
+            }
+        }
 
         if (isReleaseVersion) {
             configure<SigningExtension> {
