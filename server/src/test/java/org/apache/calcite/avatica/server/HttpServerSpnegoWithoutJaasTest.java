@@ -44,7 +44,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.security.PrivilegedExceptionAction;
 import java.util.Set;
-
 import javax.security.auth.Subject;
 import javax.security.auth.kerberos.KerberosTicket;
 

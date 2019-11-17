@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
-
 import javax.security.auth.Subject;
 import javax.servlet.ServletRequest;
 

@@ -19,7 +19,11 @@
 import com.github.vlsi.gradle.crlf.CrLfSpec
 import com.github.vlsi.gradle.crlf.LineEndings
 import com.github.vlsi.gradle.license.GatherLicenseTask
-import com.github.vlsi.gradle.license.api.*
+import com.github.vlsi.gradle.license.api.SimpleLicense
+import com.github.vlsi.gradle.license.api.SpdxLicense
+import com.github.vlsi.gradle.license.api.SpdxLicenseException
+import com.github.vlsi.gradle.license.api.and
+import com.github.vlsi.gradle.license.api.with
 import com.github.vlsi.gradle.release.Apache2LicenseRenderer
 import com.github.vlsi.gradle.release.ArtifactType
 import com.github.vlsi.gradle.release.dsl.dependencyLicenses

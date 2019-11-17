@@ -18,7 +18,6 @@ package org.apache.calcite.avatica.remote;
 
 import java.security.PrivilegedAction;
 import java.util.Objects;
-
 import javax.security.auth.Subject;
 
 /**

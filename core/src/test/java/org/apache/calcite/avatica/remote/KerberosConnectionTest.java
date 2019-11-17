@@ -24,7 +24,6 @@ import org.mockito.Mockito;
 import java.io.File;
 import java.util.Locale;
 import java.util.Map.Entry;
-
 import javax.security.auth.Subject;
 import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;

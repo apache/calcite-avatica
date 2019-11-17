@@ -120,13 +120,6 @@ limitations under the License.
       <property name="processJavadoc" value="true"/>
     </module>
     <module name="IllegalImport" />
-    <module name="AvoidStarImport" />
-    <module name="ImportOrder">
-      <property name="groups" value="org.apache.calcite,org.apache,au.com.,com.,io.,mondrian.,net.,org.,scala.,/^javax?\./"/>
-      <property name="ordered" value="true"/>
-      <property name="separated" value="true"/>
-      <property name="option" value="bottom"/>
-    </module>
 
     <!-- Checks for Javadoc comments (tree walker).       -->
     <!-- See http://checkstyle.sf.net/config_javadoc.html -->

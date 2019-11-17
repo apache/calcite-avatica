@@ -41,7 +41,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.Principal;
 import java.security.PrivilegedAction;
-
 import javax.security.auth.login.Configuration;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;

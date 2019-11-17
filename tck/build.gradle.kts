@@ -19,7 +19,8 @@
 import com.github.vlsi.gradle.crlf.CrLfSpec
 import com.github.vlsi.gradle.crlf.LineEndings
 import com.github.vlsi.gradle.license.GatherLicenseTask
-import com.github.vlsi.gradle.license.api.*
+import com.github.vlsi.gradle.license.api.SimpleLicense
+import com.github.vlsi.gradle.license.api.SpdxLicense
 import com.github.vlsi.gradle.release.Apache2LicenseRenderer
 import com.github.vlsi.gradle.release.ArtifactType
 import com.github.vlsi.gradle.release.dsl.dependencyLicenses
@@ -48,8 +49,8 @@ dependencies {
     shaded("junit:junit")
     shaded("org.hamcrest:hamcrest-core")
     shaded("org.hsqldb:hsqldb")
-    //As long as we want to run compatibility checks again 1.6.0, we have to include these because
-    //they weren't yet provided by the avatica client jar
+    // As long as we want to run compatibility checks again 1.6.0, we have to include these because
+    // they weren't yet provided by the avatica client jar
     shaded("org.slf4j:slf4j-api")
     shaded("org.slf4j:slf4j-log4j12")
 

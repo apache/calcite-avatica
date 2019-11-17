@@ -22,7 +22,6 @@ import java.io.File;
 import java.security.Principal;
 import java.util.HashSet;
 import java.util.Set;
-
 import javax.security.auth.Subject;
 import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.login.Configuration;

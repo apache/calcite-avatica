@@ -40,15 +40,14 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Properties;
+import java.util.concurrent.Callable;
 import javax.servlet.http.HttpServletRequest;
 
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
-import java.util.Arrays;
-import java.util.Properties;
-import java.util.concurrent.Callable;
 
 /**
  * Test class for providing CustomAvaticaServerConfiguration to the HTTP Server

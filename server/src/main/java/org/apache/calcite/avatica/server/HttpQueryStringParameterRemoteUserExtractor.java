@@ -17,7 +17,6 @@
 package org.apache.calcite.avatica.server;
 
 import java.util.Objects;
-
 import javax.servlet.http.HttpServletRequest;
 
 /**

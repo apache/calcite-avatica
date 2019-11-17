@@ -27,13 +27,13 @@ import com.github.vlsi.gradle.properties.dsl.toBool
 import com.github.vlsi.gradle.release.RepositoryType
 import de.thetaphi.forbiddenapis.gradle.CheckForbiddenApis
 import de.thetaphi.forbiddenapis.gradle.CheckForbiddenApisExtension
-import org.apache.tools.ant.DirectoryScanner
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
     publishing
     // Verification
     checkstyle
+    id("com.diffplug.gradle.spotless")
     id("org.nosphere.apache.rat")
     id("com.github.spotbugs")
     id("de.thetaphi.forbiddenapis") apply false
@@ -61,6 +61,7 @@ val lastEditYear by extra(lastEditYear())
 // Do not enable spotbugs by default. Execute it only when -Pspotbugs is present
 val enableSpotBugs = props.bool("spotbugs", default = false)
 val skipCheckstyle by props()
+val skipSpotless by props()
 val skipJavadoc by props()
 val enableMavenLocal by props()
 val enableGradleMetadata by props()
@@ -152,10 +153,34 @@ val javadocAggregate by tasks.registering(Javadoc::class) {
     setDestinationDir(file("$buildDir/docs/javadocAggregate"))
 }
 
+val licenseHeaderFile = file("config/license.header.java")
+
 allprojects {
     group = "org.apache.calcite.avatica"
     version = buildVersion
 
+    if (!skipSpotless) {
+        apply(plugin = "com.diffplug.gradle.spotless")
+        spotless {
+            kotlinGradle {
+                ktlint()
+                trimTrailingWhitespace()
+                endWithNewline()
+            }
+            if (project == rootProject) {
+                // Spotless does not exclude subprojects when using target(...)
+                // So **/*.md is enough to scan all the md files in the codebase
+                // See https://github.com/diffplug/spotless/issues/468
+                format("markdown") {
+                    target("**/*.md")
+                    // Flot is known to have trailing whitespace, so the files
+                    // are kept in their original format (e.g. to simplify diff on library upgrade)
+                    trimTrailingWhitespace()
+                    endWithNewline()
+                }
+            }
+        }
+    }
     if (!skipCheckstyle) {
         apply<CheckstylePlugin>()
         dependencies {
@@ -257,6 +282,37 @@ allprojects {
             }
         }
 
+        if (!skipSpotless) {
+            spotless {
+                java {
+//                    targetExclude(*javaccGeneratedPatterns + "**/test/java/*.java")
+                    licenseHeaderFile(licenseHeaderFile)
+                    importOrder(
+                        "org.apache.calcite.",
+                        "org.apache.",
+                        "au.com.",
+                        "com.",
+                        "io.",
+                        "mondrian.",
+                        "net.",
+                        "org.",
+                        "scala.",
+                        "java",
+                        "",
+                        "static com.",
+                        "static org.apache.calcite.",
+                        "static org.apache.",
+                        "static org.",
+                        "static java",
+                        "static "
+                    )
+                    removeUnusedImports()
+                    trimTrailingWhitespace()
+                    indentWithSpaces(4)
+                    endWithNewline()
+                }
+            }
+        }
         if (enableSpotBugs) {
             apply(plugin = "com.github.spotbugs")
             spotbugs {
