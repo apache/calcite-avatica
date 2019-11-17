@@ -18,14 +18,16 @@
 
 pluginManagement {
     plugins {
-        fun PluginDependenciesSpec.idv(id: String) = id(id) version extra["$id.version"].toString()
+        fun String.v() = extra["$this.version"].toString()
+        fun PluginDependenciesSpec.idv(id: String, key: String = id) = id(id) version key.v()
 
         idv("com.github.johnrengelman.shadow")
         idv("com.github.spotbugs")
-        idv("com.github.vlsi.crlf")
-        idv("com.github.vlsi.ide")
-        idv("com.github.vlsi.license-gather")
-        idv("com.github.vlsi.stage-vote-release")
+        idv("com.github.vlsi.crlf", "com.github.vlsi.vlsi-release-plugins")
+        idv("com.github.vlsi.gradle-extensions", "com.github.vlsi.vlsi-release-plugins")
+        idv("com.github.vlsi.ide", "com.github.vlsi.vlsi-release-plugins")
+        idv("com.github.vlsi.license-gather", "com.github.vlsi.vlsi-release-plugins")
+        idv("com.github.vlsi.stage-vote-release", "com.github.vlsi.vlsi-release-plugins")
         idv("com.google.protobuf")
         idv("de.thetaphi.forbiddenapis")
         idv("org.jetbrains.gradle.plugin.idea-ext")

@@ -21,6 +21,9 @@ import com.github.vlsi.gradle.crlf.CrLfSpec
 import com.github.vlsi.gradle.crlf.LineEndings
 import com.github.vlsi.gradle.git.FindGitAttributes
 import com.github.vlsi.gradle.git.dsl.gitignore
+import com.github.vlsi.gradle.properties.dsl.lastEditYear
+import com.github.vlsi.gradle.properties.dsl.props
+import com.github.vlsi.gradle.properties.dsl.toBool
 import com.github.vlsi.gradle.release.RepositoryType
 import de.thetaphi.forbiddenapis.gradle.CheckForbiddenApis
 import de.thetaphi.forbiddenapis.gradle.CheckForbiddenApisExtension
@@ -41,6 +44,7 @@ plugins {
     id("com.github.vlsi.ide")
     // Release
     id("com.github.vlsi.crlf")
+    id("com.github.vlsi.gradle-extensions")
     id("com.github.vlsi.license-gather") apply false
     id("com.github.vlsi.stage-vote-release")
 }
@@ -50,53 +54,20 @@ repositories {
     mavenCentral()
 }
 
-fun Project.boolProp(name: String) =
-    findProperty(name)
-        // Project properties include tasks, extensions, etc, and we want only String properties
-        // We don't want to use "task" as a boolean property
-        ?.let { it as? String }
-        ?.equals("false", ignoreCase = true)?.not()
+fun reportsForHumans() = !System.getenv()["CI"].toBool(default = false)
 
-fun reportsForHumans() = !(System.getenv()["CI"]?.toBoolean() ?: false)
-
-val lastEditYear by extra {
-    file("$rootDir/NOTICE")
-        .readLines()
-        .first { it.contains("Copyright") }
-        .let {
-            """Copyright \d{4}-(\d{4})""".toRegex()
-                .find(it)?.groupValues?.get(1)
-                ?: throw IllegalStateException("Unable to identify copyright year from $rootDir/NOTICE")
-        }
-}
+val lastEditYear by extra(lastEditYear())
 
 // Do not enable spotbugs by default. Execute it only when -Pspotbugs is present
-val enableSpotBugs by extra {
-    // TODO: this activates spotbuts on CI only. Should this be corrected to "enable always"?
-    boolProp("spotbugs") ?: !reportsForHumans()
-}
-
-val skipCheckstyle by extra {
-    boolProp("skipCheckstyle") ?: false
-}
-
-val skipJavadoc by extra {
-    boolProp("skipJavadoc") ?: false
-}
-
-val enableMavenLocal by extra {
-    boolProp("enableMavenLocal") ?: false
-}
-
-val enableGradleMetadata by extra {
-    boolProp("enableGradleMetadata") ?: false
-}
+val enableSpotBugs = props.bool("spotbugs", default = false)
+val skipCheckstyle by props()
+val skipJavadoc by props()
+val enableMavenLocal by props()
+val enableGradleMetadata by props()
 
 // By default use Java implementation to sign artifacts
 // When useGpgCmd=true, then gpg command line tool is used for signing
-val useGpgCmd by extra {
-    boolProp("useGpgCmd") ?: false
-}
+val useGpgCmd by props()
 
 ide {
     copyrightToAsf()
@@ -230,6 +201,8 @@ allprojects {
     tasks {
         withType<Javadoc>().configureEach {
             (options as StandardJavadocDocletOptions).apply {
+                // Please refrain from using non-ASCII chars below since the options are passed as
+                // javadoc.options file which is parsed with "default encoding"
                 noTimestamp.value = true
                 showFromProtected()
                 // javadoc: error - The code being documented uses modules but the packages
@@ -242,7 +215,7 @@ allprojects {
                 windowTitle = "Apache Calcite Avatica ${project.name} API"
                 header = "<b>Apache Calcite Avatica</b>"
                 bottom =
-                    "Copyright © 2012-$lastEditYear Apache Software Foundation. All Rights Reserved."
+                    "Copyright &copy; 2012-$lastEditYear Apache Software Foundation. All Rights Reserved."
                 if (JavaVersion.current() >= JavaVersion.VERSION_1_9) {
                     addBooleanOption("html5", true)
                     links("https://docs.oracle.com/javase/9/docs/api/")

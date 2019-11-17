@@ -150,7 +150,7 @@ fi
 Also, ensure that `default-cache-ttl 6000` is set in `~/.gnupg/gpg-agent.conf`
 to guarantee that your credentials will be cached for the duration of the build.
 
-## Set up Maven repository credentials (for Calcite committers)
+## Set up Nexus repository credentials (for Calcite committers)
 
 Gradle provides multiple ways to [configure project properties](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_configuration_properties).
 For instance, you could update `$HOME/.gradle/gradle.properties`.
@@ -265,7 +265,7 @@ docker-compose run -v /c/Users/username/AppData/Roaming/gnupg:/.gnupg dry-run
 * For each .jar (for example `core/build/libs/avatica-core-X.Y.Z.jar`
   and `server/build/libs/avatica-server-X.Y.Z-sources.jar`),
   verify that the `META-INF` directory contains the correct
-  contents for `DEPENDENCIES`, `LICENSE` and `NOTICE` per the
+  contents for `LICENSE` and `NOTICE` per the
   source/classes contained. Refer to the ASF licensing documentation on
   what is required.
 * Check PGP, per [this](https://httpd.apache.org/dev/verification.html)

@@ -185,6 +185,9 @@ for (archive in listOf(Zip::class, Tar::class)) {
             wa1191SetInputs(gitProps)
             with(sourceLayout())
         }
+        doLast {
+            logger.lifecycle("Source distribution is created: ${archiveFile.get().asFile}")
+        }
     }
     releaseArtifacts {
         artifact(archiveTask)

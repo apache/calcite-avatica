@@ -49,7 +49,7 @@ then build using maven:
 
 {% highlight bash %}
 $ git clone git://github.com/apache/calcite-avatica.git avatica
-$ cd avatica
+$ cd calcite-avatica
 $ ./gradlew build
 {% endhighlight %}
 

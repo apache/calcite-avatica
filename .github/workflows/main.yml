@@ -38,9 +38,9 @@ jobs:
       with:
         java-version: 11
     - name: 'Test'
-      shell: bash
+      shell: cmd
       run: |
-        ./gradlew --no-parallel build
+        ./gradlew --no-parallel --no-daemon build javadoc
 
   mac:
     name: 'macOS (JDK 13)'
@@ -55,4 +55,4 @@ jobs:
         java-version: 13
     - name: 'Test'
       run: |
-        ./gradlew --no-parallel build
+        ./gradlew --no-parallel --no-daemon build javadoc
