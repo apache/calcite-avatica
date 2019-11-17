@@ -81,7 +81,7 @@ https://people.apache.org/keys/committer/$committerId.asc
 https://www.apache.org/dist/$tlpUrl/KEYS
 
 N.B.
-To create the jars and test $componentName: "./gradlew build".
+To create the jars and test $componentName: "./gradlew build -Prelease -PskipSigning".
 
 If you do not have a Java environment available, you can run the tests
 using docker. To do so, install docker and docker-compose, then run

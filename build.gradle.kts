@@ -63,6 +63,7 @@ val enableSpotBugs = props.bool("spotbugs", default = false)
 val skipCheckstyle by props()
 val skipSpotless by props()
 val skipJavadoc by props()
+val skipSigning by props(props.bool("skipSign"))
 val enableMavenLocal by props()
 val enableGradleMetadata by props()
 
@@ -251,6 +252,17 @@ allprojects {
         }
     }
 
+    if (!isReleaseVersion || skipSigning) {
+        plugins.withType<SigningPlugin> {
+            afterEvaluate {
+                configure<SigningExtension> {
+                    // It would still try to sign the artifacts,
+                    // but it would refrain from failing the build
+                    isRequired = false
+                }
+            }
+        }
+    }
     plugins.withType<JavaPlugin> {
         configure<JavaPluginConvention> {
             sourceCompatibility = JavaVersion.VERSION_1_8
@@ -275,7 +287,7 @@ allprojects {
             }
         }
 
-        if (isReleaseVersion) {
+        if (isReleaseVersion && !skipSigning) {
             configure<SigningExtension> {
                 // Sign all the publications
                 sign(publishing.publications)
@@ -285,7 +297,6 @@ allprojects {
         if (!skipSpotless) {
             spotless {
                 java {
-//                    targetExclude(*javaccGeneratedPatterns + "**/test/java/*.java")
                     licenseHeaderFile(licenseHeaderFile)
                     importOrder(
                         "org.apache.calcite.",
