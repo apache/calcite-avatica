@@ -70,6 +70,9 @@ public class AvaticaSpnegoTest extends HttpBaseTest {
     if (isKdcStarted) {
       return;
     }
+    if (System.getProperty("avatica.http.spnego.use_canonical_hostname") == null) {
+      System.setProperty("avatica.http.spnego.use_canonical_hostname", "false");
+    }
     kdc = new SimpleKdcServer();
     File target = SpnegoTestUtil.TARGET_DIR;
     assertTrue(target.exists());

@@ -55,7 +55,9 @@ public class AvaticaCommonsHttpClientSpnegoImpl extends AvaticaCommonsHttpClient
   public static final String CACHED_CONNECTIONS_MAX_PER_ROUTE_KEY =
       "avatica.http.spnego.max_per_route";
 
-  private static final boolean USE_CANONICAL_HOSTNAME = true;
+  private static final boolean USE_CANONICAL_HOSTNAME =
+      Boolean.parseBoolean(
+           System.getProperty("avatica.http.spnego.use_canonical_hostname", "true"));
   private static final boolean STRIP_PORT_ON_SERVER_LOOKUP = true;
 
   /**

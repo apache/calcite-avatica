@@ -329,6 +329,20 @@ allprojects {
                     exceptionFormat = TestExceptionFormat.FULL
                     showStandardStreams = true
                 }
+                // Pass the property to tests
+                fun passProperty(name: String, default: String? = null) {
+                    val value = System.getProperty(name) ?: default
+                    value?.let { systemProperty(name, it) }
+                }
+                passProperty("java.awt.headless")
+                passProperty("user.language", "TR")
+                passProperty("user.country", "tr")
+                val props = System.getProperties()
+                for (e in props.propertyNames() as `java.util`.Enumeration<String>) {
+                    if (e.startsWith("calcite.") || e.startsWith("avatica.")) {
+                        passProperty(e)
+                    }
+                }
             }
             withType<SpotBugsTask>().configureEach {
                 group = LifecycleBasePlugin.VERIFICATION_GROUP
