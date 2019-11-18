@@ -23,32 +23,33 @@ plugins {
 dependencies {
     api(project(":core"))
     api(project(":metrics"))
-    api("org.slf4j:slf4j-api")
-    implementation("javax.servlet:javax.servlet-api")
-    implementation("com.google.guava:guava")
 
+    api("javax.servlet:javax.servlet-api")
     api("org.eclipse.jetty:jetty-http")
     api("org.eclipse.jetty:jetty-security")
     api("org.eclipse.jetty:jetty-server")
     api("org.eclipse.jetty:jetty-util")
 
+    implementation("org.slf4j:slf4j-api")
+    implementation("com.google.guava:guava")
+
     // TODO: AvaticaSuite includes AvaticaUtilsTest and ConnectStringParserTest from :core
     //   Does it really make sense?
     testImplementation(project(":core", "testClasses"))
 
+    testImplementation("com.github.stephenc.jcip:jcip-annotations")
     testImplementation("junit:junit")
-    testImplementation("org.mockito:mockito-core")
-    testImplementation("org.hamcrest:hamcrest-core")
-
     testImplementation("net.hydromatic:scott-data-hsqldb")
     testImplementation("org.apache.kerby:kerb-client")
     testImplementation("org.apache.kerby:kerb-core")
     testImplementation("org.apache.kerby:kerb-simplekdc")
-    testRuntimeOnly("org.hsqldb:hsqldb")
-    testImplementation("com.github.stephenc.jcip:jcip-annotations")
-    testRuntimeOnly("org.slf4j:slf4j-log4j12")
     testImplementation("org.bouncycastle:bcpkix-jdk15on")
     testImplementation("org.bouncycastle:bcprov-jdk15on")
+    testImplementation("org.hamcrest:hamcrest-core")
+    testImplementation("org.mockito:mockito-core")
+
+    testRuntimeOnly("org.hsqldb:hsqldb")
+    testRuntimeOnly("org.slf4j:slf4j-log4j12")
 }
 
 tasks {

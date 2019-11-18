@@ -21,9 +21,8 @@ plugins {
 }
 
 dependencies {
-    api(platform(project(":bom")))
+    implementation("org.slf4j:slf4j-api")
 
-    api("org.slf4j:slf4j-api")
     testImplementation("junit:junit")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.hamcrest:hamcrest-core")

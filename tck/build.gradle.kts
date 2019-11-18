@@ -53,9 +53,6 @@ dependencies {
     // they weren't yet provided by the avatica client jar
     shaded("org.slf4j:slf4j-api")
     shaded("org.slf4j:slf4j-log4j12")
-
-    // Can't be api due to https://github.com/johnrengelman/shadow/issues/424
-    implementation(platform(project(":bom")))
 }
 
 tasks {

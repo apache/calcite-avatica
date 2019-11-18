@@ -33,13 +33,13 @@ plugins {
 //   and "implementation" is for dependencies that do not participate in API
 dependencies {
     api(project(":metrics"))
-    api("com.google.protobuf:protobuf-java")
-    implementation("org.apache.httpcomponents:httpclient")
-    implementation("org.apache.httpcomponents:httpcore")
-    implementation("com.fasterxml.jackson.core:jackson-core")
     api("com.fasterxml.jackson.core:jackson-annotations")
     api("com.fasterxml.jackson.core:jackson-databind")
-    api("org.slf4j:slf4j-api")
+    api("com.google.protobuf:protobuf-java")
+    implementation("com.fasterxml.jackson.core:jackson-core")
+    implementation("org.apache.httpcomponents:httpclient")
+    implementation("org.apache.httpcomponents:httpcore")
+    implementation("org.slf4j:slf4j-api")
     testImplementation("junit:junit")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.hamcrest:hamcrest-core")

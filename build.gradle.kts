@@ -160,6 +160,11 @@ allprojects {
     group = "org.apache.calcite.avatica"
     version = buildVersion
 
+    plugins.withId("java-library") {
+        dependencies {
+            "implementation"(platform(project(":bom")))
+        }
+    }
     if (!skipSpotless) {
         apply(plugin = "com.diffplug.gradle.spotless")
         spotless {

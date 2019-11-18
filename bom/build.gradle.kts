@@ -47,50 +47,38 @@ dependencies {
         // runtime means "the dependency is only for runtime, not for compilation"
         // In other words, marking dependency as "runtime" would avoid accidental
         // dependency on it during compilation
-        apiv("org.slf4j:slf4j-api", "slf4j")
-        apiv("org.slf4j:slf4j-log4j12", "slf4j")
-
+        apiv("com.beust:jcommander")
+        apiv("com.fasterxml.jackson.core:jackson-annotations", "jackson")
+        apiv("com.fasterxml.jackson.core:jackson-core", "jackson")
+        apiv("com.fasterxml.jackson.core:jackson-databind", "jackson")
+        apiv("com.github.stephenc.jcip:jcip-annotations")
+        apiv("com.google.guava:guava")
         apiv("com.google.protobuf:protobuf-java", "protobuf")
-
+        apiv("com.h2database:h2")
+        apiv("javax.servlet:javax.servlet-api", "servlet")
+        apiv("junit:junit")
+        apiv("net.hydromatic:scott-data-hsqldb")
         apiv("org.apache.httpcomponents:httpclient")
         apiv("org.apache.httpcomponents:httpcore")
-
-        apiv("com.fasterxml.jackson.core:jackson-core", "jackson")
-        apiv("com.fasterxml.jackson.core:jackson-annotations", "jackson")
-        apiv("com.fasterxml.jackson.core:jackson-databind", "jackson")
-
-        apiv("junit:junit")
-        apiv("org.hamcrest:hamcrest-core", "hamcrest")
-        apiv("org.mockito:mockito-core", "mockito")
-
-        apiv("javax.servlet:javax.servlet-api", "servlet")
-        apiv("com.google.guava:guava")
-
+        apiv("org.apache.kerby:kerb-client", "kerby")
+        apiv("org.apache.kerby:kerb-core", "kerby")
+        apiv("org.apache.kerby:kerb-simplekdc", "kerby")
+        apiv("org.bouncycastle:bcpkix-jdk15on", "bouncycastle")
+        apiv("org.bouncycastle:bcprov-jdk15on", "bouncycastle")
         apiv("org.eclipse.jetty:jetty-http", "jetty")
         apiv("org.eclipse.jetty:jetty-security", "jetty")
         apiv("org.eclipse.jetty:jetty-server", "jetty")
         apiv("org.eclipse.jetty:jetty-util", "jetty")
-
-        apiv("net.hydromatic:scott-data-hsqldb")
-
-        apiv("org.apache.kerby:kerb-client", "kerby")
-        apiv("org.apache.kerby:kerb-core", "kerby")
-        apiv("org.apache.kerby:kerb-simplekdc", "kerby")
-
+        apiv("org.hamcrest:hamcrest-core", "hamcrest")
         apiv("org.hsqldb:hsqldb")
-        apiv("com.h2database:h2")
-
-        apiv("com.github.stephenc.jcip:jcip-annotations")
-
-        apiv("org.bouncycastle:bcpkix-jdk15on", "bouncycastle")
-        apiv("org.bouncycastle:bcprov-jdk15on", "bouncycastle")
-        apiv("com.beust:jcommander")
-
+        apiv("org.mockito:mockito-core", "mockito")
         apiv("org.ow2.asm:asm")
         apiv("org.ow2.asm:asm-all", "asm")
         apiv("org.ow2.asm:asm-analysis", "asm")
         apiv("org.ow2.asm:asm-commons", "asm")
         apiv("org.ow2.asm:asm-tree", "asm")
         apiv("org.ow2.asm:asm-util", "asm")
+        apiv("org.slf4j:slf4j-api", "slf4j")
+        apiv("org.slf4j:slf4j-log4j12", "slf4j")
     }
 }
