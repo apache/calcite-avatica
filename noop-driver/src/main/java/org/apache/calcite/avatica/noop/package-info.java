@@ -18,7 +18,6 @@
 /**
  * A no-operation implementation of a JDBC driver built for testing Avatica.
  */
-@PackageMarker
 package org.apache.calcite.avatica.noop;
 
 // End package-info.java

@@ -18,7 +18,6 @@
 /**
  * Metrics for the Avatica framework.
  */
-@PackageMarker
 package org.apache.calcite.avatica.metrics;
 
 // End package-info.java

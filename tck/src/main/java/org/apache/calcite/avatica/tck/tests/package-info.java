@@ -18,9 +18,6 @@
 /**
  * Tests for the Avatica compatibility framework.
  */
-@PackageMarker
 package org.apache.calcite.avatica.tck.tests;
-
-import org.apache.calcite.avatica.tck.PackageMarker;
 
 // End package-info.java

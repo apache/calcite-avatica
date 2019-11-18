@@ -18,9 +18,6 @@
 /**
  * Avatica Server without any authentication for any JDBC driver.
  */
-@PackageMarker
 package org.apache.calcite.avatica.standalone;
-
-import org.apache.calcite.avatica.util.PackageMarker;
 
 // End package-info.java

@@ -18,9 +18,6 @@
 /**
  * No-operation implementation for the Avatica Metrics framework.
  */
-@PackageMarker
 package org.apache.calcite.avatica.metrics.noop;
-
-import org.apache.calcite.avatica.metrics.PackageMarker;
 
 // End package-info.java

@@ -18,9 +18,6 @@
 /**
  * Dropwizard-Metrics (v3) implementation of the Avatica Metrics framework.
  */
-@PackageMarker
 package org.apache.calcite.avatica.metrics.dropwizard;
-
-import org.apache.calcite.avatica.metrics.PackageMarker;
 
 // End package-info.java
