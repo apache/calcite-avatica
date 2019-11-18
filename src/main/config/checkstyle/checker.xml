@@ -32,13 +32,6 @@ limitations under the License.
 <module name="Checker">
   <property name="localeLanguage" value="en"/>
 
-  <!-- Checks for headers -->
-  <!-- See http://checkstyle.sf.net/config_header.html -->
-    <!-- Verify that EVERY source file has the appropriate license -->
-  <module name="Header">
-    <property name="headerFile" value="${checkstyle.header.file}"/>
-  </module>
-
   <!-- Checks for Javadoc comments (checker).           -->
   <!-- See http://checkstyle.sf.net/config_javadoc.html -->
     <!-- Require package javadoc -->
