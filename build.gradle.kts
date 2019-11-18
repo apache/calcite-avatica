@@ -324,7 +324,7 @@ allprojects {
                     )
                     removeUnusedImports()
                     trimTrailingWhitespace()
-                    indentWithSpaces(4)
+                    indentWithSpaces(2)
                     endWithNewline()
                 }
             }
