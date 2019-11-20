@@ -152,6 +152,20 @@ val javadocAggregate by tasks.registering(Javadoc::class) {
     setDestinationDir(file("$buildDir/docs/javadocAggregate"))
 }
 
+/** Similar to {@link #javadocAggregate} but includes tests.
+ * CI uses this target to validate javadoc (e.g. checking for broken links). */
+val javadocAggregateIncludingTests by tasks.registering(Javadoc::class) {
+    description = "Generates aggregate javadoc for all the artifacts, including test code"
+
+    val sourceSets = allprojects
+        .mapNotNull { it.extensions.findByType<SourceSetContainer>() }
+        .flatMap { listOf(it.named("main"), it.named("test")) }
+
+    classpath = files(sourceSets.map { set -> set.map { it.output + it.compileClasspath } })
+    setSource(sourceSets.map { set -> set.map { it.allJava } })
+    setDestinationDir(file("$buildDir/docs/javadocAggregateIncludingTests"))
+}
+
 val licenseHeaderFile = file("config/license.header.java")
 
 allprojects {
@@ -446,7 +460,7 @@ allprojects {
 
         // Note: jars below do not normalize line endings.
         // Those jars, however are not included to source/binary distributions
-        // so the normailzation is not that important
+        // so the normalization is not that important
 
         val testJar by tasks.registering(Jar::class) {
             from(sourceSets["test"].output)
