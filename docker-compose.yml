@@ -16,52 +16,47 @@
 version: '3'
 services:
   dry-run:
-    image: maven
+    image: gradle:5.6-jdk
     working_dir: /src
     command: sh -c "./docker.sh dry-run"
+    network_mode: "host"
     volumes:
       - .:/src
-      - maven-repo:/root/.m2
-
-  release:
-    image: maven
-    working_dir: /src
-    command: sh -c "./docker.sh release"
-    volumes:
-      - .:/src
-      - maven-repo:/root/.m2
-
-  clean:
-    image: maven
-    working_dir: /src
-    command: sh -c "./docker.sh clean"
-    volumes:
-      - .:/src
-      - maven-repo:/root/.m2
+      - gradle-cache:/home/gradle/.gradle
 
   publish-release-for-voting:
-    image: maven
+    image: gradle:5.6-jdk
     working_dir: /src
     command: sh -c "./docker.sh publish-release-for-voting"
     volumes:
       - .:/src
+      - gradle-cache:/home/gradle/.gradle
+
+  clean:
+    image: gradle:5.6-jdk
+    working_dir: /src
+    command: sh -c "./docker.sh clean"
+    volumes:
+      - .:/src
+      - gradle-cache:/home/gradle/.gradle
 
   promote-release:
-    image: maven
+    image: gradle:5.6-jdk
     working_dir: /src
     command: sh -c "./docker.sh promote-release"
     volumes:
       - .:/src
+      - gradle-cache:/home/gradle/.gradle
 
   test:
-    image: maven
+    image: gradle:5.6-jdk
     working_dir: /src
     command: sh -c "./docker.sh test"
     volumes:
       - .:/src
-      - maven-repo:/root/.m2
+      - gradle-cache:/home/gradle/.gradle
 
 volumes:
-  maven-repo:
+  gradle-cache:
 
 # End docker-compose.yml

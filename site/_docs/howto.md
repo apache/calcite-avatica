@@ -240,12 +240,20 @@ git clean -xn
 the script will make a copy of the contents and move it to a different location, so that it will not modify the contents of your original
 `~/.gnupg` directory during the build.
 
+* Start the [asflike-release-environment](https://github.com/vlsi/asflike-release-environment) to prepare a staging environment for a dry-run.
+
 {% highlight bash %}
-# On Linux:
+# On Linux (dry-run):
 docker-compose run -v ~/.gnupg:/.gnupg dry-run
 
-# On Windows
+# On Windows (dry-run):
 docker-compose run -v /c/Users/username/AppData/Roaming/gnupg:/.gnupg dry-run
+
+# On Linux (push to ASF servers):
+docker-compose run -v ~/.gnupg:/.gnupg publish-release-for-voting
+
+# On Windows (push to ASF servers):
+docker-compose run -v /c/Users/username/AppData/Roaming/gnupg:/.gnupg publish-release-for-voting
 {% endhighlight %}
 
 ## Checking the artifacts
