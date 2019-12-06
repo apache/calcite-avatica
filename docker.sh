@@ -248,7 +248,7 @@ promote_release(){
     fi
 
     get_asf_credentials
-    gradle publishDist -Pasf -PasfSvnUsername=$ASF_USERNAME -PasfSvnPassword=$ASF_PASSWORD -PasfNexusUsername=$ASF_USERNAME -PasfNexusPassword=$ASF_PASSWORD -PasfGitSourceUsername=$ASF_USERNAME -PasfGitSourcePassword=$ASF_PASSWORD -Prc=$RC_NUMBER
+    gradle publishDist -Pasf -PasfSvnUsername=$ASF_USERNAME -PasfSvnPassword=$ASF_PASSWORD -PasfNexusUsername=$ASF_USERNAME -PasfNexusPassword=$ASF_PASSWORD -PasfGitSourceUsername=$ASF_USERNAME -PasfGitSourcePassword=$ASF_PASSWORD -Prc=$RC_NUMBER -Pasf.git.pushRepositoryProvider=GITBOX
 
     # If there is more than 1 release, delete all of them, except for the newest one
     # To do this, we do the following:
@@ -292,7 +292,7 @@ case $1 in
         get_build_configuration
         get_asf_credentials
 
-        gradle prepareVote -Pasf -PasfCommitterId=$ASF_USERNAME -PasfSvnUsername=$ASF_USERNAME -PasfSvnPassword=$ASF_PASSWORD -PasfNexusUsername=$ASF_USERNAME -PasfNexusPassword=$ASF_PASSWORD -PasfGitSourceUsername=$ASF_USERNAME -PasfGitSourcePassword=$ASF_PASSWORD -Prc=$RC_NUMBER -PuseGpgCmd -Psigning.gnupg.keyName=$SELECTED_GPG_KEY
+        gradle prepareVote -Pasf -PasfCommitterId=$ASF_USERNAME -PasfSvnUsername=$ASF_USERNAME -PasfSvnPassword=$ASF_PASSWORD -PasfNexusUsername=$ASF_USERNAME -PasfNexusPassword=$ASF_PASSWORD -PasfGitSourceUsername=$ASF_USERNAME -PasfGitSourcePassword=$ASF_PASSWORD -Prc=$RC_NUMBER -PuseGpgCmd -Psigning.gnupg.keyName=$SELECTED_GPG_KEY -Pasf.git.pushRepositoryProvider=GITBOX
         ;;
 
     clean)
