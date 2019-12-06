@@ -20,7 +20,7 @@ excerpt_separator: ""
 repository: https://github.com/apache/calcite-avatica
 destination: target/avatica
 exclude: [README.md,Gemfile*,add-avatica-go-docs.sh,docker-compose.yml,target]
-keep_files: [".git", ".svn", "apidocs", "testapidocs"]
+keep_files: [".git", ".svn", "javadocAggregate"]
 # This ensures 2016-03-03-separate-project.md is rendered 2016-03-03
 # no matter what the client time zone is
 timezone: Etc/GMT+5
@@ -33,12 +33,8 @@ collections:
 sourceRoot: https://github.com/apache/calcite-avatica/tree/master
 
 # The URL where Avatica Javadocs are located
-apiRoot: /avatica/apidocs
-# apiRoot: http://calcite.apache.org/avatica/apidocs
-
-# The URL where Test Javadocs are located
-testApiRoot: /avatica/testapidocs
-# testApiRoot: http://calcite.apache.org/avatica/testapidocs
+apiRoot: /avatica/javadocAggregate
+# apiRoot: http://calcite.apache.org/avatica/javadocAggregate
 
 # The URL where the JDK's Javadocs are located
 jdkApiRoot: https://docs.oracle.com/javase/8/docs/api/

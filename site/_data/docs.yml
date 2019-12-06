@@ -41,7 +41,6 @@
   docs:
   - history
   - api
-  - testapi
 
 - title: Avatica Go Client Meta
   docs:

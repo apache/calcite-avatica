@@ -30,7 +30,7 @@ services:
   generate-javadoc:
     image: gradle:6.0
     working_dir: /usr/src/calcite-avatica
-    command: sh -c "gradle javadocAggregate; rm -rf site/target/avatica/apidocs site/target/avatica/testapidocs; mkdir -p site/target/avatica; mv build/docs/javadocAggregate site/target/avatica"
+    command: sh -c "gradle javadocAggregate; rm -rf site/target/avatica/javadocAggregate; mkdir -p site/target/avatica; mv build/docs/javadocAggregate site/target/avatica"
     volumes:
       - ../:/usr/src/calcite-avatica
       - gradle-cache:/home/gradle/.gradle
