@@ -28,13 +28,13 @@ services:
     volumes:
       - .:/srv/jekyll
   generate-javadoc:
-    image: maven
+    image: gradle:6.0
     working_dir: /usr/src/calcite-avatica
-    command: sh -c "./gradlew javadocAggregate; rm -rf site/target/avatica/apidocs site/target/avatica/testapidocs; mkdir -p site/target/avatica; mv build/docs/javadocAggregate site/target/avatica"
+    command: sh -c "gradle javadocAggregate; rm -rf site/target/avatica/apidocs site/target/avatica/testapidocs; mkdir -p site/target/avatica; mv build/docs/javadocAggregate site/target/avatica"
     volumes:
       - ../:/usr/src/calcite-avatica
-      - maven-repo:/root/.m2
+      - gradle-cache:/home/gradle/.gradle
 volumes:
-  maven-repo:
+  gradle-cache:
 
 # End docker-compose.yml
