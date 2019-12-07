@@ -110,6 +110,7 @@ releaseArtifacts {
 // Configures URLs to SVN and Nexus
 releaseParams {
     tlp.set("Calcite")
+    gitRepoName.set("calcite-avatica")
     componentName.set("Apache Calcite Avatica")
     releaseTag.set("rel/avatica-$buildVersion")
     rcTag.set(rc.map { "avatica-$buildVersion-rc$it" })
