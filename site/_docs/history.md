@@ -28,6 +28,86 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.16.0">1.16.0</a> / 2019-12-XX
+{: #v1-16-0}
+
+Apache Calcite Avatica 1.16.0 replaces the maven with gradle. This release adds support for Kerberos authentication
+using SPNEGO over HTTPS. In addition, there were also a few dependency updates and bug fixes. Github Actions was also
+enabled in the repository for running tests.
+
+Compatibility: This release is tested
+on Linux, macOS, Microsoft Windows;
+using Oracle JDK 8, 9, 10, 11, 12, 13;
+using IBM Java 8;
+Guava versions 14.0 to 23.0;
+other software versions as specified in `gradle.properties`.
+
+Features and bug fixes
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3059">CALCITE-3059</a>]
+  Fix release script to use correct release branch name when merging to master and to use the correct variable when generating the vote email
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3090">CALCITE-3090</a>]
+  Remove the Central configuration
+* Update owsap-dependency-check from 4.0.2 to 5.0.0
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3104">CALCITE-3104</a>]
+  Bump httpcore from 4.4.10 to 4.4.11 (Fokko Driesprong)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3105">CALCITE-3105</a>]
+  Bump Jackson from 2.9.8 to 2.9.9 (Fokko Driesprong)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3180">CALCITE-3180</a>]
+  Bump httpclient from 4.5.6 to 4.5.9 (Fokko Driesprong)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3324">CALCITE-3324</a>]
+  Add create method in MetaResultSet (Robert Yokota)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3384">CALCITE-3384</a>]
+  Support Kerberos-authentication using SPNEGO over HTTPS (Istvan Toth)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3199">CALCITE-3199</a>]
+  DateTimeUtils.unixDateCeil should not return the same value as unixDateFloor (Zhenghua Gao)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3412">CALCITE-3412</a>]
+  FLOOR(timestamp TO WEEK) gives wrong result: Fix DateTimeUtils.julianDateFloor so that unixDateFloor etc. give the right result
+* Implement Gradle-based build scripts
+* Sign release artifacts only, skip signing for -SNAPSHOT
+* Add source=1.8 to javadoc options, fix javadoc warnings
+* Add -PskipJavadoc to skip publication of the javadocs (to speedup publishToMavenLocal)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3490">CALCITE-3490</a>]
+  Upgrade Jackson to 2.10.0
+* Bump release plugin 1.44.0 -> 1.45.0: do not require GPG key for publishDist
+* Bump release plugins 1.45.0 -> 1.46.0: avoid failures on Gralde upgrade, fix gitignore handling
+* Add -PenableMavenLocal and -PenableGradleMetadata build options
+* Update build script: simplify properties, fix javadoc build for non UTF8 default encoding
+* Update release plugins to 1.48.0 to workaround SVN 1.9 issue with mv+cp
+* Sort dependencies, use api(javax.servlet), implementation(slf4j-api)
+* @PackageMarker is no longer needed
+* License header is managed with Spotless, there's no need to double-check it with Checkstyle
+* Whitespace is managed with Spotless, so the check is removed from Checkstyle config
+* Upgrade to Gradle 6.0.1 to prevent pushing .sha256 and .sha512 to Nexus
+* Add gradle task 'aggregateJavadocIncludingTests' that builds javadoc for both main and test
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3493">CALCITE-3493</a>]
+  Update docker script to use gradle
+* Use Gitbox for pushing tags when making a release
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3573">CALCITE-3573</a>]
+  Upgrade to Gradle 6.0 container to build releases and javadoc
+* Configure Git tags to be pushed to calcite-avatica repository not calcite
+* Stop building zip archives when building using gradle
+
+Tests
+* Use GitHub Actions for Windows CI
+* Add Travis job with building Calcite master
+* Show standard streams in Gradle tests
+* Skip slow Calcite tests
+* Add GitHub Actions macOS
+* Fix AvaticaSpnegoTest for canonicalHostName("localhost") != "localhost": Avatica HTTP client always uses CANONICAL_HOSTNAME which confuses test code.
+* Use Spotless and .editorconfig for import order normalization instead of Checkstyle
+* Add option to skip signing: -PskipSigning
+* Fetch Calcite from apache/calcite repository for integration testing
+* GitHub Actions: actions/checkout@master -> v1.1.0 to avoid unexpected failures
+
+Website and Documentation
+* Add JavaScript client to client list
+* Update avatica/docs/howto.md: SVN -> Git, fix wording
+* Exclude "site/target" from Jekyll build: It prevents generation of unwanted site/target/avatica/target directory
+* Configure Jekyll to use Etc/GMT+5 timezone for consistent page urls
+* Fix links to javadoc
+* Remove instructions to close Nexus repository when building a rc as this is now automated
+
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.15.0">1.15.0</a> / 2019-05-13
 {: #v1-15-0}
 
