@@ -429,13 +429,6 @@ with a change comment
 (fill in release number and date appropriately).
 Uncheck "Send mail for this update".
 
-Promote the staged nexus artifacts (this is automatic, however, the instructions are here just in case).
-
-* Go to [https://repository.apache.org/](https://repository.apache.org/) and login
-* Under "Build Promotion" click "Staging Repositories"
-* In the line with "orgapachecalcite-xxxx", check the box
-* Press "Release" button
-
 Tip: Push the git tag only after the staged nexus artifacts are promoted in the repository. This is because pushing the
 tag triggers Docker Hub to start building the docker images immediately and the build will pull in the promoted artifacts.
 If the artifacts are not yet available, the build on Docker Hub will fail. It's best to continue with the following steps

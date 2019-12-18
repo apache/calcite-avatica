@@ -28,7 +28,7 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.16.0">1.16.0</a> / 2019-12-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.16.0">1.16.0</a> / 2019-12-19
 {: #v1-16-0}
 
 Apache Calcite Avatica 1.16.0 replaces the maven with gradle. This release adds support for Kerberos authentication
