@@ -28,7 +28,6 @@ import com.github.vlsi.gradle.release.dsl.dependencyLicenses
 import com.github.vlsi.gradle.release.dsl.licensesCopySpec
 
 plugins {
-    signing
     id("com.github.vlsi.stage-vote-release")
 }
 
@@ -79,7 +78,7 @@ https://people.apache.org/keys/committer/$committerId.asc
 https://www.apache.org/dist/$tlpUrl/KEYS
 
 N.B.
-To create the jars and test $componentName: "./gradlew build -Prelease -PskipSigning".
+To create the jars and test $componentName: "./gradlew build -Prelease -PskipSign".
 
 If you do not have a Java environment available, you can run the tests
 using docker. To do so, install docker and docker-compose, then run

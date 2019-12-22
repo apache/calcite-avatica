@@ -61,13 +61,9 @@ val enableSpotBugs = props.bool("spotbugs", default = false)
 val skipCheckstyle by props()
 val skipSpotless by props()
 val skipJavadoc by props()
-val skipSigning by props(props.bool("skipSign"))
+// Inherited from stage-vote-release-plugin: skipSign, useGpgCmd
 val enableMavenLocal by props()
 val enableGradleMetadata by props()
-
-// By default use Java implementation to sign artifacts
-// When useGpgCmd=true, then gpg command line tool is used for signing
-val useGpgCmd by props()
 
 ide {
     copyrightToAsf()
@@ -131,12 +127,6 @@ releaseParams {
             validates.add(provider {
                 Regex("release/calcite/apache-calcite-avatica-${version.toString().removeSuffix("-SNAPSHOT")}")
             })
-        }
-    }
-    validateBeforeBuildingReleaseArtifacts += Runnable {
-        if (useGpgCmd && findProperty("signing.gnupg.keyName") == null) {
-            throw GradleException("Please specify signing key id via signing.gnupg.keyName " +
-                    "(see https://github.com/gradle/gradle/issues/8657)")
         }
     }
 }
@@ -229,20 +219,6 @@ allprojects {
         fileMode = "664".toInt(8)
     }
 
-    plugins.withType<SigningPlugin> {
-        afterEvaluate {
-            configure<SigningExtension> {
-                val release = rootProject.releaseParams.release.get()
-                // Note it would still try to sign the artifacts,
-                // however it would fail only when signing a RELEASE version fails
-                isRequired = release
-                if (useGpgCmd) {
-                    useGpgCmd()
-                }
-            }
-        }
-    }
-
     tasks {
         withType<Javadoc>().configureEach {
             (options as StandardJavadocDocletOptions).apply {
@@ -271,17 +247,6 @@ allprojects {
         }
     }
 
-    if (!isReleaseVersion || skipSigning) {
-        plugins.withType<SigningPlugin> {
-            afterEvaluate {
-                configure<SigningExtension> {
-                    // It would still try to sign the artifacts,
-                    // but it would refrain from failing the build
-                    isRequired = false
-                }
-            }
-        }
-    }
     plugins.withType<JavaPlugin> {
         configure<JavaPluginConvention> {
             sourceCompatibility = JavaVersion.VERSION_1_8
@@ -296,20 +261,12 @@ allprojects {
         }
         val sourceSets: SourceSetContainer by project
 
-        apply(plugin = "signing")
         apply(plugin = "de.thetaphi.forbiddenapis")
         apply(plugin = "maven-publish")
 
         if (!enableGradleMetadata) {
             tasks.withType<GenerateModuleMetadata> {
                 enabled = false
-            }
-        }
-
-        if (isReleaseVersion && !skipSigning) {
-            configure<SigningExtension> {
-                // Sign all the publications
-                sign(publishing.publications)
             }
         }
 
