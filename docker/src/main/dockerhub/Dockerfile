@@ -23,7 +23,7 @@ RUN mkdir -p /home/avatica/classpath
 ARG AVATICA_VERSION
 
 # Dependencies
-ADD https://repository.apache.org/content/groups/public/org/apache/calcite/avatica/avatica-standalone-server/${AVATICA_VERSION}/avatica-standalone-server-${AVATICA_VERSION}-shaded.jar /home/avatica/classpath
+ADD https://repository.apache.org/content/groups/public/org/apache/calcite/avatica/avatica-standalone-server/${AVATICA_VERSION}/avatica-standalone-server-${AVATICA_VERSION}.jar /home/avatica/classpath
 
 # Make sure avatica owns its files
 RUN chown -R avatica: /home/avatica
