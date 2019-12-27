@@ -31,7 +31,7 @@ plugins {
     publishing
     // Verification
     checkstyle
-    id("com.diffplug.gradle.spotless")
+    id("com.github.autostyle")
     id("org.nosphere.apache.rat")
     id("com.github.spotbugs")
     id("de.thetaphi.forbiddenapis") apply false
@@ -59,7 +59,7 @@ val lastEditYear by extra(lastEditYear())
 // Do not enable spotbugs by default. Execute it only when -Pspotbugs is present
 val enableSpotBugs = props.bool("spotbugs", default = false)
 val skipCheckstyle by props()
-val skipSpotless by props()
+val skipAutostyle by props()
 val skipJavadoc by props()
 // Inherited from stage-vote-release-plugin: skipSign, useGpgCmd
 val enableMavenLocal by props()
@@ -158,36 +158,45 @@ val javadocAggregateIncludingTests by tasks.registering(Javadoc::class) {
     setDestinationDir(file("$buildDir/docs/javadocAggregateIncludingTests"))
 }
 
-val licenseHeaderFile = file("config/license.header.java")
-
 allprojects {
     group = "org.apache.calcite.avatica"
     version = buildVersion
+
+    repositories {
+        // RAT and Autostyle dependencies
+        mavenCentral()
+    }
 
     plugins.withId("java-library") {
         dependencies {
             "implementation"(platform(project(":bom")))
         }
     }
-    if (!skipSpotless) {
-        apply(plugin = "com.diffplug.gradle.spotless")
-        spotless {
-            kotlinGradle {
-                ktlint()
+    if (!skipAutostyle) {
+        apply(plugin = "com.github.autostyle")
+        autostyle {
+            fun com.github.autostyle.gradle.BaseFormatExtension.license() {
+                licenseHeader(rootProject.ide.licenseHeader)
                 trimTrailingWhitespace()
                 endWithNewline()
             }
-            if (project == rootProject) {
-                // Spotless does not exclude subprojects when using target(...)
-                // So **/*.md is enough to scan all the md files in the codebase
-                // See https://github.com/diffplug/spotless/issues/468
-                format("markdown") {
-                    target("**/*.md")
-                    // Flot is known to have trailing whitespace, so the files
-                    // are kept in their original format (e.g. to simplify diff on library upgrade)
-                    trimTrailingWhitespace()
-                    endWithNewline()
+            kotlinGradle {
+                license()
+                ktlint()
+            }
+            format("configs") {
+                filter {
+                    include("**/*.sh", "**/*.bsh", "**/*.cmd", "**/*.bat")
+                    include("**/*.properties", "**/*.yml")
+                    include("**/*.xsd", "**/*.xsl", "**/*.xml")
+                    // Autostyle does not support gitignore yet https://github.com/autostyle/autostyle/issues/13
+                    exclude("bin/**", "out/**", "gradlew*")
                 }
+                license()
+            }
+            format("markdown") {
+                filter.include("**/*.md")
+                endWithNewline()
             }
         }
     }
@@ -270,10 +279,10 @@ allprojects {
             }
         }
 
-        if (!skipSpotless) {
-            spotless {
+        if (!skipAutostyle) {
+            autostyle {
                 java {
-                    licenseHeaderFile(licenseHeaderFile)
+                    licenseHeader(rootProject.ide.licenseHeader)
                     importOrder(
                         "org.apache.calcite.",
                         "org.apache.",
@@ -293,6 +302,7 @@ allprojects {
                         "static java",
                         "static "
                     )
+                    replaceRegex("side by side comments", "(\n\\s*+[*]*+/\n)(/[/*])", "\$1\n\$2")
                     removeUnusedImports()
                     trimTrailingWhitespace()
                     indentWithSpaces(2)
