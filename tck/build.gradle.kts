@@ -55,7 +55,7 @@ dependencies {
 
 tasks {
     val getLicenses by registering(GatherLicenseTask::class) {
-        similarityThreshold.set(42*2)
+        similarityThreshold.set(42 * 2)
         configuration(shaded)
         extraLicenseDir.set(file("$rootDir/src/main/config/licenses"))
         overrideLicense("org.hsqldb:hsqldb") {
