@@ -716,6 +716,24 @@ public class RemoteMetaTest {
       assertEquals(props, originalProps);
     }
   }
+
+  @Test public void testUnicodeCharacters() throws Exception {
+    ConnectionSpec.getDatabaseLock().lock();
+    try (AvaticaConnection conn = (AvaticaConnection) DriverManager.getConnection(url)) {
+      final AvaticaStatement statement = conn.createStatement();
+      ResultSet rs = statement.executeQuery(
+          "select * from (values ('您好', 'こんにちは', '안녕하세요'))");
+      assertThat(rs.next(), is(true));
+      assertEquals("您好", rs.getString(1));
+      assertEquals("こんにちは", rs.getString(2));
+      assertEquals("안녕하세요", rs.getString(3));
+      rs.close();
+      statement.close();
+      conn.close();
+    } finally {
+      ConnectionSpec.getDatabaseLock().unlock();
+    }
+  }
 }
 
 // End RemoteMetaTest.java
