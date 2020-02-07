@@ -23,6 +23,7 @@ import com.github.vlsi.gradle.properties.dsl.lastEditYear
 import com.github.vlsi.gradle.properties.dsl.props
 import com.github.vlsi.gradle.properties.dsl.toBool
 import com.github.vlsi.gradle.release.RepositoryType
+import com.github.vlsi.gradle.test.dsl.printTestResults
 import de.thetaphi.forbiddenapis.gradle.CheckForbiddenApis
 import de.thetaphi.forbiddenapis.gradle.CheckForbiddenApisExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
@@ -396,6 +397,7 @@ allprojects {
                         passProperty(e)
                     }
                 }
+                printTestResults()
             }
             withType<SpotBugsTask>().configureEach {
                 group = LifecycleBasePlugin.VERIFICATION_GROUP
