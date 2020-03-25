@@ -22,6 +22,9 @@ import com.github.vlsi.gradle.git.dsl.gitignore
 import com.github.vlsi.gradle.properties.dsl.lastEditYear
 import com.github.vlsi.gradle.properties.dsl.props
 import com.github.vlsi.gradle.properties.dsl.toBool
+import com.github.vlsi.gradle.publishing.dsl.extraMavenPublications
+import com.github.vlsi.gradle.publishing.dsl.simplifyXml
+import com.github.vlsi.gradle.publishing.dsl.versionFromResolution
 import com.github.vlsi.gradle.release.RepositoryType
 import com.github.vlsi.gradle.test.dsl.printTestResults
 import de.thetaphi.forbiddenapis.gradle.CheckForbiddenApis
@@ -212,8 +215,9 @@ allprojects {
             // https://github.com/julianhyde/toolbox/issues/3
             //  toolVersion = "6.18"
             isShowViolations = true
-            configDir = File(rootDir, "src/main/config/checkstyle")
-            configFile = File(configDir, "checker.xml")
+            val dir = File(rootDir, "src/main/config/checkstyle")
+            configDirectory.set(dir)
+            configFile = File(dir, "checker.xml")
             configProperties = mapOf(
                 "checkstyle.header.file" to "$rootDir/src/main/config/checkstyle/header.txt",
                 "checkstyle.suppressions.file" to "$rootDir/src/main/config/checkstyle/suppressions.xml"
@@ -321,8 +325,7 @@ allprojects {
                 this.sourceSets = listOf(sourceSets["main"])
             }
             dependencies {
-                // Parenthesis are needed here: https://github.com/gradle/gradle/issues/9248
-                (constraints) {
+                constraints {
                     "spotbugs"("org.ow2.asm:asm:${"asm".v}")
                     "spotbugs"("org.ow2.asm:asm-all:${"asm".v}")
                     "spotbugs"("org.ow2.asm:asm-analysis:${"asm".v}")
@@ -478,6 +481,7 @@ allprojects {
                 // Do not publish "root" project. Java plugin is applied here for DSL purposes only
                 return@configure
             }
+            extraMavenPublications()
             publications {
                 create<MavenPublication>(project.name) {
                     artifactId = archivesBaseName
@@ -492,36 +496,9 @@ allprojects {
                         artifact(javadocJar.get())
                     }
 
-                    // Use the resolved versions in pom.xml
-                    // Gradle might have different resolution rules, so we set the versions
-                    // that were used in Gradle build/test.
-                    versionMapping {
-                        usage(Usage.JAVA_RUNTIME) {
-                            fromResolutionResult()
-                        }
-                        usage(Usage.JAVA_API) {
-                            fromResolutionOf("runtimeClasspath")
-                        }
-                    }
+                    versionFromResolution()
                     pom {
-                        withXml {
-                            val sb = asString()
-                            var s = sb.toString()
-                            // <scope>compile</scope> is Maven default, so delete it
-                            s = s.replace("<scope>compile</scope>", "")
-                            // Cut <dependencyManagement> because all dependencies have the resolved versions
-                            s = s.replace(
-                                Regex(
-                                    "<dependencyManagement>.*?</dependencyManagement>",
-                                    RegexOption.DOT_MATCHES_ALL
-                                ),
-                                ""
-                            )
-                            sb.setLength(0)
-                            sb.append(s)
-                            // Re-format the XML
-                            asNode()
-                        }
+                        simplifyXml()
                         project.property("artifact.name")?.let { name.set(it as String) }
                         description.set(project.description)
                         inceptionYear.set("2012")

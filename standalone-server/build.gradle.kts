@@ -86,7 +86,7 @@ tasks {
         manifest {
             attributes["Main-Class"] = "org.apache.calcite.avatica.server.StandaloneServer"
         }
-        archiveClassifier.set("")
+        archiveClassifier.set("shadow")
         configurations = listOf(shaded)
         exclude("META-INF/maven/**")
         exclude("META-INF/LICENSE*")
@@ -111,5 +111,11 @@ tasks {
                 dependencyLicenses(licenseFiles)
             }
         }
+    }
+}
+
+artifacts {
+    extraMavenPublications(tasks.shadowJar) {
+        classifier = ""
     }
 }
