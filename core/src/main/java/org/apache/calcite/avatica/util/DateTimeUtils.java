@@ -965,7 +965,20 @@ public class DateTimeUtils {
     return julian - EPOCH_JULIAN;
   }
 
+  /** Calculates the Julian Day Number for any date on the Gregorian. The paper of
+   * http://www.cs.utsa.edu/~cs1063/projects/Spring2011/Project1/jdn-explanation.html
+   * provides a brief explanation for this algorithm. */
   public static int ymdToJulian(int year, int month, int day) {
+  	if (month < 1 || month > 12) {
+  		throw new IllegalArgumentException(
+  			"Month of any date on the Gregorian should between 1 to 12, but " + month);
+    }
+
+  	if (day < 1 || day > 31) {
+  		throw new IllegalArgumentException(
+  		    "Day of any date on the Gregorian should between 1 to 31, but " + day);
+    }
+
     int a = (14 - month) / 12;
     int y = year + 4800 - a;
     int m = month + 12 * a - 3;
@@ -1003,9 +1016,15 @@ public class DateTimeUtils {
     int y0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.YEAR, date);
     int m0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.MONTH, date);
     int d0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.DAY, date);
-    int y = m / 12;
-    y0 += y;
-    m0 += m - y * 12;
+    m0 += m;
+    int deltaYear = (int) DateTimeUtils.floorDiv(m0, 12);
+    y0 += deltaYear;
+    m0 = (int) DateTimeUtils.floorMod(m0, 12);
+    if (m0 == 0) {
+      y0 -= 1;
+      m0 += 12;
+    }
+
     int last = lastDay(y0, m0);
     if (d0 > last) {
       d0 = 1;
