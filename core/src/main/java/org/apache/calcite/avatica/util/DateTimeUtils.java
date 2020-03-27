@@ -965,6 +965,19 @@ public class DateTimeUtils {
     return julian - EPOCH_JULIAN;
   }
 
+  /** Calculates the Julian Day Number for any valid date in the Gregorian
+   * calendar.
+   *
+   * <p>If date is invalid, result is unspecified.
+   *
+   * <p>See an
+   * <a href="http://www.cs.utsa.edu/~cs1063/projects/Spring2011/Project1/jdn-explanation.html">
+   * explanation</a> of this algorithm.
+   *
+   * @param year Year (e.g. 2020 means 2020 CE, 1 means 1 CE, 0 means 1 BCE
+   *   because there is no 0 CE, -1 means 2 BCE, etc.)
+   * @param month Month (between 1 and 12 inclusive, 1 meaning January)
+   * @param day Day of month (between 1 and 31 inclusive) */
   public static int ymdToJulian(int year, int month, int day) {
     int a = (14 - month) / 12;
     int y = year + 4800 - a;
@@ -1003,9 +1016,15 @@ public class DateTimeUtils {
     int y0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.YEAR, date);
     int m0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.MONTH, date);
     int d0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.DAY, date);
-    int y = m / 12;
-    y0 += y;
-    m0 += m - y * 12;
+    m0 += m;
+    int deltaYear = (int) DateTimeUtils.floorDiv(m0, 12);
+    y0 += deltaYear;
+    m0 = (int) DateTimeUtils.floorMod(m0, 12);
+    if (m0 == 0) {
+      y0 -= 1;
+      m0 += 12;
+    }
+
     int last = lastDay(y0, m0);
     if (d0 > last) {
       d0 = 1;
