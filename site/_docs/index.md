@@ -176,7 +176,7 @@ highly welcomed!
 * *Maintainer*: Lukáš Lalinský
 
 ### JavaScript binding to Calcite Avatica Server
-* [Home page](https://https://github.com/waylayio/avatica-js)
+* [Home page](https://github.com/waylayio/avatica-js)
 * Language: JavaScript
 * *License*: [MIT](https://opensource.org/licenses/MIT)
 * Any Avatica version
