@@ -37,8 +37,8 @@ Unpack the source distribution `.tar.gz` file,
 then build using maven:
 
 {% highlight bash %}
-$ tar xvfz apache-calcite-avatica-1.16.0-src.tar.gz
-$ cd apache-calcite-avatica-1.16.0-src
+$ tar xvfz apache-calcite-avatica-1.17.0-src.tar.gz
+$ cd apache-calcite-avatica-1.17.0-src
 $ ./gradlew build
 {% endhighlight %}
 

@@ -28,6 +28,41 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.17.0">1.17.0</a> / 2020-06-XX
+{: #v1-17-0}
+
+Apache Calcite Avatica 1.17.0 is a small release incorporating a few dependency upgrades and minor fixes.
+
+Compatibility: This release is tested
+on Linux, macOS, Microsoft Windows;
+using Oracle JDK 8, 9, 10, 11, 12, 13;
+using IBM Java 8;
+Guava versions 14.0 to 23.0;
+other software versions as specified in `gradle.properties`.
+
+Features and bug fixes
+* Upgrade RAT to 0.5.3 and print violations in the console.
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3610">CALCITE-3610</a>]
+  Fix dockerhub dockerfiles to point to the right JARs on nexus
+* Move PGP signing to com.github.vlsi.stage-vote-release Gradle plugin.
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3623">CALCITE-3623</a>]
+  Replace Spotless with AutoStyle.
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2704">CALCITE-2704</a>]
+  Fix multilingual decoding issue where the server parses Chinese characters as gibberish.
+* Upgrade Gradle to 6.3 and color test results in output.
+* Upgrade protobuf to 0.8.12.
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3822">CALCITE-3822</a>]
+  Source distribution must not contain fonts under SIL OFL 1.1 license (category B)
+* Upgrade Gradle to 6.3 in docker-compose files.
+
+Tests
+* Upgrade Github Actions' Checkout action to v2.
+* Add gradle wrapper validation job to Github Actions.
+
+Website and Documentation
+* Fix broken link to Javascript binding in the documentation.
+
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.16.0">1.16.0</a> / 2019-12-19
 {: #v1-16-0}
 
