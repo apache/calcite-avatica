@@ -29,16 +29,16 @@ Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.17.0">1.17.0</a> / 2020-06-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.17.0">1.17.0</a> / 2020-06-22
 {: #v1-17-0}
 
 Apache Calcite Avatica 1.17.0 is a small release incorporating a few dependency upgrades and minor fixes.
 
 Compatibility: This release is tested
 on Linux, macOS, Microsoft Windows;
-using Oracle JDK 8, 9, 10, 11, 12, 13;
+using Oracle JDK 8, 9, 10, 11, 12, 13, 14;
 using IBM Java 8;
-Guava versions 14.0 to 23.0;
+Guava versions 14.0 to 29.0;
 other software versions as specified in `gradle.properties`.
 
 Features and bug fixes
