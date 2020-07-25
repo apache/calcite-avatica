@@ -174,6 +174,10 @@ message ColumnsRequest {
   string table_name_pattern = 3;
   string column_name_pattern = 4;
   string connection_id = 5;
+  bool   has_catalog = 6;
+  bool   has_schema_pattern = 7;
+  bool   has_table_name_pattern = 8;
+  bool   has_column_name_pattern = 9;
 }
 {% endhighlight %}
 
@@ -186,6 +190,14 @@ message ColumnsRequest {
 `column_name_pattern` A Java Pattern against column names to limit returned columns.
 
 `connection_id` The identifier of the connection which to use to fetch the columns.
+
+`has_catalog` A boolean denoting if `catalog` was set.
+
+`has_schema_pattern` A boolean denoting if `schema_pattern` was set.
+
+`has_table_name_pattern` A boolean denoting if `table_name_pattern` was set.
+
+`has_column_name_pattern` A boolean denoting if `column_name_pattern` was set.
 
 ### CommitRequest
 
@@ -427,6 +439,8 @@ message SchemasRequest {
   string catalog = 1;
   string schema_pattern = 2;
   string connection_id = 3;
+  bool   has_catalog = 4;
+  bool   has_schema_pattern = 5;
 }
 {% endhighlight %}
 
@@ -435,6 +449,10 @@ message SchemasRequest {
 `schema_pattern` A Java pattern of schemas to fetch.
 
 `connection_id` The identifier for the connection to fetch schemas from.
+
+`has_catalog` A boolean denoting if `catalog` was set.
+
+`has_schema_pattern` A boolean denoting if `schema_pattern` was set.
 
 ### TableTypesRequest
 
@@ -460,6 +478,9 @@ message TablesRequest {
   repeated string type_list = 4;
   bool has_type_list = 6;
   string connection_id = 7;
+  bool   has_catalog = 8;
+  bool   has_schema_pattern = 9;
+  bool   has_table_name_pattern = 10;
 }
 {% endhighlight %}
 
@@ -474,6 +495,12 @@ message TablesRequest {
 `has_type_list` A boolean which denotes if the field `type_list` was provided.
 
 `connection_id` The identifier of the connection to fetch the tables from.
+
+`has_catalog` A boolean denoting if `catalog` was set.
+
+`has_schema_pattern` A boolean denoting if `schema_pattern` was set.
+
+`has_table_name_pattern` A boolean denoting if `table_name_pattern` was set.
 
 ### TypeInfoRequest
 

@@ -1475,6 +1475,25 @@ public class RemoteDriverTest {
     }
   }
 
+  @Test public void testMetaDataCanHaveEmptyStringArgument() throws Exception {
+    ConnectionSpec.getDatabaseLock().lock();
+    try (Connection conn = getLocalConnection();
+        Statement stmt = conn.createStatement()) {
+      DatabaseMetaData meta = conn.getMetaData();
+
+      ResultSet rs = meta.getSchemas("PUBLIC", null);
+      assertTrue(rs.next());
+      rs.close();
+
+      //Test for CALCITE-4138
+      rs = meta.getSchemas("PUBLIC", "");
+      assertFalse(rs.next());
+      rs.close();
+    } finally {
+      ConnectionSpec.getDatabaseLock().unlock();
+    }
+  }
+
   @Test public void testUnicodeColumnNames() throws Exception {
     final String tableName = "unicodeColumn";
     final String columnName = "\u041d\u043e\u043c\u0435\u0440\u0422\u0435\u043b"
