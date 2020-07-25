@@ -334,14 +334,19 @@ public interface Service {
         connectionId = msg.getConnectionId();
       }
 
+      //hasField() for String fields simply tells you if that field is ""
       String catalog = null;
       if (msg.hasField(CATALOG_DESCRIPTOR)) {
         catalog = msg.getCatalog();
+      } else if (msg.getHasCatalog()) {
+        catalog = "";
       }
 
       String schemaPattern = null;
       if (msg.hasField(SCHEMA_PATTERN_DESCRIPTOR)) {
         schemaPattern = msg.getSchemaPattern();
+      } else if (msg.getHasSchemaPattern()) {
+        schemaPattern = "";
       }
 
       return new SchemasRequest(connectionId, catalog, schemaPattern);
@@ -354,9 +359,12 @@ public interface Service {
       }
       if (null != catalog) {
         builder.setCatalog(catalog);
+        builder.setHasCatalog(true);
       }
+
       if (null != schemaPattern) {
         builder.setSchemaPattern(schemaPattern);
+        builder.setHasSchemaPattern(true);
       }
 
       return builder.build();
@@ -435,16 +443,22 @@ public interface Service {
       String catalog = null;
       if (msg.hasField(CATALOG_DESCRIPTOR)) {
         catalog = msg.getCatalog();
+      } else if (msg.getHasCatalog()) {
+        catalog = "";
       }
 
       String schemaPattern = null;
       if (msg.hasField(SCHEMA_PATTERN_DESCRIPTOR)) {
         schemaPattern = msg.getSchemaPattern();
+      } else if (msg.getHasSchemaPattern()) {
+        schemaPattern = "";
       }
 
       String tableNamePattern = null;
       if (msg.hasField(TABLE_NAME_PATTERN_DESCRIPTOR)) {
         tableNamePattern = msg.getTableNamePattern();
+      } else if (msg.getHasTableNamePattern()) {
+        tableNamePattern = "";
       }
 
       // Cannot determine if a value was set for a repeated field. Must use an extra boolean
@@ -465,12 +479,15 @@ public interface Service {
       }
       if (null != catalog) {
         builder.setCatalog(catalog);
+        builder.setHasCatalog(true);
       }
       if (null != schemaPattern) {
         builder.setSchemaPattern(schemaPattern);
+        builder.setHasSchemaPattern(true);
       }
       if (null != tableNamePattern) {
         builder.setTableNamePattern(tableNamePattern);
+        builder.setHasTableNamePattern(true);
       }
       if (null != typeList) {
         builder.setHasTypeList(true);
@@ -616,21 +633,29 @@ public interface Service {
       String catalog = null;
       if (msg.hasField(CATALOG_DESCRIPTOR)) {
         catalog = msg.getCatalog();
+      } else if (msg.getHasCatalog()) {
+        catalog = "";
       }
 
       String schemaPattern = null;
       if (msg.hasField(SCHEMA_PATTERN_DESCRIPTOR)) {
         schemaPattern = msg.getSchemaPattern();
+      } else if (msg.getHasSchemaPattern()) {
+        schemaPattern = "";
       }
 
       String tableNamePattern = null;
       if (msg.hasField(TABLE_NAME_PATTERN_DESCRIPTOR)) {
         tableNamePattern = msg.getTableNamePattern();
+      } else if (msg.getHasTableNamePattern()) {
+        tableNamePattern = "";
       }
 
       String columnNamePattern = null;
       if (msg.hasField(COLUMN_NAME_PATTERN_DESCRIPTOR)) {
         columnNamePattern = msg.getColumnNamePattern();
+      } else if (msg.getHasColumnNamePattern()) {
+        columnNamePattern = "";
       }
 
       return new ColumnsRequest(connectionId, catalog, schemaPattern, tableNamePattern,
