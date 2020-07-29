@@ -19,7 +19,7 @@ name: Publish non-release website updates
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'site/**'                       # Trigger only for changes to files in the site/ folder
       - '!site/_docs/**'                # except for files in the site/_docs/ folder
@@ -54,5 +54,5 @@ jobs:
           git add .
           if ! git diff-index --quiet HEAD; then
             git commit -m "Website deployed from calcite-avatica@$GITHUB_SHA"
-            git push origin master
+            git push origin main
           fi

@@ -25,7 +25,7 @@ limitations under the License.
 Avatica is a framework for building JDBC and ODBC drivers for databases,
 and an RPC wire protocol.
 
-![Avatica Architecture](https://raw.githubusercontent.com/julianhyde/share/master/slides/avatica-architecture.png)
+![Avatica Architecture](https://raw.githubusercontent.com/julianhyde/share/main/slides/avatica-architecture.png)
 
 Avatica's Java binding has very few dependencies.
 Even though it is part of Apache Calcite it does not depend on other parts of

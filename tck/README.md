@@ -75,6 +75,6 @@ while the following tests will be run for cross-version compatibility:
 Any errors encountered will be printed to the terminal. The final output of the script
 will be a summary of both the identity tests and the cross-version tests for easy consumption.
 
-[example-config-yml]: https://github.com/apache/calcite-avatica/tree/master/tck/src/main/resources/example_config.yml
+[example-config-yml]: https://github.com/apache/calcite-avatica/tree/main/tck/src/main/resources/example_config.yml
 [legacy-readme]: https://github.com/joshelser/legacy-avatica-hsqldb-server/blob/master/README.md
-[test-runner-script]: https://github.com/apache/calcite-avatica/tree/master/tck/src/main/ruby/test_runner.rb
+[test-runner-script]: https://github.com/apache/calcite-avatica/tree/main/tck/src/main/ruby/test_runner.rb

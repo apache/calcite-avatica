@@ -31,7 +31,7 @@ collections:
     output: true
 
 # The URL where the code can be found
-sourceRoot: https://github.com/apache/calcite-avatica/tree/master
+sourceRoot: https://github.com/apache/calcite-avatica/tree/main
 
 # The URL where Avatica Javadocs are located
 apiRoot: /avatica/javadocAggregate
