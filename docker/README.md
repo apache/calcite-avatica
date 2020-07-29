@@ -33,9 +33,9 @@ The other Dockerfiles must be built by hand.
 
 A number of Dockerfiles for different databases are provided. Presently, they include:
 
-* [HyperSQL](https://github.com/apache/calcite-avatica/tree/master/docker/src/main/docker/hypersql)
-* [MySQL](https://github.com/apache/calcite-avatica/tree/master/docker/src/main/docker/mysql)
-* [PostgreSQL](https://github.com/apache/calcite-avatica/tree/master/docker/src/main/docker/postgresql)
+* [HyperSQL](https://github.com/apache/calcite-avatica/tree/main/docker/src/main/docker/hypersql)
+* [MySQL](https://github.com/apache/calcite-avatica/tree/main/docker/src/main/docker/mysql)
+* [PostgreSQL](https://github.com/apache/calcite-avatica/tree/main/docker/src/main/docker/postgresql)
 
 ## Docker Hub
 

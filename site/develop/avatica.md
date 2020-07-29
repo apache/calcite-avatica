@@ -78,20 +78,14 @@ the JIRA case number, like this:
 [CALCITE-345] AssertionError in RexToLixTranslator comparing to date literal
 {% endhighlight %}
 
-If your change had multiple commits, use `git rebase -i master` to
+If your change had multiple commits, use `git rebase -i main` to
 squash them into a single commit, and to bring your code up to date
 with the latest on the main line.
 
 Then push your commit(s) to github, and create a pull request from
-your branch to the calcite master branch. Update the JIRA case
+your branch to the calcite main branch. Update the JIRA case
 to reference your pull request, and a committer will review your
 changes.
-
-## Continuous Integration Testing
-
-Calcite has a collection of Jenkins jobs on ASF-hosted infrastructure.
-They are all organized in a single view and available at
-[https://builds.apache.org/view/A-D/view/Calcite/job/Calcite-Avatica-Master/](https://builds.apache.org/view/A-D/view/Calcite/job/Calcite-Avatica-Master/).
 
 ## Getting started
 

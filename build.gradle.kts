@@ -72,7 +72,7 @@ val enableGradleMetadata by props()
 ide {
     copyrightToAsf()
     ideaInstructionsUri =
-        uri("https://github.com/apache/calcite-avatica/blob/master/CONTRIBUTING.md#intellij")
+        uri("https://github.com/apache/calcite-avatica/blob/main/CONTRIBUTING.md#intellij")
     doNotDetectFrameworks("android", "jruby")
 }
 

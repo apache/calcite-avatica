@@ -61,8 +61,7 @@ matrix:
 
 branches:
   only:
-    - master
-    - new-master
+    - main
     - javadoc
     - stage
     - /^branch-.*$/

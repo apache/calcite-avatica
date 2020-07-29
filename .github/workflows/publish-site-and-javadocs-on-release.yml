@@ -49,5 +49,5 @@ jobs:
           git add .
           if ! git diff-index --quiet HEAD; then
             git commit -m "Website deployed from calcite-avatica@$GITHUB_SHA"
-            git push origin master
+            git push origin main
           fi

@@ -98,8 +98,8 @@ automation around verifying the test cases as a part of the Maven build.
 For more information on running this TCK, including specific instructions for
 running the TCK, reference the provided [README][github-tck-readme] file.
 
-[github-tck]: https://github.com/apache/calcite-avatica/tree/master/tck
-[github-tck-tests]: https://github.com/apache/calcite-avatica/tree/master/tck/src/main/java/org/apache/calcite/avatica/tck/tests
-[github-standalone-server]: https://github.com/apache/calcite-avatica/tree/master/standalone-server
-[github-tck-readme]: https://github.com/apache/calcite-avatica/tree/master/tck/README.md
-[github-tck-yml-file]: https://github.com/apache/calcite-avatica/tree/master/tck/src/main/resources/example_config.yml
+[github-tck]: https://github.com/apache/calcite-avatica/tree/main/tck
+[github-tck-tests]: https://github.com/apache/calcite-avatica/tree/main/tck/src/main/java/org/apache/calcite/avatica/tck/tests
+[github-standalone-server]: https://github.com/apache/calcite-avatica/tree/main/standalone-server
+[github-tck-readme]: https://github.com/apache/calcite-avatica/tree/main/tck/README.md
+[github-tck-yml-file]: https://github.com/apache/calcite-avatica/tree/main/tck/src/main/resources/example_config.yml

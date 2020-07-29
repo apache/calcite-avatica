@@ -26,7 +26,7 @@ a sub-directory of the
 
 You can build the site manually using your environment or use the docker compose file.
 
-The site is automatically built and published following the process outlined in the [Calcite repository](https://github.com/apache/calcite/blob/master/site/README.md).
+The site is automatically built and published following the process outlined in the [Calcite repository](https://github.com/apache/calcite/blob/main/site/README.md).
 
 # Previewing the website locally
 
@@ -35,7 +35,7 @@ The site is automatically built and published following the process outlined in 
 ### Setup your environment
 
 Similar to the instructions to
-[set up the Calcite web site](https://github.com/apache/calcite-avatica/blob/master/site/README.md).
+[set up the Calcite web site](https://github.com/apache/calcite-avatica/blob/main/site/README.md).
 
 Site generation currently works best with ruby-2.7.4.
 
