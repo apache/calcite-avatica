@@ -76,7 +76,7 @@ public class HttpServer {
   private final AvaticaHandler handler;
   private final AvaticaServerConfiguration config;
   private final Subject subject;
-  private final SslContextFactory sslFactory;
+  private final SslContextFactory.Server sslFactory;
   private final List<ServerCustomizer<Server>> serverCustomizers;
   private final int maxAllowedHeaderSize;
 
@@ -135,11 +135,11 @@ public class HttpServer {
    * @param handler The Handler to run
    * @param config Optional configuration for the server
    * @param subject The javax.security Subject for the server, or null
-   * @param sslFactory A configured SslContextFactory, or null
+   * @param sslFactory A configured SslContextFactory.Server, or null
    */
   public HttpServer(int port, AvaticaHandler handler,
       AvaticaServerConfiguration config, Subject subject,
-      SslContextFactory sslFactory) {
+      SslContextFactory.Server sslFactory) {
     this(port, handler, config, subject, sslFactory,
         Collections.<ServerCustomizer<Server>>emptyList(),
         MAX_ALLOWED_HEADER_SIZE);
@@ -151,11 +151,11 @@ public class HttpServer {
    * @param handler The Handler to run
    * @param config Optional configuration for the server
    * @param subject The javax.security Subject for the server, or null
-   * @param sslFactory A configured SslContextFactory, or null
+   * @param sslFactory A configured SslContextFactory.Server, or null
    * @param maxAllowedHeaderSize A maximum size in bytes that are allowed in an HTTP header
    */
   public HttpServer(int port, AvaticaHandler handler, AvaticaServerConfiguration config,
-      Subject subject, SslContextFactory sslFactory, int maxAllowedHeaderSize) {
+      Subject subject, SslContextFactory.Server sslFactory, int maxAllowedHeaderSize) {
     this(port, handler, config, subject, sslFactory,
         Collections.<ServerCustomizer<Server>>emptyList(),
         maxAllowedHeaderSize);
@@ -167,11 +167,11 @@ public class HttpServer {
    * @param handler The Handler to run
    * @param config Optional configuration for the server
    * @param subject The javax.security Subject for the server, or null
-   * @param sslFactory A configured SslContextFactory, or null
+   * @param sslFactory A configured SslContextFactory.Server, or null
    * @param maxAllowedHeaderSize A maximum size in bytes that are allowed in an HTTP header
    */
   private HttpServer(int port, AvaticaHandler handler, AvaticaServerConfiguration config,
-      Subject subject, SslContextFactory sslFactory,
+      Subject subject, SslContextFactory.Server sslFactory,
       List<ServerCustomizer<Server>> serverCustomizers, int maxAllowedHeaderSize) {
     this.port = port;
     this.handler = handler;
@@ -798,7 +798,7 @@ public class HttpServer {
         throw new IllegalArgumentException("Unhandled AuthenticationType");
       }
 
-      SslContextFactory sslFactory = buildSSLContextFactory();
+      SslContextFactory.Server sslFactory = buildSSLContextFactory();
 
       List<ServerCustomizer<Server>> jettyCustomizers = new ArrayList<>();
       for (ServerCustomizer<?> customizer : this.serverCustomizers) {
@@ -810,10 +810,10 @@ public class HttpServer {
           maxAllowedHeaderSize);
     }
 
-    protected SslContextFactory buildSSLContextFactory() {
-      SslContextFactory sslFactory = null;
+    protected SslContextFactory.Server buildSSLContextFactory() {
+      SslContextFactory.Server sslFactory = null;
       if (usingTLS) {
-        sslFactory = new SslContextFactory();
+        sslFactory = new SslContextFactory.Server();
         sslFactory.setKeyStorePath(this.keystore.getAbsolutePath());
         sslFactory.setKeyStorePassword(keystorePassword);
         sslFactory.setTrustStorePath(truststore.getAbsolutePath());
