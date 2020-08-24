@@ -23,8 +23,12 @@ import org.apache.calcite.avatica.util.ByteString;
 
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -32,9 +36,13 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 
+import static org.apache.calcite.avatica.AvaticaUtils.skipFully;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -268,6 +276,31 @@ public class AvaticaUtilsTest {
     copyBytes[3] = 11;
     assertThat(s.getBytes()[3], is((byte) 92));
     assertThat(s, is(s2));
+  }
+
+  @Test public void testSkipFully() throws IOException {
+    InputStream in = of("");
+    assertEquals(0, in.available());
+    skipFully(in);
+    assertEquals(0, in.available());
+
+    in = of("asdf");
+    assertEquals(4, in.available());
+    skipFully(in);
+    assertEquals(0, in.available());
+
+    in = of("asdfasdf");
+    for (int i = 0; i < 4; i++) {
+      assertNotEquals(-1, in.read());
+    }
+    assertEquals(4, in.available());
+    skipFully(in);
+    assertEquals(0, in.available());
+  }
+
+  /** Returns an InputStream of UTF-8 encoded bytes from the provided string */
+  InputStream of(String str) {
+    return new ByteArrayInputStream(str.getBytes(StandardCharsets.UTF_8));
   }
 
   /** Dummy implementation of {@link ConnectionProperty}. */

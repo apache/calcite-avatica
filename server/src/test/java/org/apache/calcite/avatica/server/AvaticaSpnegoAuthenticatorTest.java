@@ -24,10 +24,14 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -40,17 +44,21 @@ public class AvaticaSpnegoAuthenticatorTest {
 
   private HttpServletRequest request;
   private HttpServletResponse response;
+  private ServletInputStream requestInput;
   private AvaticaSpnegoAuthenticator authenticator;
 
-  @Before public void setup() {
+  @Before public void setup() throws IOException {
     request = mock(HttpServletRequest.class);
+    requestInput = mock(ServletInputStream.class);
+    when(request.getInputStream()).thenReturn(requestInput);
     response = mock(HttpServletResponse.class);
     authenticator = new AvaticaSpnegoAuthenticator();
   }
 
   @Test public void testAuthenticatedDoesNothingExtra() throws IOException {
+    // SEND_CONTINUE not listed here for explicit testing below.
     List<Authentication> authsNotRequiringUpdate = Arrays.asList(Authentication.NOT_CHECKED,
-        Authentication.SEND_CONTINUE, Authentication.SEND_FAILURE, Authentication.SEND_SUCCESS);
+        Authentication.SEND_FAILURE, Authentication.SEND_SUCCESS);
     for (Authentication auth : authsNotRequiringUpdate) {
       assertEquals(auth, authenticator.sendChallengeIfNecessary(auth, request, response));
       verifyZeroInteractions(request);
@@ -66,6 +74,15 @@ public class AvaticaSpnegoAuthenticatorTest {
     verify(response).setHeader(HttpHeader.WWW_AUTHENTICATE.toString(),
         HttpHeader.NEGOTIATE.asString());
     verify(response).sendError(HttpServletResponse.SC_UNAUTHORIZED);
+  }
+
+  @Test public void testConsumeClientBufferOnChallenge() throws IOException {
+    when(requestInput.read(any(byte[].class), anyInt(), anyInt())).thenReturn(-1);
+    assertEquals(Authentication.SEND_CONTINUE,
+        authenticator.sendChallengeIfNecessary(Authentication.SEND_CONTINUE, request, response));
+    verify(request).getInputStream();
+    verify(requestInput).skip(anyLong());
+    verify(requestInput).read(any(byte[].class), anyInt(), anyInt());
   }
 }
 

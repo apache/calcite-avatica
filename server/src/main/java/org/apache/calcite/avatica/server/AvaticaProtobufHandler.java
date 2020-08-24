@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import javax.servlet.ServletException;
@@ -46,7 +47,7 @@ import javax.servlet.http.HttpServletResponse;
  * Jetty handler that executes Avatica JSON request-responses.
  */
 public class AvaticaProtobufHandler extends AbstractAvaticaHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(AvaticaJsonHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AvaticaProtobufHandler.class);
 
   private final Service service;
   private final ProtobufHandler pbHandler;
@@ -90,6 +91,14 @@ public class AvaticaProtobufHandler extends AbstractAvaticaHandler {
       HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
     try (final Context ctx = this.requestTimer.start()) {
+      if (!request.getMethod().equals("POST")) {
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        response.getOutputStream().write(
+            "This server expects only POST calls.".getBytes(StandardCharsets.UTF_8));
+        baseRequest.setHandled(true);
+        return;
+      }
+
       // Check if the user is OK to proceed.
       if (!isUserPermitted(serverConfig, baseRequest, request, response)) {
         LOG.debug("HTTP request from {} is unauthenticated and authentication is required",
@@ -97,50 +106,48 @@ public class AvaticaProtobufHandler extends AbstractAvaticaHandler {
         return;
       }
 
+      final byte[] requestBytes;
+      // Avoid a new buffer creation for every HTTP request
+      final UnsynchronizedBuffer buffer = threadLocalBuffer.get();
+      try (ServletInputStream inputStream = request.getInputStream()) {
+        requestBytes = AvaticaUtils.readFullyToBytes(inputStream, buffer);
+      } finally {
+        buffer.reset();
+      }
+
       response.setContentType("application/octet-stream;charset=utf-8");
       response.setStatus(HttpServletResponse.SC_OK);
-      if (request.getMethod().equals("POST")) {
-        final byte[] requestBytes;
-        // Avoid a new buffer creation for every HTTP request
-        final UnsynchronizedBuffer buffer = threadLocalBuffer.get();
-        try (ServletInputStream inputStream = request.getInputStream()) {
-          requestBytes = AvaticaUtils.readFullyToBytes(inputStream, buffer);
-        } finally {
-          buffer.reset();
+      HandlerResponse<byte[]> handlerResponse;
+      try {
+        if (null != serverConfig && serverConfig.supportsImpersonation()) {
+          // If we can't extract a user, need to throw 401 in that case.
+          String remoteUser = serverConfig.getRemoteUserExtractor().extract(request);
+          // Invoke the ProtobufHandler inside as doAs for the remote user.
+          // The doAsRemoteUser call may disallow a user, need to throw 403 in that case.
+          handlerResponse = serverConfig.doAsRemoteUser(remoteUser,
+            request.getRemoteAddr(), new Callable<HandlerResponse<byte[]>>() {
+              @Override public HandlerResponse<byte[]> call() {
+                return pbHandler.apply(requestBytes);
+              }
+            });
+        } else {
+          handlerResponse = pbHandler.apply(requestBytes);
         }
-
-        HandlerResponse<byte[]> handlerResponse;
-        try {
-          if (null != serverConfig && serverConfig.supportsImpersonation()) {
-            // If we can't extract a user, need to throw 401 in that case.
-            String remoteUser = serverConfig.getRemoteUserExtractor().extract(request);
-            // Invoke the ProtobufHandler inside as doAs for the remote user.
-            // The doAsRemoteUser call may disallow a user, need to throw 403 in that case.
-            handlerResponse = serverConfig.doAsRemoteUser(remoteUser,
-              request.getRemoteAddr(), new Callable<HandlerResponse<byte[]>>() {
-                @Override public HandlerResponse<byte[]> call() {
-                  return pbHandler.apply(requestBytes);
-                }
-              });
-          } else {
-            handlerResponse = pbHandler.apply(requestBytes);
-          }
-        } catch (RemoteUserExtractionException e) {
-          LOG.debug("Failed to extract remote user from request", e);
-          handlerResponse = pbHandler.unauthenticatedErrorResponse(e);
-        } catch (RemoteUserDisallowedException e) {
-          LOG.debug("Remote user is not authorized", e);
-          handlerResponse = pbHandler.unauthorizedErrorResponse(e);
-        } catch (Exception e) {
-          LOG.debug("Error invoking request from {}", baseRequest.getRemoteAddr(), e);
-          // Catch at the highest level of exceptions
-          handlerResponse = pbHandler.convertToErrorResponse(e);
-        }
-
-        baseRequest.setHandled(true);
-        response.setStatus(handlerResponse.getStatusCode());
-        response.getOutputStream().write(handlerResponse.getResponse());
+      } catch (RemoteUserExtractionException e) {
+        LOG.debug("Failed to extract remote user from request", e);
+        handlerResponse = pbHandler.unauthenticatedErrorResponse(e);
+      } catch (RemoteUserDisallowedException e) {
+        LOG.debug("Remote user is not authorized", e);
+        handlerResponse = pbHandler.unauthorizedErrorResponse(e);
+      } catch (Exception e) {
+        LOG.debug("Error invoking request from {}", baseRequest.getRemoteAddr(), e);
+        // Catch at the highest level of exceptions
+        handlerResponse = pbHandler.convertToErrorResponse(e);
       }
+
+      baseRequest.setHandled(true);
+      response.setStatus(handlerResponse.getStatusCode());
+      response.getOutputStream().write(handlerResponse.getResponse());
     }
   }
 

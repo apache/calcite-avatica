@@ -251,7 +251,6 @@ public class AvaticaSpnegoTest extends HttpBaseTest {
       assertEquals(3, results.getInt(1));
     }
   }
-
 }
 
 // End AvaticaSpnegoTest.java
