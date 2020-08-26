@@ -23,8 +23,6 @@ import org.apache.calcite.avatica.remote.Service.ErrorResponse;
 
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -38,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public abstract class AbstractAvaticaHandler extends AbstractHandler
     implements MetricsAwareAvaticaHandler {
-  private static final Logger LOG = LoggerFactory.getLogger(AbstractAvaticaHandler.class);
 
   private static final ErrorResponse UNAUTHORIZED_ERROR = new ErrorResponse(
       Collections.<String>emptyList(), "User is not authenticated",
