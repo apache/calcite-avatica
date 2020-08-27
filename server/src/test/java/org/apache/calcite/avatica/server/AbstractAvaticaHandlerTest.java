@@ -26,12 +26,15 @@ import org.junit.Test;
 
 import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
+import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,9 +62,13 @@ public class AbstractAvaticaHandlerTest {
 
   @Test public void disallowUnauthenticatedUsers() throws Exception {
     ServletOutputStream os = mock(ServletOutputStream.class);
+    ServletInputStream is = mock(ServletInputStream.class);
+
+    when(is.read(any(byte[].class), anyInt(), anyInt())).thenReturn(-1);
 
     when(config.getAuthenticationType()).thenReturn(AuthenticationType.SPNEGO);
     when(request.getRemoteUser()).thenReturn(null);
+    when(request.getInputStream()).thenReturn(is);
     when(response.getOutputStream()).thenReturn(os);
 
     assertFalse(handler.isUserPermitted(config, baseRequest, request, response));

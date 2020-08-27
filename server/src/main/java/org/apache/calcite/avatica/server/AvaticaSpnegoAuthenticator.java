@@ -16,6 +16,8 @@
  */
 package org.apache.calcite.avatica.server;
 
+import org.apache.calcite.avatica.AvaticaUtils;
+
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.security.ServerAuthException;
 import org.eclipse.jetty.security.authentication.DeferredAuthentication;
@@ -73,6 +75,14 @@ public class AvaticaSpnegoAuthenticator extends
         res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         return Authentication.SEND_CONTINUE;
       }
+    } else if (computedAuth == Authentication.SEND_CONTINUE) {
+      // CALCITE-4196 When we need to reply back to the client with the HTTP/401 challenge
+      // we must make sure that we consume all of the data that the client has written. Otherwise,
+      // the client will continue to write the data on a socket which we've already closed. This
+      // would ultimately result in the client receiving a TCP Reset and seeing a "Broken pipe"
+      // exception in their client application.
+      HttpServletRequest req = (HttpServletRequest) request;
+      AvaticaUtils.skipFully(req.getInputStream());
     }
     return computedAuth;
   }

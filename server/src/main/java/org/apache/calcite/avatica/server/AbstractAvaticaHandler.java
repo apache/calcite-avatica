@@ -17,6 +17,7 @@
 package org.apache.calcite.avatica.server;
 
 import org.apache.calcite.avatica.AvaticaSeverity;
+import org.apache.calcite.avatica.AvaticaUtils;
 import org.apache.calcite.avatica.remote.AuthenticationType;
 import org.apache.calcite.avatica.remote.Service.ErrorResponse;
 
@@ -26,6 +27,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.Collections;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -57,8 +59,14 @@ public abstract class AbstractAvaticaHandler extends AbstractHandler
     // Make sure that we drop any unauthenticated users out first.
     if (null != serverConfig) {
       if (AuthenticationType.SPNEGO == serverConfig.getAuthenticationType()) {
+        // This is largely a failsafe. We should never normally get here, but
+        // AvaticaSpnegoAuthenticator should throw the HTTP/401.
         String remoteUser = request.getRemoteUser();
         if (null == remoteUser) {
+          ServletInputStream input = request.getInputStream();
+          if (request.getContentLengthLong() < 0) {
+            AvaticaUtils.skipFully(input);
+          }
           response.setStatus(HttpURLConnection.HTTP_UNAUTHORIZED);
           response.getOutputStream().write(UNAUTHORIZED_ERROR.serialize().toByteArray());
           baseRequest.setHandled(true);

@@ -57,6 +57,8 @@ public class AvaticaUtils {
     }
   };
 
+  private static final int SKIP_BUFFER_SIZE = 4096;
+
   private AvaticaUtils() {}
 
   static {
@@ -284,6 +286,26 @@ public class AvaticaUtils {
       buffer.write(bytes, 0, count);
     }
     return buffer.toArray();
+  }
+
+  /**
+   * Reads and discards all data available on the InputStream.
+   */
+  public static void skipFully(InputStream inputStream) throws IOException {
+    byte[] temp = null;
+    while (true) {
+      long bytesSkipped = inputStream.skip(Long.MAX_VALUE);
+      if (bytesSkipped == 0) {
+        if (temp == null) {
+          temp = new byte[SKIP_BUFFER_SIZE];
+        }
+        int bytesRead = inputStream.read(temp, 0, SKIP_BUFFER_SIZE);
+        if (bytesRead < 0) {
+          // EOF
+          return;
+        }
+      }
+    }
   }
 
   /** Invokes {@code Statement#setLargeMaxRows}, falling back on
