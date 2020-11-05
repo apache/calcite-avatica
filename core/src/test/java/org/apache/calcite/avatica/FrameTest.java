@@ -23,6 +23,7 @@ import org.apache.calcite.avatica.proto.Common.TypedValue;
 
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -103,6 +104,84 @@ public class FrameTest {
     Frame singleRow = new Frame(0, true, rows);
 
     serializeAndTestEquality(singleRow);
+  }
+
+  protected void testValueRoundTrip(Object value) {
+    List<Object> rows = Collections.singletonList(new Object[]{value});
+    serializeAndTestEquality(new Frame(0, true, rows));
+  }
+
+  @Test
+  public void testInteger() {
+    testValueRoundTrip(Integer.MIN_VALUE);
+    testValueRoundTrip(Integer.MAX_VALUE);
+  }
+
+  @Test
+  public void testLong() {
+    testValueRoundTrip(1L);
+    testValueRoundTrip(0L);
+    testValueRoundTrip(Long.MIN_VALUE);
+    testValueRoundTrip(Long.MAX_VALUE);
+  }
+
+  @Test
+  public void testFloat() {
+    testValueRoundTrip(Float.MIN_VALUE);
+    testValueRoundTrip(Float.MAX_VALUE);
+    testValueRoundTrip(Float.MIN_NORMAL);
+  }
+
+  @Test
+  public void testDouble() {
+    testValueRoundTrip(Double.MIN_VALUE);
+    testValueRoundTrip(Double.MAX_VALUE);
+    testValueRoundTrip(Double.MIN_NORMAL);
+  }
+
+  @Test
+  public void testString() {
+    testValueRoundTrip("example-value");
+    testValueRoundTrip("");
+  }
+
+  @Test
+  public void testChar() {
+    testValueRoundTrip('a');
+    testValueRoundTrip('\0');
+  }
+
+  @Test
+  public void testByte() {
+    testValueRoundTrip(Byte.MAX_VALUE);
+    testValueRoundTrip(Byte.MIN_VALUE);
+  }
+
+  @Test
+  public void testByteArray() {
+    testValueRoundTrip(new byte[] {1, 0});
+  }
+
+  @Test
+  public void testBoolean() {
+    testValueRoundTrip(true);
+    testValueRoundTrip(false);
+  }
+
+  @Test
+  public void testShort() {
+    testValueRoundTrip(Short.MAX_VALUE);
+    testValueRoundTrip(Short.MIN_VALUE);
+  }
+
+  @Test
+  public void testBigDecimal() {
+    testValueRoundTrip(BigDecimal.valueOf(0));
+    testValueRoundTrip(BigDecimal.valueOf(1));
+    testValueRoundTrip(BigDecimal // make a non-integer value larger than Long.MAX_VALUE
+        .valueOf(Long.MAX_VALUE)
+        .multiply(BigDecimal.TEN)
+        .add(BigDecimal.valueOf(0.12345d)));
   }
 
   @Test public void testMalformedColumnValue() {
