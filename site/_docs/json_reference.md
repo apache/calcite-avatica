@@ -36,7 +36,6 @@ miscellaneous:
   - { name: "Frame" }
   - { name: "QueryState" }
   - { name: "Rep" }
-  - { name: "RpcMetadata" }
   - { name: "Signature" }
   - { name: "StateType" }
   - { name: "StatementHandle" }
@@ -58,6 +57,7 @@ responses:
   - { name: "PrepareResponse" }
   - { name: "ResultSetResponse" }
   - { name: "RollbackResponse" }
+  - { name: "RpcMetadata" }
   - { name: "SyncResultsResponse" }
 ---
 
@@ -229,6 +229,7 @@ This request is used to fetch all <a href="#databaseproperty">database propertie
 {% highlight json %}
 {
   "request": "databaseProperties",
+  "connectionId": "000000-0000-0000-00000000",
 }
 {% endhighlight %}
 
@@ -421,9 +422,9 @@ This request is used to fetch the schemas matching the provided criteria in the 
 
 `connection_id` The identifier for the connection to fetch schemas from.
 
-`catalog` (required string) The name of the catalog to fetch the schema from.
+`catalog` (optional string) The name of the catalog to fetch the schema from.
 
-`schemaPattern` (required string) A Java pattern of schemas to fetch.
+`schemaPattern` (optional string) A Java pattern of schemas to fetch.
 
 ### TableTypesRequest
 
@@ -746,6 +747,19 @@ A response to the <a href="#rollbackrequest">RollBackRequest</a>.
 
 There are no extra attributes on this Response.
 
+### RpcMetadata
+
+A response which contains assorted per-call/contextual metadata returned by the Avatica server.
+
+{% highlight json %}
+{
+  "response": "rpcMetadata",
+  "serverAddress": "localhost:8765"
+}
+{% endhighlight %}
+
+`serverAddress` The `host:port` of the server which created this object.
+
 ### SyncResultsResponse
 
 A response to the <a href="#syncresultsrequest">SyncResultsRequest</a>. When `moreResults` is true, a <a href="#fetchrequest">FetchRequest</a>
@@ -920,6 +934,7 @@ This object represents the properties for a given JDBC Connection.
 {% highlight json %}
 {
   "connProps": "connPropsImpl",
+  "dirty": true,
   "autoCommit": true,
   "readOnly": true,
   "transactionIsolation": 0,
@@ -927,6 +942,8 @@ This object represents the properties for a given JDBC Connection.
   "schema": "schema"
 }
 {% endhighlight %}
+
+`dirty` (optional boolean) A boolean denoting if the properties have been altered.
 
 `autoCommit` (optional boolean) A boolean denoting if autoCommit is enabled for transactions.
 
@@ -1043,18 +1060,6 @@ One of:
 * `STRING`
 * `NUMBER`
 * `OBJECT`
-
-### RpcMetadata
-
-This object contains assorted per-call/contextual metadata returned by the Avatica server.
-
-{% highlight json %}
-{
-  "serverAddress": "localhost:8765"
-}
-{% endhighlight %}
-
-`serverAddress` The `host:port` of the server which created this object.
 
 ### Signature
 

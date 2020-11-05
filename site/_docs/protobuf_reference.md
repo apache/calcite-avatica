@@ -38,7 +38,6 @@ miscellaneous:
   - { name: "QueryState" }
   - { name: "Rep" }
   - { name: "Row" }
-  - { name: "RpcMetadata" }
   - { name: "Signature" }
   - { name: "StateType" }
   - { name: "StatementHandle" }
@@ -62,6 +61,7 @@ responses:
   - { name: "PrepareResponse" }
   - { name: "ResultSetResponse" }
   - { name: "RollbackResponse" }
+  - { name: "RpcMetadata" }
   - { name: "SyncResultsResponse" }
 ---
 
@@ -773,6 +773,18 @@ message RollbackResponse {
 
 There are no attributes on this Response.
 
+### RpcMetadata
+
+A response which contains assorted per-call/contextual metadata returned by the Avatica server.
+
+{% highlight protobuf %}
+message RpcMetadata {
+  string server_address = 1;
+}
+{% endhighlight %}
+
+`serverAddress` The `host:port` of the server which created this object.
+
 ### SyncResultsResponse
 
 A response to the <a href="#syncresultsrequest">SyncResultsRequest</a>. When `moreResults` is true, a <a href="#fetchrequest">FetchRequest</a>
@@ -1139,18 +1151,6 @@ enum Rep {
   MULTISET = 29;
 }
 {% endhighlight %}
-
-### RpcMetadata
-
-This object contains assorted per-call/contextual metadata returned by the Avatica server.
-
-{% highlight protobuf %}
-message RpcMetadata {
-  string server_address = 1;
-}
-{% endhighlight %}
-
-`serverAddress` The `host:port` of the server which created this object.
 
 ### Signature
 
