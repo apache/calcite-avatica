@@ -229,6 +229,7 @@ This request is used to fetch all <a href="#databaseproperty">database propertie
 {% highlight json %}
 {
   "request": "databaseProperties",
+  "connectionId": "000000-0000-0000-00000000"
 }
 {% endhighlight %}
 
@@ -421,9 +422,9 @@ This request is used to fetch the schemas matching the provided criteria in the 
 
 `connection_id` The identifier for the connection to fetch schemas from.
 
-`catalog` (required string) The name of the catalog to fetch the schema from.
+`catalog` (optional string) The name of the catalog to fetch the schema from.
 
-`schemaPattern` (required string) A Java pattern of schemas to fetch.
+`schemaPattern` (optional string) A Java pattern of schemas to fetch.
 
 ### TableTypesRequest
 
@@ -944,6 +945,9 @@ specification. This value is analogous to the values defined in `java.sql.Connec
 `catalog` (optional string) The name of the catalog to include when fetching connection properties.
 
 `schema` (optional string) The name of the schema to include when fetching connection properties.
+
+`isDirty` (internal boolean) A boolean used for internal purposes only (not required by the Avatica protocol).
+This field will be removed from the protocol in future releases.
 
 ### CursorFactory
 

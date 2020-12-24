@@ -957,7 +957,8 @@ message ConnectionProperties {
 }
 {% endhighlight %}
 
-`is_dirty` A boolean denoting if the properties have been altered.
+`is_dirty` A boolean denoting if the properties have been altered. This field should not be present as it
+never and will be removed from the protocol in future releases.
 
 `auto_commit` A boolean denoting if autoCommit is enabled for transactions.
 
