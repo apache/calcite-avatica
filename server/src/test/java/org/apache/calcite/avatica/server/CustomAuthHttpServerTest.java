@@ -22,7 +22,6 @@ import org.apache.calcite.avatica.remote.AuthenticationType;
 import org.apache.calcite.avatica.remote.Driver;
 import org.apache.calcite.avatica.remote.LocalService;
 
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.UserAuthentication;
 import org.eclipse.jetty.server.Authentication;
 import org.eclipse.jetty.server.Connector;
@@ -33,6 +32,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.UserIdentity;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -208,7 +208,7 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
               Driver.Serialization.PROTOBUF, null, configuration);
 
       if (isBasicAuth) {
-        ConstraintSecurityHandler securityHandler =
+        HandlerWrapper securityHandler =
                 avaticaServer.configureBasicAuthentication(server, configuration);
         securityHandler.setHandler(avaticaHandler);
         avaticaHandler = securityHandler;
@@ -235,6 +235,14 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
     }
 
     @Override public String getKerberosPrincipal() {
+      return null;
+    }
+
+    @Override public String getKerberosServiceName() {
+      return null;
+    }
+
+    @Override public String getKerberosHostName() {
       return null;
     }
 
@@ -286,6 +294,14 @@ public class CustomAuthHttpServerTest extends HttpAuthBase {
     }
 
     @Override public String getKerberosPrincipal() {
+      return null;
+    }
+
+    @Override public String getKerberosServiceName() {
+      return null;
+    }
+
+    @Override public String getKerberosHostName() {
       return null;
     }
 

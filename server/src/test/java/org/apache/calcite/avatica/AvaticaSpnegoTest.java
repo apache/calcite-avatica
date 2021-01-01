@@ -65,6 +65,12 @@ public class AvaticaSpnegoTest extends HttpBaseTest {
   private static boolean isKdcStarted = false;
 
   private static void setupKdc() throws Exception {
+    System.setProperty("sun.security.krb5.debug", "true");
+    System.setProperty("sun.security.jgss.debug", "true");
+    System.setProperty("sun.security.spnego.debug", "true");
+    System.setProperty("java.security.debug", "all");
+    System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
+
     if (isKdcStarted) {
       return;
     }
@@ -108,9 +114,9 @@ public class AvaticaSpnegoTest extends HttpBaseTest {
     clientConfig.setString(KrbConfigKey.DEFAULT_REALM, SpnegoTestUtil.REALM);
 
     // Kerby sets "java.security.krb5.conf" for us!
+    // useSubjectCredsOnly is only important when we expect JAAS to go "looking"
+    // for credentials on our behalf.
     System.setProperty("javax.security.auth.useSubjectCredsOnly", "false");
-    //System.setProperty("sun.security.spnego.debug", "true");
-    //System.setProperty("sun.security.krb5.debug", "true");
   }
 
   @AfterClass public static void stopKdc() throws KrbException {

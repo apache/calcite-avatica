@@ -29,6 +29,7 @@ import com.beust.jcommander.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.Locale;
 
 /**
@@ -53,6 +54,14 @@ public class StandaloneServer {
       description = "Print the help message")
   private boolean help = false;
 
+  @Parameter(names = { "--principal" }, required = false,
+      description = "Kerberos principal (optiona)")
+  private String kerberosPrincipal = null;
+
+  @Parameter(names = { "--keytab" }, required = false,
+      description = "Kerberos keytab (optional)", converter = ToFileConverter.class)
+  private File kerberosKeytab = null;
+
   private HttpServer server;
 
   public void start() {
@@ -67,10 +76,19 @@ public class StandaloneServer {
       LocalService service = new LocalService(meta);
 
       // Construct the server
-      this.server = new HttpServer.Builder()
+      HttpServer.Builder builder = new HttpServer.Builder()
           .withHandler(service, serialization)
-          .withPort(port)
-          .build();
+          .withPort(port);
+
+      if (kerberosPrincipal != null && kerberosKeytab != null) {
+        System.out.println("Configuring Avatica to use SPENGO");
+        builder.withSpnego(kerberosPrincipal)
+            .withAutomaticLogin(kerberosKeytab);
+      } else {
+        System.out.println("Not configuring Avatica authentication");
+      }
+
+      server = builder.build();
 
       // Then start it
       server.start();
@@ -132,6 +150,20 @@ public class StandaloneServer {
   public static class SerializationConverter implements IStringConverter<Serialization> {
     @Override public Serialization convert(String value) {
       return Serialization.valueOf(value.toUpperCase(Locale.ROOT));
+    }
+  }
+
+  /**
+   * Converter from String to a File.
+   */
+  public static class ToFileConverter implements IStringConverter<File> {
+    @Override public File convert(String value) {
+      File f = new File(value);
+      if (!f.isFile()) {
+        String msg = "Kerberos keytab '" + value + "' appears to not be a file";
+        throw new IllegalArgumentException(msg);
+      }
+      return f;
     }
   }
 
