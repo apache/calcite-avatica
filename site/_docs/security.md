@@ -9,6 +9,7 @@ auth_types:
   - { name: "Kerberos with SPNEGO", anchor: "kerberos-with-spnego-authentication" }
   - { name: "Custom Authentication", anchor: "custom-authentication" }
   - { name: "Client implementation", anchor: "client-implementation" }
+  - { name: "TLS", anchor: "tls" }
 ---
 <!--
 {% comment %}
@@ -164,6 +165,10 @@ HttpServer server = new HttpServer.Builder()
 
 #### JAAS Configuration File Login
 
+**Since Avatica 1.20.0, Jetty has removed this functionality which means that Avatica
+also does not support Avatica server login via JAAS configuration file. The Avatica
+programmatic login is the only manner to do this.**
+
 A JAAS configuration file can be set via the system property `java.security.auth.login.config`.
 The user must set this property when launching their Java application invoking the Avatica server.
 The presence of this file will automatically perform login as necessary in the first use
@@ -190,6 +195,20 @@ com.sun.security.jgss.accept  {
 {% endhighlight %}
 
 Ensure the `keyTab` and `principal` attributes are set correctly for your system.
+
+#### Additional Allowed Realms
+
+Versions of Avatica prior to 1.20.0 provided API to specify a list of `additionalAllowedRealms`.
+While this API could have been leveraged by other integrators of Avatica, the only provided
+usage of this API was to specify additional Kerberos realms (realms other than the kerberos
+realm which the server's principal was a part of) which should be allowed to authenticate
+against the Avatica server.
+
+With the Jetty update in Avatica 1.20.0, this functionality was removed without replacement.
+Any user with valid Kerberos credentials which can be validated based on the krb5.conf file
+on the host where the Avatica server runs should be capable of authenticating against Avatica.
+Consult your JVM to determine where the default krb5.conf file is loaded from and the Java
+system property to use if you need to override this file.
 
 ### Impersonation
 
@@ -286,8 +305,21 @@ these implementations as it is likely correct.
 ### SPNEGO
 
 For information on building SPNEGO support by hand, consult [RFC-4559](https://tools.ietf.org/html/rfc4559)
-which describes how the authentication handshake, through use of the "WWW-authenticate=Negotiate"
-HTTP header, is used to authenticate a client.
+which describes how the authentication handshake, through use of the `WWW-Authenticate=Negotiate`
+HTTP header, is used to authenticate a client. Prior to Avatica 1.20.0, this handshake is done
+for every HTTP call to the Avatica server.
+
+Starting in Avatica 1.20.0, Avatica was updated to use a newer version of Jetty which includes
+the ability to perform one SPNEGO-based authentication handshake but then set a cookie which
+can be used to re-identify the client without performing subsequent SPNEGO handshakes.
+
+This is a notable change because it will effectively reduce the number of HTTP calls that an Avatica
+client has to make to the server which, for often results in a near 2x performance improvement (as there
+is a lower-bound of 1's of milliseconds per HTTP call). However, if the cookie is compromised, another
+client could potentially access Avatica as the user for whom the cookie was set for. Because of this, it
+is important to configure the Avatica server to [use TLS](#tls) to authenticate its clients.
+
+See more information in [CALCITE-4152](https://issues.apache.org/jira/browse/CALCITE-4152).
 
 ### Password-based
 
@@ -298,3 +330,17 @@ properties are used to identify the client with the server. If the underlying da
 these are set via the traditional "user" and "password" properties in the Avatica
 JDBC driver. This also implies that adding HTTP-level authentication in Avatica is likely
 superfluous.
+
+## TLS
+
+Deploying the Avatica server with TLS is common practice, like it is for any HTTP server. To do this,
+use the method `withTls(File, String, File, String)` to provide the server's TLS private key (a.k.a keystore)
+and the certificate authority's public key (a.k.a. truststore) as a Java Key Store (JKS) files, along with
+passwords to validate that the JKS files have not been tampered with.
+
+{% highlight java %}
+HttpServer server = new HttpServer.Builder()
+    .withTLS(new File("/avatica/server.jks"), "MyKeystorePassword",
+        new File("/avatica/truststore.jks"), "MyTruststorePassword")
+    .build();
+{% endhighlight %}

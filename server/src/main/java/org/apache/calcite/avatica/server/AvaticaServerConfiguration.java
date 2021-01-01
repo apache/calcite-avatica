@@ -18,6 +18,7 @@ package org.apache.calcite.avatica.server;
 
 import org.apache.calcite.avatica.remote.AuthenticationType;
 
+import java.io.File;
 import java.util.concurrent.Callable;
 
 /**
@@ -40,11 +41,30 @@ public interface AvaticaServerConfiguration {
   String getKerberosRealm();
 
   /**
+   * Returns the "primary" component of the Kerberos principal for the Avatica server,
+   * e.g. primary/instance@REALM
+   */
+  String getKerberosServiceName();
+
+  /**
+   * Returns the "instance" component of the Kerberos principal for the Avatica server,
+   * e.g. primary/instance@REALM
+   */
+  String getKerberosHostName();
+
+  /**
    * Returns the Kerberos principal that the Avatica server should log in as.
    *
    * @return A Kerberos principal, or null if not applicable.
    */
   String getKerberosPrincipal();
+
+  /**
+   * Returns the file to the server's Kerberos keytab.
+   */
+  default File getKerberosKeytab() {
+    return null;
+  }
 
   /**
    * Returns the array of allowed roles for login. Only applicable when

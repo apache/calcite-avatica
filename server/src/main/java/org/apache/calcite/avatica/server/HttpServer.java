@@ -23,11 +23,14 @@ import org.apache.calcite.avatica.remote.Service;
 import org.apache.calcite.avatica.remote.Service.RpcMetadataResponse;
 
 import org.eclipse.jetty.security.Authenticator;
+import org.eclipse.jetty.security.ConfigurableSpnegoLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
+import org.eclipse.jetty.security.authentication.AuthorizationService;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.security.authentication.ConfigurableSpnegoAuthenticator;
 import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 import org.eclipse.jetty.server.AbstractConnectionFactory;
 import org.eclipse.jetty.server.Connector;
@@ -37,6 +40,8 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.session.DefaultSessionIdManager;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
@@ -48,7 +53,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.Principal;
 import java.security.PrivilegedAction;
+import java.security.SecureRandom;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -275,7 +283,10 @@ public class HttpServer {
     if (null != config) {
       ConstraintSecurityHandler securityHandler = getSecurityHandler();
       securityHandler.setHandler(handler);
-      avaticaHandler = securityHandler;
+      // SPNEGO requires a session
+      SessionHandler sessionHandler = new SessionHandler();
+      sessionHandler.setHandler(securityHandler);
+      avaticaHandler = sessionHandler;
     }
 
     handlerList.setHandlers(new Handler[] {avaticaHandler, new DefaultHandler()});
@@ -337,31 +348,45 @@ public class HttpServer {
   protected ConstraintSecurityHandler configureSpnego(Server server,
       AvaticaServerConfiguration config) {
     final String realm = Objects.requireNonNull(config.getKerberosRealm());
-    final String principal = Objects.requireNonNull(config.getKerberosPrincipal());
+
+    // DefaultSessionIdManager uses SecureRandom, but we can be explicit about that.
+    server.setSessionIdManager(new DefaultSessionIdManager(server, new SecureRandom()));
+
+    // We rely on SPNEGO to authenticate the users with valid Kerberos identities. We
+    // do not require a _specific_ Kerberos identity in order to authenticate with
+    // Avatica. AvaticaUserStore will assign the role "avatica-user" to every SPNEGO-authenticated
+    // user, and then ConfigurableSpnegoAuthenticator will check that role.
+    //
+    // This setup adds nothing but complexity to Avatica, but Jetty removed the
+    // functionality to not have this layer of indirection. It paves the way for
+    // flexibility in having "user" centric HTTP endpoints and "admin" centric
+    // HTTP endpoints which Avatica can authorize appropriately.
+    final AvaticaUserStore userStore = new AvaticaUserStore();
+    LOG.info("Instantiating HashLoginService with {}", realm);
+    // Passing the Kerberos Realm here was previously important, but is not critical any longer.
+    final HashLoginService authz = new HashLoginService(realm);
+    authz.setUserStore(userStore);
 
     // A customization of SpnegoLoginService to explicitly set the server's principal, otherwise
     // we would have to require a custom file to set the server's principal.
-    PropertyBasedSpnegoLoginService spnegoLoginService =
-        new PropertyBasedSpnegoLoginService(realm, principal);
+    ConfigurableSpnegoLoginService spnegoLoginService =
+        new ConfigurableSpnegoLoginService(realm, AuthorizationService.from(authz, ""));
+    // Why? The Jetty unit test does it.
+    spnegoLoginService.addBean(authz);
+    spnegoLoginService.setServiceName(config.getKerberosServiceName());
+    spnegoLoginService.setHostName(config.getKerberosHostName());
+    spnegoLoginService.setKeyTabPath(config.getKerberosKeytab().toPath());
 
-    // Roles are "realms" for Kerberos/SPNEGO
-    final String[] allowedRealms = getAllowedRealms(realm, config);
+    // The Authenticator independently validates what role(s) the authenticated
+    // user has and authorizes them to access the HTTP resources. We use "avatica-user"
+    // as the role to check.
+    final String[] allowedRealms = new String[] {AvaticaUserStore.AVATICA_USER_ROLE};
+
+    final ConfigurableSpnegoAuthenticator spnegoAuthn = new ConfigurableSpnegoAuthenticator();
+    spnegoAuthn.setAuthenticationDuration(Duration.ofMinutes(5));
 
     return configureCommonAuthentication(Constraint.__SPNEGO_AUTH,
-        allowedRealms, new AvaticaSpnegoAuthenticator(), realm, spnegoLoginService);
-  }
-
-  protected String[] getAllowedRealms(String serverRealm, AvaticaServerConfiguration config) {
-    // Roles are "realms" for Kerberos/SPNEGO
-    String[] allowedRealms = new String[] {serverRealm};
-    // By default, only the server's realm is allowed, but other realms can also be allowed.
-    if (null != config.getAllowedRoles()) {
-      allowedRealms = new String[config.getAllowedRoles().length + 1];
-      allowedRealms[0] = serverRealm;
-      System.arraycopy(config.getAllowedRoles(), 0, allowedRealms, 1,
-          config.getAllowedRoles().length);
-    }
-    return allowedRealms;
+        allowedRealms, spnegoAuthn, realm, spnegoLoginService);
   }
 
   protected ConstraintSecurityHandler configureBasicAuthentication(Server server,
@@ -404,13 +429,12 @@ public class HttpServer {
     cm.setConstraint(constraint);
     cm.setPathSpec("/*");
 
-    ConstraintSecurityHandler sh = new ConstraintSecurityHandler();
-    sh.setAuthenticator(authenticator);
-    sh.setLoginService(loginService);
-    sh.setConstraintMappings(new ConstraintMapping[]{cm});
-    sh.setRealmName(realm);
+    ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+    securityHandler.setAuthenticator(authenticator);
+    securityHandler.setLoginService(loginService);
+    securityHandler.setConstraintMappings(new ConstraintMapping[]{cm});
 
-    return sh;
+    return securityHandler;
   }
 
   /**
@@ -574,7 +598,9 @@ public class HttpServer {
      * @param additionalAllowedRealms Any additional realms, other than the server's realm, which
      *    should be allowed to authenticate against the server. Can be null.
      * @return <code>this</code>
+     * @deprecated Since 1.20.0, because {@code additionalAllowedRealms} is no longer considered.
      */
+    @Deprecated
     public Builder<T> withSpnego(String principal, String[] additionalAllowedRealms) {
       int index = Objects.requireNonNull(principal).lastIndexOf('@');
       if (-1 == index) {
@@ -613,12 +639,20 @@ public class HttpServer {
      * @param additionalAllowedRealms Any additional realms, other than the server's realm, which
      *    should be allowed to authenticate against the server. Can be null.
      * @return <code>this</code>
+     * @deprecated since 1.20.0 because {@code additionalAllowedRealms} is no longer considered.
      */
+    @Deprecated
     public Builder<T> withSpnego(String principal, String realm, String[] additionalAllowedRealms) {
       this.authenticationType = AuthenticationType.SPNEGO;
       this.kerberosPrincipal = Objects.requireNonNull(principal);
       this.kerberosRealm = Objects.requireNonNull(realm);
+      if (additionalAllowedRealms != null) {
+        LOG.warn("Avatica no longer support additionalAllowedRealms as the Jetty SPNEGO"
+            + " implementation does not adhere to it. All authenticateable realms are allowed: {}",
+            Arrays.toString(additionalAllowedRealms));
+      }
       this.loginServiceAllowedRoles = additionalAllowedRealms;
+
       return this;
     }
 
@@ -653,7 +687,7 @@ public class HttpServer {
      * @return <code>this</code>
      */
 
-    public Builder withRemoteUserExtractor(RemoteUserExtractor remoteUserExtractor) {
+    public Builder<T> withRemoteUserExtractor(RemoteUserExtractor remoteUserExtractor) {
       this.remoteUserExtractor = Objects.requireNonNull(remoteUserExtractor);
       return this;
     }
@@ -781,13 +815,8 @@ public class HttpServer {
         handler = buildHandler(this, serverConfig);
         break;
       case SPNEGO:
-        if (null != keytab) {
-          LOG.debug("Performing Kerberos login with {} as {}", keytab, kerberosPrincipal);
-          subject = loginViaKerberos(this);
-        } else {
-          LOG.debug("Not performing Kerberos login");
-          subject = null;
-        }
+        LOG.debug("Not performing Kerberos login, Jetty does this now");
+        subject = null;
         serverConfig = buildSpnegoConfiguration(this);
         handler = buildHandler(this, serverConfig);
         break;
@@ -854,7 +883,22 @@ public class HttpServer {
      */
     private AvaticaServerConfiguration buildSpnegoConfiguration(Builder b) {
       final String principal = b.kerberosPrincipal;
+      final int separatorIndex = principal.indexOf('/');
+      if (separatorIndex < 1) {
+        throw new RuntimeException("Expected principal to be of the form primary/instance"
+            + " but got " + principal);
+      }
+      final String primary = principal.substring(0, separatorIndex);
+      final int atSignIndex = principal.indexOf('@');
+      final String instance;
+      // Trim off the @REALM if it's present
+      if (atSignIndex == -1) {
+        instance = principal.substring(separatorIndex + 1);
+      } else {
+        instance = principal.substring(separatorIndex + 1, atSignIndex);
+      }
       final String realm = b.kerberosRealm;
+      final File keytab = b.keytab;
       final String[] additionalAllowedRealms = b.loginServiceAllowedRoles;
       final DoAsRemoteUserCallback callback = b.remoteUserCallback;
       final RemoteUserExtractor remoteUserExtractor = b.remoteUserExtractor;
@@ -870,6 +914,18 @@ public class HttpServer {
 
         @Override public String getKerberosPrincipal() {
           return principal;
+        }
+
+        @Override public String getKerberosServiceName() {
+          return primary;
+        }
+
+        @Override public String getKerberosHostName() {
+          return instance;
+        }
+
+        @Override public File getKerberosKeytab() {
+          return keytab;
         }
 
         @Override public boolean supportsImpersonation() {
@@ -930,6 +986,14 @@ public class HttpServer {
         }
 
         @Override public String getKerberosPrincipal() {
+          return null;
+        }
+
+        @Override public String getKerberosServiceName() {
+          return null;
+        }
+
+        @Override public String getKerberosHostName() {
           return null;
         }
 

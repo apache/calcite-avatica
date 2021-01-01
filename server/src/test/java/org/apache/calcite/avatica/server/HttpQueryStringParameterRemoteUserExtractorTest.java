@@ -97,6 +97,14 @@ public class HttpQueryStringParameterRemoteUserExtractorTest extends HttpAuthBas
       return null;
     }
 
+    @Override public String getKerberosServiceName() {
+      return null;
+    }
+
+    @Override public String getKerberosHostName() {
+      return null;
+    }
+
     @Override public boolean supportsImpersonation() {
       // Impersonation is allowed
       return true;
