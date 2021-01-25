@@ -225,6 +225,8 @@ public class DateTimeUtilsTest {
   }
 
   @Test public void testTimeToString() {
+    checkTimeString("00", "00:00:00", 0, 0);
+    checkTimeString("00:00", "00:00:00", 0, 0);
     checkTimeString("00:00:00", 0, 0);
     checkTimeString("23:59:59", 0, 86400000 - 1000);
     checkTimeString("23:59:59.1", 1, 86400000 - 1000 + 100);
@@ -270,13 +272,17 @@ public class DateTimeUtilsTest {
   }
 
   private void checkTimeString(String s, int p, int d) {
-    int digitsAfterPoint = s.indexOf('.') >= 0
-        ? s.length() - s.indexOf('.') - 1
+    checkTimeString(s, s, p, d);
+  }
+
+  private void checkTimeString(String string, String expectedString, int p, int d) {
+    int digitsAfterPoint = string.indexOf('.') >= 0
+        ? string.length() - string.indexOf('.') - 1
         : 0;
     if (digitsAfterPoint == p) {
-      assertThat(unixTimeToString(d, p), is(s));
+      assertThat(unixTimeToString(d, p), is(expectedString));
     }
-    assertThat(timeStringToUnixDate(s), is(d));
+    assertThat(timeStringToUnixDate(string), is(d));
   }
 
   @Test public void testTimestampToString() {

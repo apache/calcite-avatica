@@ -666,15 +666,15 @@ public class DateTimeUtils {
     int milli;
     if (colon1 < 0) {
       hour = Integer.parseInt(v.trim());
-      minute = 1;
-      second = 1;
+      minute = 0;
+      second = 0;
       milli = 0;
     } else {
       hour = Integer.parseInt(v.substring(start, colon1).trim());
       final int colon2 = v.indexOf(':', colon1 + 1);
       if (colon2 < 0) {
         minute = Integer.parseInt(v.substring(colon1 + 1).trim());
-        second = 1;
+        second = 0;
         milli = 0;
       } else {
         minute = Integer.parseInt(v.substring(colon1 + 1, colon2).trim());
