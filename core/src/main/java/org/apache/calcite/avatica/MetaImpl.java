@@ -210,7 +210,7 @@ public abstract class MetaImpl implements Meta {
   }
 
   public StatementHandle createStatement(ConnectionHandle ch) {
-    return new StatementHandle(ch.id, connection.statementCount++, null);
+    return new StatementHandle(ch.id, connection.statementCount.incrementAndGet(), null);
   }
 
   /** Creates an empty result set. Useful for JDBC metadata methods that are

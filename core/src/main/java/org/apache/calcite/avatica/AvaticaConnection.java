@@ -53,6 +53,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implementation of JDBC connection
@@ -77,7 +78,7 @@ public abstract class AvaticaConnection implements Connection {
 
   public static final Helper HELPER = Helper.INSTANCE;
 
-  protected int statementCount;
+  protected final AtomicInteger statementCount = new AtomicInteger();
   private boolean closed;
   private int holdability;
   private int networkTimeout;
