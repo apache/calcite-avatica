@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * Command handler for getting various metadata. Should be implemented by each
@@ -608,8 +609,8 @@ public interface Meta {
     private CursorFactory(Style style, Class clazz, List<Field> fields,
         List<String> fieldNames) {
       assert (fieldNames != null)
-          == (style == Style.RECORD_PROJECTION || style == Style.MAP);
-      assert (fields != null) == (style == Style.RECORD_PROJECTION);
+          == (style == Style.RECORD || style == Style.RECORD_PROJECTION || style == Style.MAP);
+      assert (fields != null) == (style == Style.RECORD || style == Style.RECORD_PROJECTION);
       this.style = Objects.requireNonNull(style);
       this.clazz = clazz;
       this.fields = fields;
@@ -628,9 +629,9 @@ public interface Meta {
       case LIST:
         return LIST;
       case RECORD:
-        return record(clazz);
+        return record(Style.RECORD, clazz, null, fieldNames);
       case RECORD_PROJECTION:
-        return record(clazz, null, fieldNames);
+        return record(Style.RECORD_PROJECTION, clazz, null, fieldNames);
       case MAP:
         return map(fieldNames);
       default:
@@ -647,12 +648,13 @@ public interface Meta {
     public static final CursorFactory LIST =
         new CursorFactory(Style.LIST, null, null, null);
 
-    public static CursorFactory record(Class resultClazz) {
-      return new CursorFactory(Style.RECORD, resultClazz, null, null);
+    public static CursorFactory record(Class resultClass, List<Field> fields,
+                                       List<String> fieldNames) {
+      return record(Style.RECORD_PROJECTION, resultClass, fields, fieldNames);
     }
 
-    public static CursorFactory record(Class resultClass, List<Field> fields,
-        List<String> fieldNames) {
+    public static CursorFactory record(Style style, Class resultClass, List<Field> fields,
+                                       List<String> fieldNames) {
       if (fields == null) {
         fields = new ArrayList<>();
         for (String fieldName : fieldNames) {
@@ -663,8 +665,7 @@ public interface Meta {
           }
         }
       }
-      return new CursorFactory(Style.RECORD_PROJECTION, resultClass, fields,
-          fieldNames);
+      return new CursorFactory(style, resultClass, fields, fieldNames);
     }
 
     public static CursorFactory map(List<String> fieldNames) {
@@ -685,7 +686,14 @@ public interface Meta {
       if (List.class.isAssignableFrom(resultClazz)) {
         return LIST;
       }
-      return record(resultClazz);
+      // columns for MetaImpl internal classes do not match field names, "record" would fail
+      // can be removed once CALCITE-2489 is merged in Calcite
+      if (resultClazz.getName().startsWith("org.apache.calcite.avatica.MetaImpl")
+          && !resultClazz.getName().endsWith("MetaTable")) {
+        return ARRAY;
+      }
+      return record(Style.RECORD, resultClazz, null,
+          columns.stream().map(c -> c.columnName).collect(Collectors.toList()));
     }
 
     public Common.CursorFactory toProto() {

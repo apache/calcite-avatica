@@ -89,14 +89,9 @@ public abstract class MetaImpl implements Meta {
           (Iterable<Object[]>) (Iterable) iterable;
       return new ArrayIteratorCursor(iterable1.iterator());
     case RECORD:
-      @SuppressWarnings("unchecked") final Class<Object> clazz =
-          cursorFactory.clazz;
-      return new RecordIteratorCursor<Object>(iterable.iterator(), clazz);
     case RECORD_PROJECTION:
-      @SuppressWarnings("unchecked") final Class<Object> clazz2 =
-          cursorFactory.clazz;
-      return new RecordIteratorCursor<Object>(iterable.iterator(), clazz2,
-          cursorFactory.fields);
+      @SuppressWarnings("unchecked") final Class<Object> clazz = cursorFactory.clazz;
+      return new RecordIteratorCursor<>(iterable.iterator(), clazz, cursorFactory.fields);
     case LIST:
       @SuppressWarnings("unchecked") final Iterable<List<Object>> iterable2 =
           (Iterable<List<Object>>) (Iterable) iterable;
@@ -139,15 +134,8 @@ public abstract class MetaImpl implements Meta {
       return list;
     case RECORD:
     case RECORD_PROJECTION:
-      final Field[] fields;
-      switch (cursorFactory.style) {
-      case RECORD:
-        fields = cursorFactory.clazz.getFields();
-        break;
-      default:
-        fields = cursorFactory.fields.toArray(
-            new Field[cursorFactory.fields.size()]);
-      }
+      final Field[] fields = cursorFactory.fields.toArray(
+          new Field[cursorFactory.fields.size()]);
       for (Object o : iterable) {
         final Object[] objects = new Object[fields.length];
         for (int i = 0; i < fields.length; i++) {
