@@ -28,6 +28,16 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.18.0">1.18.0</a> / 2021-04-XX
+{: #v1-18-0}
+
+### Breaking changes
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4503">CALCITE-4503</a>] Order of fields in records should follow that of the SQL types
+
+`Meta#deduce(List<ColumnMetaData> columns, Class resultClazz)` now only derives the order of the fields from the list of provided column metadata `columns` when generating a record from the given Java class `resultClazz`, instead of relying on the field order provided by `Object#getFields()`, which is a JVM-dependent feature.
+
+Before, the field names where not checked against the field names of the provided class. Now, if `resultClazz` is not null, the provided field names are expected to match existing fields in that class. If a column metadata has name `column`, and no public field in `resultClazz` with that name exists, the following exception is thrown:
+`java.lang.RuntimeException: java.lang.NoSuchFieldException: C`.
 
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.17.0">1.17.0</a> / 2020-06-22
 {: #v1-17-0}
