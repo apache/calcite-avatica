@@ -266,7 +266,59 @@ public class ArrayTypeTest {
         }
         arrays.add(createArray("DOUBLE", component, elements));
       }
-      writeAndReadArrays(conn, "float_arrays", "DOUBLE", component, arrays,
+      writeAndReadArrays(conn, "double_arrays", "DOUBLE", component, arrays,
+          PRIMITIVE_LIST_VALIDATOR);
+    }
+  }
+
+  @Test public void realArrays() throws Exception {
+    final Random r = new Random();
+    try (Connection conn = DriverManager.getConnection(url)) {
+      ScalarType component = ColumnMetaData.scalar(Types.REAL, "REAL", Rep.FLOAT);
+      List<Array> arrays = new ArrayList<>();
+      // Construct the data
+      for (int i = 0; i < 3; i++) {
+        List<Float> elements = new ArrayList<>();
+        for (int j = 0; j < 7; j++) {
+          float element = r.nextFloat();
+          if (r.nextBoolean()) {
+            element *= -1;
+          }
+          elements.add(element);
+        }
+        arrays.add(createArray("REAL", component, elements));
+      }
+      writeAndReadArrays(conn, "real_arrays", "REAL", component, arrays,
+          (expected, actual) -> {
+            // 'Real' maps to 'Float' following the JDBC specs, but hsqldb maps 'Double', 'Real'
+            // and 'Float' to Java 'double'
+            double[] expectedArray = Arrays.stream((Object[]) expected.getArray())
+                .mapToDouble(x -> ((Float) x).doubleValue()).toArray();
+            double[] actualArray = Arrays.stream((Object[]) actual.getArray())
+                .mapToDouble(x -> (double) x).toArray();
+            assertArrayEquals(expectedArray, actualArray, Double.MIN_VALUE);
+          });
+    }
+  }
+
+  @Test public void floatArrays() throws Exception {
+    final Random r = new Random();
+    try (Connection conn = DriverManager.getConnection(url)) {
+      ScalarType component = ColumnMetaData.scalar(Types.FLOAT, "FLOAT", Rep.FLOAT);
+      List<Array> arrays = new ArrayList<>();
+      // Construct the data
+      for (int i = 0; i < 3; i++) {
+        List<Double> elements = new ArrayList<>();
+        for (int j = 0; j < 7; j++) {
+          double element = r.nextFloat();
+          if (r.nextBoolean()) {
+            element *= -1;
+          }
+          elements.add(element);
+        }
+        arrays.add(createArray("FLOAT", component, elements));
+      }
+      writeAndReadArrays(conn, "float_arrays", "FLOAT", component, arrays,
           PRIMITIVE_LIST_VALIDATOR);
     }
   }
