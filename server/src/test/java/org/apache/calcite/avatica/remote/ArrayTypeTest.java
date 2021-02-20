@@ -92,9 +92,7 @@ public class ArrayTypeTest {
   }
 
   @AfterClass public static void afterClass() throws Exception {
-    if (null != SERVERS) {
-      SERVERS.stopServers();
-    }
+    SERVERS.stopServers();
   }
 
   @Test public void simpleArrayTest() throws Exception {
@@ -155,7 +153,7 @@ public class ArrayTypeTest {
           if (0 == r.nextInt(2)) {
             value *= -1;
           }
-          elements.add(Short.valueOf(value));
+          elements.add(value);
         }
         arrays.add(createArray("SMALLINT", component, elements));
       }
@@ -179,7 +177,7 @@ public class ArrayTypeTest {
           if (0 == r.nextInt(2)) {
             value *= -1;
           }
-          elements.add(Short.valueOf(value));
+          elements.add(value);
         }
         elements.add(null);
         arrays.add(createArray("SMALLINT", component, elements));
@@ -338,12 +336,13 @@ public class ArrayTypeTest {
           if (0 == r.nextInt(2)) {
             value *= -1;
           }
-          elements.add(Byte.valueOf(value));
+          elements.add(value);
         }
         arrays.add(createArray("TINYINT", component, elements));
       }
       // Verify read/write
-      writeAndReadArrays(conn, "byte_arrays", "TINYINT", component, arrays, BYTE_ARRAY_VALIDATOR);
+      writeAndReadArrays(conn, "byte_arrays", "TINYINT", component, arrays,
+          BYTE_ARRAY_VALIDATOR);
     }
   }
 
@@ -378,35 +377,32 @@ public class ArrayTypeTest {
         }
         arrays.add(createArray("TIME", component, elements));
       }
-      writeAndReadArrays(conn, "time_arrays", "TIME", component, arrays, new Validator<Array>() {
-        @Override public void validate(Array expected, Array actual) throws SQLException {
-          Object[] expectedTimes = (Object[]) expected.getArray();
-          Object[] actualTimes = (Object[]) actual.getArray();
-          assertEquals(expectedTimes.length, actualTimes.length);
-          final Calendar cal = Unsafe.localCalendar();
-          for (int i = 0;  i < expectedTimes.length; i++) {
-            cal.setTime((Time) expectedTimes[i]);
-            int expectedHour = cal.get(Calendar.HOUR_OF_DAY);
-            int expectedMinute = cal.get(Calendar.MINUTE);
-            int expectedSecond = cal.get(Calendar.SECOND);
-            cal.setTime((Time) actualTimes[i]);
-            assertEquals(expectedHour, cal.get(Calendar.HOUR_OF_DAY));
-            assertEquals(expectedMinute, cal.get(Calendar.MINUTE));
-            assertEquals(expectedSecond, cal.get(Calendar.SECOND));
-          }
-        }
-      });
+      writeAndReadArrays(conn, "time_arrays", "TIME", component, arrays,
+          (expected, actual) -> {
+            Object[] expectedTimes = (Object[]) expected.getArray();
+            Object[] actualTimes = (Object[]) actual.getArray();
+            assertEquals(expectedTimes.length, actualTimes.length);
+            final Calendar cal = Unsafe.localCalendar();
+            for (int i = 0;  i < expectedTimes.length; i++) {
+              cal.setTime((Time) expectedTimes[i]);
+              int expectedHour = cal.get(Calendar.HOUR_OF_DAY);
+              int expectedMinute = cal.get(Calendar.MINUTE);
+              int expectedSecond = cal.get(Calendar.SECOND);
+              cal.setTime((Time) actualTimes[i]);
+              assertEquals(expectedHour, cal.get(Calendar.HOUR_OF_DAY));
+              assertEquals(expectedMinute, cal.get(Calendar.MINUTE));
+              assertEquals(expectedSecond, cal.get(Calendar.SECOND));
+            }
+          });
       // Ensure an array with a null element can be written/read
       Array arrayWithNull = createArray("TIME", component, Arrays.asList((Time) null));
       writeAndReadArrays(conn, "time_array_with_null", "TIME", component,
-          Collections.singletonList(arrayWithNull), new Validator<Array>() {
-            @Override public void validate(Array expected, Array actual) throws Exception {
-              Object[] expectedArray = (Object[]) expected.getArray();
-              Object[] actualArray = (Object[]) actual.getArray();
-              assertEquals(1, expectedArray.length);
-              assertEquals(expectedArray.length, actualArray.length);
-              assertEquals(expectedArray[0], actualArray[0]);
-            }
+          Collections.singletonList(arrayWithNull), (expected, actual) -> {
+            Object[] expectedArray = (Object[]) expected.getArray();
+            Object[] actualArray = (Object[]) actual.getArray();
+            assertEquals(1, expectedArray.length);
+            assertEquals(expectedArray.length, actualArray.length);
+            assertEquals(expectedArray[0], actualArray[0]);
           });
     }
   }
@@ -424,35 +420,32 @@ public class ArrayTypeTest {
         }
         arrays.add(createArray("DATE", component, elements));
       }
-      writeAndReadArrays(conn, "date_arrays", "DATE", component, arrays, new Validator<Array>() {
-        @Override public void validate(Array expected, Array actual) throws SQLException {
-          Object[] expectedDates = (Object[]) expected.getArray();
-          Object[] actualDates = (Object[]) actual.getArray();
-          assertEquals(expectedDates.length, actualDates.length);
-          final Calendar cal = Unsafe.localCalendar();
-          for (int i = 0;  i < expectedDates.length; i++) {
-            cal.setTime((Date) expectedDates[i]);
-            int expectedDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-            int expectedMonth = cal.get(Calendar.MONTH);
-            int expectedYear = cal.get(Calendar.YEAR);
-            cal.setTime((Date) actualDates[i]);
-            assertEquals(expectedDayOfMonth, cal.get(Calendar.DAY_OF_MONTH));
-            assertEquals(expectedMonth, cal.get(Calendar.MONTH));
-            assertEquals(expectedYear, cal.get(Calendar.YEAR));
-          }
-        }
-      });
+      writeAndReadArrays(conn, "date_arrays", "DATE", component, arrays,
+          (expected, actual) -> {
+            Object[] expectedDates = (Object[]) expected.getArray();
+            Object[] actualDates = (Object[]) actual.getArray();
+            assertEquals(expectedDates.length, actualDates.length);
+            final Calendar cal = Unsafe.localCalendar();
+            for (int i = 0;  i < expectedDates.length; i++) {
+              cal.setTime((Date) expectedDates[i]);
+              int expectedDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+              int expectedMonth = cal.get(Calendar.MONTH);
+              int expectedYear = cal.get(Calendar.YEAR);
+              cal.setTime((Date) actualDates[i]);
+              assertEquals(expectedDayOfMonth, cal.get(Calendar.DAY_OF_MONTH));
+              assertEquals(expectedMonth, cal.get(Calendar.MONTH));
+              assertEquals(expectedYear, cal.get(Calendar.YEAR));
+            }
+          });
       // Ensure an array with a null element can be written/read
       Array arrayWithNull = createArray("DATE", component, Arrays.asList((Time) null));
       writeAndReadArrays(conn, "date_array_with_null", "DATE", component,
-          Collections.singletonList(arrayWithNull), new Validator<Array>() {
-            @Override public void validate(Array expected, Array actual) throws Exception {
-              Object[] expectedArray = (Object[]) expected.getArray();
-              Object[] actualArray = (Object[]) actual.getArray();
-              assertEquals(1, expectedArray.length);
-              assertEquals(expectedArray.length, actualArray.length);
-              assertEquals(expectedArray[0], actualArray[0]);
-            }
+          Collections.singletonList(arrayWithNull), (expected, actual) -> {
+            Object[] expectedArray = (Object[]) expected.getArray();
+            Object[] actualArray = (Object[]) actual.getArray();
+            assertEquals(1, expectedArray.length);
+            assertEquals(expectedArray.length, actualArray.length);
+            assertEquals(expectedArray[0], actualArray[0]);
           });
     }
   }
@@ -472,43 +465,39 @@ public class ArrayTypeTest {
         arrays.add(createArray("TIMESTAMP", component, elements));
       }
       writeAndReadArrays(conn, "timestamp_arrays", "TIMESTAMP", component, arrays,
-          new Validator<Array>() {
-            @Override public void validate(Array expected, Array actual) throws SQLException {
-              Object[] expectedTimestamps = (Object[]) expected.getArray();
-              Object[] actualTimestamps = (Object[]) actual.getArray();
-              assertEquals(expectedTimestamps.length, actualTimestamps.length);
-              final Calendar cal = Unsafe.localCalendar();
-              for (int i = 0;  i < expectedTimestamps.length; i++) {
-                cal.setTime((Timestamp) expectedTimestamps[i]);
-                int expectedDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-                int expectedMonth = cal.get(Calendar.MONTH);
-                int expectedYear = cal.get(Calendar.YEAR);
-                int expectedHour = cal.get(Calendar.HOUR_OF_DAY);
-                int expectedMinute = cal.get(Calendar.MINUTE);
-                int expectedSecond = cal.get(Calendar.SECOND);
-                int expectedMillisecond = cal.get(Calendar.MILLISECOND);
-                cal.setTime((Timestamp) actualTimestamps[i]);
-                assertEquals(expectedDayOfMonth, cal.get(Calendar.DAY_OF_MONTH));
-                assertEquals(expectedMonth, cal.get(Calendar.MONTH));
-                assertEquals(expectedYear, cal.get(Calendar.YEAR));
-                assertEquals(expectedHour, cal.get(Calendar.HOUR_OF_DAY));
-                assertEquals(expectedMinute, cal.get(Calendar.MINUTE));
-                assertEquals(expectedSecond, cal.get(Calendar.SECOND));
-                assertEquals(expectedMillisecond, cal.get(Calendar.MILLISECOND));
-              }
+          (expected, actual) -> {
+            Object[] expectedTimestamps = (Object[]) expected.getArray();
+            Object[] actualTimestamps = (Object[]) actual.getArray();
+            assertEquals(expectedTimestamps.length, actualTimestamps.length);
+            final Calendar cal = Unsafe.localCalendar();
+            for (int i = 0;  i < expectedTimestamps.length; i++) {
+              cal.setTime((Timestamp) expectedTimestamps[i]);
+              int expectedDayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+              int expectedMonth = cal.get(Calendar.MONTH);
+              int expectedYear = cal.get(Calendar.YEAR);
+              int expectedHour = cal.get(Calendar.HOUR_OF_DAY);
+              int expectedMinute = cal.get(Calendar.MINUTE);
+              int expectedSecond = cal.get(Calendar.SECOND);
+              int expectedMillisecond = cal.get(Calendar.MILLISECOND);
+              cal.setTime((Timestamp) actualTimestamps[i]);
+              assertEquals(expectedDayOfMonth, cal.get(Calendar.DAY_OF_MONTH));
+              assertEquals(expectedMonth, cal.get(Calendar.MONTH));
+              assertEquals(expectedYear, cal.get(Calendar.YEAR));
+              assertEquals(expectedHour, cal.get(Calendar.HOUR_OF_DAY));
+              assertEquals(expectedMinute, cal.get(Calendar.MINUTE));
+              assertEquals(expectedSecond, cal.get(Calendar.SECOND));
+              assertEquals(expectedMillisecond, cal.get(Calendar.MILLISECOND));
             }
           });
       // Ensure an array with a null element can be written/read
       Array arrayWithNull = createArray("TIMESTAMP", component, Arrays.asList((Timestamp) null));
       writeAndReadArrays(conn, "timestamp_array_with_null", "TIMESTAMP", component,
-          Collections.singletonList(arrayWithNull), new Validator<Array>() {
-            @Override public void validate(Array expected, Array actual) throws Exception {
-              Object[] expectedArray = (Object[]) expected.getArray();
-              Object[] actualArray = (Object[]) actual.getArray();
-              assertEquals(1, expectedArray.length);
-              assertEquals(expectedArray.length, actualArray.length);
-              assertEquals(expectedArray[0], actualArray[0]);
-            }
+          Collections.singletonList(arrayWithNull), (expected, actual) -> {
+            Object[] expectedArray = (Object[]) expected.getArray();
+            Object[] actualArray = (Object[]) actual.getArray();
+            assertEquals(1, expectedArray.length);
+            assertEquals(expectedArray.length, actualArray.length);
+            assertEquals(expectedArray[0], actualArray[0]);
           });
     }
   }
@@ -599,8 +588,8 @@ public class ArrayTypeTest {
       List<ColumnMetaData> types = Collections.singletonList(ColumnMetaData.dummy(array, true));
       Calendar calendar = Unsafe.localCalendar();
       List<Accessor> accessors = cursor.createAccessors(types, calendar, null);
-      assertTrue("Expected at least one accessor, found " + accessors.size(),
-          !accessors.isEmpty());
+      assertFalse("Expected at least one accessor, found " + accessors.size(),
+          accessors.isEmpty());
       ArrayAccessor arrayAccessor = (ArrayAccessor) accessors.get(0);
 
       return new ArrayImpl((List<Object>) arrayValues, arrayAccessor);
@@ -672,7 +661,7 @@ public class ArrayTypeTest {
   private static final PrimitiveArrayValidator PRIMITIVE_LIST_VALIDATOR =
       new PrimitiveArrayValidator();
   /**
-   * Validator that coerces primitive arrays into lists and comparse them.
+   * Validator that coerces primitive arrays into lists and compare them.
    */
   private static class PrimitiveArrayValidator implements Validator<Array> {
     @Override public void validate(Array expected, Array actual) throws SQLException {
