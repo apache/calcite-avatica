@@ -22,6 +22,7 @@ import org.apache.calcite.avatica.ColumnMetaData;
 import org.apache.calcite.avatica.ColumnMetaData.ArrayType;
 import org.apache.calcite.avatica.ColumnMetaData.Rep;
 import org.apache.calcite.avatica.ColumnMetaData.ScalarType;
+import org.apache.calcite.avatica.ColumnMetadataTestUtils;
 import org.apache.calcite.avatica.ConnectionPropertiesImpl;
 import org.apache.calcite.avatica.Meta;
 import org.apache.calcite.avatica.Meta.Frame;
@@ -294,7 +295,8 @@ public class ProtobufTranslationImplTest<T> {
     // Nested classes (Signature, ColumnMetaData, CursorFactory, etc) are implicitly getting tested)
 
     // Stub out the metadata for a row
-    ScalarType arrayComponentType = ColumnMetaData.scalar(Types.INTEGER, "integer", Rep.INTEGER);
+    ScalarType arrayComponentType =
+        ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.INTEGER, false);
     ColumnMetaData arrayColumnMetaData = getArrayColumnMetaData(arrayComponentType, 2, "counts");
     List<ColumnMetaData> columns =
         Arrays.asList(MetaImpl.columnMetaData("str", 0, String.class, true),

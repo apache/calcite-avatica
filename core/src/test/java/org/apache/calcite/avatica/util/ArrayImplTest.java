@@ -21,6 +21,7 @@ import org.apache.calcite.avatica.ColumnMetaData.ArrayType;
 import org.apache.calcite.avatica.ColumnMetaData.Rep;
 import org.apache.calcite.avatica.ColumnMetaData.ScalarType;
 import org.apache.calcite.avatica.ColumnMetaData.StructType;
+import org.apache.calcite.avatica.ColumnMetadataTestUtils;
 import org.apache.calcite.avatica.MetaImpl;
 import org.apache.calcite.avatica.util.Cursor.Accessor;
 
@@ -33,7 +34,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiFunction;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -44,67 +44,81 @@ import static org.junit.Assert.assertTrue;
 public class ArrayImplTest {
 
   private static final double DELTA = 1e-15;
+  private static final ArrayImpl.Factory ARRAY_FACTORY =
+      new ArrayFactoryImpl(Unsafe.localCalendar().getTimeZone());
 
   @Test public void resultSetFromIntegerArray() throws Exception {
-    BiFunction<Object, Object, Void> validator = (Object o1, Object o2) -> {
-      assertEquals((int) o1, (int) o2);
-      return null;
-    };
+    AssertTestUtils.Validator validator =
+        (Object o1, Object o2) -> assertEquals((int) o1, (int) o2);
 
-    ScalarType intType = ColumnMetaData.scalar(Types.INTEGER, "INTEGER", Rep.INTEGER);
+    ScalarType intType = ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.INTEGER, true);
+    ColumnMetaData arrayMetadata = ColumnMetadataTestUtils.createArrayColumnMetaData(intType);
 
     List<List<Object>> rowsValues = Arrays.asList(Arrays.asList(1, 2),
         Collections.singletonList(3), Arrays.asList(4, 5, 6));
 
-    UtilTestCommon.assertResultSetFromArray(intType, rowsValues, validator, true);
+    try (Cursor cursor =
+             CursorTestUtils.createArrayImplBasedCursor(rowsValues, intType, ARRAY_FACTORY)) {
+      AssertTestUtils.assertRowsValuesMatchCursorContentViaArrayAccessor(
+          rowsValues, intType, cursor, arrayMetadata, ARRAY_FACTORY, validator);
+    }
   }
 
   @Test public void resultSetFromRealArray() throws Exception {
-    BiFunction<Object, Object, Void> validator = (Object o1, Object o2) -> {
-      assertEquals((float) o1, (float) o2, DELTA);
-      return null;
-    };
+    AssertTestUtils.Validator validator =
+        (Object o1, Object o2) -> assertEquals((float) o1, (float) o2, DELTA);
 
-    ScalarType realType = ColumnMetaData.scalar(Types.REAL, "REAL", Rep.FLOAT);
+    ScalarType realType = ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.REAL, true);
+    ColumnMetaData arrayMetadata = ColumnMetadataTestUtils.createArrayColumnMetaData(realType);
 
     List<List<Object>> rowsValues = Arrays.asList(
         Arrays.asList(1.123f, 0.2f),
         Arrays.asList(4.1f, 5f, 66.12345f)
     );
 
-    UtilTestCommon.assertResultSetFromArray(realType, rowsValues, validator, true);
+    try (Cursor cursor =
+             CursorTestUtils.createArrayImplBasedCursor(rowsValues, realType, ARRAY_FACTORY)) {
+      AssertTestUtils.assertRowsValuesMatchCursorContentViaArrayAccessor(
+          rowsValues, realType, cursor, arrayMetadata, ARRAY_FACTORY, validator);
+    }
   }
 
   @Test public void resultSetFromDoubleArray() throws Exception {
-    BiFunction<Object, Object, Void> validator = (Object o1, Object o2) -> {
-      assertEquals((double) o1, (double) o2, DELTA);
-      return null;
-    };
+    AssertTestUtils.Validator validator =
+        (Object o1, Object o2) -> assertEquals((double) o1, (double) o2, DELTA);
 
-    ScalarType doubleType = ColumnMetaData.scalar(Types.DOUBLE, "DOUBLE", Rep.DOUBLE);
+    ScalarType doubleType = ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.DOUBLE, true);
+    ColumnMetaData arrayMetadata = ColumnMetadataTestUtils.createArrayColumnMetaData(doubleType);
 
     List<List<Object>> rowsValues = Arrays.asList(
         Arrays.asList(1.123d, 0.123456789012d),
         Arrays.asList(4.134555d, 54444d, 66.12345d)
     );
 
-    UtilTestCommon.assertResultSetFromArray(doubleType, rowsValues, validator, true);
+    try (Cursor cursor =
+             CursorTestUtils.createArrayImplBasedCursor(rowsValues, doubleType, ARRAY_FACTORY)) {
+      AssertTestUtils.assertRowsValuesMatchCursorContentViaArrayAccessor(
+          rowsValues, doubleType, cursor, arrayMetadata, ARRAY_FACTORY, validator);
+    }
   }
 
   @Test public void resultSetFromFloatArray() throws Exception {
-    BiFunction<Object, Object, Void> validator = (Object o1, Object o2) -> {
-      assertEquals((double) o1, (double) o2, DELTA);
-      return null;
-    };
+    AssertTestUtils.Validator validator =
+        (Object o1, Object o2) -> assertEquals((double) o1, (double) o2, DELTA);
 
-    ScalarType floatType = ColumnMetaData.scalar(Types.FLOAT, "DOUBLE", Rep.FLOAT);
+    ScalarType floatType = ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.FLOAT, true);
+    ColumnMetaData arrayMetadata = ColumnMetadataTestUtils.createArrayColumnMetaData(floatType);
 
     List<List<Object>> rowsValues = Arrays.asList(
         Arrays.asList(1.123d, 0.123456789012d),
         Arrays.asList(4.134555d, 54444d, 66.12345d)
     );
 
-    UtilTestCommon.assertResultSetFromArray(floatType, rowsValues, validator, true);
+    try (Cursor cursor =
+             CursorTestUtils.createArrayImplBasedCursor(rowsValues, floatType, ARRAY_FACTORY)) {
+      AssertTestUtils.assertRowsValuesMatchCursorContentViaArrayAccessor(
+          rowsValues, floatType, cursor, arrayMetadata, ARRAY_FACTORY, validator);
+    }
   }
 
   @Test public void arraysOfStructs() throws Exception {
@@ -381,7 +395,8 @@ public class ArrayImplTest {
 
   @Test public void testArrayWithOffsets() throws Exception {
     // Define the struct type we're creating
-    ScalarType intType = ColumnMetaData.scalar(Types.INTEGER, "INTEGER", Rep.INTEGER);
+    ScalarType intType =
+        ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.INTEGER, false);
     ArrayImpl.Factory factory = new ArrayFactoryImpl(Unsafe.localCalendar().getTimeZone());
     // Create some arrays from the structs
     Array array1 = factory.createArray(intType, Arrays.<Object>asList(1, 2));

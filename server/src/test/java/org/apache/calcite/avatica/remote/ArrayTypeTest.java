@@ -22,6 +22,7 @@ import org.apache.calcite.avatica.ColumnMetaData.ArrayType;
 import org.apache.calcite.avatica.ColumnMetaData.AvaticaType;
 import org.apache.calcite.avatica.ColumnMetaData.Rep;
 import org.apache.calcite.avatica.ColumnMetaData.ScalarType;
+import org.apache.calcite.avatica.ColumnMetadataTestUtils;
 import org.apache.calcite.avatica.SqlType;
 import org.apache.calcite.avatica.remote.Driver.Serialization;
 import org.apache.calcite.avatica.server.HttpServer;
@@ -97,7 +98,8 @@ public class ArrayTypeTest {
 
   @Test public void simpleArrayTest() throws Exception {
     try (Connection conn = DriverManager.getConnection(url)) {
-      ScalarType varcharComponent = ColumnMetaData.scalar(Types.VARCHAR, "VARCHAR", Rep.STRING);
+      ScalarType varcharComponent =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.VARCHAR, false);
       List<Array> varcharArrays = new ArrayList<>();
       for (int i = 0; i < 5; i++) {
         List<String> value = Collections.singletonList(Integer.toString(i));
@@ -111,7 +113,8 @@ public class ArrayTypeTest {
   @Test public void booleanArrays() throws Exception {
     final Random r = new Random();
     try (Connection conn = DriverManager.getConnection(url)) {
-      ScalarType component = ColumnMetaData.scalar(Types.BOOLEAN, "BOOLEAN", Rep.BOOLEAN);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.BOOLEAN, false);
       List<Array> arrays = new ArrayList<>();
       // Construct the data
       for (int i = 0; i < 5; i++) {
@@ -142,7 +145,8 @@ public class ArrayTypeTest {
   @Test public void shortArrays() throws Exception {
     final Random r = new Random();
     try (Connection conn = DriverManager.getConnection(url)) {
-      ScalarType component = ColumnMetaData.scalar(Types.SMALLINT, "SMALLINT", Rep.SHORT);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.SMALLINT, false);
       List<Array> arrays = new ArrayList<>();
       // Construct the data
       for (int i = 0; i < 5; i++) {
@@ -166,7 +170,8 @@ public class ArrayTypeTest {
   @Test public void shortArraysWithNull() throws Exception {
     final Random r = new Random();
     try (Connection conn = DriverManager.getConnection(url)) {
-      ScalarType component = ColumnMetaData.scalar(Types.SMALLINT, "SMALLINT", Rep.SHORT);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.SMALLINT, false);
       List<Array> arrays = new ArrayList<>();
       // Construct the data
       for (int i = 0; i < 5; i++) {
@@ -191,7 +196,8 @@ public class ArrayTypeTest {
   @Test public void longArrays() throws Exception {
     final Random r = new Random();
     try (Connection conn = DriverManager.getConnection(url)) {
-      ScalarType component = ColumnMetaData.scalar(Types.BIGINT, "BIGINT", Rep.LONG);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.BIGINT, false);
       List<Array> arrays = new ArrayList<>();
       // Construct the data
       for (int i = 0; i < 5; i++) {
@@ -209,7 +215,8 @@ public class ArrayTypeTest {
 
   @Test public void stringArrays() throws Exception {
     try (Connection conn = DriverManager.getConnection(url)) {
-      ScalarType component = ColumnMetaData.scalar(Types.VARCHAR, "VARCHAR", Rep.STRING);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.VARCHAR, false);
       List<Array> arrays = new ArrayList<>();
       // Construct the data
       for (int i = 0; i < 5; i++) {
@@ -228,7 +235,8 @@ public class ArrayTypeTest {
   @Test public void bigintArrays() throws Exception {
     final Random r = new Random();
     try (Connection conn = DriverManager.getConnection(url)) {
-      ScalarType component = ColumnMetaData.scalar(Types.BIGINT, "BIGINT", Rep.LONG);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.BIGINT, false);
       List<Array> arrays = new ArrayList<>();
       // Construct the data
       for (int i = 0; i < 3; i++) {
@@ -250,7 +258,8 @@ public class ArrayTypeTest {
   @Test public void doubleArrays() throws Exception {
     final Random r = new Random();
     try (Connection conn = DriverManager.getConnection(url)) {
-      ScalarType component = ColumnMetaData.scalar(Types.DOUBLE, "DOUBLE", Rep.DOUBLE);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.DOUBLE, false);
       List<Array> arrays = new ArrayList<>();
       // Construct the data
       for (int i = 0; i < 3; i++) {
@@ -272,7 +281,8 @@ public class ArrayTypeTest {
   @Test public void realArrays() throws Exception {
     final Random r = new Random();
     try (Connection conn = DriverManager.getConnection(url)) {
-      ScalarType component = ColumnMetaData.scalar(Types.REAL, "REAL", Rep.FLOAT);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.REAL, false);
       List<Array> arrays = new ArrayList<>();
       // Construct the data
       for (int i = 0; i < 3; i++) {
@@ -302,7 +312,8 @@ public class ArrayTypeTest {
   @Test public void floatArrays() throws Exception {
     final Random r = new Random();
     try (Connection conn = DriverManager.getConnection(url)) {
-      ScalarType component = ColumnMetaData.scalar(Types.FLOAT, "FLOAT", Rep.FLOAT);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.FLOAT, false);
       List<Array> arrays = new ArrayList<>();
       // Construct the data
       for (int i = 0; i < 3; i++) {
@@ -324,7 +335,8 @@ public class ArrayTypeTest {
   @Test public void arraysOfByteArrays() throws Exception {
     final Random r = new Random();
     try (Connection conn = DriverManager.getConnection(url)) {
-      ScalarType component = ColumnMetaData.scalar(Types.TINYINT, "TINYINT", Rep.BYTE);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.TINYINT, false);
       // [ Array([b, b, b]), Array([b, b, b]), ... ]
       List<Array> arrays = new ArrayList<>();
       // Construct the data
@@ -348,7 +360,8 @@ public class ArrayTypeTest {
 
   @Test public void varbinaryArrays() throws Exception {
     try (Connection conn = DriverManager.getConnection(url)) {
-      ScalarType component = ColumnMetaData.scalar(Types.VARBINARY, "VARBINARY", Rep.BYTE_STRING);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.VARBINARY, false);
       // [ Array(binary, binary, binary), Array(binary, binary, binary), ...]
       List<Array> arrays = new ArrayList<>();
       // Construct the data
@@ -367,7 +380,8 @@ public class ArrayTypeTest {
   @Test public void timeArrays() throws Exception {
     try (Connection conn = DriverManager.getConnection(url)) {
       final long now = System.currentTimeMillis();
-      ScalarType component = ColumnMetaData.scalar(Types.TIME, "TIME", Rep.JAVA_SQL_TIME);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.TIME, false);
       List<Array> arrays = new ArrayList<>();
       // Construct the data
       for (int i = 0; i < 5; i++) {
@@ -410,7 +424,8 @@ public class ArrayTypeTest {
   @Test public void dateArrays() throws Exception {
     try (Connection conn = DriverManager.getConnection(url)) {
       final long now = System.currentTimeMillis();
-      ScalarType component = ColumnMetaData.scalar(Types.DATE, "DATE", Rep.JAVA_SQL_DATE);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.DATE, false);
       List<Array> arrays = new ArrayList<>();
       // Construct the data
       for (int i = 0; i < 5; i++) {
@@ -453,8 +468,8 @@ public class ArrayTypeTest {
   @Test public void timestampArrays() throws Exception {
     try (Connection conn = DriverManager.getConnection(url)) {
       final long now = System.currentTimeMillis();
-      ScalarType component = ColumnMetaData.scalar(Types.TIMESTAMP, "TIMESTAMP",
-          Rep.JAVA_SQL_TIMESTAMP);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.TIMESTAMP, false);
       List<Array> arrays = new ArrayList<>();
       // Construct the data
       for (int i = 0; i < 5; i++) {
@@ -517,7 +532,8 @@ public class ArrayTypeTest {
 
   @Test public void testBatchInsert() throws Exception {
     try (Connection conn = DriverManager.getConnection(url)) {
-      ScalarType component = ColumnMetaData.scalar(Types.VARCHAR, "VARCHAR", Rep.STRING);
+      ScalarType component =
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.VARCHAR, false);
       List<Array> arrays = new ArrayList<>();
       // Construct the data
       for (int i = 0; i < 5; i++) {

@@ -111,53 +111,41 @@ public class AvaticaResultSetConversionsTest {
       assertEquals("SELECT * FROM TABLE", sql);
       List<ColumnMetaData> columns = Arrays.asList(
           columnMetaData("bool", 0,
-              ColumnMetaData.scalar(Types.BOOLEAN, "BOOLEAN",
-                  ColumnMetaData.Rep.PRIMITIVE_BOOLEAN),
+              ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.BOOLEAN, true),
               DatabaseMetaData.columnNoNulls),
           columnMetaData("byte", 1,
-              ColumnMetaData.scalar(Types.TINYINT, "TINYINT",
-                  ColumnMetaData.Rep.PRIMITIVE_BYTE),
+              ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.TINYINT, true),
               DatabaseMetaData.columnNoNulls),
           columnMetaData("short", 2,
-              ColumnMetaData.scalar(Types.SMALLINT, "SMALLINT",
-                  ColumnMetaData.Rep.PRIMITIVE_SHORT),
+              ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.SMALLINT, true),
               DatabaseMetaData.columnNoNulls),
           columnMetaData("int", 3,
-              ColumnMetaData.scalar(Types.INTEGER, "INTEGER",
-                  ColumnMetaData.Rep.PRIMITIVE_INT),
+              ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.INTEGER, true),
               DatabaseMetaData.columnNoNulls),
           columnMetaData("long", 4,
-              ColumnMetaData.scalar(Types.BIGINT, "BIGINT",
-                  ColumnMetaData.Rep.PRIMITIVE_LONG),
+              ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.BIGINT, true),
               DatabaseMetaData.columnNoNulls),
           columnMetaData("float", 5,
-              ColumnMetaData.scalar(Types.REAL, "REAL",
-                  ColumnMetaData.Rep.FLOAT),
+              ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.REAL, true),
               DatabaseMetaData.columnNoNulls),
           columnMetaData("double", 6,
-              ColumnMetaData.scalar(Types.FLOAT, "FLOAT",
-                  ColumnMetaData.Rep.DOUBLE),
+              ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.FLOAT, true),
               DatabaseMetaData.columnNoNulls),
           columnMetaData("string", 7,
-              ColumnMetaData.scalar(Types.VARCHAR, "VARCHAR",
-                  ColumnMetaData.Rep.STRING),
+              ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.VARCHAR, false),
               DatabaseMetaData.columnNoNulls),
           columnMetaData("date", 8,
-              ColumnMetaData.scalar(Types.DATE, "DATE",
-                  ColumnMetaData.Rep.JAVA_SQL_DATE),
+              ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.DATE, false),
               DatabaseMetaData.columnNoNulls),
           columnMetaData("time", 9,
-              ColumnMetaData.scalar(Types.TIME, "TIME",
-                  ColumnMetaData.Rep.JAVA_SQL_TIME),
+              ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.TIME, false),
               DatabaseMetaData.columnNoNulls),
           columnMetaData("timestamp", 10,
-              ColumnMetaData.scalar(Types.TIMESTAMP, "TIMESTAMP",
-                  ColumnMetaData.Rep.JAVA_SQL_TIMESTAMP),
+              ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.TIMESTAMP, false),
               DatabaseMetaData.columnNoNulls),
           columnMetaData("array", 11,
               ColumnMetaData.array(
-                  ColumnMetaData.scalar(Types.INTEGER, "INTEGER",
-                      ColumnMetaData.Rep.PRIMITIVE_INT),
+                  ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.INTEGER, true),
                   "ARRAY",
                   ColumnMetaData.Rep.ARRAY),
               DatabaseMetaData.columnNoNulls),
@@ -165,12 +153,10 @@ public class AvaticaResultSetConversionsTest {
               ColumnMetaData.struct(
                   Arrays.asList(
                       columnMetaData("int", 0,
-                          ColumnMetaData.scalar(Types.INTEGER, "INTEGER",
-                              ColumnMetaData.Rep.PRIMITIVE_INT),
+                          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.INTEGER, true),
                           DatabaseMetaData.columnNoNulls),
                       columnMetaData("bool", 1,
-                          ColumnMetaData.scalar(Types.BOOLEAN, "BOOLEAN",
-                              ColumnMetaData.Rep.PRIMITIVE_BOOLEAN),
+                          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.BOOLEAN, true),
                           DatabaseMetaData.columnNoNulls))),
               DatabaseMetaData.columnNoNulls));
 
@@ -552,7 +538,7 @@ public class AvaticaResultSetConversionsTest {
 
     @Override public void testGetArray(ResultSet resultSet) throws SQLException {
       ColumnMetaData.ScalarType intType =
-          ColumnMetaData.scalar(Types.INTEGER, "INTEGER", ColumnMetaData.Rep.INTEGER);
+          ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.INTEGER, false);
       Array expectedArray =
           new ArrayFactoryImpl(Unsafe.localCalendar().getTimeZone()).createArray(
               intType, Arrays.asList(1, 2, 3));

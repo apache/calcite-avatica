@@ -16,9 +16,9 @@
  */
 package org.apache.calcite.avatica.remote;
 
-import org.apache.calcite.avatica.ColumnMetaData;
 import org.apache.calcite.avatica.ColumnMetaData.Rep;
 import org.apache.calcite.avatica.ColumnMetaData.ScalarType;
+import org.apache.calcite.avatica.ColumnMetadataTestUtils;
 import org.apache.calcite.avatica.proto.Common;
 import org.apache.calcite.avatica.util.ArrayFactoryImpl;
 import org.apache.calcite.avatica.util.ArrayImpl;
@@ -217,7 +217,8 @@ public class TypedValueTest {
   @Test public void testArrays() {
     List<Object> serialObj = Arrays.<Object>asList(1, 2, 3, 4);
     ArrayImpl.Factory factory = new ArrayFactoryImpl(Unsafe.localCalendar().getTimeZone());
-    ScalarType scalarType = ColumnMetaData.scalar(Types.INTEGER, "INTEGER", Rep.INTEGER);
+    ScalarType scalarType =
+        ColumnMetadataTestUtils.getScalarTypeByTypeId(Types.INTEGER, false);
     Array a1 = factory.createArray(scalarType, serialObj);
     TypedValue tv1 = TypedValue.ofJdbc(Rep.ARRAY, a1, Unsafe.localCalendar());
     Object jdbcObj = tv1.toJdbc(Unsafe.localCalendar());
