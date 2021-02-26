@@ -18,8 +18,8 @@ package org.apache.calcite.avatica.util;
 
 import org.apache.calcite.avatica.ColumnMetaData;
 import org.apache.calcite.avatica.ColumnMetaData.Rep;
-
 import org.apache.calcite.avatica.MetaImpl;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -31,7 +31,9 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.apache.calcite.avatica.AvaticaMatchers.isArrayAccessorResult;
+
+import static org.junit.Assert.assertThat;
 
 /**
  * Test class for verifying functionality in array accessor from abstract cursor.
@@ -39,7 +41,6 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class ArrayAccessorTest {
 
-  private static final double DELTA = 1e-15;
   private static final ArrayImpl.Factory ARRAY_FACTORY =
       new ArrayFactoryImpl(Unsafe.localCalendar().getTimeZone());
 
@@ -62,10 +63,8 @@ public class ArrayAccessorTest {
   }
 
   @Test public void listIteratorFromIntegerArray() throws Exception {
-    AssertTestUtils.Validator validator =
-        (Object o1, Object o2) -> assertEquals((int) o1, (int) o2);
-
-    ColumnMetaData.ScalarType intType = ColumnMetaData.scalar(Types.INTEGER, "INTEGER", Rep.INTEGER);
+    ColumnMetaData.ScalarType intType =
+        ColumnMetaData.scalar(Types.INTEGER, "INTEGER", Rep.INTEGER);
 
     ColumnMetaData arrayMetadata = createArrayMetaData(intType);
 
@@ -73,15 +72,17 @@ public class ArrayAccessorTest {
         Collections.singletonList(3), Arrays.asList(4, 5, 6));
 
     try (Cursor cursor = cursorBuilder.apply(rowsValues)) {
-      AssertTestUtils.assertRowsValuesMatchCursorContentViaArrayAccessor(
-          rowsValues, intType, cursor, arrayMetadata, ARRAY_FACTORY, validator);
+      Cursor.Accessor accessor = createArrayAccessor(cursor, arrayMetadata);
+      int rowid = 0;
+      while (cursor.next()) {
+        List<Object> expectedArray = rowsValues.get(rowid);
+        assertThat(accessor, isArrayAccessorResult(expectedArray, Integer.class));
+        rowid++;
+      }
     }
   }
 
   @Test public void resultSetFromRealArray() throws Exception {
-    AssertTestUtils.Validator validator =
-        (Object o1, Object o2) -> assertEquals((float) o1, (float) o2, DELTA);
-
     ColumnMetaData.ScalarType realType = ColumnMetaData.scalar(Types.REAL, "REAL", Rep.FLOAT);
 
     ColumnMetaData arrayMetadata = createArrayMetaData(realType);
@@ -92,16 +93,19 @@ public class ArrayAccessorTest {
     );
 
     try (Cursor cursor = cursorBuilder.apply(rowsValues)) {
-      AssertTestUtils.assertRowsValuesMatchCursorContentViaArrayAccessor(
-          rowsValues, realType, cursor, arrayMetadata, ARRAY_FACTORY, validator);
+      Cursor.Accessor accessor = createArrayAccessor(cursor, arrayMetadata);
+      int rowid = 0;
+      while (cursor.next()) {
+        List<Object> expectedArray = rowsValues.get(rowid);
+        assertThat(accessor, isArrayAccessorResult(expectedArray, Float.class));
+        rowid++;
+      }
     }
   }
 
   @Test public void resultSetFromDoubleArray() throws Exception {
-    AssertTestUtils.Validator validator =
-        (Object o1, Object o2) -> assertEquals((double) o1, (double) o2, DELTA);
-
-    ColumnMetaData.ScalarType doubleType = ColumnMetaData.scalar(Types.DOUBLE, "DOUBLE", Rep.DOUBLE);
+    ColumnMetaData.ScalarType doubleType =
+        ColumnMetaData.scalar(Types.DOUBLE, "DOUBLE", Rep.DOUBLE);
 
     ColumnMetaData arrayMetadata = createArrayMetaData(doubleType);
 
@@ -111,15 +115,17 @@ public class ArrayAccessorTest {
     );
 
     try (Cursor cursor = cursorBuilder.apply(rowsValues)) {
-      AssertTestUtils.assertRowsValuesMatchCursorContentViaArrayAccessor(
-          rowsValues, doubleType, cursor, arrayMetadata, ARRAY_FACTORY, validator);
+      Cursor.Accessor accessor = createArrayAccessor(cursor, arrayMetadata);
+      int rowid = 0;
+      while (cursor.next()) {
+        List<Object> expectedArray = rowsValues.get(rowid);
+        assertThat(accessor, isArrayAccessorResult(expectedArray, Double.class));
+        rowid++;
+      }
     }
   }
 
   @Test public void resultSetFromFloatArray() throws Exception {
-    AssertTestUtils.Validator validator =
-        (Object o1, Object o2) -> assertEquals((double) o1, (double) o2, DELTA);
-
     ColumnMetaData.ScalarType floatType = ColumnMetaData.scalar(Types.FLOAT, "FLOAT", Rep.DOUBLE);
 
     ColumnMetaData arrayMetadata = createArrayMetaData(floatType);
@@ -130,8 +136,13 @@ public class ArrayAccessorTest {
     );
 
     try (Cursor cursor = cursorBuilder.apply(rowsValues)) {
-      AssertTestUtils.assertRowsValuesMatchCursorContentViaArrayAccessor(
-          rowsValues, floatType, cursor, arrayMetadata, ARRAY_FACTORY, validator);
+      Cursor.Accessor accessor = createArrayAccessor(cursor, arrayMetadata);
+      int rowid = 0;
+      while (cursor.next()) {
+        List<Object> expectedArray = rowsValues.get(rowid);
+        assertThat(accessor, isArrayAccessorResult(expectedArray, Double.class));
+        rowid++;
+      }
     }
   }
 
@@ -139,6 +150,12 @@ public class ArrayAccessorTest {
     ColumnMetaData.ArrayType arrayType =
         ColumnMetaData.array(componentType, componentType.name, componentType.rep);
     return MetaImpl.columnMetaData("MY_ARRAY", 1, arrayType, false);
+  }
+
+  private static Cursor.Accessor createArrayAccessor(Cursor c, ColumnMetaData meta) {
+    List<Cursor.Accessor> accessors =
+        c.createAccessors(Collections.singletonList(meta), Unsafe.localCalendar(), ARRAY_FACTORY);
+    return accessors.get(0);
   }
 }
 
