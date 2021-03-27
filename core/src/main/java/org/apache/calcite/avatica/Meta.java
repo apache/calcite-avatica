@@ -672,6 +672,16 @@ public interface Meta {
       return new CursorFactory(Style.MAP, null, null, fieldNames);
     }
 
+    /**
+     * Deduces the appropriate {@code CursorFactory} for accessing the underlying
+     * result set. For result sets composed by records, {@code resultClazz} must
+     * be not null, and each field name in {@code columns} must match one of its
+     * public fields.
+     * @param columns The columns metadata for the result set
+     * @param resultClazz The class representing the records, if any
+     * @return the appropriate {@code CursorFactory} for the underlying result set
+     * @throws RuntimeException if the field name validation fails
+     */
     public static CursorFactory deduce(List<ColumnMetaData> columns,
         Class resultClazz) {
       if (columns.size() == 1) {
