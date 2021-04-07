@@ -31,13 +31,60 @@ Downloads are available on the
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.18.0">1.18.0</a> / 2021-04-XX
 {: #v1-18-0}
 
-### Breaking changes
+Apache Calcite Avatica 1.18.0 includes a few dependency upgrades, minor fixes and a breaking change.
+Please see below to determine how the breaking change will affect your project.
+
+Compatibility: This release is tested
+on Linux, macOS, Microsoft Windows;
+using Oracle JDK 8, 9, 10, 11, 12, 13, 14;
+using IBM Java 8;
+Guava versions 14.0 to 29.0;
+other software versions as specified in `gradle.properties`.
+
+***Breaking changes***
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-4503">CALCITE-4503</a>] Order of fields in records should follow that of the SQL types
 
 `Meta#deduce(List<ColumnMetaData> columns, Class resultClazz)` now only derives the order of the fields from the list of provided column metadata `columns` when generating a record from the given Java class `resultClazz`, instead of relying on the field order provided by `Object#getFields()`, which is a JVM-dependent feature.
 
 Before, the field names where not checked against the field names of the provided class. Now, if `resultClazz` is not null, the provided field names are expected to match existing fields in that class. If a column metadata has name `column`, and no public field in `resultClazz` with that name exists, the following exception is thrown:
 `java.lang.RuntimeException: java.lang.NoSuchFieldException: C`.
+
+Features and bug fixes
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4138">CALCITE-4138</a>]
+  Metadata operations via Avatica turn empty string args to null (Istvan Toth)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4095">CALCITE-4095</a>]
+  Update Jetty to 9.4.31.v20200723 and use `SslContextFactory.Server` instead of `SslContextFactory` (Peter Somogyi)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4196">CALCITE-4196</a>]
+  Consume all data from client before replying with HTTP/401
+* Upgrade gradle from 6.3 to 6.7
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4379">CALCITE-4379</a>]
+  Meta.Frame created with java float values in rows hits a ClassCastException in toProto() (Dmitri Bourlatchkov)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4181">CALCITE-4181</a>]
+  Avatica throws exception when select field is a List<Object> (Kent Nguyen)
+* Upgrade Gradle from 6.7 to 6.8.1
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4476">CALCITE-4476</a>]
+  DateTimeUtils.timeStringToUnixDate may produce wrong time (Vladimir Ozerov)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3401">CALCITE-3401</a>]
+  Assume empty keystore passwords by default (Istvan Toth, Alessandro Solimando)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3881">CALCITE-3881</a>]
+  DateTimeUtils.addMonths yields incorrect results (Zhenghua Gao)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3163">CALCITE-3163</a>]
+  Incorrect mapping of JDBC float/real array types to Java types (Ralph Gasser)
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4503">CALCITE-4503</a>]
+  Order of fields in records should follow that of the SQL types (Alessandro Solimando)
+* Upgrade Gradle docker containers to 6.8
+
+Tests
+* Remove files that change often from Travis cache and remove broken files automatically
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3163">CALCITE-3163</a>]
+  Improve test coverage for float/real/double array types (Alessandro Solimando)
+* Replace AssertTestUtils with custom Hamcrest matcher for accessors content
+
+Website and Documentation
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3841">CALCITE-3841</a>]
+  Change downloads page to use downloads.apache.org
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4367">CALCITE-4367</a>]
+  Correct Avatica protocol docs
 
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.17.0">1.17.0</a> / 2020-06-22
 {: #v1-17-0}
