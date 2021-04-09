@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
  * Tests for {@code AvaticaResultSet} relative to close behavior
  */
 @RunWith(Parameterized.class)
-public class AvaticaClosedResultSetWithNullStatmentTest extends AvaticaClosedTestBase<ResultSet> {
+public class AvaticaClosedResultSetWithNullStatementTest extends AvaticaClosedTestBase<ResultSet> {
   // Mapping between Connection method and the verifier to check close behavior
   private static MethodVerifier methodVerifier(Method method) {
     String name = method.getName();
@@ -68,11 +68,11 @@ public class AvaticaClosedResultSetWithNullStatmentTest extends AvaticaClosedTes
 
   @Parameters(name = "{index}: {0}")
   public static Iterable<? extends Object[]> getParameters() {
-    return getMethodsToTest(ResultSet.class, AvaticaResultSet.class, METHOD_FILTER, AvaticaClosedResultSetWithNullStatmentTest::methodVerifier);
+    return getMethodsToTest(ResultSet.class, AvaticaResultSet.class, METHOD_FILTER, AvaticaClosedResultSetWithNullStatementTest::methodVerifier);
   }
 
-  public AvaticaClosedResultSetWithNullStatmentTest(Method method,
-      MethodVerifier verifier) {
+  public AvaticaClosedResultSetWithNullStatementTest(Method method,
+                                                     MethodVerifier verifier) {
     super(method, verifier);
   }
 
@@ -88,4 +88,4 @@ public class AvaticaClosedResultSetWithNullStatmentTest extends AvaticaClosedTes
   }
 }
 
-// End AvaticaClosedResultSetTest.java
+// End AvaticaClosedResultSetWithNullStatementTest.java
