@@ -153,7 +153,9 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
       this.cursor = null;
       cursor.close();
     }
-    statement.onResultSetClose(this);
+    if (statement != null) {
+      statement.onResultSetClose(this);
+    }
   }
 
   /** Sets the flag to indicate that cancel has been requested.
