@@ -17,7 +17,6 @@
 package org.apache.calcite.avatica;
 
 import org.apache.calcite.avatica.Meta.Signature;
-import org.apache.calcite.avatica.Meta.StatementHandle;
 import org.apache.calcite.avatica.util.DateTimeUtils;
 
 import org.junit.runner.RunWith;
@@ -27,11 +26,9 @@ import org.junit.runners.Parameterized.Parameters;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.util.Collections;
-import java.util.Properties;
 import java.util.function.Function;
 
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 /**
  * Tests for {@code AvaticaResultSet} relative to close behavior
