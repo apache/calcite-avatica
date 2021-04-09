@@ -71,7 +71,8 @@ public class AvaticaClosedResultSetWithNullStatmentTest extends AvaticaClosedTes
     return getMethodsToTest(ResultSet.class, AvaticaResultSet.class, METHOD_FILTER, AvaticaClosedResultSetWithNullStatmentTest::methodVerifier);
   }
 
-  public AvaticaClosedResultSetWithNullStatmentTest(Method method, MethodVerifier verifier) {
+  public AvaticaClosedResultSetWithNullStatmentTest(Method method,
+      MethodVerifier verifier) {
     super(method, verifier);
   }
 
