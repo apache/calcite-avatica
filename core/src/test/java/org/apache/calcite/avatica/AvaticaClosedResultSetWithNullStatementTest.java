@@ -68,7 +68,8 @@ public class AvaticaClosedResultSetWithNullStatementTest extends AvaticaClosedTe
 
   @Parameters(name = "{index}: {0}")
   public static Iterable<? extends Object[]> getParameters() {
-    return getMethodsToTest(ResultSet.class, AvaticaResultSet.class, METHOD_FILTER, AvaticaClosedResultSetWithNullStatementTest::methodVerifier);
+    return getMethodsToTest(ResultSet.class, AvaticaResultSet.class, METHOD_FILTER,
+        AvaticaClosedResultSetWithNullStatementTest::methodVerifier);
   }
 
   public AvaticaClosedResultSetWithNullStatementTest(Method method,
