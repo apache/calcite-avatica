@@ -26,7 +26,6 @@ import org.junit.runners.Parameterized.Parameters;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.util.Collections;
-import java.util.function.Function;
 
 import static org.junit.Assert.assertTrue;
 
