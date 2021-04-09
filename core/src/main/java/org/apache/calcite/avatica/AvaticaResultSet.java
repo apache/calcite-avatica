@@ -153,7 +153,7 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
       this.cursor = null;
       cursor.close();
     }
-    if(statement != null) {
+    if (statement != null) {
       statement.onResultSetClose(this);
     }
   }
