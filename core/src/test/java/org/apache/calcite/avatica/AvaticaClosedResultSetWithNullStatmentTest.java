@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(Parameterized.class)
 public class AvaticaClosedResultSetWithNullStatmentTest extends AvaticaClosedTestBase<ResultSet> {
   // Mapping between Connection method and the verifier to check close behavior
-  private static final Function<Method, MethodVerifier> METHOD_MAPPING = method -> {
+  private static MethodVerifier methodVerifier(Method method) {
     String name = method.getName();
     // All update methods are not supported yet
     if (name.startsWith("update")) {
@@ -69,7 +69,7 @@ public class AvaticaClosedResultSetWithNullStatmentTest extends AvaticaClosedTes
 
   @Parameters(name = "{index}: {0}")
   public static Iterable<? extends Object[]> getParameters() {
-    return getMethodsToTest(ResultSet.class, AvaticaResultSet.class, METHOD_FILTER, METHOD_MAPPING);
+    return getMethodsToTest(ResultSet.class, AvaticaResultSet.class, METHOD_FILTER, AvaticaClosedResultSetWithNullStatmentTest::methodVerifier);
   }
 
   public AvaticaClosedResultSetWithNullStatmentTest(Method method, MethodVerifier verifier) {
