@@ -37,7 +37,9 @@ public class RecordIteratorCursor<E> extends IteratorCursor<E> {
    *
    * @param iterator Iterator
    * @param clazz Element type
+   * @deprecated Use {@link #RecordIteratorCursor(Iterator, Class, List)}
    */
+  @Deprecated // to be removed before 2.0
   public RecordIteratorCursor(Iterator<E> iterator, Class<E> clazz) {
     this(iterator, clazz, Arrays.asList(clazz.getFields()));
   }

@@ -17,7 +17,7 @@
 version: '3'
 services:
   dry-run:
-    image: gradle:6.3-jdk
+    image: gradle:6.8-jdk
     working_dir: /src
     command: sh -c "./docker.sh dry-run"
     network_mode: "host"
@@ -26,7 +26,7 @@ services:
       - gradle-cache:/home/gradle/.gradle
 
   publish-release-for-voting:
-    image: gradle:6.3-jdk
+    image: gradle:6.8-jdk
     working_dir: /src
     command: sh -c "./docker.sh publish-release-for-voting"
     volumes:
@@ -34,7 +34,7 @@ services:
       - gradle-cache:/home/gradle/.gradle
 
   clean:
-    image: gradle:6.3-jdk
+    image: gradle:6.8-jdk
     working_dir: /src
     command: sh -c "./docker.sh clean"
     volumes:
@@ -42,7 +42,7 @@ services:
       - gradle-cache:/home/gradle/.gradle
 
   promote-release:
-    image: gradle:6.3-jdk
+    image: gradle:6.8-jdk
     working_dir: /src
     command: sh -c "./docker.sh promote-release"
     volumes:
@@ -50,7 +50,7 @@ services:
       - gradle-cache:/home/gradle/.gradle
 
   test:
-    image: gradle:6.3-jdk
+    image: gradle:6.8-jdk
     working_dir: /src
     command: sh -c "./docker.sh test"
     volumes:

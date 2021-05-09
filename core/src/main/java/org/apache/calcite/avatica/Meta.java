@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * Command handler for getting various metadata. Should be implemented by each
@@ -607,9 +608,8 @@ public interface Meta {
 
     private CursorFactory(Style style, Class clazz, List<Field> fields,
         List<String> fieldNames) {
-      assert (fieldNames != null)
-          == (style == Style.RECORD_PROJECTION || style == Style.MAP);
-      assert (fields != null) == (style == Style.RECORD_PROJECTION);
+      assert (fieldNames != null) == (style == Style.RECORD || style == Style.MAP);
+      assert (fields != null) == (style == Style.RECORD);
       this.style = Objects.requireNonNull(style);
       this.clazz = clazz;
       this.fields = fields;
@@ -628,8 +628,6 @@ public interface Meta {
       case LIST:
         return LIST;
       case RECORD:
-        return record(clazz);
-      case RECORD_PROJECTION:
         return record(clazz, null, fieldNames);
       case MAP:
         return map(fieldNames);
@@ -647,8 +645,14 @@ public interface Meta {
     public static final CursorFactory LIST =
         new CursorFactory(Style.LIST, null, null, null);
 
+    /**
+     *
+     * @deprecated Use {@link #record(Class, List, List)}
+     */
+    @Deprecated // to be removed before 1.19.0
     public static CursorFactory record(Class resultClazz) {
-      return new CursorFactory(Style.RECORD, resultClazz, null, null);
+      List<Field> fields = Arrays.asList(resultClazz.getFields());
+      return new CursorFactory(Style.RECORD, resultClazz, fields, null);
     }
 
     public static CursorFactory record(Class resultClass, List<Field> fields,
@@ -663,14 +667,23 @@ public interface Meta {
           }
         }
       }
-      return new CursorFactory(Style.RECORD_PROJECTION, resultClass, fields,
-          fieldNames);
+      return new CursorFactory(Style.RECORD, resultClass, fields, fieldNames);
     }
 
     public static CursorFactory map(List<String> fieldNames) {
       return new CursorFactory(Style.MAP, null, null, fieldNames);
     }
 
+    /**
+     * Deduces the appropriate {@code CursorFactory} for accessing the underlying
+     * result set. For result sets composed by records, {@code resultClazz} must
+     * be not null, and each field name in {@code columns} must match one of its
+     * public fields.
+     * @param columns The columns metadata for the result set
+     * @param resultClazz The class representing the records, if any
+     * @return the appropriate {@code CursorFactory} for the underlying result set
+     * @throws RuntimeException if the field name validation fails
+     */
     public static CursorFactory deduce(List<ColumnMetaData> columns,
         Class resultClazz) {
       if (columns.size() == 1) {
@@ -685,7 +698,8 @@ public interface Meta {
       if (List.class.isAssignableFrom(resultClazz)) {
         return LIST;
       }
-      return record(resultClazz);
+      return record(resultClazz, null,
+          columns.stream().map(c -> c.columnName).collect(Collectors.toList()));
     }
 
     public Common.CursorFactory toProto() {
@@ -737,7 +751,6 @@ public interface Meta {
   enum Style {
     OBJECT,
     RECORD,
-    RECORD_PROJECTION,
     ARRAY,
     LIST,
     MAP;
