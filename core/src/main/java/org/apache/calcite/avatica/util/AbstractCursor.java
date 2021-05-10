@@ -908,15 +908,15 @@ public abstract class AbstractCursor implements Cursor {
     }
 
     @Override public Date getDate(Calendar calendar) throws SQLException {
-      final Number v = getDate();
+      final Number v = getNumber();
       if (v == null) {
         return null;
       }
-      return longToDate(((Number) v).longValue() * DateTimeUtils.MILLIS_PER_DAY, calendar);
+      return longToDate(v.longValue() * DateTimeUtils.MILLIS_PER_DAY, calendar);
     }
 
     @Override public Timestamp getTimestamp(Calendar calendar) throws SQLException {
-      final Number v = getDate();
+      final Number v = getNumber();
       if (v == null) {
         return null;
       }
@@ -925,14 +925,14 @@ public abstract class AbstractCursor implements Cursor {
     }
 
     @Override public String getString() throws SQLException {
-      final Number v = getDate();
+      final Number v = getNumber();
       if (v == null) {
         return null;
       }
       return dateAsString(v.intValue(), null);
     }
 
-    protected Number getDate() throws SQLException {
+    protected Number getNumber() throws SQLException {
       final Object value = super.getObject();
       if (value == null) {
         return null;
