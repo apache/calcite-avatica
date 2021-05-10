@@ -919,6 +919,19 @@ public abstract class AbstractCursor implements Cursor {
       }
       return dateAsString(v.intValue(), null);
     }
+
+    protected Number getNumber() throws SQLException {
+      final Object value = super.getObject();
+      if (value == null) {
+        return null;
+      }
+      if (value instanceof Date) {
+        long time = ((Date) value).getTime();
+        time -= localCalendar.getTimeZone().getOffset(time);
+        return time / DateTimeUtils.MILLIS_PER_DAY;
+      }
+      return (Number) value;
+    }
   }
 
   /**
@@ -961,6 +974,17 @@ public abstract class AbstractCursor implements Cursor {
       }
       return timeAsString(v.intValue(), null);
     }
+
+    protected Number getNumber() throws SQLException {
+      final Object v = super.getObject();
+      if (v == null) {
+        return null;
+      }
+      if (v instanceof Time) {
+        return ((Time) v).getTime();
+      }
+      return (Number) v;
+    }
   }
 
   /**
@@ -989,7 +1013,7 @@ public abstract class AbstractCursor implements Cursor {
     }
 
     @Override public Date getDate(Calendar calendar) throws SQLException {
-      final Timestamp timestamp  = getTimestamp(calendar);
+      final Timestamp timestamp = getTimestamp(calendar);
       if (timestamp == null) {
         return null;
       }
@@ -997,7 +1021,7 @@ public abstract class AbstractCursor implements Cursor {
     }
 
     @Override public Time getTime(Calendar calendar) throws SQLException {
-      final Timestamp timestamp  = getTimestamp(calendar);
+      final Timestamp timestamp = getTimestamp(calendar);
       if (timestamp == null) {
         return null;
       }
@@ -1012,6 +1036,17 @@ public abstract class AbstractCursor implements Cursor {
         return null;
       }
       return timestampAsString(v.longValue(), null);
+    }
+
+    protected Number getNumber() throws SQLException {
+      final Object v = super.getObject();
+      if (v == null) {
+        return null;
+      }
+      if (v instanceof Timestamp) {
+        return ((Timestamp) v).getTime();
+      }
+      return (Number) v;
     }
   }
 

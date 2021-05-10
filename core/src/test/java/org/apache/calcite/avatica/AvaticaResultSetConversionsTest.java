@@ -57,9 +57,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -180,7 +182,28 @@ public class AvaticaResultSetConversionsTest {
           columnMetaData("null", 14,
               ColumnMetaData.scalar(Types.NULL, "NULL",
                   ColumnMetaData.Rep.OBJECT),
-              DatabaseMetaData.columnNullable));
+              DatabaseMetaData.columnNullable),
+          columnMetaData("date_array", 15,
+              ColumnMetaData.array(
+                  ColumnMetaData.scalar(Types.DATE, "DATE",
+                      ColumnMetaData.Rep.PRIMITIVE_INT),
+                  "ARRAY",
+                  ColumnMetaData.Rep.ARRAY),
+              DatabaseMetaData.columnNoNulls),
+          columnMetaData("timestamp_array", 16,
+              ColumnMetaData.array(
+                  ColumnMetaData.scalar(Types.TIMESTAMP, "TIMESTAMP",
+                      ColumnMetaData.Rep.PRIMITIVE_LONG),
+                  "ARRAY",
+                  ColumnMetaData.Rep.ARRAY),
+              DatabaseMetaData.columnNoNulls),
+          columnMetaData("time_array", 17,
+              ColumnMetaData.array(
+                  ColumnMetaData.scalar(Types.TIME, "TIME",
+                      ColumnMetaData.Rep.NUMBER),
+                  "ARRAY",
+                  ColumnMetaData.Rep.ARRAY),
+              DatabaseMetaData.columnNoNulls));
 
       List<Object> row = Collections.<Object>singletonList(
           new Object[] {
@@ -189,8 +212,11 @@ public class AvaticaResultSetConversionsTest {
               new Timestamp(1476130718123L),
               Arrays.asList(1, 2, 3),
               new StructImpl(Arrays.asList(42, false)),
-              false,
+              true,
               null,
+              Arrays.asList(123, 18234),
+              Arrays.asList(1476130718123L, 1479123123242L),
+              Arrays.asList(1476123L, 147912242L)
           });
 
       CursorFactory factory = CursorFactory.deduce(columns, null);
@@ -571,6 +597,60 @@ public class AvaticaResultSetConversionsTest {
   }
 
   /**
+   * Accessor test helper for date array column.
+   */
+  private static final class DateArrayAccessorTestHelper extends AccessorTestHelper {
+    private DateArrayAccessorTestHelper(Getter g) {
+      super(g);
+    }
+
+    @Override public void testGetArray(ResultSet resultSet) throws SQLException {
+      ColumnMetaData.ScalarType intType =
+          ColumnMetaData.scalar(Types.DATE, "DATE", ColumnMetaData.Rep.PRIMITIVE_INT);
+      Array expectedArray =
+          new ArrayFactoryImpl(TimeZone.getTimeZone("UTC")).createArray(
+              intType, Arrays.asList(123, 18234));
+      assertTrue(ArrayImpl.equalContents(expectedArray, g.getArray(resultSet)));
+    }
+  }
+
+  /**
+   * Accessor test helper for time array column.
+   */
+  private static final class TimeArrayAccessorTestHelper extends AccessorTestHelper {
+    private TimeArrayAccessorTestHelper(Getter g) {
+      super(g);
+    }
+
+    @Override public void testGetArray(ResultSet resultSet) throws SQLException {
+      ColumnMetaData.ScalarType intType =
+          ColumnMetaData.scalar(Types.TIME, "TIME", ColumnMetaData.Rep.NUMBER);
+      Array expectedArray =
+          new ArrayFactoryImpl(TimeZone.getTimeZone("UTC")).createArray(
+              intType, Arrays.asList(1476123L, 147912242L));
+      assertTrue(ArrayImpl.equalContents(expectedArray, g.getArray(resultSet)));
+    }
+  }
+
+  /**
+   * Accessor test helper for timestamp array column.
+   */
+  private static final class TimestampArrayAccessorTestHelper extends AccessorTestHelper {
+    private TimestampArrayAccessorTestHelper(Getter g) {
+      super(g);
+    }
+
+    @Override public void testGetArray(ResultSet resultSet) throws SQLException {
+      ColumnMetaData.ScalarType intType =
+          ColumnMetaData.scalar(Types.TIMESTAMP, "TIMESTAMP", ColumnMetaData.Rep.PRIMITIVE_LONG);
+      Array expectedArray =
+          new ArrayFactoryImpl(TimeZone.getTimeZone("UTC")).createArray(
+              intType, Arrays.asList(1476130718123L, 1479123123242L));
+      assertTrue(ArrayImpl.equalContents(expectedArray, g.getArray(resultSet)));
+    }
+  }
+
+  /**
    * Accessor test helper for row column.
    */
   private static final class StructAccessorTestHelper extends AccessorTestHelper {
@@ -581,6 +661,23 @@ public class AvaticaResultSetConversionsTest {
     @Override public void testGetStruct(ResultSet resultSet) throws SQLException {
       Struct expectedStruct = new StructImpl(Arrays.asList(42, false));
       assertEquals(expectedStruct, g.getStruct(resultSet));
+    }
+  }
+
+  /**
+   * Accessor test helper for the (null) object column.
+   */
+  private static final class NullObjectAccessorTestHelper extends AccessorTestHelper {
+    private NullObjectAccessorTestHelper(Getter g) {
+      super(g);
+    }
+
+    @Override public void testGetString(ResultSet resultSet) throws SQLException {
+      assertNull(g.getString(resultSet));
+    }
+
+    @Override public void testGetObject(ResultSet resultSet) throws SQLException {
+      assertNull(g.getObject(resultSet));
     }
   }
 
@@ -1043,7 +1140,17 @@ public class AvaticaResultSetConversionsTest {
         new ArrayAccessorTestHelper(new OrdinalGetter(12)),
         new ArrayAccessorTestHelper(new LabelGetter("array")),
         new StructAccessorTestHelper(new OrdinalGetter(13)),
-        new StructAccessorTestHelper(new LabelGetter("struct")));
+        new StructAccessorTestHelper(new LabelGetter("struct")),
+        new BooleanAccessorTestHelper(new OrdinalGetter(14)),
+        new BooleanAccessorTestHelper(new LabelGetter("bit")),
+        new NullObjectAccessorTestHelper(new OrdinalGetter(15)),
+        new NullObjectAccessorTestHelper(new LabelGetter("null")),
+        new DateArrayAccessorTestHelper(new OrdinalGetter(16)),
+        new DateArrayAccessorTestHelper(new LabelGetter("date_array")),
+        new TimestampArrayAccessorTestHelper(new OrdinalGetter(17)),
+        new TimestampArrayAccessorTestHelper(new LabelGetter("timestamp_array")),
+        new TimeArrayAccessorTestHelper(new OrdinalGetter(18)),
+        new TimeArrayAccessorTestHelper(new LabelGetter("time_array")));
   }
 
   private final AccessorTestHelper testHelper;

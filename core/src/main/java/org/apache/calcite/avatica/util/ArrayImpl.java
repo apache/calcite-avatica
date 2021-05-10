@@ -227,11 +227,21 @@ public class ArrayImpl implements Array {
    * Elements are compared using {@link Object#equals(Object)}, and null
    * values are equal to each other. */
   public static boolean equalContents(Array left, Array right) throws SQLException {
+    if (left.getBaseType() != right.getBaseType()) {
+      return false;
+    }
     ResultSet leftResultSet = left.getResultSet();
     ResultSet rightResultSet = right.getResultSet();
+    int leftColumnCount = leftResultSet.getMetaData().getColumnCount();
+    int rightColumnCount = rightResultSet.getMetaData().getColumnCount();
+    if (leftColumnCount != rightColumnCount) {
+      return false;
+    }
     while (leftResultSet.next() && rightResultSet.next()) {
-      if (!Objects.equals(leftResultSet.getObject(1), rightResultSet.getObject(1))) {
-        return false;
+      for (int i = 1; i <= leftColumnCount; i++) {
+        if (!Objects.equals(leftResultSet.getObject(i), rightResultSet.getObject(i))) {
+          return false;
+        }
       }
     }
     return !leftResultSet.next() && !rightResultSet.next();
