@@ -908,15 +908,15 @@ public abstract class AbstractCursor implements Cursor {
     }
 
     @Override public Date getDate(Calendar calendar) throws SQLException {
-      final Number v = getNumber();
+      final Number v = getDate();
       if (v == null) {
         return null;
       }
-      return longToDate(v.longValue() * DateTimeUtils.MILLIS_PER_DAY, calendar);
+      return longToDate(((Number) v).longValue() * DateTimeUtils.MILLIS_PER_DAY, calendar);
     }
 
     @Override public Timestamp getTimestamp(Calendar calendar) throws SQLException {
-      final Number v = getNumber();
+      final Number v = getDate();
       if (v == null) {
         return null;
       }
@@ -925,11 +925,22 @@ public abstract class AbstractCursor implements Cursor {
     }
 
     @Override public String getString() throws SQLException {
-      final Number v = getNumber();
+      final Number v = getDate();
       if (v == null) {
         return null;
       }
       return dateAsString(v.intValue(), null);
+    }
+
+    protected Number getDate() throws SQLException {
+      final Object value = super.getObject();
+      if (value == null) {
+        return null;
+      }
+      if (value instanceof Date) {
+        return ((Date) value).toLocalDate().toEpochDay();
+      }
+      return (Number) value;
     }
   }
 
@@ -973,6 +984,17 @@ public abstract class AbstractCursor implements Cursor {
       }
       return timeAsString(v.intValue(), null);
     }
+
+    protected Number getNumber() throws SQLException {
+      final Object v = super.getObject();
+      if (v == null) {
+        return null;
+      }
+      if (v instanceof Time) {
+        return ((Time) v).getTime();
+      }
+      return (Number) v;
+    }
   }
 
   /**
@@ -1001,7 +1023,7 @@ public abstract class AbstractCursor implements Cursor {
     }
 
     @Override public Date getDate(Calendar calendar) throws SQLException {
-      final Timestamp timestamp  = getTimestamp(calendar);
+      final Timestamp timestamp = getTimestamp(calendar);
       if (timestamp == null) {
         return null;
       }
@@ -1009,7 +1031,7 @@ public abstract class AbstractCursor implements Cursor {
     }
 
     @Override public Time getTime(Calendar calendar) throws SQLException {
-      final Timestamp timestamp  = getTimestamp(calendar);
+      final Timestamp timestamp = getTimestamp(calendar);
       if (timestamp == null) {
         return null;
       }
@@ -1024,6 +1046,17 @@ public abstract class AbstractCursor implements Cursor {
         return null;
       }
       return timestampAsString(v.longValue(), null);
+    }
+
+    protected Number getNumber() throws SQLException {
+      final Object v = super.getObject();
+      if (v == null) {
+        return null;
+      }
+      if (v instanceof Timestamp) {
+        return ((Timestamp) v).getTime();
+      }
+      return (Number) v;
     }
   }
 
