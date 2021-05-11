@@ -683,6 +683,32 @@ public abstract class AbstractCursor implements Cursor {
   }
 
   /**
+   * Accessor that assumes that the underlying value is a {@link BigDecimal};
+   * corresponds to {@link java.sql.Types#DECIMAL}.
+   */
+  private static class BigDecimalAccessor extends BigNumberAccessor {
+    private BigDecimalAccessor(Getter getter) {
+      super(getter);
+    }
+
+    protected Number getNumber() throws SQLException {
+      return (Number) getObject();
+    }
+
+    public BigDecimal getBigDecimal(int scale) throws SQLException {
+      Number number = getNumber();
+      return number == null || number instanceof BigDecimal
+          ? (BigDecimal) number : BigDecimal.valueOf(number.longValue());
+    }
+
+    public BigDecimal getBigDecimal() throws SQLException {
+      Number number = getNumber();
+      return number == null || number instanceof BigDecimal
+          ? (BigDecimal) number : BigDecimal.valueOf(number.longValue());
+    }
+  }
+
+  /**
    * Accessor that assumes that the underlying value is a {@link Number};
    * corresponds to {@link java.sql.Types#NUMERIC}
    * or {@link java.sql.Types#DECIMAL}.
