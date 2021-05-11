@@ -194,6 +194,13 @@ public class AvaticaResultSetConversionsTest {
                       ColumnMetaData.Rep.NUMBER),
                   "ARRAY",
                   ColumnMetaData.Rep.ARRAY),
+              DatabaseMetaData.columnNoNulls),
+          columnMetaData("decimal_array", 16,
+              ColumnMetaData.array(
+                  ColumnMetaData.scalar(Types.DECIMAL, "DECIMAL",
+                      ColumnMetaData.Rep.PRIMITIVE_DOUBLE),
+                  "ARRAY",
+                  ColumnMetaData.Rep.ARRAY),
               DatabaseMetaData.columnNoNulls));
 
       List<Object> row = Collections.<Object>singletonList(
@@ -205,7 +212,8 @@ public class AvaticaResultSetConversionsTest {
               new StructImpl(Arrays.asList(42, false)),
               Arrays.asList(123, 18234),
               Arrays.asList(1476130718123L, 1479123123242L),
-              Arrays.asList(1476123L, 147912242L)
+              Arrays.asList(1476123L, 147912242L),
+              Arrays.asList(1, 1.1)
           });
 
       CursorFactory factory = CursorFactory.deduce(columns, null);
@@ -581,6 +589,24 @@ public class AvaticaResultSetConversionsTest {
       Array expectedArray =
           new ArrayFactoryImpl(Unsafe.localCalendar().getTimeZone()).createArray(
               intType, Arrays.asList(1, 2, 3));
+      assertTrue(ArrayImpl.equalContents(expectedArray, g.getArray(resultSet)));
+    }
+  }
+
+  /**
+   * Accessor test helper for decimal array column.
+   */
+  private static final class DecimalArrayAccessorTestHelper extends AccessorTestHelper {
+    private DecimalArrayAccessorTestHelper(Getter g) {
+      super(g);
+    }
+
+    @Override public void testGetArray(ResultSet resultSet) throws SQLException {
+      ColumnMetaData.ScalarType intType =
+          ColumnMetaData.scalar(Types.DECIMAL, "DECIMAL", ColumnMetaData.Rep.PRIMITIVE_DOUBLE);
+      Array expectedArray =
+          new ArrayFactoryImpl(Unsafe.localCalendar().getTimeZone()).createArray(
+              intType, Arrays.asList(1, 1.1));
       assertTrue(ArrayImpl.equalContents(expectedArray, g.getArray(resultSet)));
     }
   }
@@ -1118,7 +1144,9 @@ public class AvaticaResultSetConversionsTest {
         new TimestampArrayAccessorTestHelper(new OrdinalGetter(15)),
         new TimestampArrayAccessorTestHelper(new LabelGetter("timestamp_array")),
         new TimeArrayAccessorTestHelper(new OrdinalGetter(16)),
-        new TimeArrayAccessorTestHelper(new LabelGetter("time_array")));
+        new TimeArrayAccessorTestHelper(new LabelGetter("time_array")),
+        new DecimalArrayAccessorTestHelper(new OrdinalGetter(17)),
+        new DecimalArrayAccessorTestHelper(new LabelGetter("decimal_array")));
   }
 
   private final AccessorTestHelper testHelper;

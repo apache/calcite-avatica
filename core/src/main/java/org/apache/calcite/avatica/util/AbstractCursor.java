@@ -694,11 +694,15 @@ public abstract class AbstractCursor implements Cursor {
     }
 
     public BigDecimal getBigDecimal(int scale) throws SQLException {
-      return (BigDecimal) getObject();
+      Number number = getNumber();
+      return number == null || number instanceof BigDecimal
+          ? (BigDecimal) number : BigDecimal.valueOf(number.longValue());
     }
 
     public BigDecimal getBigDecimal() throws SQLException {
-      return (BigDecimal) getObject();
+      Number number = getNumber();
+      return number == null || number instanceof BigDecimal
+          ? (BigDecimal) number : BigDecimal.valueOf(number.longValue());
     }
   }
 
