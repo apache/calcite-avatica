@@ -30,20 +30,27 @@ Here's some miscellaneous documentation about using Avatica.
 
 ## Building from a source distribution
 
-Prerequisites are Java (JDK 8 or later) on your path.
+Prerequisites are Java (JDK 8 or later)
+and Gradle (version 6.8.1) on your path.
+
+(The source distribution
+[does not include the Gradle wrapper](https://issues.apache.org/jira/browse/CALCITE-4575);
+therefore you need to
+[install Gradle manually](https://gradle.org/releases/).)
 
 Unpack the source distribution `.tar.gz` file,
 `cd` to the root directory of the unpacked source,
-then build using maven:
+then build using Gradle:
 
 {% highlight bash %}
 $ tar xvfz apache-calcite-avatica-1.18.0-src.tar.gz
 $ cd apache-calcite-avatica-1.18.0-src
-$ ./gradlew build
+$ gradle build
 {% endhighlight %}
 
 [Running tests](#running-tests) describes how to run more or fewer
-tests.
+tests (but you should use the `gradle` command rather than
+`./gradlew`).
 
 ## Building from Git
 
@@ -52,16 +59,13 @@ and Java (JDK 8 or later) on your path.
 
 Create a local copy of the GitHub repository,
 `cd` to its root directory,
-then build using maven:
+then build using Gradle:
 
 {% highlight bash %}
 $ git clone git://github.com/apache/calcite-avatica.git avatica
 $ cd avatica
 $ ./gradlew build
 {% endhighlight %}
-
-Note: [gdub](https://github.com/dougborg/gdub) simplifies `./gradlew build` to `gw build`,
-and it simplifies cases like `../../gradlew ...` to `gw ...` as well.
 
 [Running tests](#running-tests) describes how to run more or fewer
 tests.
@@ -83,7 +87,8 @@ You can use `./gradlew assemble` to build the artifacts and skip all tests and v
 
 ### To run tests in docker:
 
-* You will need to have [docker](https://docs.docker.com/install/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
+Prerequisites are [Docker](https://docs.docker.com/install/) and
+[Docker Compose](https://docs.docker.com/compose/install/).
 
 {% highlight bash %}
 docker-compose run test
@@ -123,7 +128,7 @@ ball because that would be
 
 ## Run a GPG agent
 
-By default, Maven plugins which require you to unlock a GPG secret key
+By default, Gradle plugins which require you to unlock a GPG secret key
 will prompt you in the terminal. To prevent you from having to enter
 this password numerous times, it is highly recommended to install and
 run `gpg-agent`.
@@ -167,8 +172,10 @@ asfSvnUsername=
 asfSvnPassword=
 {% endhighlight %}
 
-Note: when https://github.com/vlsi/asflike-release-environment is used, the credentials are takend from
-`asfTest...` (e.g. `asfTestNexusUsername=test`)
+When
+[asflike-release-environment](https://github.com/vlsi/asflike-release-environment)
+is used, the credentials are taken from `asfTest...`
+(e.g. `asfTestNexusUsername=test`)
 
 Note: if you want to uses `gpg-agent`, you need to pass `useGpgCmd` property, and specify the key id
 via `signing.gnupg.keyName`.
@@ -194,6 +201,7 @@ Before you start:
 * Set up signing keys as described above.
 * Make sure you are using JDK 8 (not 9 or 10).
 * Check that `README`, `site/_docs/howto.md`, `site/_docs/docker_images.md` have the correct version number.
+* Check that `site/_docs/howto.md` has the correct Gradle version.
 * Check that `NOTICE` has the current copyright year.
 * Check that `calcite.avatica.version` has the proper value in `/gradle.properties`.
 * Add release notes to `site/_docs/history.md`. Include the commit history,
@@ -269,7 +277,9 @@ docker-compose run -v /c/Users/username/AppData/Roaming/gnupg:/.gnupg publish-re
 * That directory must contain files `NOTICE`, `LICENSE`,
   `README`, `README.md`
   * Check that the version in `README` is correct
-* Make sure that there is no `KEYS` file in the source distros
+* Make sure that the following files do not occur in the source
+  distros: `KEYS`, `gradlew`, `gradlew.bat`, `gradle-wrapper.jar`,
+  `gradle-wrapper.properties`
 * For each .jar (for example `core/build/libs/avatica-core-X.Y.Z.jar`
   and `server/build/libs/avatica-server-X.Y.Z-sources.jar`),
   verify that the `META-INF` directory contains the correct
@@ -299,7 +309,7 @@ gpg --recv-keys key
 # Check keys
 curl -O https://dist.apache.org/repos/dist/release/calcite/KEYS
 
-# Sign/check sha256 hashes
+# Sign/check sha512 hashes
 # (Assumes your O/S has a 'shasum' command.)
 function checkHash() {
   cd "$1"
@@ -307,15 +317,15 @@ function checkHash() {
     if [ ! -f $i ]; then
       continue
     fi
-    if [ -f $i.sha256 ]; then
-      if [ "$(cat $i.sha256)" = "$(shasum -a 256 $i)" ]; then
-        echo $i.sha256 present and correct
+    if [ -f $i.sha512 ]; then
+      if [ "$(cat $i.sha512)" = "$(shasum -a 512 $i)" ]; then
+        echo $i.sha512 present and correct
       else
-        echo $i.sha256 does not match
+        echo $i.sha512 does not match
       fi
     else
-      shasum -a 256 $i > $i.sha256
-      echo $i.sha256 created
+      shasum -a 512 $i > $i.sha512
+      echo $i.sha512 created
     fi
   done
 }
@@ -349,7 +359,7 @@ The artifacts to be voted on are located here:
 https://dist.apache.org/repos/dist/dev/calcite/apache-calcite-avatica-X.Y.Z-rcN/
 
 The hashes of the artifacts are as follows:
-src.tar.gz.sha256 XXXX
+src.tar.gz.sha512 XXXX
 
 A staged Maven repository is available for review at:
 https://repository.apache.org/content/repositories/orgapachecalcite-NNNN
@@ -362,7 +372,7 @@ Please vote on releasing this package as Apache Calcite Avatica X.Y.Z.
 The vote is open for the next 72 hours and passes if a majority of
 at least three +1 PMC votes are cast.
 
-[ ] +1 Release this package as Apache Calcite X.Y.Z
+[ ] +1 Release this package as Apache Calcite Avatica X.Y.Z
 [ ]  0 I don't feel strongly about it, but I'm okay with the release
 [ ] -1 Do not release this package because...
 

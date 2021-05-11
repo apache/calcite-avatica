@@ -36,7 +36,7 @@ Please see below to determine how the breaking change will affect your project.
 
 Compatibility: This release is tested
 on Linux, macOS, Microsoft Windows;
-using Oracle JDK 8, 9, 10, 11, 12, 13, 14;
+using Oracle JDK 8, 9, 10, 11, 12, 13, 14, 15;
 using IBM Java 8;
 Guava versions 14.0 to 29.0;
 other software versions as specified in `gradle.properties`.
