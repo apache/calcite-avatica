@@ -77,10 +77,9 @@ Release artifacts are signed with the following key:
 https://people.apache.org/keys/committer/$committerId.asc
 https://www.apache.org/dist/$tlpUrl/KEYS
 
-N.B.
-To create the jars and test $componentName: "./gradlew build -Prelease -PskipSign".
+To create the jars and test $componentName: "gradle build -Prelease -PskipSign".
 
-If you do not have a Java environment available, you can run the tests
+If you do not have a Java/Gradle environment available, you can run the tests
 using docker. To do so, install docker and docker-compose, then run
 "docker-compose run test" from the root of the directory.
 
@@ -89,7 +88,7 @@ Please vote on releasing this package as $componentName $version.
 The vote is open for the next 72 hours and passes if a majority of at
 least three +1 PMC votes are cast.
 
-[ ] +1 Release this package as Apache Calcite $version
+[ ] +1 Release this package as Apache Calcite Avatica $version
 [ ]  0 I don't feel strongly about it, but I'm okay with the release
 [ ] -1 Do not release this package because...
 
@@ -142,6 +141,15 @@ fun CopySpec.excludeLicenseFromSourceRelease() {
     exclude("LICENSE")
 }
 
+fun CopySpec.excludeGradleWrapperFromSourceRelease() {
+    // Source distributions must not include binary files. The Gradle wrapper
+    // requires gradle-wrapper.jar, so exclude the whole wrapper. Users must
+    // install Gradle manually.
+    exclude("gradlew")
+    exclude("gradlew.bat")
+    exclude("gradle/wrapper/**")
+}
+
 fun CopySpec.excludeCategoryBLicensedWorksFromSourceRelease() {
     // The source distribution contains "font-awesome:fonts" which is licensed as
     // http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License).
@@ -167,6 +175,7 @@ fun CrLfSpec.sourceLayout() = copySpec {
         from(rootDir) {
             gitignore(gitProps)
             excludeLicenseFromSourceRelease()
+            excludeGradleWrapperFromSourceRelease()
             excludeCategoryBLicensedWorksFromSourceRelease()
         }
     }
