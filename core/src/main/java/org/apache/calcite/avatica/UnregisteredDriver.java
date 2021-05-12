@@ -126,12 +126,11 @@ public abstract class UnregisteredDriver implements java.sql.Driver {
     throw new RuntimeException(msg, e);
   }
 
-  public Connection connect(String url, Properties info) throws SQLException {
+  @Override public Connection connect(String url, Properties info) throws SQLException {
     if (!acceptsURL(url)) {
       return null;
     }
     final String prefix = getConnectStringPrefix();
-    assert url.startsWith(prefix);
     final String urlSuffix = url.substring(prefix.length());
     final Properties info2 = ConnectStringParser.parse(urlSuffix, info);
     final AvaticaConnection connection =
@@ -140,15 +139,15 @@ public abstract class UnregisteredDriver implements java.sql.Driver {
     return connection;
   }
 
-  public boolean acceptsURL(String url) throws SQLException {
-    return url.startsWith(getConnectStringPrefix());
+  @Override public boolean acceptsURL(String url) throws SQLException {
+    return url != null && url.startsWith(getConnectStringPrefix());
   }
 
   /** Returns the prefix of the connect string that this driver will recognize
    * as its own. For example, "jdbc:calcite:". */
   protected abstract String getConnectStringPrefix();
 
-  public DriverPropertyInfo[] getPropertyInfo(
+  @Override public DriverPropertyInfo[] getPropertyInfo(
       String url, Properties info) throws SQLException {
     List<DriverPropertyInfo> list = new ArrayList<DriverPropertyInfo>();
 
@@ -170,7 +169,7 @@ public abstract class UnregisteredDriver implements java.sql.Driver {
   }
 
   // JDBC 4.1 support (JDK 1.7 and higher)
-  public Logger getParentLogger() {
+  @Override public Logger getParentLogger() {
     return Logger.getLogger("");
   }
 
@@ -183,15 +182,15 @@ public abstract class UnregisteredDriver implements java.sql.Driver {
     return version;
   }
 
-  public final int getMajorVersion() {
+  @Override public final int getMajorVersion() {
     return version.majorVersion;
   }
 
-  public final int getMinorVersion() {
+  @Override public final int getMinorVersion() {
     return version.minorVersion;
   }
 
-  public boolean jdbcCompliant() {
+  @Override public boolean jdbcCompliant() {
     return version.jdbcCompliant;
   }
 

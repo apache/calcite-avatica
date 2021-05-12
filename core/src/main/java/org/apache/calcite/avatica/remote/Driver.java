@@ -66,7 +66,7 @@ public class Driver extends UnregisteredDriver {
     return CONNECT_STRING_PREFIX;
   }
 
-  protected DriverVersion createDriverVersion() {
+  @Override protected DriverVersion createDriverVersion() {
     return DriverVersion.load(
         Driver.class,
         "org-apache-calcite-jdbc.properties",
