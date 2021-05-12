@@ -28,7 +28,7 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.18.0">1.18.0</a> / 2021-04-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.18.0">1.18.0</a> / 2021-05-XX
 {: #v1-18-0}
 
 Apache Calcite Avatica 1.18.0 includes a few dependency upgrades, minor fixes and a breaking change.
@@ -73,6 +73,10 @@ Features and bug fixes
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-4503">CALCITE-4503</a>]
   Order of fields in records should follow that of the SQL types (Alessandro Solimando)
 * Upgrade Gradle docker containers to 6.8
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4575">CALCITE-4575</a>]
+  Remove Gradle wrapper from source distribution
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4576">CALCITE-4576</a>]
+  Release process should not overwrite LICENSE file
 
 Tests
 * Remove files that change often from Travis cache and remove broken files automatically
