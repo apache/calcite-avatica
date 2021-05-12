@@ -277,6 +277,7 @@ docker-compose run -v /c/Users/username/AppData/Roaming/gnupg:/.gnupg publish-re
 * That directory must contain files `NOTICE`, `LICENSE`,
   `README`, `README.md`
   * Check that the version in `README` is correct
+  * Check that `LICENSE` is identical to the file checked into git
 * Make sure that the following files do not occur in the source
   distros: `KEYS`, `gradlew`, `gradlew.bat`, `gradle-wrapper.jar`,
   `gradle-wrapper.properties`
