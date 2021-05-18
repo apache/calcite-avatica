@@ -28,7 +28,7 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.18.0">1.18.0</a> / 2021-05-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.18.0">1.18.0</a> / 2021-05-18
 {: #v1-18-0}
 
 Apache Calcite Avatica 1.18.0 includes a few dependency upgrades, minor fixes and a breaking change.
