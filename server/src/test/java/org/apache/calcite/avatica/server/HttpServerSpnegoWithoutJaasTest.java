@@ -222,7 +222,7 @@ public class HttpServerSpnegoWithoutJaasTest {
 
     // We should get a response which is "OK" with our client's name
     assertNotNull(response);
-    assertEquals("OK " + SpnegoTestUtil.CLIENT_PRINCIPAL,
+    assertEquals("OK " + SpnegoTestUtil.CLIENT_NAME,
         new String(response, StandardCharsets.UTF_8));
   }
 }

@@ -111,6 +111,9 @@ public class AvaticaSpnegoTest extends HttpBaseTest {
     System.setProperty("javax.security.auth.useSubjectCredsOnly", "false");
     //System.setProperty("sun.security.spnego.debug", "true");
     //System.setProperty("sun.security.krb5.debug", "true");
+    //System.setProperty("sun.security.jgss.debug", "true");
+    //System.setProperty("java.security.debug", "all");
+    //System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
   }
 
   @AfterClass public static void stopKdc() throws KrbException {

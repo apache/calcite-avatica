@@ -31,6 +31,7 @@ import org.ietf.jgss.Oid;
 import org.junit.AfterClass;
 import org.junit.Assume;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,7 @@ import static org.junit.Assert.assertTrue;
  * of that HTTP. This variant of the test requires that the user use JAAS configuration to
  * perform server-side login.
  */
+@Ignore("No longer supported after Jetty update")
 public class HttpServerSpnegoWithJaasTest {
   private static final Logger LOG = LoggerFactory.getLogger(HttpServerSpnegoWithJaasTest.class);
 

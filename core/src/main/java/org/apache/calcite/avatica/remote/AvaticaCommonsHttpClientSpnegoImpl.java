@@ -20,6 +20,7 @@ import org.apache.http.auth.AuthSchemeProvider;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.KerberosCredentials;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -30,6 +31,7 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.auth.SPNegoSchemeFactory;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.util.EntityUtils;
 
@@ -59,6 +61,8 @@ public class AvaticaCommonsHttpClientSpnegoImpl extends AvaticaCommonsHttpClient
       Boolean.parseBoolean(
            System.getProperty("avatica.http.spnego.use_canonical_hostname", "true"));
   private static final boolean STRIP_PORT_ON_SERVER_LOOKUP = true;
+
+  private CookieStore cookieStore;
 
   /**
    * Constructs an http client with the expectation that the user is already logged in with their
@@ -99,6 +103,7 @@ public class AvaticaCommonsHttpClientSpnegoImpl extends AvaticaCommonsHttpClient
   public void setGSSCredential(GSSCredential credential) {
     this.authRegistry = RegistryBuilder.<AuthSchemeProvider>create().register(AuthSchemes.SPNEGO,
         new SPNegoSchemeFactory(STRIP_PORT_ON_SERVER_LOOKUP, USE_CANONICAL_HOSTNAME)).build();
+    this.cookieStore = new BasicCookieStore();
 
     this.credentialsProvider = new BasicCredentialsProvider();
     if (null != credential) {
@@ -119,6 +124,7 @@ public class AvaticaCommonsHttpClientSpnegoImpl extends AvaticaCommonsHttpClient
     context.setCredentialsProvider(credentialsProvider);
     context.setAuthSchemeRegistry(authRegistry);
     context.setAuthCache(authCache);
+    context.setCookieStore(cookieStore);
 
     ByteArrayEntity entity = new ByteArrayEntity(request, ContentType.APPLICATION_OCTET_STREAM);
 
@@ -127,10 +133,20 @@ public class AvaticaCommonsHttpClientSpnegoImpl extends AvaticaCommonsHttpClient
     post.setEntity(entity);
 
     try (CloseableHttpResponse response = client.execute(post, context)) {
+      LOG.debug("Response {}", response);
       final int statusCode = response.getStatusLine().getStatusCode();
       if (HttpURLConnection.HTTP_OK == statusCode
           || HttpURLConnection.HTTP_INTERNAL_ERROR == statusCode) {
         return EntityUtils.toByteArray(response.getEntity());
+      }
+
+      if (statusCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+        try (CloseableHttpResponse resp2 = client.execute(post, context)) {
+          int status = resp2.getStatusLine().getStatusCode();
+          if (HttpURLConnection.HTTP_OK == statusCode) {
+            return EntityUtils.toByteArray(response.getEntity());
+          }
+        }
       }
 
       throw new RuntimeException("Failed to execute HTTP Request, got HTTP/" + statusCode);

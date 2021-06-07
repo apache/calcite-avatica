@@ -97,6 +97,14 @@ public class HttpQueryStringParameterRemoteUserExtractorTest extends HttpAuthBas
       return null;
     }
 
+    @Override public String getKerberosServiceName() {
+      return null;
+    }
+
+    @Override public String getKerberosHostName() {
+      return null;
+    }
+
     @Override public boolean supportsImpersonation() {
       // Impersonation is allowed
       return true;
@@ -115,10 +123,6 @@ public class HttpQueryStringParameterRemoteUserExtractorTest extends HttpAuthBas
     @Override public RemoteUserExtractor getRemoteUserExtractor() {
       // We extract the "real" user via the "doAs" query string parameter
       return new HttpQueryStringParameterRemoteUserExtractor("doAs");
-    }
-
-    @Override public String[] getAllowedRoles() {
-      return new String[] { "users" };
     }
 
     @Override public String getHashLoginServiceRealm() {
