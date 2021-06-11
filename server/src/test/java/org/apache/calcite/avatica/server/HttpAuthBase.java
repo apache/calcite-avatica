@@ -17,9 +17,8 @@
 package org.apache.calcite.avatica.server;
 
 import org.apache.calcite.avatica.ConnectionSpec;
+import org.apache.calcite.avatica.util.Sources;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -79,15 +78,10 @@ public class HttpAuthBase {
   }
 
   static String getHashLoginServicePropertiesString() {
-    try {
-      final String userPropertiesFile =
-              URLDecoder.decode(HttpQueryStringParameterRemoteUserExtractorTest.class
-                      .getResource("/auth-users.properties").getFile(), "UTF-8");
-      assertNotNull("Could not find properties file for basic auth users", userPropertiesFile);
-      return userPropertiesFile;
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
-    }
+    final String userPropertiesFile =  Sources.of(HttpAuthBase.class
+        .getResource("/auth-users.properties")).file().getAbsolutePath();
+    assertNotNull("Could not find properties file for basic auth users", userPropertiesFile);
+    return userPropertiesFile;
   }
 
 }

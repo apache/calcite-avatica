@@ -20,12 +20,12 @@ import org.apache.calcite.avatica.ConnectionSpec;
 import org.apache.calcite.avatica.jdbc.JdbcMeta;
 import org.apache.calcite.avatica.remote.Driver;
 import org.apache.calcite.avatica.remote.LocalService;
+import org.apache.calcite.avatica.util.Sources;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.net.URLDecoder;
 import java.util.Properties;
 
 import static org.hamcrest.core.StringContains.containsString;
@@ -44,8 +44,9 @@ public class BasicAuthHttpServerTest extends HttpAuthBase {
   private static String url;
 
   @BeforeClass public static void startServer() throws Exception {
-    final String userPropertiesFile = URLDecoder.decode(BasicAuthHttpServerTest.class
-        .getResource("/auth-users.properties").getFile(), "UTF-8");
+    final String userPropertiesFile = Sources.of(
+        BasicAuthHttpServerTest.class.getResource("/auth-users.properties")).file()
+            .getAbsolutePath();
     assertNotNull("Could not find properties file for basic auth users", userPropertiesFile);
 
     // Create a LocalService around HSQLDB
