@@ -128,7 +128,7 @@ public class ConnectionConfigImpl implements ConnectionConfig {
         .getEnum(HostnameVerification.class);
   }
 
-  public int fetchSize() {
+  public int fetchRowCount() {
     return BuiltInConnectionProperty.FETCH_ROW_COUNT.wrap(properties).getInt();
   }
 

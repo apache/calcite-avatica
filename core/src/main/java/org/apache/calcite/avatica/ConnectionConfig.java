@@ -63,7 +63,7 @@ public interface ConnectionConfig {
   /** @see BuiltInConnectionProperty#HOSTNAME_VERIFICATION */
   HostnameVerification hostnameVerification();
   /** @see BuiltInConnectionProperty#FETCH_ROW_COUNT */
-  int fetchSize();
+  int fetchRowCount();
 }
 
 // End ConnectionConfig.java

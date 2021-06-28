@@ -67,7 +67,7 @@ public abstract class AvaticaStatement
   final int resultSetType;
   final int resultSetConcurrency;
   final int resultSetHoldability;
-  private int fetchSize = DEFAULT_FETCH_SIZE;
+  private int fetchRowCount;
   private int fetchDirection;
   protected long maxRowCount = 0;
 
@@ -109,7 +109,7 @@ public abstract class AvaticaStatement
     this.resultSetType = resultSetType;
     this.resultSetConcurrency = resultSetConcurrency;
     this.resultSetHoldability = resultSetHoldability;
-    this.fetchSize = connection.config().fetchSize(); // Default to connection config fetch size.
+    this.fetchRowCount = connection.config().fetchRowCount(); // Default to connection config fetch size.
     this.signature = signature;
     this.closed = false;
     if (h == null) {
@@ -409,12 +409,12 @@ public abstract class AvaticaStatement
 
   public void setFetchSize(int rows) throws SQLException {
     checkOpen();
-    this.fetchSize = rows;
+    this.fetchRowCount = rows;
   }
 
   public int getFetchSize() throws SQLException {
     checkOpen();
-    return fetchSize;
+    return fetchRowCount;
   }
 
   public int getResultSetConcurrency() throws SQLException {
