@@ -172,3 +172,11 @@ on-hover images for the permalink, but oh well.
 : _Default_: `null`.
 
 : _Required_: Only if `truststore` was provided.
+
+<strong><a name="fetch_row_count" href="#fetch_row_count">fetch_row_count</a></strong>
+
+: _Description_: The number of rows to fetch
+
+: _Default_: `100`.
+
+: _Required_: No.
