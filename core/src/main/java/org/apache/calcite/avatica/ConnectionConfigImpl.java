@@ -129,7 +129,7 @@ public class ConnectionConfigImpl implements ConnectionConfig {
   }
 
   public int fetchSize() {
-    return BuiltInConnectionProperty.FETCH_SIZE.wrap(properties).getInt();
+    return BuiltInConnectionProperty.FETCH_ROW_COUNT.wrap(properties).getInt();
   }
 
   /** Converts a {@link Properties} object containing (name, value)

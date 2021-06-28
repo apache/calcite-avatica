@@ -88,8 +88,8 @@ public enum BuiltInConnectionProperty implements ConnectionProperty {
   HOSTNAME_VERIFICATION("hostname_verification", Type.ENUM, HostnameVerification.STRICT,
       HostnameVerification.class, false),
 
-  /** Fetch size limit, default is 100 rows. */
-  FETCH_SIZE("fetch_size", Type.NUMBER, AvaticaStatement.DEFAULT_FETCH_SIZE, false);
+  /** The number of rows to fetch per call, default is 100 rows. */
+  FETCH_ROW_COUNT("fetch_row_count", Type.NUMBER, AvaticaStatement.DEFAULT_FETCH_SIZE, false);
 
   private final String camelName;
   private final Type type;
