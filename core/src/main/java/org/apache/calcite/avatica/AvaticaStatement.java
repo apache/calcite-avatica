@@ -109,7 +109,7 @@ public abstract class AvaticaStatement
     this.resultSetType = resultSetType;
     this.resultSetConcurrency = resultSetConcurrency;
     this.resultSetHoldability = resultSetHoldability;
-    this.fetchRowCount = connection.config().fetchRowCount(); // Default to connection config fetch size.
+    this.fetchRowCount = connection.config().fetchRowCount(); // Default to connection config value
     this.signature = signature;
     this.closed = false;
     if (h == null) {
