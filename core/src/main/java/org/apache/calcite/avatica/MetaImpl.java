@@ -1543,6 +1543,7 @@ public abstract class MetaImpl implements Meta {
   private class FetchIterator implements Iterator<Object> {
     private final AvaticaStatement stmt;
     private final QueryState state;
+    private final int fetchRowCount;
     private Frame frame;
     private Iterator<Object> rows;
     private long currentOffset = 0;
@@ -1550,6 +1551,13 @@ public abstract class MetaImpl implements Meta {
     private FetchIterator(AvaticaStatement stmt, QueryState state, Frame firstFrame) {
       this.stmt = stmt;
       this.state = state;
+      int fetchRowCount;
+      try {
+        fetchRowCount = stmt.getFetchSize();
+      } catch (SQLException e) {
+        fetchRowCount = AvaticaStatement.DEFAULT_FETCH_SIZE;
+      }
+      this.fetchRowCount = fetchRowCount;
       if (firstFrame == null) {
         frame = Frame.MORE;
         rows = EmptyIterator.INSTANCE;
@@ -1589,7 +1597,7 @@ public abstract class MetaImpl implements Meta {
         }
         try {
           // currentOffset updated after element is read from `rows` iterator
-          frame = fetch(stmt.handle, currentOffset, stmt.getFetchSize());
+          frame = fetch(stmt.handle, currentOffset, fetchRowCount);
         } catch (NoSuchStatementException e) {
           resetStatement();
           // re-fetch the batch where we left off
