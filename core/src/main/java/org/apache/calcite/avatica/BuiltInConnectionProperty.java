@@ -89,7 +89,7 @@ public enum BuiltInConnectionProperty implements ConnectionProperty {
       HostnameVerification.class, false),
 
   /** The number of rows to fetch per call, default is 100 rows. */
-  FETCH_ROW_COUNT("fetch_row_count", Type.NUMBER, AvaticaStatement.DEFAULT_FETCH_SIZE, false);
+  FETCH_SIZE_ROWS("fetch_size_rows", Type.NUMBER, AvaticaStatement.DEFAULT_FETCH_SIZE, false);
 
   private final String camelName;
   private final Type type;

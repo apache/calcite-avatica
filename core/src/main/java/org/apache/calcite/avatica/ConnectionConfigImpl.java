@@ -128,8 +128,8 @@ public class ConnectionConfigImpl implements ConnectionConfig {
         .getEnum(HostnameVerification.class);
   }
 
-  public int fetchRowCount() {
-    return BuiltInConnectionProperty.FETCH_ROW_COUNT.wrap(properties).getInt();
+  public int fetchSizeRows() {
+    return BuiltInConnectionProperty.FETCH_SIZE_ROWS.wrap(properties).getInt();
   }
 
   /** Converts a {@link Properties} object containing (name, value)
