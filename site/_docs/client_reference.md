@@ -175,7 +175,9 @@ on-hover images for the permalink, but oh well.
 
 <strong><a name="fetch_row_count" href="#fetch_row_count">fetch_row_count</a></strong>
 
-: _Description_: The number of rows to fetch
+: _Description_: The number of rows to fetch. If
+    <a href="https://docs.oracle.com/javase/8/docs/api/java/sql/Statement.html#setFetchSize-int-">
+    Statement:setFetchSize</a> is set, that value overrides fetch_row_count.
 
 : _Default_: `100`.
 
