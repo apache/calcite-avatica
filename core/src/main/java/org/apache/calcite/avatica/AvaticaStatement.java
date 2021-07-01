@@ -36,7 +36,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public abstract class AvaticaStatement
     implements Statement {
-
   /** The default value for {@link Statement#getFetchSize()}. */
   public static final int DEFAULT_FETCH_SIZE = 100;
 
