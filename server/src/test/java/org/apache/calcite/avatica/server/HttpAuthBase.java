@@ -17,9 +17,8 @@
 package org.apache.calcite.avatica.server;
 
 import org.apache.calcite.avatica.ConnectionSpec;
+import org.apache.calcite.avatica.util.Sources;
 
-import java.io.File;
-import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -79,14 +78,10 @@ public class HttpAuthBase {
   }
 
   static String getHashLoginServicePropertiesString() {
-    try {
-      final String userPropertiesFile = (new File(BasicAuthHttpServerTest.class
-          .getResource("/auth-users.properties").toURI())).getPath();
-      assertNotNull("Could not find properties file for basic auth users", userPropertiesFile);
-      return userPropertiesFile;
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
+    final String userPropertiesFile =  Sources.of(HttpAuthBase.class
+        .getResource("/auth-users.properties")).file().getAbsolutePath();
+    assertNotNull("Could not find properties file for basic auth users", userPropertiesFile);
+    return userPropertiesFile;
   }
 
 }
