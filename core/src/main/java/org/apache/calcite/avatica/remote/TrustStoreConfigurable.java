@@ -21,7 +21,7 @@ import java.io.File;
 /**
  * Allows a truststore (and password) to be provided to enable TLS authentication.
  */
-public interface TrustStoreConfigurable {
+@Deprecated public interface TrustStoreConfigurable {
 
   /**
    * Sets a truststore containing the collection of trust SSL/TLS server certificates

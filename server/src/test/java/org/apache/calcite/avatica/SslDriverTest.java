@@ -47,7 +47,7 @@ public class SslDriverTest extends HttpBaseTest {
     super(jdbcUrl);
   }
 
-  @Parameters public static List<Object[]> parameters() throws Exception {
+  @Parameters(name = "{0}") public static List<Object[]> parameters() throws Exception {
     // Skip TLS testing on IBM Java due the combination of:
     // - Jetty 9.4.12+ ignores SSL_* ciphers due to security - eclipse/jetty.project#2807
     // - IBM uses SSL_* cipher names for ALL ciphers not following RFC cipher names

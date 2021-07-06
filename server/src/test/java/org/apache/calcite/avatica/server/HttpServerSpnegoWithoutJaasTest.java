@@ -16,9 +16,13 @@
  */
 package org.apache.calcite.avatica.server;
 
+import org.apache.calcite.avatica.ConnectionConfig;
+import org.apache.calcite.avatica.ConnectionConfigImpl;
 import org.apache.calcite.avatica.SpnegoTestUtil;
-import org.apache.calcite.avatica.remote.AvaticaCommonsHttpClientSpnegoImpl;
+import org.apache.calcite.avatica.remote.AvaticaCommonsHttpClientImpl;
+import org.apache.calcite.avatica.remote.CommonsHttpClientPoolCache;
 
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.kerby.kerberos.kerb.KrbException;
 import org.apache.kerby.kerberos.kerb.client.KrbConfig;
 import org.apache.kerby.kerberos.kerb.client.KrbConfigKey;
@@ -43,6 +47,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.security.PrivilegedExceptionAction;
+import java.util.Properties;
 import java.util.Set;
 import javax.security.auth.Subject;
 import javax.security.auth.kerberos.KerberosTicket;
@@ -212,9 +217,16 @@ public class HttpServerSpnegoWithoutJaasTest {
         GSSCredential credential = gssManager.createCredential(gssClient,
             GSSCredential.DEFAULT_LIFETIME, oid, GSSCredential.INITIATE_ONLY);
 
+        Properties props = new Properties();
+        ConnectionConfig config = new ConnectionConfigImpl(props);
+
+        PoolingHttpClientConnectionManager pool = CommonsHttpClientPoolCache.getPool(config);
+
         // Passes the GSSCredential into the HTTP client implementation
-        final AvaticaCommonsHttpClientSpnegoImpl httpClient =
-            new AvaticaCommonsHttpClientSpnegoImpl(httpServerUrl, credential);
+        final AvaticaCommonsHttpClientImpl httpClient =
+            new AvaticaCommonsHttpClientImpl(httpServerUrl);
+        httpClient.setGSSCredential(credential);
+        httpClient.setHttpClientPool(pool);
 
         return httpClient.send(new byte[0]);
       }

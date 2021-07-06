@@ -16,24 +16,21 @@
  */
 package org.apache.calcite.avatica.remote;
 
-import java.io.File;
+import org.ietf.jgss.GSSCredential;
 
 /**
- * Allows a keystore (and keystorepassword, keypassword) to be
- * provided to enable MTLS authentication
+ * Interface that allows configuration of a GSS credential with SPENGO HTTP authentication.
  */
-@Deprecated public interface KeyStoreConfigurable {
+public interface GSSAuthenticateable {
 
-    /**
-     * Sets a keystore containing the collection of client side certificates
-     * to use for HTTPS mutual authentication along with
-     * password for keystore and password for key
-     *
-     * @param keystore The keystore on the local filesystem
-     * @param keystorepassword The keystore's password
-     * @param keypassword The key's password
-     */
-  void setKeyStore(File keystore, String keystorepassword, String keypassword);
+  /**
+   * Sets the GSS Credential
+   * If credential is null, then the current subject will be used
+   *
+   * @param credential GSS Credentials
+   */
+  void setGSSCredential(GSSCredential credential);
+
 }
 
-// End KeyStoreConfigurable.java
+// End GSSAuthenticateable.java
