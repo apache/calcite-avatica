@@ -20,7 +20,7 @@ package org.apache.calcite.avatica.remote;
  * An interface to decorate an {@link AvaticaHttpClient} that can support configuration on
  * SSL hostname verification.
  */
-public interface HostnameVerificationConfigurable {
+@Deprecated public interface HostnameVerificationConfigurable {
   /**
    * Describes the support hostname verification methods of {@link AvaticaHttpClient}.
    */

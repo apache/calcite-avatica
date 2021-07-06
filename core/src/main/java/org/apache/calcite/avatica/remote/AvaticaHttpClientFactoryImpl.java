@@ -18,6 +18,8 @@ package org.apache.calcite.avatica.remote;
 
 import org.apache.calcite.avatica.ConnectionConfig;
 
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +37,6 @@ public class AvaticaHttpClientFactoryImpl implements AvaticaHttpClientFactory {
 
   public static final String HTTP_CLIENT_IMPL_DEFAULT =
       AvaticaCommonsHttpClientImpl.class.getName();
-  public static final String SPNEGO_HTTP_CLIENT_IMPL_DEFAULT =
-      AvaticaCommonsHttpClientSpnegoImpl.class.getName();
 
   // Public for Type.PLUGIN
   public static final AvaticaHttpClientFactoryImpl INSTANCE = new AvaticaHttpClientFactoryImpl();
@@ -57,70 +57,77 @@ public class AvaticaHttpClientFactoryImpl implements AvaticaHttpClientFactory {
       KerberosConnection kerberosUtil) {
     String className = config.httpClientClass();
     if (null == className) {
-      // Provide an implementation that works with SPNEGO if that's the authentication is use.
-      if ("SPNEGO".equalsIgnoreCase(config.authentication())) {
-        className = SPNEGO_HTTP_CLIENT_IMPL_DEFAULT;
-      } else {
-        className = HTTP_CLIENT_IMPL_DEFAULT;
-      }
+      className = HTTP_CLIENT_IMPL_DEFAULT;
     }
 
     AvaticaHttpClient client = instantiateClient(className, url);
 
-    if (client instanceof TrustStoreConfigurable) {
-      File truststore = config.truststore();
-      String truststorePassword = config.truststorePassword();
-      if (null != truststore && null != truststorePassword) {
-        ((TrustStoreConfigurable) client)
-                .setTrustStore(truststore, truststorePassword);
-      }
+    if (client instanceof HttpClientPoolConfigurable) {
+      PoolingHttpClientConnectionManager pool = CommonsHttpClientPoolCache.getPool(config);
+      ((HttpClientPoolConfigurable) client).setHttpClientPool(pool);
     } else {
-      LOG.debug("{} is not capable of SSL/TLS communication", client.getClass().getName());
+      // Kept for backwards compatibility, the current AvaticaCommonsHttpClientImpl
+      // does not implement these interfaces
+      if (client instanceof TrustStoreConfigurable) {
+        File truststore = config.truststore();
+        String truststorePassword = config.truststorePassword();
+        if (null != truststore && null != truststorePassword) {
+          ((TrustStoreConfigurable) client).setTrustStore(truststore, truststorePassword);
+        }
+      } else {
+        LOG.debug("{} is not capable of SSL/TLS communication", client.getClass().getName());
+      }
+
+      if (client instanceof KeyStoreConfigurable) {
+        File keystore = config.keystore();
+        String keystorePassword = config.keystorePassword();
+        String keyPassword = config.keyPassword();
+        if (null != keystore && null != keystorePassword && null != keyPassword) {
+          ((KeyStoreConfigurable) client).setKeyStore(keystore, keystorePassword, keyPassword);
+        }
+      } else {
+        LOG.debug("{} is not capable of Mutual authentication", client.getClass().getName());
+      }
+
+      // Set the SSL hostname verification if the client supports it
+      if (client instanceof HostnameVerificationConfigurable) {
+        ((HostnameVerificationConfigurable) client)
+            .setHostnameVerification(config.hostnameVerification());
+      } else {
+        LOG.debug("{} is not capable of configurable SSL/TLS hostname verification",
+            client.getClass().getName());
+      }
     }
 
-    if (client instanceof KeyStoreConfigurable) {
-      File keystore = config.keystore();
-      String keystorePassword = config.keystorePassword();
-      String keyPassword = config.keyPassword();
-      if (null != keystore && null != keystorePassword && null != keyPassword) {
-        ((KeyStoreConfigurable) client)
-                .setKeyStore(keystore, keystorePassword, keyPassword);
-      }
-    } else {
-      LOG.debug("{} is not capable of Mutual authentication", client.getClass().getName());
-    }
-
-    // Set the SSL hostname verification if the client supports it
-    if (client instanceof HostnameVerificationConfigurable) {
-      ((HostnameVerificationConfigurable) client)
-          .setHostnameVerification(config.hostnameVerification());
-    } else {
-      LOG.debug("{} is not capable of configurable SSL/TLS hostname verification",
-          client.getClass().getName());
-    }
+    final String authString = config.authentication();
+    final AuthenticationType authType = authString == null ? null
+        : AuthenticationType.valueOf(authString);
 
     if (client instanceof UsernamePasswordAuthenticateable) {
-      // Shortcircuit quickly if authentication wasn't provided (implies NONE)
-      final String authString = config.authentication();
-      if (null == authString) {
-        return client;
-      }
-
-      final AuthenticationType authType = AuthenticationType.valueOf(authString);
-      final String username = config.avaticaUser();
-      final String password = config.avaticaPassword();
-
-      // Can't authenticate with NONE or w/o username and password
       if (isUserPasswordAuth(authType)) {
+
+        final String username = config.avaticaUser();
+        final String password = config.avaticaPassword();
+
+        // Can't authenticate with NONE or w/o username and password
         if (null != username && null != password) {
           ((UsernamePasswordAuthenticateable) client)
               .setUsernamePassword(authType, username, password);
         } else {
           LOG.debug("Username or password was null");
         }
-      } else {
-        LOG.debug("{} is not capable of username/password authentication.", authType);
       }
+    } else {
+      LOG.debug("{} is not capable of username/password authentication.", authType);
+    }
+
+    if (client instanceof GSSAuthenticateable) {
+      if (AuthenticationType.SPNEGO == authType) {
+        // The actual principal is set in DoAsAvaticaHttpClient below
+        ((GSSAuthenticateable) client).setGSSCredential(null);
+      }
+    } else {
+      LOG.debug("{} is not capable of kerberos authentication.", authType);
     }
 
     if (null != kerberosUtil) {

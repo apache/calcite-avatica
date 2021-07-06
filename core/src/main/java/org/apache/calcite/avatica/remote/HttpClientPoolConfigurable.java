@@ -16,24 +16,20 @@
  */
 package org.apache.calcite.avatica.remote;
 
-import java.io.File;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 /**
- * Allows a keystore (and keystorepassword, keypassword) to be
- * provided to enable MTLS authentication
+ * Allows a http connection pool to be provided to enable TLS authentication.
+ * On clients with this interface setHttpClientPool() MUST be called before using them.
  */
-@Deprecated public interface KeyStoreConfigurable {
-
-    /**
-     * Sets a keystore containing the collection of client side certificates
-     * to use for HTTPS mutual authentication along with
-     * password for keystore and password for key
-     *
-     * @param keystore The keystore on the local filesystem
-     * @param keystorepassword The keystore's password
-     * @param keypassword The key's password
-     */
-  void setKeyStore(File keystore, String keystorepassword, String keypassword);
+public interface HttpClientPoolConfigurable {
+  /**
+   * Sets a PoolingHttpClientConnectionManager containing the collection of SSL/TLS server
+   * keys and truststores to use for HTTPS calls.
+   *
+   * @param pool The http connection pool
+   */
+  void setHttpClientPool(PoolingHttpClientConnectionManager pool);
 }
 
-// End KeyStoreConfigurable.java
+// End HttpClientPoolConfigurable.java
