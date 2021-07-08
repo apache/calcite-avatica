@@ -172,6 +172,10 @@ public class AvaticaResultSetConversionsTest {
                           ColumnMetaData.scalar(Types.BOOLEAN, "BOOLEAN",
                               ColumnMetaData.Rep.PRIMITIVE_BOOLEAN),
                           DatabaseMetaData.columnNoNulls))),
+              DatabaseMetaData.columnNoNulls),
+          columnMetaData("bit", 13,
+              ColumnMetaData.scalar(Types.BIT, "BIT",
+                  ColumnMetaData.Rep.PRIMITIVE_BOOLEAN),
               DatabaseMetaData.columnNoNulls));
 
       List<Object> row = Collections.<Object>singletonList(
@@ -180,7 +184,8 @@ public class AvaticaResultSetConversionsTest {
               new Date(1476130718123L), new Time(1476130718123L),
               new Timestamp(1476130718123L),
               Arrays.asList(1, 2, 3),
-              new StructImpl(Arrays.asList(42, false))
+              new StructImpl(Arrays.asList(42, false)),
+              false
           });
 
       CursorFactory factory = CursorFactory.deduce(columns, null);

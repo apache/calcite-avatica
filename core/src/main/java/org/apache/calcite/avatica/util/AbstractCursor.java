@@ -111,6 +111,7 @@ public abstract class AbstractCursor implements Cursor {
     case Types.BIGINT:
       return new LongAccessor(getter);
     case Types.BOOLEAN:
+    case Types.BIT:
       return new BooleanAccessor(getter);
     case Types.REAL:
       return new FloatAccessor(getter);
