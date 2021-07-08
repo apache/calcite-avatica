@@ -209,8 +209,11 @@ public class HttpServer {
       throw new RuntimeException("Server is already started");
     }
 
-    final QueuedThreadPool threadPool = new QueuedThreadPool();
-    threadPool.setDaemon(true);
+    final SubjectPreservingPrivilegedThreadFactory subjectPreservingPrivilegedThreadFactory =
+        new SubjectPreservingPrivilegedThreadFactory();
+    //The constructor parameters are the Jetty defaults, except for the ThreadFactory
+    final QueuedThreadPool threadPool = new QueuedThreadPool(200, 8, 60000, -1, null, null,
+        subjectPreservingPrivilegedThreadFactory);
     server = new Server(threadPool);
     server.manage(threadPool);
 
