@@ -128,6 +128,10 @@ public class ConnectionConfigImpl implements ConnectionConfig {
         .getEnum(HostnameVerification.class);
   }
 
+  public int fetchSizeRows() {
+    return BuiltInConnectionProperty.FETCH_SIZE_ROWS.wrap(properties).getInt();
+  }
+
   /** Converts a {@link Properties} object containing (name, value)
    * pairs into a map whose keys are
    * {@link org.apache.calcite.avatica.InternalProperty} objects.
