@@ -44,7 +44,7 @@ jobs:
         ./gradlew --no-parallel --no-daemon build javadoc
 
   linux-avatica:
-    name: 'Linux (JDK 8), Avatica master'
+    name: 'Linux (JDK 8), Avatica main'
     runs-on: ubuntu-latest
     steps:
     - name: 'Set up JDK 8'
@@ -56,12 +56,12 @@ jobs:
         fetch-depth: 50
     - name: 'Install Avatica to Maven Local'
       run: |
-        ./gradlew publishToMavenLocal -Pcalcite.avatica.version=1.0.0-dev-master -PskipJavadoc
+        ./gradlew publishToMavenLocal -Pcalcite.avatica.version=1.0.0-dev-main -PskipJavadoc
     - name: 'Test Calcite'
       run: |
         git clone --depth 100 https://github.com/apache/calcite.git ../calcite
         cd ../calcite
-        ./gradlew --no-parallel --no-daemon build -Pcalcite.avatica.version=1.0.0-dev-master-SNAPSHOT -PenableMavenLocal
+        ./gradlew --no-parallel --no-daemon build -Pcalcite.avatica.version=1.0.0-dev-main-SNAPSHOT -PenableMavenLocal
 
   mac:
     name: 'macOS (JDK 14)'

@@ -24,19 +24,19 @@ matrix:
     - install: true
       script:
         - ./gradlew $GRADLE_ARGS build javadoc
-    - name: Calcite/master
+    - name: Calcite/main
       install:
-        - ./gradlew publishToMavenLocal -PskipJavadoc -Pcalcite.avatica.version=1.0.0-dev-master
+        - ./gradlew publishToMavenLocal -PskipJavadoc -Pcalcite.avatica.version=1.0.0-dev-main
         - cd ..
         - git clone --depth 10000 https://github.com/apache/calcite.git
         - cd calcite
       script:
-        - ./gradlew --no-parallel --no-daemon build -Pcalcite.avatica.version=1.0.0-dev-master-SNAPSHOT -PenableMavenLocal
+        - ./gradlew --no-parallel --no-daemon build -Pcalcite.avatica.version=1.0.0-dev-main-SNAPSHOT -PenableMavenLocal
 
 branches:
   only:
-    - master
-    - new-master
+    - main
+    - new-main
     - javadoc
     - /^branch-.*$/
     - /^[0-9]+-.*$/

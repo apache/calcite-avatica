@@ -31,7 +31,7 @@ You can build the site manually using your environment or use the docker compose
 ### Setup your environment
 
 Similar to the instructions to
-[set up the Calcite web site](https://github.com/apache/calcite-avatica/blob/master/site/README.md).
+[set up the Calcite web site](https://github.com/apache/calcite-avatica/blob/main/site/README.md).
 
 Site generation currently works best with ruby-2.5.1.
 
