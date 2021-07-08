@@ -235,6 +235,65 @@ public class RemoteDriverTest {
     QuasiRemotePBJdbcServiceFactory.initService();
   }
 
+  @Test public void testDate() throws Exception {
+    ConnectionSpec.getDatabaseLock().lock();
+    final String t = AvaticaUtils.unique("TEST_TABLE");
+    final String timeVal = "20:08:08.034900";
+
+    final String drop =
+        String.format(Locale.ROOT, "drop table %s if exists", t);
+    final String create =
+        String.format(Locale.ROOT, "create table %s("
+                + "id int not null, "
+                + "t TIME(6) not null)",
+            t);
+
+    final String insert = String.format(Locale.ROOT,
+        "insert into %s values(1, '%s')", t, timeVal);
+    try (Connection connection = getLocalConnection();
+         Statement statement = connection.createStatement()) {
+      // drop
+      assertFalse(statement.execute(drop));
+      assertEquals(0, statement.getUpdateCount());
+      assertNull(statement.getResultSet());
+
+      // create
+      assertFalse(statement.execute(create));
+      assertEquals(0, statement.getUpdateCount());
+      assertNull(statement.getResultSet());
+
+//      // check table
+//      assertTrue(statement.execute(String.format(Locale.ROOT,"SELECT * FROM INFORMATION_SCHEMA.SYSTEM_COLUMNS WHERE TABLE_NAME = '%s'", t)));
+//      try(ResultSet rs = statement.getResultSet()) {
+//        assertNotNull(rs);
+//        ResultSetMetaData rsMetaData = rs.getMetaData();
+//        int colCount = rsMetaData.getColumnCount();
+//        while(rs.next()) {
+//          for(int i=1; i <= colCount; i++) {
+//            System.out.println(rsMetaData.getColumnLabel(i) + " - " + rs.getString(i));
+//          }
+//          System.out.println();
+//        }
+//      }
+
+      // insert
+      assertFalse(statement.execute(insert));
+      assertEquals(1, statement.getUpdateCount());
+      assertNull(statement.getResultSet());
+
+      // query
+      assertTrue(statement.execute(String.format(Locale.ROOT, "select t from %s", t)));
+      try(ResultSet rs = statement.getResultSet()) {
+        assertNotNull(rs);
+        assertTrue(rs.next());
+        assertEquals(timeVal, rs.getTime(1).toString());
+        assertFalse(rs.next());
+      }
+    } finally {
+      ConnectionSpec.getDatabaseLock().unlock();
+    }
+  }
+
   @Test public void testRegister() throws Exception {
     final Connection connection = getLocalConnection();
     assertThat(connection.isClosed(), is(false));
