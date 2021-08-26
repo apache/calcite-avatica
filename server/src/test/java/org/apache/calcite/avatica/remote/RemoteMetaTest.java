@@ -47,6 +47,7 @@ import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.URL;
@@ -59,6 +60,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -732,6 +734,65 @@ public class RemoteMetaTest {
       conn.close();
     } finally {
       ConnectionSpec.getDatabaseLock().unlock();
+    }
+  }
+
+  @Test public void testBigDecimalTest() throws Exception {
+    final String tableName = "testbigdecimal";
+    try (Connection conn = DriverManager.getConnection(url);
+          Statement stmt = conn.createStatement()) {
+      conn.setAutoCommit(false);
+      stmt.execute("DROP TABLE IF EXISTS " + tableName);
+      stmt.execute("CREATE TABLE " + tableName + " ("
+          + "pk VARCHAR NOT NULL PRIMARY KEY, "
+          + "v1 DECIMAL(10,5))");
+      conn.commit();
+      try (PreparedStatement pstmt = conn.prepareStatement("INSERT INTO "
+          + tableName + " values(?, ?)")) {
+        pstmt.setString(1, "1");
+        pstmt.setBigDecimal(2, new BigDecimal("12345.67890"));
+        assertEquals(1, pstmt.executeUpdate());
+
+        pstmt.setString(1, "2");
+        pstmt.setObject(2, new BigDecimal("12345.67891"));
+        assertEquals(1, pstmt.executeUpdate());
+
+        pstmt.setString(1, "3");
+        pstmt.setObject(2, new BigDecimal("12345.67892"), Types.NUMERIC);
+        assertEquals(1, pstmt.executeUpdate());
+
+        pstmt.setString(1, "4");
+        pstmt.setObject(2, new BigDecimal("4000"), Types.DECIMAL);
+        assertEquals(1, pstmt.executeUpdate());
+
+        pstmt.setString(1, "5");
+        pstmt.setLong(2, 4000L);
+        assertEquals(1, pstmt.executeUpdate());
+
+        conn.commit();
+
+        ResultSet rs = stmt.executeQuery("select v1 from " + tableName + " order by pk asc");
+        assertTrue(rs.next());
+        assertTrue((new BigDecimal("12345.67890")).compareTo(rs.getBigDecimal(1)) == 0);
+        assertEquals("12345.67890", rs.getString(1));
+        assertTrue(rs.next());
+        assertEquals(rs.getObject(1).getClass(), BigDecimal.class);
+        assertTrue((new BigDecimal("12345.67891")).compareTo((BigDecimal) rs.getObject(1)) == 0);
+        // Not implemeneted / throws error
+        //assertTrue((new BigDecimal("12345.67891")).compareTo(
+        //    (BigDecimal)rs.getObject(1, BigDecimal.class)) == 0);
+
+        assertTrue(rs.next());
+        // The build system makes it impossible to test deprecated APIs, but these also
+        // fail bacase of RoundingMode.Unneccessary in AbstractCursor#NumberAccessor.:
+        //assertTrue((new BigDecimal("12345.679")).compareTo(rs.getBigDecimal(1, 3)) == 0);
+        //assertTrue((new BigDecimal("12345.6789200")).compareTo(rs.getBigDecimal(1, 7)) == 0);
+
+        assertTrue(rs.next());
+        assertEquals("4000.00000", rs.getString(1));
+        assertEquals(4000L, rs.getLong(1));
+        assertEquals(4000, rs.getInt(1));
+      }
     }
   }
 }
