@@ -118,7 +118,7 @@ public abstract class AbstractCursor implements Cursor {
     case Types.DOUBLE:
       return new DoubleAccessor(getter);
     case Types.DECIMAL:
-      return new BigDecimalAccessor(getter);
+      return new NumberAccessor(getter, columnMetaData.scale);
     case Types.CHAR:
       switch (columnMetaData.type.rep) {
       case PRIMITIVE_CHAR:
@@ -681,30 +681,9 @@ public abstract class AbstractCursor implements Cursor {
   }
 
   /**
-   * Accessor that assumes that the underlying value is a {@link BigDecimal};
-   * corresponds to {@link java.sql.Types#DECIMAL}.
-   */
-  private static class BigDecimalAccessor extends BigNumberAccessor {
-    private BigDecimalAccessor(Getter getter) {
-      super(getter);
-    }
-
-    protected Number getNumber() throws SQLException {
-      return (Number) getObject();
-    }
-
-    public BigDecimal getBigDecimal(int scale) throws SQLException {
-      return (BigDecimal) getObject();
-    }
-
-    public BigDecimal getBigDecimal() throws SQLException {
-      return (BigDecimal) getObject();
-    }
-  }
-
-  /**
    * Accessor that assumes that the underlying value is a {@link Number};
-   * corresponds to {@link java.sql.Types#NUMERIC}.
+   * corresponds to {@link java.sql.Types#NUMERIC}
+   * or {@link java.sql.Types#DECIMAL}.
    *
    * <p>This is useful when numbers have been translated over JSON. JSON
    * converts a 0L (0 long) value to the string "0" and back to 0 (0 int).
@@ -722,14 +701,20 @@ public abstract class AbstractCursor implements Cursor {
       return (Number) super.getObject();
     }
 
+    //FIXME There are several issues with this, the code below simply implements
+    //a previous behaviour codified by the Calcite test suite.
+    //
+    // 1. It interprets a scale of 0 as a NOOP parameter, it should in fact drop all fractionals
+    // 2. The scale from MetaData is NOT applied to BigDecimal values. Why ?
+    // 3. Metadata scale is only applied for getBigDecimal(), and only in this Accessor. Why ?
     public BigDecimal getBigDecimal(int scale) throws SQLException {
       Number n = getNumber();
       if (n == null) {
         return null;
       }
       BigDecimal decimal = AvaticaSite.toBigDecimal(n);
-      if (0 != scale) {
-        return decimal.setScale(scale, RoundingMode.UNNECESSARY);
+      if (0 != scale && !(n instanceof BigDecimal)) {
+        return decimal.setScale(scale, RoundingMode.DOWN);
       }
       return decimal;
     }
@@ -737,6 +722,7 @@ public abstract class AbstractCursor implements Cursor {
     public BigDecimal getBigDecimal() throws SQLException {
       return getBigDecimal(scale);
     }
+
   }
 
   /**

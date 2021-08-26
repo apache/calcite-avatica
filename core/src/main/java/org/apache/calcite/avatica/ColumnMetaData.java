@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
@@ -341,7 +342,7 @@ public class ColumnMetaData {
 
     /** Values are represented as some sub-class of {@link Number}.
      * The JSON encoding does this. */
-    NUMBER(Number.class, Types.NUMERIC),
+    NUMBER(BigDecimal.class, Types.NUMERIC),
 
     ARRAY(Array.class, Types.ARRAY),
     MULTISET(List.class, Types.JAVA_OBJECT),
