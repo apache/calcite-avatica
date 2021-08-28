@@ -210,6 +210,7 @@ public abstract class AbstractCursor implements Cursor {
         throw new AssertionError("bad " + columnMetaData.type.rep);
       }
     case Types.JAVA_OBJECT:
+    case Types.NULL:
     case Types.OTHER: // e.g. map
       if (columnMetaData.type.getName().startsWith("INTERVAL_")) {
         int end = columnMetaData.type.getName().indexOf("(");
