@@ -343,6 +343,7 @@ public class AvaticaSite {
       }
       return anInt;
     case Types.JAVA_OBJECT:
+    case Types.NULL:
     case Types.OTHER:
       return accessor.getObject();
     case Types.LONGNVARCHAR:
