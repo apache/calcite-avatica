@@ -173,7 +173,11 @@ public class AvaticaResultSetConversionsTest {
                               ColumnMetaData.Rep.PRIMITIVE_BOOLEAN),
                           DatabaseMetaData.columnNoNulls))),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("NULL", 13,
+          columnMetaData("bit", 13,
+              ColumnMetaData.scalar(Types.BIT, "BIT",
+                  ColumnMetaData.Rep.PRIMITIVE_BOOLEAN),
+              DatabaseMetaData.columnNoNulls),
+          columnMetaData("NULL", 14,
               ColumnMetaData.scalar(Types.NULL, "NULL",
                   ColumnMetaData.Rep.OBJECT),
               DatabaseMetaData.columnNullable));
@@ -185,6 +189,7 @@ public class AvaticaResultSetConversionsTest {
               new Timestamp(1476130718123L),
               Arrays.asList(1, 2, 3),
               new StructImpl(Arrays.asList(42, false)),
+              false,
               null
           });
 
