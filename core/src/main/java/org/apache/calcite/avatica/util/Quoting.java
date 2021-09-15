@@ -18,11 +18,29 @@ package org.apache.calcite.avatica.util;
 
 /** Syntax for quoting identifiers in SQL statements. */
 public enum Quoting {
-  /** Quote identifiers in double-quotes. For example, {@code "my id"}. */
+  /** Quote identifiers in double-quotes, and use double-quote to escape
+   * double-quotes. For example, {@code "my ""id"""}. */
   DOUBLE_QUOTE("\""),
 
-  /** Quote identifiers in back-quotes. For example, {@code `my id`}. */
+  /** Quote identifiers in double-quotes, and use backslash to escape
+   * double-quotes. For example, {@code "my \"id\""}. */
+  DOUBLE_QUOTE_BACKSLASH("\""),
+
+  /** Quote identifiers in single-quotes, and use single-quotes to escape
+   * single-quotes. For example, {@code 'my ''id'''}. */
+  SINGLE_QUOTE("`"),
+
+  /** Quote identifiers in single-quotes, and use backslash to escape
+   * single-quotes. For example, {@code 'my \'id\''}. */
+  SINGLE_QUOTE_BACKSLASH("`"),
+
+  /** Quote identifiers in back-quotes, and use back-quotes to escape
+   * back-quotes. For example, {@code `my ``id```}. */
   BACK_TICK("`"),
+
+  /** Quote identifiers in back-quotes, and use backslash to escape
+   * back-quotes. For example, {@code `my \`id\``}. */
+  BACK_TICK_BACKSLASH("`"),
 
   /** Quote identifiers in brackets. For example, {@code [my id]}. */
   BRACKET("[");
