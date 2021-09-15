@@ -21,8 +21,15 @@ public enum Quoting {
   /** Quote identifiers in double-quotes. For example, {@code "my id"}. */
   DOUBLE_QUOTE("\""),
 
-  /** Quote identifiers in back-quotes. For example, {@code `my id`}. */
+  /** Quote identifiers in back-quotes and use back-quotes to escape back-quotes.
+   * For example, {@code `my ``id```}.
+   */
   BACK_TICK("`"),
+
+  /** Quote identifiers in back-quotes and use backslash to escape back-quotes.
+   *  For example, {@code `my \`id\``}.
+   */
+  BQ_BACK_TICK("`"),
 
   /** Quote identifiers in brackets. For example, {@code [my id]}. */
   BRACKET("[");
