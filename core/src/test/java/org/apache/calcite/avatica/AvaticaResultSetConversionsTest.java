@@ -177,7 +177,7 @@ public class AvaticaResultSetConversionsTest {
               ColumnMetaData.scalar(Types.BIT, "BIT",
                   ColumnMetaData.Rep.PRIMITIVE_BOOLEAN),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("NULL", 14,
+          columnMetaData("null", 14,
               ColumnMetaData.scalar(Types.NULL, "NULL",
                   ColumnMetaData.Rep.OBJECT),
               DatabaseMetaData.columnNullable));
