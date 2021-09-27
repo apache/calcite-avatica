@@ -61,6 +61,7 @@ import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -690,6 +691,23 @@ public class AvaticaResultSetConversionsTest {
   }
 
   /**
+   * Accessor test helper for the (null) object column.
+   */
+  private static final class NullObjectAccessorTestHelper extends AccessorTestHelper {
+    private NullObjectAccessorTestHelper(Getter g) {
+      super(g);
+    }
+
+    @Override public void testGetString(ResultSet resultSet) throws SQLException {
+      assertNull(g.getString(resultSet));
+    }
+
+    @Override public void testGetObject(ResultSet resultSet) throws SQLException {
+      assertNull(g.getObject(resultSet));
+    }
+  }
+
+  /**
    * Accessor test helper for the byte column.
    */
   private static final class ByteAccessorTestHelper extends AccessorTestHelper {
@@ -1149,6 +1167,8 @@ public class AvaticaResultSetConversionsTest {
         new ArrayAccessorTestHelper(new LabelGetter("array")),
         new StructAccessorTestHelper(new OrdinalGetter(13)),
         new StructAccessorTestHelper(new LabelGetter("struct")),
+        new NullObjectAccessorTestHelper(new OrdinalGetter(15)),
+        new NullObjectAccessorTestHelper(new LabelGetter("null")),
         new DateArrayAccessorTestHelper(new OrdinalGetter(16)),
         new DateArrayAccessorTestHelper(new LabelGetter("date_array")),
         new TimestampArrayAccessorTestHelper(new OrdinalGetter(17)),
