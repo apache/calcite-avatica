@@ -399,6 +399,7 @@ allprojects {
                 passProperty("java.awt.headless")
                 passProperty("user.language", "TR")
                 passProperty("user.country", "tr")
+                passProperty("user.timezone", "UTC")
                 val props = System.getProperties()
                 for (e in props.propertyNames() as `java.util`.Enumeration<String>) {
                     if (e.startsWith("calcite.") || e.startsWith("avatica.")) {
