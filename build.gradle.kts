@@ -405,6 +405,15 @@ allprojects {
                         passProperty(e)
                     }
                 }
+                // Test JVM is forked, and we can pass extra JVM arguments via -Ptest.avatica.extra.jvmargs=...
+                providers.gradleProperty("test.avatica.extra.jvmargs")
+                    .forUseAtConfigurationTime()
+                    .orNull?.toString()?.trim()
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let {
+                        // TODO: support quoted arguments
+                        jvmArgs(it.split(Regex("\\s+")))
+                    }
                 printTestResults()
             }
             withType<SpotBugsTask>().configureEach {

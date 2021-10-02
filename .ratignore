@@ -4,6 +4,7 @@
 # Third-party license files
 src/main/config/licenses/
 #
+.github/workflows/matrix_builder.js
 **/META-INF/services/
 # Site
 site/_includes/anchor_links.html
