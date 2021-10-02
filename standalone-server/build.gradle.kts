@@ -35,7 +35,10 @@ plugins {
     id("com.github.vlsi.stage-vote-release")
 }
 
-val shaded by configurations.creating
+val shaded by configurations.creating {
+    // https://github.com/google/guava/pull/3652
+    exclude(group = "org.codehaus.mojo", module = "animal-sniffer-annotations")
+}
 
 configurations {
     compileOnly {
