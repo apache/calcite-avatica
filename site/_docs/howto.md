@@ -43,8 +43,8 @@ Unpack the source distribution `.tar.gz` file,
 then build using Gradle:
 
 {% highlight bash %}
-$ tar xvfz apache-calcite-avatica-1.18.0-src.tar.gz
-$ cd apache-calcite-avatica-1.18.0-src
+$ tar xvfz apache-calcite-avatica-1.19.0-src.tar.gz
+$ cd apache-calcite-avatica-1.19.0-src
 $ gradle build
 {% endhighlight %}
 
@@ -205,6 +205,7 @@ Before you start:
 * Check that `NOTICE` has the current copyright year.
 * Check that `calcite.avatica.version` has the proper value in `/gradle.properties`.
 * Add release notes to `site/_docs/history.md`. Include the commit history,
+  names of people who contributed to the release,
   and say which versions of Java, Guava and operating systems the release is
   tested against.
 * Generate a report of vulnerabilities that occur among dependencies,
@@ -219,8 +220,9 @@ The release candidate process does not add commits,
 so there's no harm if it fails. It might leave `-rc` tag behind
 which can be removed if required.
 
-You can perform a dry-run release with a help of https://github.com/vlsi/asflike-release-environment
-That would perform the same steps, however it would push changes to the mock Nexus, Git, and SVN servers.
+You can perform a dry-run release with a help of
+[vlsi/asflike-release-environment](https://github.com/vlsi/asflike-release-environment).
+That performs the same steps, however it pushes changes to the mock Nexus, Git, and SVN servers.
 
 If any of the steps fail, fix the problem, and
 start again from the top.

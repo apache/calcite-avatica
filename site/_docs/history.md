@@ -28,7 +28,7 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.19.0">1.19.0</a> / under development
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.19.0">1.19.0</a> / 2021-10-07
 {: #v1-19-0}
 
 Compatibility: This release is tested
@@ -37,6 +37,60 @@ using Oracle JDK 8, 9, 10, 11, 12, 13, 14, 15;
 using IBM Java 8;
 Guava versions 14.0.1 to 31.0.1-jre;
 other software versions as specified in `gradle.properties`.
+
+Contributors to this release:
+Alessandro Solimando,
+Amann Malik,
+chenyuzhi459,
+Francis Chuang,
+Istvan Toth,
+Julian Hyde (release manager),
+NoboGo,
+Jack Scott,
+Sergey Nuyanzin,
+Stamatis Zampetakis,
+Zeng Rui.
+
+Features and bug fixes
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4573">CALCITE-4573</a>]
+  `NullPointerException` while fetching from a column of type `ARRAY`
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4626">CALCITE-4626</a>]
+  Upgrade protobuf version to 3.17.1 to remove `com.google.protobuf.UnsafeUtil`
+  warnings
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4602">CALCITE-4602</a>]
+  `ClassCastException` retrieving from `ARRAY` that has mixed `INTEGER` and
+  `DECIMAL` elements
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4600">CALCITE-4600</a>]
+  `ClassCastException` retrieving from an `ARRAY` that has `DATE`, `TIME` or
+  `TIMESTAMP` elements
+* Upgrade forbiddenapis 2.7 &rarr; 3.2, and Guava to 14.0.1 &rarr; 31.0.1-jre
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4757">CALCITE-4757</a>]
+  Allow columns of type `NULL` in `ResultSet`
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4767">CALCITE-4767</a>]
+  Add `Quoting.BACK_TICK_BACKSLASH`
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4536">CALCITE-4536</a>]
+  Add support for `BIT` data type
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4752">CALCITE-4752</a>]
+  `PreparedStatement#SetObject()` fails for `BigDecimal` values
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4646">CALCITE-4646</a>]
+  Bump Jetty version to 9.4.42.v20210604
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4676">CALCITE-4676</a>]
+  Avatica client leaks TCP connections
+
+Build and tests
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4790">CALCITE-4790</a>]
+  Make Gradle pass the `user.timezone` property to the test JVM
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4815">CALCITE-4815</a>]
+  Enforce shaded artifacts include `checker-qual` 3.10.0 or later
+* Bump javadoc compilation gradle image to 6.8
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4755">CALCITE-4755</a>]
+  Prepare for next development iteration
+
+Website and documentation
+
+* Site: Remove nowadays redundant minified javascript files
 
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.18.0">1.18.0</a> / 2021-05-18
 {: #v1-18-0}
