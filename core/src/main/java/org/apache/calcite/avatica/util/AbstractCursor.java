@@ -952,7 +952,9 @@ public abstract class AbstractCursor implements Cursor {
         return null;
       }
       if (value instanceof Date) {
-        return ((Date) value).toLocalDate().toEpochDay();
+        long time = ((Date) value).getTime();
+        time -= localCalendar.getTimeZone().getOffset(time);
+        return time / DateTimeUtils.MILLIS_PER_DAY;
       }
       return (Number) value;
     }
