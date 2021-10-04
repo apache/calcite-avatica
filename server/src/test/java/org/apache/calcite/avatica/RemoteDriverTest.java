@@ -913,7 +913,6 @@ public class RemoteDriverTest {
       final ResultSet resultSet = ps.executeQuery();
       fail("expected error, got " + resultSet);
     } catch (SQLException e) {
-      LOG.info("Caught expected error", e);
       assertThat(e.getMessage(),
           containsString("exception while executing query: unbound parameter"));
     }
