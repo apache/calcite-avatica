@@ -921,6 +921,18 @@ public class DateTimeUtils {
     int month = (m + 2) % 12 + 1;
     int day = d + 1;
     switch (range) {
+    case MILLENNIUM:
+      return floor
+          ? ymdToUnixDate(1000 * ((year + 999) / 1000) - 999, 1, 1)
+          : ymdToUnixDate(1000 * ((year + 999) / 1000) + 1, 1, 1);
+    case CENTURY:
+      return floor
+          ? ymdToUnixDate(100 * ((year + 99) / 100) - 99, 1, 1)
+          : ymdToUnixDate(100 * ((year + 99) / 100) + 1, 1, 1);
+    case DECADE:
+      return floor
+          ? ymdToUnixDate(10 * (year / 10), 1, 1)
+          : ymdToUnixDate(10 * (1 + year / 10), 1, 1);
     case YEAR:
       if (!floor && (month > 1 || day > 1)) {
         ++year;
