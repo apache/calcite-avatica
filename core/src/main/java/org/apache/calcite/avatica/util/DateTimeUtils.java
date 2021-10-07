@@ -921,6 +921,22 @@ public class DateTimeUtils {
     int month = (m + 2) % 12 + 1;
     int day = d + 1;
     switch (range) {
+    case DECADE:
+    case CENTURY:
+    case MILLENNIUM:
+      int factor = 10;
+      if (range == TimeUnitRange.CENTURY) {
+        factor = 100;
+      } else if (range == TimeUnitRange.MILLENNIUM) {
+        factor = 1000;
+      }
+      int currentRange = year / factor;
+      if (!floor && (year % factor > 0 || month > 1 || day > 1)) {
+        year = factor * (currentRange + 1);
+      } else {
+        year = currentRange * factor;
+      }
+      return ymdToUnixDate(year, 1, 1);
     case YEAR:
       if (!floor && (month > 1 || day > 1)) {
         ++year;
