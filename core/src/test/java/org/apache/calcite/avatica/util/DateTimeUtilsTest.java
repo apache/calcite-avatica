@@ -911,13 +911,13 @@ public class DateTimeUtilsTest {
   }
 
   @Test public void testUnixDateFloorCeil() {
-    final long y1000 = ymdToUnixDate(1000, 1, 1);
-    final long y1800 = -(170 * 365 + 170 / 4 - 1);
+    final long y1001 = ymdToUnixDate(1001, 1, 1);
+    final long y1801 = -(169 * 365 + 169 / 4 - 1);
     final long y1890 = -(80 * 365 + 80 / 4 - 1);
     final long y1900 = -(70 * 365 + 70 / 4);
     final long y1910 = -(60 * 365 + 60 / 4);
     final long y1907 = -(63 * 365 + 63 / 4);
-    final long y2000 = 30 * 365 + 30 / 4;
+    final long y2001 = 31 * 365 + 31 / 4 + 1;
     final long y1900_0102 = y1900 + 1;
     final long y1899 = y1900 - 365;
     final long y1901 = y1900 + 365;
@@ -932,16 +932,16 @@ public class DateTimeUtilsTest {
     final long y1900_0701 = y1900 - 1 + 31 + 28 + 31 + 30 + 31 + 30 + 1;
     final long y1900_1001 = y1900 - 1 + 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 1;
     final long y1900_1002 = y1900 - 1 + 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 2;
-    checkDateString("1800-01-01", (int) y1800);
+    checkDateString("1801-01-01", (int) y1801);
     checkDateString("1900-01-01", (int) y1900);
     checkDateString("1900-01-02", (int) y1900_0102);
     checkDateString("1899-01-01", (int) y1899);
     checkDateString("1901-01-01", (int) y1901);
-    checkDateString("2000-01-01", (int) y2000);
-    assertThat(unixDateFloor(TimeUnitRange.MILLENNIUM, y1907), is(y1000));
-    assertThat(unixDateCeil(TimeUnitRange.MILLENNIUM, y1907), is(y2000));
-    assertThat(unixDateFloor(TimeUnitRange.CENTURY, y1899), is(y1800));
-    assertThat(unixDateCeil(TimeUnitRange.CENTURY, y1899), is(y1900));
+    checkDateString("2001-01-01", (int) y2001);
+    assertThat(unixDateFloor(TimeUnitRange.MILLENNIUM, y1907), is(y1001));
+    assertThat(unixDateCeil(TimeUnitRange.MILLENNIUM, y1907), is(y2001));
+    assertThat(unixDateFloor(TimeUnitRange.CENTURY, y1899), is(y1801));
+    assertThat(unixDateCeil(TimeUnitRange.CENTURY, y1899), is(y1901));
     assertThat(unixDateFloor(TimeUnitRange.DECADE, y1899), is(y1890));
     assertThat(unixDateFloor(TimeUnitRange.DECADE, y1900_0701), is(y1900));
     assertThat(unixDateFloor(TimeUnitRange.DECADE, y1907), is(y1900));

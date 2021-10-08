@@ -922,21 +922,17 @@ public class DateTimeUtils {
     int day = d + 1;
     switch (range) {
     case DECADE:
+      return floor
+          ? ymdToUnixDate(10 * (year / 10), 1, 1)
+          : ymdToUnixDate(10 * (1 + year / 10), 1, 1);
     case CENTURY:
+      return floor
+          ? ymdToUnixDate(100 * ((year + 99) / 100) - 99, 1, 1)
+          : ymdToUnixDate(100 * ((year + 99) / 100) + 1, 1, 1);
     case MILLENNIUM:
-      int factor = 10;
-      if (range == TimeUnitRange.CENTURY) {
-        factor = 100;
-      } else if (range == TimeUnitRange.MILLENNIUM) {
-        factor = 1000;
-      }
-      int currentRange = year / factor;
-      if (!floor && (year % factor > 0 || month > 1 || day > 1)) {
-        year = factor * (currentRange + 1);
-      } else {
-        year = currentRange * factor;
-      }
-      return ymdToUnixDate(year, 1, 1);
+      return floor
+          ? ymdToUnixDate(1000 * ((year + 999) / 1000) - 999, 1, 1)
+          : ymdToUnixDate(1000 * ((year + 999) / 1000) + 1, 1, 1);
     case YEAR:
       if (!floor && (month > 1 || day > 1)) {
         ++year;
