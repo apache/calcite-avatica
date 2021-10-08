@@ -1,18 +1,23 @@
 Apache Calcite Avatica release 1.19.0
 
+# Overview
 This is a source or binary distribution of Avatica, a framework for
 building database drivers. Avatica is a sub-project of Apache Calcite.
 
-Changes since the previous release are described in the
-site/_docs/history.md file.
-
-The LICENSE and NOTICE files contain license information.
-
+# Build
 If this is a source distribution, you can find instructions how to
 build the release in the "Building from a source distribution" section
 in site/_docs/howto.md.
 
+# Release Notes
+Changes since the previous release are described in the
+site/_docs/history.md file.
+
+# Usage
 README.md contains examples of running Avatica.
+
+# Legal
+The LICENSE and NOTICE files contain license information.
 
 Further information about Avatica is available at its web site,
 http://calcite.apache.org/avatica.
