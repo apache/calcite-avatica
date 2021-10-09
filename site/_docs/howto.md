@@ -227,22 +227,23 @@ That performs the same steps, however it pushes changes to the mock Nexus, Git, 
 If any of the steps fail, fix the problem, and
 start again from the top.
 
-### To prepare a release candidate directly in your environment:
+### Prepare a release candidate directly in your environment
 
-Pick a release candidate index and ensure it does not interfere with previous candidates for the version.
+Pick a release candidate index (starting from 0) and ensure it does
+not interfere with previous candidates for the version.
 
 {% highlight bash %}
 # Make sure that there are no junk files in the sandbox
 git clean -xn
 
 # Dry run the release candidate (push to asf-like-environment)
-./gradlew prepareVote -Prc=1
+./gradlew prepareVote -Prc=0
 
 # Push release candidate to ASF servers
-./gradlew prepareVote -Prc=1 -Pasf
+./gradlew prepareVote -Prc=0 -Pasf
 {% endhighlight %}
 
-### To prepare a release candidate in Docker:
+### Prepare a release candidate in Docker
 
 * You will need to have [Docker](https://docs.docker.com/install/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
 
@@ -447,14 +448,14 @@ tag triggers Docker Hub to start building the docker images immediately and the 
 If the artifacts are not yet available, the build on Docker Hub will fail. It's best to continue with the following steps
 after you have confirmed that the nexus artifacts were promoted properly.
 
-### Publishing directly in your environment:
+### Publishing directly in your environment
 
 {% highlight bash %}
 # Dry run publishing the release (push to asf-like-environment)
-./gradlew publishDist -Prc=1
+./gradlew publishDist -Prc=0
 
 # Publish the release to ASF servers
-./gradlew publishDist -Prc=1 -Pasf
+./gradlew publishDist -Prc=0 -Pasf
 {% endhighlight %}
 
 If there are more than 2 releases in SVN (see https://dist.apache.org/repos/dist/release/calcite),
@@ -467,7 +468,8 @@ svn rm https://dist.apache.org/repos/dist/release/calcite/apache-calcite-avatica
 The old releases will remain available in the
 [release archive](http://archive.apache.org/dist/calcite/).
 
-### Publishing a release using docker:
+### Publishing a release using docker
+
 This assumes that a rc release was tagged and pushed to the git repository.
 
 {% highlight bash %}
@@ -475,9 +477,11 @@ docker-compose run promote-release
 {% endhighlight %}
 
 ## Add release notes and announce the release
+
 Add a release note by copying
 [site/_posts/2016-11-01-release-1.9.0.md]({{ site.sourceRoot }}/site/_posts/2016-11-01-release-1.9.0.md),
-generate the javadoc and copy to `site/target/avatica/javadocAggregate`
+update the version number in `gradle.properties`,
+generate the javadoc and copy to `site/target/avatica/javadocAggregate`,
 [publish the site](#publish-the-web-site),
 and check that it appears in the contents in [news](http://localhost:4000/news/).
 

@@ -28,8 +28,12 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.19.0">1.19.0</a> / 2021-10-07
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.19.0">1.19.0</a> / 2021-10-12
 {: #v1-19-0}
+
+Apache Calcite Avatica 1.19.0 adds support for `BIT` and `NULL` data
+types, fixes issues with values of type `ARRAY`, and includes a few
+dependency updates.
 
 Compatibility: This release is tested
 on Linux, macOS, Microsoft Windows;
@@ -45,7 +49,7 @@ chenyuzhi459,
 Francis Chuang,
 Istvan Toth,
 Julian Hyde (release manager),
-NoboGo,
+NobiGo,
 Jack Scott,
 Sergey Nuyanzin,
 Stamatis Zampetakis,
