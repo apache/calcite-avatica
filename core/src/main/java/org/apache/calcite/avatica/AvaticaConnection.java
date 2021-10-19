@@ -553,7 +553,6 @@ public abstract class AvaticaConnection implements Connection {
           signature2 = executeResult.resultSets.get(0).signature;
         }
       } catch (Exception e) {
-        e.printStackTrace();
         throw HELPER.createException(e.getMessage(), e);
       }
 
