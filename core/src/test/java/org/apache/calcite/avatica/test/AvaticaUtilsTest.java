@@ -55,6 +55,41 @@ public class AvaticaUtilsTest {
         AvaticaUtils.instantiatePlugin(String.class, "java.lang.String");
     assertThat(s, is(""));
 
+    final BigInteger b =
+            AvaticaUtils.instantiatePlugin(BigInteger.class, "java.math.BigInteger#ONE");
+    assertThat(b, is(BigInteger.ONE));
+
+    // Class not found
+    try {
+      final BigInteger b2 =
+              AvaticaUtils.instantiatePlugin(BigInteger.class, "org.apache.calcite.Abc");
+      fail("expected error, got " + b2);
+    } catch (Throwable e) {
+      assertThat(e.getMessage(),
+              is("Property 'org.apache.calcite.Abc' not valid as "
+                      + "'org.apache.calcite.Abc' not found in the classpath"));
+    }
+
+    // No instance of ABC
+    try {
+      final String s2 = AvaticaUtils.instantiatePlugin(String.class, "java.lang.String#ABC");
+      fail("expected error, got " + s2);
+    } catch (Throwable e) {
+      assertThat(e.getMessage(),
+              is("Property 'java.lang.String#ABC' not valid as "
+                      + "there is no 'ABC' field in the class of 'java.lang.String'"));
+    }
+
+    // The instance type is not the plugin type
+    try {
+      final String s2 = AvaticaUtils.instantiatePlugin(String.class, "java.math.BigInteger#ONE");
+      fail("expected error, got " + s2);
+    } catch (Throwable e) {
+      assertThat(e.getMessage(),
+              is("Property 'java.math.BigInteger#ONE' not valid as "
+                      + "Cannot cast java.math.BigInteger to java.lang.String"));
+    }
+
     // No default constructor or INSTANCE member
     try {
       final Integer i =
@@ -62,21 +97,18 @@ public class AvaticaUtilsTest {
       fail("expected error, got " + i);
     } catch (Throwable e) {
       assertThat(e.getMessage(),
-          is("Property 'java.lang.Integer' not valid for plugin type java.lang.Integer"));
+          is("Property 'java.lang.Integer' not valid as the default constructor is necessary,"
+                  + " but not found in the class of 'java.lang.Integer'"));
     }
 
-    final BigInteger b =
-        AvaticaUtils.instantiatePlugin(BigInteger.class, "java.math.BigInteger#ONE");
-    assertThat(b, is(BigInteger.ONE));
-
+    // Not valid for plugin type
     try {
       final BigInteger b2 =
-          AvaticaUtils.instantiatePlugin(BigInteger.class,
-              "java.math.BigInteger.ONE");
+          AvaticaUtils.instantiatePlugin(BigInteger.class, "java.lang.String");
       fail("expected error, got " + b2);
     } catch (Throwable e) {
       assertThat(e.getMessage(),
-          is("Property 'java.math.BigInteger.ONE' not valid for plugin type java.math.BigInteger"));
+          is("Property 'java.lang.String' not valid for plugin type java.math.BigInteger"));
     }
   }
 

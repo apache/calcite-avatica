@@ -209,26 +209,23 @@ public class AvaticaUtils {
    */
   public static <T> T instantiatePlugin(Class<T> pluginClass,
       String className) {
+    String right = null;
+    String left = null;
     try {
       // Given a static field, say "com.example.MyClass#FOO_INSTANCE", return
       // the value of that static field.
       if (className.contains("#")) {
-        try {
-          int i = className.indexOf('#');
-          String left = className.substring(0, i);
-          String right = className.substring(i + 1);
-          //noinspection unchecked
-          final Class<T> clazz = (Class) Class.forName(left);
-          final Field field;
-          field = clazz.getField(right);
-          return pluginClass.cast(field.get(null));
-        } catch (NoSuchFieldException e) {
-          // ignore
-        }
+        int i = className.indexOf('#');
+        left = className.substring(0, i);
+        right = className.substring(i + 1);
+        //noinspection unchecked
+        final Class<T> clazz = (Class) Class.forName(left);
+        final Field field;
+        field = clazz.getField(right);
+        return pluginClass.cast(field.get(null));
       }
       //noinspection unchecked
       final Class<T> clazz = (Class) Class.forName(className);
-      assert pluginClass.isAssignableFrom(clazz);
       try {
         // We assume that if there is an INSTANCE field it is static and
         // has the right type.
@@ -237,10 +234,29 @@ public class AvaticaUtils {
       } catch (NoSuchFieldException e) {
         // ignore
       }
+      if (!pluginClass.isAssignableFrom(clazz)) {
+        throw new RuntimeException("Property '" + className
+            + "' not valid for plugin type " + pluginClass.getName());
+      }
       return clazz.getConstructor().newInstance();
-    } catch (Exception e) {
+    } catch (ClassNotFoundException e) {
       throw new RuntimeException("Property '" + className
-          + "' not valid for plugin type " + pluginClass.getName(), e);
+          + "' not valid as '" + className + "' not found in the classpath", e);
+    } catch (NoSuchFieldException e) {
+      // We can't ignore it because the right field is user configured.
+      throw new RuntimeException("Property '" + className
+          + "' not valid as there is no '" + right + "' field in the class of '"
+          + left + "'", e);
+    } catch (ClassCastException e) {
+      throw new RuntimeException(
+          "Property '" + className + "' not valid as " + e.getMessage(), e);
+    } catch (NoSuchMethodException e) {
+      throw new RuntimeException("Property '" + className + "' not valid as "
+          + "the default constructor is necessary, "
+          + "but not found in the class of '" + className + "'", e);
+    } catch (ReflectiveOperationException e) {
+      throw new RuntimeException("Property '" + className
+          + "' not valid. The exception info here : " + e.getMessage(), e);
     }
   }
 
