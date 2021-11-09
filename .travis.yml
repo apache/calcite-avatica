@@ -58,14 +58,6 @@ matrix:
       env:
       script:
         - ./gradlew $GRADLE_ARGS build
-    - name: Calcite/master
-      install:
-        - ./gradlew publishToMavenLocal -PskipJavadoc -Pcalcite.avatica.version=1.0.0-dev-master
-        - cd ..
-        - git clone --depth 10000 https://github.com/apache/calcite.git
-        - cd calcite
-      script:
-        - ./gradlew --no-parallel --no-daemon build -Pcalcite.avatica.version=1.0.0-dev-master-SNAPSHOT -PenableMavenLocal
 
 branches:
   only:
