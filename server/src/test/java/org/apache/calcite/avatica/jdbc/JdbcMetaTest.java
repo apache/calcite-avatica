@@ -123,6 +123,36 @@ public class JdbcMetaTest {
     Mockito.verify(statement).setMaxRows(maxRows);
   }
 
+  @Test public void testPrepareNoParams() throws Exception {
+    final String id = UUID.randomUUID().toString();
+    final int statementId = 12345;
+    final int maxRows = 500;
+
+    JdbcMeta meta = Mockito.mock(JdbcMeta.class);
+
+    @SuppressWarnings("unchecked")
+    Cache<Integer, StatementInfo> statementCache =
+        (Cache<Integer, StatementInfo>) Mockito.mock(Cache.class);
+
+    PreparedStatement statement = Mockito.mock(PreparedStatement.class);
+    Signature signature = Mockito.mock(Signature.class);
+
+    final StatementInfo statementInfo = new StatementInfo(statement);
+    final StatementHandle statementHandle = new StatementHandle(id, statementId, signature);
+
+    Mockito.when(meta.getStatementCache()).thenReturn(statementCache);
+    Mockito.when(statementCache.getIfPresent(statementId)).thenReturn(statementInfo);
+    Mockito.when(statement.getResultSet()).thenReturn(null);
+    // The real methods
+    Mockito.when(meta.execute(statementHandle, null, maxRows)).thenCallRealMethod();
+
+    // Call our method
+    meta.execute(statementHandle, null, maxRows);
+
+    // Make sure we call execute and there is no exception
+    Mockito.verify(statement).execute();
+  }
+
   @Test public void testConcurrentConnectionOpening() throws Exception {
     final Map<String, String> properties = Collections.emptyMap();
     final Connection conn = Mockito.mock(Connection.class);
