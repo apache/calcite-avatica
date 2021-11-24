@@ -846,11 +846,11 @@ public class JdbcMeta implements ProtobufMeta {
   @Override public ExecuteResult execute(StatementHandle h,
       List<TypedValue> parameterValues, int maxRowsInFirstFrame) throws NoSuchStatementException {
     try {
-      if (MetaImpl.checkParameterValueHasNull(parameterValues)) {
+      if (parameterValues != null && MetaImpl.checkParameterValueHasNull(parameterValues)) {
         throw new SQLException("exception while executing query: unbound parameter");
       }
 
-      final StatementInfo statementInfo = statementCache.getIfPresent(h.id);
+      final StatementInfo statementInfo = getStatementCache().getIfPresent(h.id);
       if (null == statementInfo) {
         throw new NoSuchStatementException(h);
       }
