@@ -47,7 +47,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.apache.httpcomponents:httpclient")
     testRuntimeOnly("org.hsqldb:hsqldb")
-    testRuntimeOnly("org.slf4j:slf4j-log4j12")
+    testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl")
 }
 
 tasks {

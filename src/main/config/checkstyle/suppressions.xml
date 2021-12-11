@@ -44,7 +44,6 @@ limitations under the License.
   <suppress checks=".*" files="trace.properties"/>
   <suppress checks=".*" files="release.properties"/>
   <suppress checks=".*" files="core[/\\]src[/\\]main[/\\]java[/\\]org[/\\]apache[/\\]calcite[/\\]avatica[/\\]proto"/>
-  <suppress checks=".*" files="log4j.properties"/>
   <suppress checks=".*" files="auth-users.properties"/>
   <suppress checks=".*" files="FilteredConstants.java"/>
 

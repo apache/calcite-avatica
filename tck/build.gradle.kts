@@ -50,7 +50,7 @@ dependencies {
     // As long as we want to run compatibility checks again 1.6.0, we have to include these because
     // they weren't yet provided by the avatica client jar
     shaded("org.slf4j:slf4j-api")
-    shaded("org.slf4j:slf4j-log4j12")
+    shaded("org.apache.logging.log4j:log4j-slf4j-impl")
 }
 
 tasks {
@@ -92,7 +92,7 @@ tasks {
             "javax.servlet",
             "junit",
             "net.hydromatic",
-            "org.apache.log4j",
+            "org.apache.logging.log4j",
             "org.eclipse.jetty",
             "org.hamcrest",
             "org.hsqldb",
