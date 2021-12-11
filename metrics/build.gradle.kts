@@ -24,4 +24,5 @@ dependencies {
     testImplementation("junit:junit")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.hamcrest:hamcrest-core")
+    testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl")
 }

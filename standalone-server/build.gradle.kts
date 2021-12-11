@@ -49,7 +49,7 @@ dependencies {
     shaded("com.beust:jcommander")
 
     shaded("org.slf4j:slf4j-api")
-    shaded("org.slf4j:slf4j-log4j12")
+    shaded("org.apache.logging.log4j:log4j-slf4j-impl")
 }
 
 tasks {
