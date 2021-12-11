@@ -28,6 +28,57 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.20.0">1.20.0</a> / 2021-12-13
+{: #v1-20-0}
+
+Apache Calcite Avatica 1.20.0
+<a href="https://issues.apache.org/jira/browse/CALCITE-4931">upgrades Log4j2 to version 2.15.0</a>
+to address
+<a href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=2021-44228">CVE-2021-44228</a>,
+and makes the SPNEGO protocol
+<a href="https://issues.apache.org/jira/browse/CALCITE-4152">much more efficient</a>.
+
+Compatibility: This release is tested
+on Linux, macOS, Microsoft Windows;
+using Oracle JDK 8, 9, 10, 11, 12, 13, 14, 15;
+using IBM Java 8;
+Guava versions 14.0.1 to 31.0.1-jre;
+other software versions as specified in `gradle.properties`.
+
+Contributors to this release:
+Jacques Nadeau,
+Jincheng Sun,
+Josh Elser,
+Julian Hyde (release manager),
+NobiGo,
+Sergey Nuyanzin,
+Stamatis Zampetakis.
+
+Features and bug fixes
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4931">CALCITE-4931</a>]
+  Upgrade SLF4J binding to Log4j2 version 2.15.0
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4877">CALCITE-4877</a>]
+  Make the exception information more explicit for instantiate plugin
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4152">CALCITE-4152</a>]
+  Upgrade Avatica to use the configurable SPNEGO Jetty implementation
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4828">CALCITE-4828</a>]
+  Standard exception console output
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4837">CALCITE-4837</a>]
+  `FLOOR` and `CEIL` functions return wrong results for `DECADE`, `CENTURY`,
+  `MILLENNIUM`
+
+Build and tests
+
+* Disable Travis job that uses Calcite master until
+  [<a href="https://issues.apache.org/jira/browse/CALCITE-4877">CALCITE-4877</a>]
+  is fixed
+
+Web site and documentation
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4840">CALCITE-4840</a>]
+  Make `README` easier to scan
+
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.19.0">1.19.0</a> / 2021-10-11
 {: #v1-19-0}
 
