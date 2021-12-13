@@ -126,8 +126,8 @@ public class CommonsHttpClientPoolCache {
       throws Exception {
     sslContextBuilder.loadTrustMaterial(config.truststore(),
         config.truststorePassword().toCharArray());
-    System.out.println("truststore loaded. truststore:" + config.truststore()
-        + "pw:" + config.truststorePassword());
+    // Avoid printing sensitive information such as passwords in the logs
+    LOG.info("Trustore loaded from: {}", config.truststore());
   }
 
   private static void configureHttpRegistry(
