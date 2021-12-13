@@ -49,6 +49,14 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * End to end test case for SPNEGO with Avatica.
+ *
+ * <p>The following system properties are useful for debugging problems around SPNEGO.</p>
+ * <ul>
+ *   <li>sun.security.krb5.debug</li>
+ *   <li>sun.security.jgss.debug</li>
+ *   <li>sun.security.spnego.debug</li>
+ *   <li>java.security.debug</li>
+ * </ul>
  */
 @RunWith(Parameterized.class)
 public class AvaticaSpnegoTest extends HttpBaseTest {
@@ -65,12 +73,6 @@ public class AvaticaSpnegoTest extends HttpBaseTest {
   private static boolean isKdcStarted = false;
 
   private static void setupKdc() throws Exception {
-    System.setProperty("sun.security.krb5.debug", "true");
-    System.setProperty("sun.security.jgss.debug", "true");
-    System.setProperty("sun.security.spnego.debug", "true");
-    System.setProperty("java.security.debug", "all");
-    System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug");
-
     if (isKdcStarted) {
       return;
     }

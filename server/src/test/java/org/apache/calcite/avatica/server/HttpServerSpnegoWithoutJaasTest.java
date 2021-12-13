@@ -129,8 +129,6 @@ public class HttpServerSpnegoWithoutJaasTest {
     // Kerby sets "java.security.krb5.conf" for us!
     System.clearProperty("java.security.auth.login.config");
     System.setProperty("javax.security.auth.useSubjectCredsOnly", "false");
-    System.setProperty("sun.security.spnego.debug", "true");
-    System.setProperty("sun.security.krb5.debug", "true");
 
     // Create and start an HTTP server configured only to allow SPNEGO requests
     // We use `withAutomaticLogin(File)` here which should invalidate the need to do JAAS config

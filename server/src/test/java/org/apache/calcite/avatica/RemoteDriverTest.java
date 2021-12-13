@@ -66,6 +66,7 @@ import java.util.Properties;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -891,9 +892,10 @@ public class RemoteDriverTest {
       getRequestInspection().getRequestLogger().enableAndClear();
       checkPrepareBindExecuteFetch(getLocalConnection());
       List<String[]> x = getRequestInspection().getRequestLogger().getAndDisable();
-      for (String[] pair : x) {
-        System.out.println(pair[0] + "=" + pair[1]);
-      }
+      // Counting the number of elements is not the best way to prevent regressions
+      // but it's better than just printing elements to standard out as it was before.
+      // Feel free to improve the assertion if you understand the original intention.
+      assertEquals(18, x.stream().flatMap(Stream::of).count());
     } finally {
       ConnectionSpec.getDatabaseLock().unlock();
     }
