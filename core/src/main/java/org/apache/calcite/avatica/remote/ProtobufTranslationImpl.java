@@ -105,7 +105,11 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
       // This should already be an aliased CodedInputStream from the WireMessage parsing.
       Message msg = parser.parseFrom(serializedMessage.newCodedInput());
       if (LOG.isTraceEnabled()) {
-        LOG.trace("Deserialized request '{}'", TextFormat.shortDebugString(msg));
+        LOG.trace(
+            "Deserialized {} '{}'",
+            msg.getClass().getSimpleName(),
+            TextFormat.shortDebugString(msg)
+        );
       }
       return impl.deserialize(msg);
     }
@@ -129,7 +133,11 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
         InvalidProtocolBufferException {
       Message msg = parser.parseFrom(serializedMessage);
       if (LOG.isTraceEnabled()) {
-        LOG.trace("Deserialized response '{}'", TextFormat.shortDebugString(msg));
+        LOG.trace(
+            "Deserialized {} '{}'",
+            msg.getClass().getSimpleName(),
+            TextFormat.shortDebugString(msg)
+        );
       }
       return impl.deserialize(msg);
     }
@@ -348,7 +356,11 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
       Message responseMsg = response.serialize();
       // Serialization of the response may be large
       if (LOG.isTraceEnabled()) {
-        LOG.trace("Serializing response '{}'", TextFormat.shortDebugString(responseMsg));
+        LOG.trace(
+            "Serializing {} '{}'",
+            responseMsg.getClass().getSimpleName(),
+            TextFormat.shortDebugString(responseMsg)
+        );
       }
       serializeMessage(out, responseMsg);
       return out.toArray();
@@ -364,7 +376,11 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
       Message requestMsg = request.serialize();
       // Serialization of the request may be large
       if (LOG.isTraceEnabled()) {
-        LOG.trace("Serializing request '{}'", TextFormat.shortDebugString(requestMsg));
+        LOG.trace(
+            "Serializing {} '{}'",
+            requestMsg.getClass().getSimpleName(),
+            TextFormat.shortDebugString(requestMsg)
+        );
       }
       serializeMessage(out, requestMsg);
       return out.toArray();
