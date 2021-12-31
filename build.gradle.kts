@@ -246,8 +246,8 @@ allprojects {
                 docEncoding = "UTF-8"
                 charSet = "UTF-8"
                 encoding = "UTF-8"
-                docTitle = "Apache Calcite Avatica ${project.name} API"
-                windowTitle = "Apache Calcite Avatica ${project.name} API"
+                docTitle = "Apache Calcite Avatica API"
+                windowTitle = "Apache Calcite Avatica API"
                 header = "<b>Apache Calcite Avatica</b>"
                 bottom =
                     "Copyright &copy; 2012-$lastEditYear Apache Software Foundation. All Rights Reserved."
