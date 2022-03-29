@@ -17,21 +17,21 @@
 version: '3'
 services:
   dev:
-    image: jekyll/jekyll:3
+    image: jekyll/jekyll:4
     command: sh -c "./add-avatica-go-docs.sh; jekyll serve --watch --force_polling"
     ports:
       - 4000:4000
     volumes:
       - .:/srv/jekyll
   build-site:
-    image: jekyll/jekyll:3
+    image: jekyll/jekyll:4
     command: sh -c "./add-avatica-go-docs.sh; jekyll build"
     volumes:
       - .:/srv/jekyll
   generate-javadoc:
-    image: gradle:6.8
+    image: openjdk:15
     working_dir: /usr/src/calcite-avatica
-    command: sh -c "gradle javadocAggregate; rm -rf site/target/avatica/javadocAggregate; mkdir -p site/target/avatica; mv build/docs/javadocAggregate site/target/avatica"
+    command: sh -c "./gradlew javadocAggregate; rm -rf site/target/avatica/javadocAggregate; mkdir -p site/target/avatica; mv build/docs/javadocAggregate site/target/avatica"
     volumes:
       - ../:/usr/src/calcite-avatica
       - gradle-cache:/home/gradle/.gradle
