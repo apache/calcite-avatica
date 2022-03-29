@@ -62,6 +62,8 @@ public interface ConnectionConfig {
   String keyPassword();
   /** @see BuiltInConnectionProperty#HOSTNAME_VERIFICATION */
   HostnameVerification hostnameVerification();
+  /** @see BuiltInConnectionProperty#TRANSPARENT_RECONNECTION */
+  boolean transparentReconnectionEnabled();
 }
 
 // End ConnectionConfig.java

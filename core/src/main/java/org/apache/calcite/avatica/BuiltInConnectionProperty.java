@@ -86,7 +86,9 @@ public enum BuiltInConnectionProperty implements ConnectionProperty {
   KEY_PASSWORD("key_password", Type.STRING, "", false),
 
   HOSTNAME_VERIFICATION("hostname_verification", Type.ENUM, HostnameVerification.STRICT,
-      HostnameVerification.class, false);
+      HostnameVerification.class, false),
+
+  TRANSPARENT_RECONNECTION("transparent_reconnection", Type.BOOLEAN, Boolean.FALSE, false);
 
   private final String camelName;
   private final Type type;

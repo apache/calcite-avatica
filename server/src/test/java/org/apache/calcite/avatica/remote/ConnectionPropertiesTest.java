@@ -16,7 +16,9 @@
  */
 package org.apache.calcite.avatica.remote;
 
+import org.apache.calcite.avatica.AvaticaClientRuntimeException;
 import org.apache.calcite.avatica.AvaticaConnection;
+import org.apache.calcite.avatica.BuiltInConnectionProperty;
 import org.apache.calcite.avatica.ConnectionSpec;
 import org.apache.calcite.avatica.jdbc.JdbcMeta;
 import org.apache.calcite.avatica.server.HttpServer;
@@ -36,6 +38,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /** Tests covering {@link ConnectionPropertiesTest}. */
 @RunWith(Parameterized.class)
@@ -48,6 +52,7 @@ public class ConnectionPropertiesTest {
   private final String url;
   private final int port;
   private final Driver.Serialization serialization;
+  private final Properties clientReconnectProps = new Properties();
 
   @Parameterized.Parameters(name = "{0}")
   public static List<Object[]> parameters() throws Exception {
@@ -63,13 +68,16 @@ public class ConnectionPropertiesTest {
     this.port = this.server.getPort();
     this.serialization = serialization;
     this.url = SERVERS.getJdbcUrl(port, serialization);
+    this.clientReconnectProps.setProperty(
+        BuiltInConnectionProperty.TRANSPARENT_RECONNECTION.camelName(), "true");
   }
 
   @Test
   public void testConnectionPropertiesSync() throws Exception {
     ConnectionSpec.getDatabaseLock().lock();
     try {
-      AvaticaConnection conn = (AvaticaConnection) DriverManager.getConnection(url);
+      AvaticaConnection conn =
+              (AvaticaConnection) DriverManager.getConnection(url, clientReconnectProps);
       conn.setAutoCommit(false);
       conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
 
@@ -92,6 +100,37 @@ public class ConnectionPropertiesTest {
       assertFalse(remoteConn1.getAutoCommit());
       assertEquals(remoteConn1.getTransactionIsolation(),
               Connection.TRANSACTION_REPEATABLE_READ);
+    } finally {
+      ConnectionSpec.getDatabaseLock().unlock();
+    }
+  }
+
+  @Test
+  public void testConnectionPropertiesSyncNoReconnect() throws Exception {
+    ConnectionSpec.getDatabaseLock().lock();
+    try {
+      AvaticaConnection conn = (AvaticaConnection) DriverManager.getConnection(url);
+      conn.setAutoCommit(false);
+      conn.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+
+      // sync connection properties
+      conn.createStatement();
+      Connection remoteConn = getConnection(
+              AvaticaServersForTest.PropertyRemoteJdbcMetaFactory.getInstance(PROPERTIES), conn.id);
+
+      assertFalse(remoteConn.getAutoCommit());
+      assertEquals(remoteConn.getTransactionIsolation(),
+              Connection.TRANSACTION_REPEATABLE_READ);
+
+      // after 1s, remote connection expired and reopen
+      Thread.sleep(1000);
+
+      try {
+        conn.createStatement();
+        fail("Should have thrown AvaticaClientRuntimeException");
+      } catch (Exception e) {
+        assertTrue(e instanceof AvaticaClientRuntimeException);
+      }
     } finally {
       ConnectionSpec.getDatabaseLock().unlock();
     }
