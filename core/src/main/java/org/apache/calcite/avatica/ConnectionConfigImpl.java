@@ -128,6 +128,11 @@ public class ConnectionConfigImpl implements ConnectionConfig {
         .getEnum(HostnameVerification.class);
   }
 
+  @Override public boolean transparentReconnectionEnabled() {
+    return BuiltInConnectionProperty.TRANSPARENT_RECONNECTION.wrap(properties)
+       .getBoolean();
+  }
+
   /** Converts a {@link Properties} object containing (name, value)
    * pairs into a map whose keys are
    * {@link org.apache.calcite.avatica.InternalProperty} objects.
