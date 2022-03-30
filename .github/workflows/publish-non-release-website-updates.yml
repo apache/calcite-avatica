@@ -1,0 +1,42 @@
+name: Publish non-release website updates
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'site/**'                       # Trigger only for changes to files in the site/ folder
+      - '!site/_docs/**'                # except for files in the site/_docs/ folder
+      - 'site/_docs/docker_images.md'   # unless the file is site/_docs/docker_images.md
+      - 'site/_docs/history.md'         # or site/_docs/history.md
+      - 'site/_docs/howto.md'           # or site/_docs/howto.md
+      - 'site/_docs/index.md'           # or site/_docs/index.md
+
+jobs:
+   publish-website:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build site
+        working-directory: site
+        run: |
+          docker-compose run -e JEKYLL_UID=$(id -u) -e JEKYLL_GID=$(id -g) build-site
+      - uses: actions/checkout@v3
+        with:
+          repository: apache/calcite-site
+          path: calcite-site
+          token: ${{ secrets.CALCITE_WEBSITE_BUILD }}
+      - name: Publish site
+        working-directory: calcite-site
+        run: |
+          git config user.email ${{ github.actor }}@users.noreply.github.com
+          git config user.name ${{ github.actor }}
+          rm -rf avatica/
+          mv ../site/target/avatica/ .
+          git reset -- avatica/javadocAggregate/       # Restore the avatica javadoc
+          git checkout -- avatica/javadocAggregate/
+          git add .
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "Website deployed from calcite-avatica@$GITHUB_SHA"
+            git push origin master
+          fi

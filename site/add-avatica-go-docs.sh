@@ -17,6 +17,16 @@
 #
 git clone https://github.com/apache/calcite-avatica-go /tmp/calcite-avatica-go
 
+CURRENT_DIR=$PWD
+
+ # Reset the client reference to the last release (so that unreleased changes are not published)
+cd /tmp/calcite-avatica-go
+
+LATEST_TAG=$(git describe --exclude "*-rc*" --tags --abbrev=0)
+git checkout tags/$LATEST_TAG site/_docs/go_client_reference.md
+
+cd $CURRENT_DIR
+
 cp /tmp/calcite-avatica-go/site/_docs/* _docs/
 cp /tmp/calcite-avatica-go/site/_posts/* _posts/
 cp /tmp/calcite-avatica-go/site/develop/* develop/

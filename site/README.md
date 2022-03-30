@@ -26,6 +26,10 @@ a sub-directory of the
 
 You can build the site manually using your environment or use the docker compose file.
 
+The site is automatically built and published following the process outlined in the [Calcite repository](https://github.com/apache/calcite/blob/master/site/README.md).
+
+# Previewing the website locally
+
 ## Building website on a host system
 
 ### Setup your environment
@@ -85,9 +89,3 @@ You can preview your work while working on the site.
 The web server will be started on [http://localhost:4000/avatica/](http://localhost:4000/avatica/) (note the trailing slash)
 
 As you make changes to the site, the site will automatically rebuild.
-
-## Pushing to site
-
-Push the Calcite site, which includes `avatica` as a sub-directory,
-as described in its
-[README](../site/README.md).
