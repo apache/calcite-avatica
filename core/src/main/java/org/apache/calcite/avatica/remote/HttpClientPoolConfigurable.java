@@ -16,7 +16,7 @@
  */
 package org.apache.calcite.avatica.remote;
 
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 
 /**
  * Allows a http connection pool to be provided to enable TLS authentication.

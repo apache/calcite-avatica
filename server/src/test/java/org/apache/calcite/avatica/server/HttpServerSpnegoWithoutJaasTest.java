@@ -22,7 +22,7 @@ import org.apache.calcite.avatica.SpnegoTestUtil;
 import org.apache.calcite.avatica.remote.AvaticaCommonsHttpClientImpl;
 import org.apache.calcite.avatica.remote.CommonsHttpClientPoolCache;
 
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.kerby.kerberos.kerb.KrbException;
 import org.apache.kerby.kerberos.kerb.client.KrbConfig;
 import org.apache.kerby.kerberos.kerb.client.KrbConfigKey;
