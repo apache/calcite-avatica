@@ -19,15 +19,16 @@ package org.apache.calcite.avatica.remote;
 import org.apache.calcite.avatica.ConnectionConfig;
 import org.apache.calcite.avatica.remote.HostnameVerificationConfigurable.HostnameVerification;
 
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContextBuilder;
-import org.apache.http.ssl.SSLContexts;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.HttpsSupport;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.core5.http.config.Registry;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
+import org.apache.hc.core5.ssl.SSLContexts;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,14 +146,13 @@ public class CommonsHttpClientPoolCache {
    */
   private static HostnameVerifier getHostnameVerifier(HostnameVerification verification) {
     // Normally, the configuration logic would give us a default of STRICT if it was
-    // not
-    // provided by the user. It's easy for us to do a double-check.
+    // not provided by the user. It's easy for us to do a double-check.
     if (verification == null) {
       verification = HostnameVerification.STRICT;
     }
     switch (verification) {
     case STRICT:
-      return SSLConnectionSocketFactory.getDefaultHostnameVerifier();
+      return HttpsSupport.getDefaultHostnameVerifier();
     case NONE:
       return NoopHostnameVerifier.INSTANCE;
     default:

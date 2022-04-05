@@ -16,34 +16,35 @@
  */
 package org.apache.calcite.avatica.remote;
 
-import org.apache.http.HttpHost;
-import org.apache.http.NoHttpResponseException;
-import org.apache.http.auth.AuthSchemeProvider;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.KerberosCredentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.config.AuthSchemes;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.config.Lookup;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.impl.auth.BasicSchemeFactory;
-import org.apache.http.impl.auth.DigestSchemeFactory;
-import org.apache.http.impl.auth.SPNegoSchemeFactory;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.ClientProtocolException;
+import org.apache.hc.client5.http.SystemDefaultDnsResolver;
+import org.apache.hc.client5.http.auth.AuthSchemeFactory;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.Credentials;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.auth.KerberosConfig;
+import org.apache.hc.client5.http.auth.KerberosCredentials;
+import org.apache.hc.client5.http.auth.StandardAuthScheme;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.auth.BasicSchemeFactory;
+import org.apache.hc.client5.http.impl.auth.DigestSchemeFactory;
+import org.apache.hc.client5.http.impl.auth.SPNegoSchemeFactory;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.NoHttpResponseException;
+import org.apache.hc.core5.http.config.Lookup;
+import org.apache.hc.core5.http.config.Registry;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
 
 import org.ietf.jgss.GSSCredential;
 import org.slf4j.Logger;
@@ -69,8 +70,12 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
   private static final boolean USE_CANONICAL_HOSTNAME = Boolean
       .parseBoolean(System.getProperty("avatica.http.spnego.use_canonical_hostname", "true"));
   private static final boolean STRIP_PORT_ON_SERVER_LOOKUP = true;
+  private static final KerberosConfig KERBEROS_CONFIG =
+          KerberosConfig.custom().setStripPort(STRIP_PORT_ON_SERVER_LOOKUP)
+          .setUseCanonicalHostname(USE_CANONICAL_HOSTNAME)
+          .build();
+  private static AuthScope anyAuthScope = new AuthScope(null, -1);
 
-  protected final HttpHost host;
   protected final URI uri;
   protected BasicAuthCache authCache;
   protected CloseableHttpClient client;
@@ -79,11 +84,10 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
 
   protected UsernamePasswordCredentials credentials = null;
   protected CredentialsProvider credentialsProvider = null;
-  protected Lookup<AuthSchemeProvider> authRegistry = null;
+  protected Lookup<AuthSchemeFactory> authRegistry = null;
   protected Object userToken;
 
   public AvaticaCommonsHttpClientImpl(URL url) {
-    this.host = new HttpHost(url.getHost(), url.getPort(), url.getProtocol());
     this.uri = toURI(Objects.requireNonNull(url));
   }
 
@@ -97,8 +101,6 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
   @Override public byte[] send(byte[] request) {
     while (true) {
       HttpClientContext context = HttpClientContext.create();
-
-      context.setTargetHost(host);
 
       // Set the credentials if they were provided.
       if (null != this.credentialsProvider) {
@@ -118,7 +120,7 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
       post.setEntity(entity);
 
       try (CloseableHttpResponse response = execute(post, context)) {
-        final int statusCode = response.getStatusLine().getStatusCode();
+        final int statusCode = response.getCode();
         if (HttpURLConnection.HTTP_OK == statusCode
             || HttpURLConnection.HTTP_INTERNAL_ERROR == statusCode) {
           userToken = context.getUserToken();
@@ -152,18 +154,18 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
   @Override public void setUsernamePassword(AuthenticationType authType, String username,
       String password) {
     this.credentials = new UsernamePasswordCredentials(Objects.requireNonNull(username),
-        Objects.requireNonNull(password));
+        Objects.requireNonNull(password).toCharArray());
 
     this.credentialsProvider = new BasicCredentialsProvider();
-    credentialsProvider.setCredentials(AuthScope.ANY, credentials);
+    ((BasicCredentialsProvider) credentialsProvider).setCredentials(anyAuthScope, credentials);
 
-    RegistryBuilder<AuthSchemeProvider> authRegistryBuilder = RegistryBuilder.create();
+    RegistryBuilder<AuthSchemeFactory> authRegistryBuilder = RegistryBuilder.create();
     switch (authType) {
     case BASIC:
-      authRegistryBuilder.register(AuthSchemes.BASIC, new BasicSchemeFactory());
+      authRegistryBuilder.register(StandardAuthScheme.BASIC, new BasicSchemeFactory());
       break;
     case DIGEST:
-      authRegistryBuilder.register(AuthSchemes.DIGEST, new DigestSchemeFactory());
+      authRegistryBuilder.register(StandardAuthScheme.DIGEST, new DigestSchemeFactory());
       break;
     default:
       throw new IllegalArgumentException("Unsupported authentiation type: " + authType);
@@ -171,21 +173,24 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
     this.authRegistry = authRegistryBuilder.build();
   }
 
-  public void setGSSCredential(GSSCredential credential) {
-    this.authRegistry = RegistryBuilder.<AuthSchemeProvider>create()
-        .register(AuthSchemes.SPNEGO,
-            new SPNegoSchemeFactory(STRIP_PORT_ON_SERVER_LOOKUP, USE_CANONICAL_HOSTNAME))
+  @Override public void setGSSCredential(GSSCredential credential) {
+
+    this.authRegistry = RegistryBuilder.<AuthSchemeFactory>create()
+        .register(StandardAuthScheme.SPNEGO,
+                new SPNegoSchemeFactory(KERBEROS_CONFIG, SystemDefaultDnsResolver.INSTANCE))
         .build();
 
     this.credentialsProvider = new BasicCredentialsProvider();
     if (null != credential) {
       // Non-null credential should be used directly with KerberosCredentials.
       // This is never set by the JDBC driver, nor the tests
-      this.credentialsProvider.setCredentials(AuthScope.ANY, new KerberosCredentials(credential));
+      ((BasicCredentialsProvider) this.credentialsProvider)
+              .setCredentials(anyAuthScope, new KerberosCredentials(credential));
     } else {
       // A null credential implies that the user is logged in via JAAS using the
       // java.security.auth.login.config system property
-      this.credentialsProvider.setCredentials(AuthScope.ANY, EmptyCredentials.INSTANCE);
+      ((BasicCredentialsProvider) this.credentialsProvider)
+              .setCredentials(anyAuthScope, EmptyCredentials.INSTANCE);
     }
   }
 
@@ -195,7 +200,7 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
   private static class EmptyCredentials implements Credentials {
     public static final EmptyCredentials INSTANCE = new EmptyCredentials();
 
-    @Override public String getPassword() {
+    @Override public char[] getPassword() {
       return null;
     }
 

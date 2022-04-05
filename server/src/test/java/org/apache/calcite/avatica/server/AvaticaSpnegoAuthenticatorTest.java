@@ -34,7 +34,7 @@ import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -61,8 +61,8 @@ public class AvaticaSpnegoAuthenticatorTest {
         Authentication.SEND_FAILURE, Authentication.SEND_SUCCESS);
     for (Authentication auth : authsNotRequiringUpdate) {
       assertEquals(auth, authenticator.sendChallengeIfNecessary(auth, request, response));
-      verifyZeroInteractions(request);
-      verifyZeroInteractions(response);
+      verifyNoMoreInteractions(request);
+      verifyNoMoreInteractions(response);
     }
   }
 
