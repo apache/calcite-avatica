@@ -45,7 +45,7 @@ dependencies {
     testImplementation("org.bouncycastle:bcprov-jdk15on")
     testImplementation("org.hamcrest:hamcrest-core")
     testImplementation("org.mockito:mockito-core")
-    testImplementation("org.apache.httpcomponents:httpclient")
+    testImplementation("org.apache.httpcomponents.client5:httpclient5")
     testRuntimeOnly("org.hsqldb:hsqldb")
     testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl")
 }

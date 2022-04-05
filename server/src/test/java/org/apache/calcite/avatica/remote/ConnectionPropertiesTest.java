@@ -91,7 +91,7 @@ public class ConnectionPropertiesTest {
               Connection.TRANSACTION_REPEATABLE_READ);
 
       // after 1s, remote connection expired and reopen
-      Thread.sleep(1000);
+      Thread.sleep(10000);
 
       conn.createStatement();
       Connection remoteConn1 = getConnection(
@@ -123,7 +123,7 @@ public class ConnectionPropertiesTest {
               Connection.TRANSACTION_REPEATABLE_READ);
 
       // after 1s, remote connection expired and reopen
-      Thread.sleep(1000);
+      Thread.sleep(10000);
 
       try {
         conn.createStatement();

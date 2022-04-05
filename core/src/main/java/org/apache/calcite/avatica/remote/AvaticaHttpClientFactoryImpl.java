@@ -18,7 +18,7 @@ package org.apache.calcite.avatica.remote;
 
 import org.apache.calcite.avatica.ConnectionConfig;
 
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
