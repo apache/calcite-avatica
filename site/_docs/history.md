@@ -28,6 +28,26 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.21.0">1.21.0</a> / TODO
+{: #v1-21-0}
+
+Apache Calcite Avatica 1.21.0 is under development.
+
+Compatibility: This release is tested
+on Linux, macOS, Microsoft Windows;
+using Oracle JDK 8, 9, 10, 11, 12, 13, 14, 15, 16, 17;
+using IBM Java 8;
+Guava versions 14.0.1 to 31.0.1-jre;
+other software versions as specified in `gradle.properties`.
+
+Contributors to this release:
+
+Features and bug fixes
+
+Build and tests
+
+Web site and documentation
+
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.20.0">1.20.0</a> / 2021-12-13
 {: #v1-20-0}
 
