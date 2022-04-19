@@ -50,7 +50,6 @@ include(
         "tck",
         "standalone-server",
         "shaded:avatica",
-        "testkit",
         "release"
         )
 
