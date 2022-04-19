@@ -27,8 +27,6 @@ import org.junit.runners.Suite;
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    AvaticaUtilsTest.class,
-    ConnectStringParserTest.class,
     RemoteDriverTest.class,
     ConnectionPropertiesTest.class
     })
