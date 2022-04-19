@@ -29,7 +29,7 @@ services:
     volumes:
       - .:/srv/jekyll
   generate-javadoc:
-    image: openjdk:15
+    image: openjdk:17
     working_dir: /usr/src/calcite-avatica
     command: sh -c "./gradlew javadocAggregate; rm -rf site/target/avatica/javadocAggregate; mkdir -p site/target/avatica; mv build/docs/javadocAggregate site/target/avatica"
     volumes:
