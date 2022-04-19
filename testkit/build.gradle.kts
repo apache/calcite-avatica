@@ -14,24 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.calcite.avatica.test;
-
-import org.apache.calcite.avatica.RemoteDriverTest;
-import org.apache.calcite.avatica.remote.ConnectionPropertiesTest;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-
-/**
- * Avatica test suite.
- */
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-    ConnectStringParserTest.class,
-    RemoteDriverTest.class,
-    ConnectionPropertiesTest.class
-    })
-public class AvaticaSuite {
+plugins {
+    `java-library`
 }
 
-// End AvaticaSuite.java
+dependencies {
+    api(project(":core"))
+    api("org.checkerframework:checker-qual")
+
+    implementation("junit:junit")
+}

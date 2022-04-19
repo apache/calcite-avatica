@@ -31,9 +31,7 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
     implementation("com.google.guava:guava")
 
-    // TODO: AvaticaSuite includes AvaticaUtilsTest and ConnectStringParserTest from :core
-    //   Does it really make sense?
-    testImplementation(project(":core", "testClasses"))
+    testImplementation(project(":testkit"))
 
     testImplementation("com.github.stephenc.jcip:jcip-annotations")
     testImplementation("junit:junit")
