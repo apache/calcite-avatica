@@ -31,7 +31,7 @@ Here's some miscellaneous documentation about using Avatica.
 ## Building from a source distribution
 
 Prerequisites are Java (JDK 8 or later)
-and Gradle (version 7.3) on your path.
+and Gradle (version 7.4.2) on your path.
 
 (The source distribution
 [does not include the Gradle wrapper](https://issues.apache.org/jira/browse/CALCITE-4575);
