@@ -204,10 +204,10 @@ Before you start:
 * Check that `site/_docs/howto.md` has the correct Gradle version.
 * Check that `NOTICE` has the current copyright year.
 * Check that `calcite.avatica.version` has the proper value in `/gradle.properties`.
-* Add release notes to `site/_docs/history.md`. Include the commit history,
-  names of people who contributed to the release,
-  and say which versions of Java, Guava and operating systems the release is
-  tested against.
+* Add release notes to `site/_docs/history.md`. If release notes already exist for the version to be released, but
+  are commented out, remove the comments (`{% comment %}` and `{% endcomment %}`). Include the commit history,
+  names of people who contributed to the release, and say which versions of Java, Guava and operating systems the
+  release is tested against.
 * Generate a report of vulnerabilities that occur among dependencies,
   using `./gradlew dependencyCheckUpdate dependencyCheckAggregate`.
 * Make sure that
