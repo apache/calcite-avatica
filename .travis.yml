@@ -50,11 +50,11 @@ matrix:
     - install: true
       jdk: openjdk11
       env:
-        - GUAVA=31.0.1-jre # newest supported Guava version
+        - GUAVA=31.1-jre # newest supported Guava version
       script:
         - ./gradlew $GRADLE_ARGS -Pguava.version=${GUAVA:-14.0.1} build
     - install: true
-      jdk: openjdk15
+      jdk: openjdk18
       env:
       script:
         - ./gradlew $GRADLE_ARGS build

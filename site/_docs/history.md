@@ -35,9 +35,9 @@ Apache Calcite Avatica 1.21.0 is under development.
 
 Compatibility: This release is tested
 on Linux, macOS, Microsoft Windows;
-using Oracle JDK 8, 9, 10, 11, 12, 13, 14, 15, 16, 17;
+using Oracle JDK 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18;
 using IBM Java 8;
-Guava versions 14.0.1 to 31.0.1-jre;
+Guava versions 14.0.1 to 31.1-jre;
 other software versions as specified in `gradle.properties`.
 
 Contributors to this release:
