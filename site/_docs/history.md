@@ -28,6 +28,7 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+{% comment %}
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.21.0">1.21.0</a> / TODO
 {: #v1-21-0}
 
@@ -47,6 +48,7 @@ Features and bug fixes
 Build and tests
 
 Web site and documentation
+{% endcomment %}
 
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.20.0">1.20.0</a> / 2021-12-13
 {: #v1-20-0}
