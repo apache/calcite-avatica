@@ -205,7 +205,7 @@ Before you start:
 * Check that `NOTICE` has the current copyright year.
 * Check that `calcite.avatica.version` has the proper value in `/gradle.properties`.
 * Add release notes to `site/_docs/history.md`. If release notes already exist for the version to be released, but
-  are commented out, remove the comments (`{% comment %}` and `{% endcomment %}`). Include the commit history,
+  are commented out, remove the comments (`{% raw %}{% comment %}{% endraw %}` and `{% raw %}{% endcomment %}{% endraw %}`). Include the commit history,
   names of people who contributed to the release, and say which versions of Java, Guava and operating systems the
   release is tested against.
 * Generate a report of vulnerabilities that occur among dependencies,
