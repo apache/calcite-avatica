@@ -48,7 +48,7 @@ public class ArrayAccessorTest {
       Arrays.asList(CursorTestUtils::createArrayBasedCursor,
           CursorTestUtils::createListBasedCursor);
 
-  private Function<List<List<Object>>, Cursor> cursorBuilder;
+  private final Function<List<List<Object>>, Cursor> cursorBuilder;
 
   @Parameterized.Parameters
   public static List<Object[]> parameters() throws Exception {
@@ -62,14 +62,28 @@ public class ArrayAccessorTest {
     this.cursorBuilder = cursorBuilder;
   }
 
+  /** Shorthand to create a singleton array. */
+  private static <E> List<E> list(E e) {
+    return Collections.singletonList(e);
+  }
+
+  /** Shorthand to create an array with two entries. */
+  private static <E> List<E> list(E e0, E e1) {
+    return Arrays.asList(e0, e1);
+  }
+
+  /** Shorthand to create an array with three entries. */
+  private static <E> List<E> list(E e0, E e1, E e2) {
+    return Arrays.asList(e0, e1, e2);
+  }
+
   @Test public void listIteratorFromIntegerArray() throws Exception {
     ColumnMetaData.ScalarType intType =
         ColumnMetaData.scalar(Types.INTEGER, "INTEGER", Rep.INTEGER);
 
     ColumnMetaData arrayMetadata = createArrayMetaData(intType);
 
-    List<List<Object>> rowsValues = Arrays.asList(Arrays.asList(1, 2),
-        Collections.singletonList(3), Arrays.asList(4, 5, 6));
+    List<List<Object>> rowsValues = list(list(1, 2), list(3), list(4, 5, 6));
 
     try (Cursor cursor = cursorBuilder.apply(rowsValues)) {
       Cursor.Accessor accessor = createArrayAccessor(cursor, arrayMetadata);
@@ -87,10 +101,9 @@ public class ArrayAccessorTest {
 
     ColumnMetaData arrayMetadata = createArrayMetaData(realType);
 
-    List<List<Object>> rowsValues = Arrays.asList(
-        Arrays.asList(1.123f, 0.2f),
-        Arrays.asList(4.1f, 5f, 66.12345f)
-    );
+    List<List<Object>> rowsValues = list(
+        list(1.123f, 0.2f),
+        list(4.1f, 5f, 66.12345f));
 
     try (Cursor cursor = cursorBuilder.apply(rowsValues)) {
       Cursor.Accessor accessor = createArrayAccessor(cursor, arrayMetadata);
@@ -109,10 +122,9 @@ public class ArrayAccessorTest {
 
     ColumnMetaData arrayMetadata = createArrayMetaData(doubleType);
 
-    List<List<Object>> rowsValues = Arrays.asList(
-        Arrays.asList(1.123d, 0.123456789012d),
-        Arrays.asList(4.134555d, 54444d, 66.12345d)
-    );
+    List<List<Object>> rowsValues = list(
+        list(1.123d, 0.123456789012d),
+        list(4.134555d, 54444d, 66.12345d));
 
     try (Cursor cursor = cursorBuilder.apply(rowsValues)) {
       Cursor.Accessor accessor = createArrayAccessor(cursor, arrayMetadata);
@@ -130,10 +142,9 @@ public class ArrayAccessorTest {
 
     ColumnMetaData arrayMetadata = createArrayMetaData(floatType);
 
-    List<List<Object>> rowsValues = Arrays.asList(
-        Arrays.asList(1.123d, 0.123456789012d),
-        Arrays.asList(4.134555d, 54444d, 66.12345d)
-    );
+    List<List<Object>> rowsValues = list(
+        list(1.123d, 0.123456789012d),
+        list(4.134555d, 54444d, 66.12345d));
 
     try (Cursor cursor = cursorBuilder.apply(rowsValues)) {
       Cursor.Accessor accessor = createArrayAccessor(cursor, arrayMetadata);
@@ -141,6 +152,42 @@ public class ArrayAccessorTest {
       while (cursor.next()) {
         List<Object> expectedArray = rowsValues.get(rowid);
         assertThat(accessor, isArrayAccessorResult(expectedArray, Double.class));
+        rowid++;
+      }
+    }
+  }
+
+  /** Test case for
+   * <a href="https://issues.apache.org/jira/browse/CALCITE-3557">[CALCITE-3557]
+   * ResultSet.getObject throws ClassCastException when applied to an ARRAY
+   * or MULTISET inside a MULTISET</a>. */
+  @Test public void resultSetFromMultisetArray() throws Exception {
+    ColumnMetaData.ScalarType intType =
+        ColumnMetaData.scalar(Types.INTEGER, "INTEGER", Rep.INTEGER);
+    ColumnMetaData.ArrayType multisetArrayType =
+        ColumnMetaData.array(ColumnMetaData.array(intType, "ARRAY INTEGER", Rep.ARRAY),
+            "MULTISET ARRAY INTEGER", Rep.MULTISET);
+    ColumnMetaData multisetMetaData =
+        MetaImpl.columnMetaData("MY_MULTISET", 0, multisetArrayType, false);
+
+    // MULTISET[ARRAY[1, 2]]
+    List<Object> firstRow = list(list(new Object[]{1}, new Object[]{2}));
+    // MULTISET[ARRAY[3, 4]]
+    List<Object> secondRow = list(list(new Object[]{3}, new Object[]{4}));
+    List<List<Object>> inputRowsValues = list(
+        firstRow,
+        secondRow);
+
+    List<List<Object>> expectedRowsValues = list(
+        list(list(1, 2)),
+        list(list(3, 4)));
+
+    try (Cursor cursor = cursorBuilder.apply(inputRowsValues)) {
+      Cursor.Accessor accessor = createArrayAccessor(cursor, multisetMetaData);
+      int rowid = 0;
+      while (cursor.next()) {
+        List<Object> expectedArray = expectedRowsValues.get(rowid);
+        assertThat(accessor, isArrayAccessorResult(expectedArray, ArrayImpl.class));
         rowid++;
       }
     }
@@ -154,7 +201,7 @@ public class ArrayAccessorTest {
 
   private static Cursor.Accessor createArrayAccessor(Cursor c, ColumnMetaData meta) {
     List<Cursor.Accessor> accessors =
-        c.createAccessors(Collections.singletonList(meta), Unsafe.localCalendar(), ARRAY_FACTORY);
+        c.createAccessors(list(meta), Unsafe.localCalendar(), ARRAY_FACTORY);
     return accessors.get(0);
   }
 }

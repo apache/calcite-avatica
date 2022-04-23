@@ -1368,8 +1368,12 @@ public abstract class AbstractCursor implements Cursor {
           if (null == val) {
             convertedValues.add(null);
           } else {
-            // Set the current value in the SlotGetter so we can use the Accessor to coerce it.
-            componentSlotGetter.slot = val;
+            // Set the current value in the SlotGetter, so we can use the
+            // Accessor to coerce it.
+            componentSlotGetter.slot =
+                val instanceof Object[] && componentType.id != Types.STRUCT
+                    ? ((Object[]) val)[0]
+                    : val;
             convertedValues.add(convertValue());
           }
         }
