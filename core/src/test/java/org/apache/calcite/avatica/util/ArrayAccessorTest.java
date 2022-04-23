@@ -146,6 +146,40 @@ public class ArrayAccessorTest {
     }
   }
 
+  @Test public void resultSetFromMultisetArray() throws Exception {
+    ColumnMetaData.ScalarType intType =
+        ColumnMetaData.scalar(Types.INTEGER, "INTEGER", Rep.INTEGER);
+    ColumnMetaData.ArrayType multisetArrayType =
+        ColumnMetaData.array(ColumnMetaData.array(intType, "ARRAY INTEGER", Rep.ARRAY),
+            "MULTISET ARRAY INTEGER", Rep.MULTISET);
+    ColumnMetaData multisetMetaData =
+        MetaImpl.columnMetaData("MY_MULTISET", 0, multisetArrayType, false);
+
+    // MULTISET[ARRAY[1, 2]]
+    List<Object> firstRow = Arrays.asList(Arrays.asList(new Object[]{1}, new Object[]{2}));
+    // MULTISET[ARRAY[3, 4]]
+    List<Object> secondRow = Arrays.asList(Arrays.asList(new Object[]{3}, new Object[]{4}));
+    List<List<Object>> inputRowsValues = Arrays.asList(
+        firstRow,
+        secondRow
+    );
+
+    List<List<Object>> expectedRowsValues = Arrays.asList(
+        Arrays.asList(Arrays.asList(1, 2)),
+        Arrays.asList(Arrays.asList(3, 4))
+    );
+
+    try (Cursor cursor = cursorBuilder.apply(inputRowsValues)) {
+      Cursor.Accessor accessor = createArrayAccessor(cursor, multisetMetaData);
+      int rowid = 0;
+      while (cursor.next()) {
+        List<Object> expectedArray = expectedRowsValues.get(rowid);
+        assertThat(accessor, isArrayAccessorResult(expectedArray, ArrayImpl.class));
+        rowid++;
+      }
+    }
+  }
+
   private static ColumnMetaData createArrayMetaData(ColumnMetaData.ScalarType componentType) {
     ColumnMetaData.ArrayType arrayType =
         ColumnMetaData.array(componentType, componentType.name, componentType.rep);

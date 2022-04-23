@@ -16,6 +16,7 @@
  */
 package org.apache.calcite.avatica;
 
+import org.apache.calcite.avatica.util.ArrayImpl;
 import org.apache.calcite.avatica.util.Cursor;
 
 import org.hamcrest.Matcher;
@@ -49,6 +50,8 @@ public class AvaticaMatchers {
       comparisonPredicate = (f1, f2) -> Math.abs((float) f1 - (float) f2) <= DELTA;
     } else if (Double.class.equals(type)) {
       comparisonPredicate = (d1, d2) -> Math.abs((double) d1 - (double) d2) <= DELTA;
+    } else if (ArrayImpl.class.equals(type)) {
+      comparisonPredicate = (a1, a2) -> a1.toString().equals(a2.toString());
     }
     return new IsArrayAccessorResultSetEqual(value, comparisonPredicate);
   }
