@@ -73,19 +73,19 @@ All of the `Dockerfile` and `docker-compose.yml` files are conveniently provided
 each release. Here is the layout for release 1.20.0:
 
 ```
-avatica-docker-1.20.0/
-avatica-docker-1.20.0/hypersql/
-avatica-docker-1.20.0/mysql/
-avatica-docker-1.20.0/postgresql/
-avatica-docker-1.20.0/Dockerfile
-avatica-docker-1.20.0/hypersql/build.sh
-avatica-docker-1.20.0/hypersql/Dockerfile
-avatica-docker-1.20.0/mysql/build.sh
-avatica-docker-1.20.0/mysql/docker-compose.yml
-avatica-docker-1.20.0/mysql/Dockerfile
-avatica-docker-1.20.0/postgresql/build.sh
-avatica-docker-1.20.0/postgresql/docker-compose.yml
-avatica-docker-1.20.0/postgresql/Dockerfile
+avatica-docker-1.21.0/
+avatica-docker-1.21.0/hypersql/
+avatica-docker-1.21.0/mysql/
+avatica-docker-1.21.0/postgresql/
+avatica-docker-1.21.0/Dockerfile
+avatica-docker-1.21.0/hypersql/build.sh
+avatica-docker-1.21.0/hypersql/Dockerfile
+avatica-docker-1.21.0/mysql/build.sh
+avatica-docker-1.21.0/mysql/docker-compose.yml
+avatica-docker-1.21.0/mysql/Dockerfile
+avatica-docker-1.21.0/postgresql/build.sh
+avatica-docker-1.21.0/postgresql/docker-compose.yml
+avatica-docker-1.21.0/postgresql/Dockerfile
 ```
 
 #### Running

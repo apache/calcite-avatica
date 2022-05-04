@@ -28,11 +28,14 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-{% comment %}
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.21.0">1.21.0</a> / TODO
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.21.0">1.21.0</a> / 2022-05-XX
 {: #v1-21-0}
 
-Apache Calcite Avatica 1.21.0 is under development.
+Apache Calcite Avatica 1.21.0 is a maintenance release with dependency upgrades and added support for Oracle JDK 16
+to 18. Of particular note is Log4j2 being upgrade to 2.16.0 and subsequently 2.17.0 and 2.17.1 to address
+<a href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=2021-44228">CVE-2021-44228</a>,
+<a href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=2021-45105">CVE-2021-45105</a> and
+<a href="http://cve.mitre.org/cgi-bin/cvename.cgi?name=2021-44832">CVE-2021-44832</a>.
 
 Compatibility: This release is tested
 on Linux, macOS, Microsoft Windows;
@@ -42,13 +45,63 @@ Guava versions 14.0.1 to 31.1-jre;
 other software versions as specified in `gradle.properties`.
 
 Contributors to this release:
+Benchao Li,
+Francis Chuang (Release Manager),
+Istvan Toth,
+Julian Hyde,
+Marco Jorge,
+Michael Mior,
+Stamatis Zampetakis,
+Xiong Duan.
 
 Features and bug fixes
 
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5095">CALCITE-5095</a>]
+  Support Java 18 and Guava 31.1-jre
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5116">CALCITE-5116</a>]
+  Upgrade vlsi-release-plugins to 1.78
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4147">CALCITE-4147</a>]
+  Rename "master" branch to "main"
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5098">CALCITE-5098</a>]
+  Migrate Avatica to Gradle 7.4.2, and support Java 16 and 17
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4971">CALCITE-4971</a>]
+  Update httpclient and httpcore to latest 5.1 release
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5009">CALCITE-5009</a>]
+  Transparent JDBC connection re-creation may lead to data loss
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4974">CALCITE-4974</a>]
+  Upgrade log4j2 version to 2.17.1
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4962">CALCITE-4962</a>]
+  Protobuf debug does not show request/response type
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4951">CALCITE-4951</a>]
+  Upgrade log4j2 version to 2.17.0
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4940">CALCITE-4940</a>]
+  Upgrade log4j2 version to 2.16.0
+
 Build and tests
 
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5103">CALCITE-5103</a>]
+  Update docker-compose.yml files to use OpenJDK 17 and Gradle 7.4.2 images
+* Add Apache license header to website publication Github workflows
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5075">CALCITE-5075</a>]
+  Build fails due to rat check on Gemfile.lock
+* Silence standard out messages in tests
+
 Web site and documentation
-{% endcomment %}
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5108">CALCITE-5108</a>]
+  Make website GDPR-compliant
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5106">CALCITE-5106</a>]
+  Upgrade to Jekyll 4 and remove unnecessary dependencies from gemfile for site
+* Fix formatting in howto
+* Add instructions for release managers to uncomment commented out release history
+* Comment out release notes for next release, so that they don't appear on the web site
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5102">CALCITE-5102</a>]
+  Update github-pages gem for site build
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3129">CALCITE-3129</a>]
+  Automate website builds
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5070">CALCITE-5070</a>]
+  Upgrade Jekyll and ruby gems for site generation
+* Change the javadoc title to Apache Calcite Avatica API
 
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.20.0">1.20.0</a> / 2021-12-13
 {: #v1-20-0}
@@ -72,7 +125,7 @@ Jacques Nadeau,
 Jincheng Sun,
 Josh Elser,
 Julian Hyde (release manager),
-NobiGo,
+Xiong Duan,
 Sergey Nuyanzin,
 Stamatis Zampetakis.
 

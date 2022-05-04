@@ -43,8 +43,8 @@ Unpack the source distribution `.tar.gz` file,
 then build using Gradle:
 
 {% highlight bash %}
-$ tar xvfz apache-calcite-avatica-1.20.0-src.tar.gz
-$ cd apache-calcite-avatica-1.20.0-src
+$ tar xvfz apache-calcite-avatica-1.21.0-src.tar.gz
+$ cd apache-calcite-avatica-1.21.0-src
 $ gradle build
 {% endhighlight %}
 
