@@ -28,7 +28,7 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.21.0">1.21.0</a> / 2022-05-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.21.0">1.21.0</a> / 2022-05-08
 {: #v1-21-0}
 
 Apache Calcite Avatica 1.21.0 is a maintenance release with dependency upgrades and added support for Oracle JDK 16
@@ -125,9 +125,9 @@ Jacques Nadeau,
 Jincheng Sun,
 Josh Elser,
 Julian Hyde (release manager),
-Xiong Duan,
 Sergey Nuyanzin,
-Stamatis Zampetakis.
+Stamatis Zampetakis,
+Xiong Duan.
 
 Features and bug fixes
 
@@ -175,10 +175,10 @@ chenyuzhi459,
 Francis Chuang,
 Istvan Toth,
 Julian Hyde (release manager),
-NobiGo,
 Jack Scott,
 Sergey Nuyanzin,
 Stamatis Zampetakis,
+Xiong Duan,
 Zeng Rui.
 
 Features and bug fixes

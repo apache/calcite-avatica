@@ -70,7 +70,7 @@ file will start an instance of PostgreSQL and an instance of the Avatica server,
 exposing an Avatica server configured against a "real" PostgreSQL database.
 
 All of the `Dockerfile` and `docker-compose.yml` files are conveniently provided in an archive for
-each release. Here is the layout for release 1.20.0:
+each release. Here is the layout for release 1.21.0:
 
 ```
 avatica-docker-1.21.0/
