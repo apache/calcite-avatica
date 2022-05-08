@@ -258,6 +258,9 @@ promote_release(){
     # 4. Exclude the release we're trying to promote, in case it was from a failed promotion.
     # 5. Trim all whitespace down to 1 empty space.
     # 6. Select field 7, which is each release's folder
+    svn checkout $RELEASE_REPO /tmp/release
+    cd /tmp/release
+
     CURRENT_RELEASES=$(svn ls -v $RELEASE_REPO | sort -k1 -r | grep $PRODUCT-[[:digit:]] | grep -v $PRODUCT-$TAG_WITHOUT_RC | tr -s ' ' | cut -d ' ' -f 7)
 
     RELEASE_COUNT=0
