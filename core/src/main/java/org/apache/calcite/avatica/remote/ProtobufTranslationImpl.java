@@ -459,7 +459,7 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
   }
 
   void serializeMessage(OutputStream out, Message msg) throws IOException {
-    serializeMessageWithObjectPool(out, msg);
+    serializeMessageDirectly(out, msg);
   }
 
   void serializeMessageWithObjectPool(OutputStream out, Message msg) throws IOException {
