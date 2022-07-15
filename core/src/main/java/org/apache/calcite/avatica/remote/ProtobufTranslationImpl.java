@@ -60,7 +60,9 @@ import org.apache.calcite.avatica.remote.Service.RpcMetadataResponse;
 import org.apache.calcite.avatica.util.UnsynchronizedBuffer;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.ByteString.Output;
 import com.google.protobuf.CodedInputStream;
+import com.google.protobuf.CodedOutputStream;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.Parser;
@@ -81,14 +83,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Implementation of {@link ProtobufTranslationImpl} that translates
- * protobuf requests to POJO requests.
+ * Implementation of {@link ProtobufTranslationImpl} that translates protobuf requests to POJO
+ * requests.
  */
 public class ProtobufTranslationImpl implements ProtobufTranslation {
+
   private static final Logger LOG = LoggerFactory.getLogger(ProtobufTranslationImpl.class);
 
   /**
-   * Encapsulate the logic of transforming a protobuf Request message into the Avatica POJO request.
+   * Encapsulate the logic of transforming a protobuf Request message into the Avatica POJO
+   * request.
    */
   static class RequestTranslator {
 
@@ -156,7 +160,7 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
         new RequestTranslator(OpenConnectionRequest.parser(), new Service.OpenConnectionRequest()));
     reqParsers.put(CloseConnectionRequest.class.getName(),
         new RequestTranslator(CloseConnectionRequest.parser(),
-          new Service.CloseConnectionRequest()));
+            new Service.CloseConnectionRequest()));
     reqParsers.put(CloseStatementRequest.class.getName(),
         new RequestTranslator(CloseStatementRequest.parser(), new Service.CloseStatementRequest()));
     reqParsers.put(ColumnsRequest.class.getName(),
@@ -165,7 +169,7 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
         new RequestTranslator(ConnectionSyncRequest.parser(), new Service.ConnectionSyncRequest()));
     reqParsers.put(CreateStatementRequest.class.getName(),
         new RequestTranslator(CreateStatementRequest.parser(),
-          new Service.CreateStatementRequest()));
+            new Service.CreateStatementRequest()));
     reqParsers.put(DatabasePropertyRequest.class.getName(),
         new RequestTranslator(DatabasePropertyRequest.parser(),
             new Service.DatabasePropertyRequest()));
@@ -300,18 +304,44 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
 
   private final ThreadLocal<UnsynchronizedBuffer> threadLocalBuffer =
       new ThreadLocal<UnsynchronizedBuffer>() {
-        @Override protected UnsynchronizedBuffer initialValue() {
+        @Override
+        protected UnsynchronizedBuffer initialValue() {
           return new UnsynchronizedBuffer();
         }
       };
+
+  private static class OutputStuff {
+
+    private final Output output;
+    private final CodedOutputStream codedOutputStream;
+
+    private OutputStuff() {
+      output = ByteString.newOutput(4096);
+      codedOutputStream = CodedOutputStream.newInstance(output);
+    }
+
+    void reset() throws IOException {
+      codedOutputStream.flush();
+      output.reset();
+    }
+
+    ByteString toByteString(Message message) throws IOException {
+      message.writeTo(codedOutputStream);
+      codedOutputStream.flush();
+      return output.toByteString();
+    }
+  }
+
+  private final ThreadLocal<OutputStuff> outputStuffThreadLocal = ThreadLocal.withInitial(
+      OutputStuff::new);
 
   /**
    * Fetches the concrete message's Parser implementation.
    *
    * @param className The protocol buffer class name
    * @return The Parser for the class
-   * @throws IllegalArgumentException If the argument is null or if a Parser for the given
-   *     class name is not found.
+   * @throws IllegalArgumentException If the argument is null or if a Parser for the given class
+   *                                  name is not found.
    */
   public static RequestTranslator getParserForRequest(String className) {
     if (null == className || className.isEmpty()) {
@@ -332,8 +362,8 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
    *
    * @param className The protocol buffer class name
    * @return The Parser for the class
-   * @throws IllegalArgumentException If the argument is null or if a Parser for the given
-   *     class name is not found.
+   * @throws IllegalArgumentException If the argument is null or if a Parser for the given class
+   *                                  name is not found.
    */
   public static ResponseTranslator getParserForResponse(String className) {
     if (null == className || className.isEmpty()) {
@@ -349,7 +379,8 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
     return translator;
   }
 
-  @Override public byte[] serializeResponse(Response response) throws IOException {
+  @Override
+  public byte[] serializeResponse(Response response) throws IOException {
     // Avoid BAOS for its synchronized write methods, we don't need that concurrency control
     UnsynchronizedBuffer out = threadLocalBuffer.get();
     try {
@@ -369,7 +400,8 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
     }
   }
 
-  @Override public byte[] serializeRequest(Request request) throws IOException {
+  @Override
+  public byte[] serializeRequest(Request request) throws IOException {
     // Avoid BAOS for its synchronized write methods, we don't need that concurrency control
     UnsynchronizedBuffer out = threadLocalBuffer.get();
     try {
@@ -391,7 +423,7 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
 
   void serializeMessage(OutputStream out, Message msg) throws IOException {
     // Serialize the protobuf message
-    UnsynchronizedBuffer buffer = threadLocalBuffer.get();
+    /*UnsynchronizedBuffer buffer = threadLocalBuffer.get();
     ByteString serializedMsg;
     try {
       msg.writeTo(buffer);
@@ -399,14 +431,22 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
       serializedMsg = UnsafeByteOperations.unsafeWrap(buffer.toArray());
     } finally {
       buffer.reset();
+    }*/
+
+    OutputStuff outputStuff = outputStuffThreadLocal.get();
+    try {
+
+      ByteString serializedMsg = outputStuff.toByteString(msg);
+
+      // Wrap the serialized message in a WireMessage
+      WireMessage wireMsg = WireMessage.newBuilder().setNameBytes(getClassNameBytes(msg.getClass()))
+          .setWrappedMessage(serializedMsg).build();
+
+      // Write the WireMessage to the provided OutputStream
+      wireMsg.writeTo(out);
+    } finally {
+      outputStuff.reset();
     }
-
-    // Wrap the serialized message in a WireMessage
-    WireMessage wireMsg = WireMessage.newBuilder().setNameBytes(getClassNameBytes(msg.getClass()))
-        .setWrappedMessage(serializedMsg).build();
-
-    // Write the WireMessage to the provided OutputStream
-    wireMsg.writeTo(out);
   }
 
   ByteString getClassNameBytes(Class<?> clz) {
@@ -417,7 +457,8 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
     return byteString;
   }
 
-  @Override public Request parseRequest(byte[] bytes) throws IOException {
+  @Override
+  public Request parseRequest(byte[] bytes) throws IOException {
     ByteString byteString = UnsafeByteOperations.unsafeWrap(bytes);
     CodedInputStream inputStream = byteString.newCodedInput();
     // Enable aliasing to avoid an extra copy to get at the serialized Request inside of the
@@ -440,7 +481,8 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
     }
   }
 
-  @Override public Response parseResponse(byte[] bytes) throws IOException {
+  @Override
+  public Response parseResponse(byte[] bytes) throws IOException {
     ByteString byteString = UnsafeByteOperations.unsafeWrap(bytes);
     CodedInputStream inputStream = byteString.newCodedInput();
     // Enable aliasing to avoid an extra copy to get at the serialized Response inside of the
