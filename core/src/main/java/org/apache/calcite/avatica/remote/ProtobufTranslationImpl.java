@@ -59,6 +59,13 @@ import org.apache.calcite.avatica.remote.Service.Response;
 import org.apache.calcite.avatica.remote.Service.RpcMetadataResponse;
 import org.apache.calcite.avatica.util.UnsynchronizedBuffer;
 
+import org.apache.commons.pool2.BasePooledObjectFactory;
+import org.apache.commons.pool2.ObjectPool;
+import org.apache.commons.pool2.PooledObject;
+import org.apache.commons.pool2.impl.DefaultPooledObject;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+
 import com.google.protobuf.ByteString;
 import com.google.protobuf.ByteString.Output;
 import com.google.protobuf.CodedInputStream;
@@ -316,7 +323,7 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
     private final CodedOutputStream codedOutputStream;
 
     private OutputStuff() {
-      output = ByteString.newOutput(4096);
+      output = ByteString.newOutput(1024 * 1024);
       codedOutputStream = CodedOutputStream.newInstance(output);
     }
 
@@ -331,6 +338,36 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
       return output.toByteString();
     }
   }
+
+  private static class ObjectPoolFactory extends BasePooledObjectFactory<OutputStuff> {
+
+    private static final ObjectPoolFactory INSTANCE = new ObjectPoolFactory();
+
+    @Override
+    public OutputStuff create() throws Exception {
+      return new OutputStuff();
+    }
+
+    @Override
+    public PooledObject<OutputStuff> wrap(OutputStuff obj) {
+      return new DefaultPooledObject<>(obj);
+    }
+
+    @Override
+    public void passivateObject(PooledObject<OutputStuff> p) throws Exception {
+      p.getObject().reset();
+    }
+  }
+
+  private GenericObjectPoolConfig<OutputStuff> createObjectPoolConfig() {
+    GenericObjectPoolConfig<OutputStuff> config = new GenericObjectPoolConfig<OutputStuff>();
+    config.setMaxTotal(-1);
+    config.setMaxIdle(-1);
+    return config;
+  }
+
+  private final ObjectPool<OutputStuff> outputStuffObjectPool = new GenericObjectPool<>(
+      ObjectPoolFactory.INSTANCE, createObjectPoolConfig());
 
   private final ThreadLocal<OutputStuff> outputStuffThreadLocal = ThreadLocal.withInitial(
       OutputStuff::new);
@@ -422,17 +459,46 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
   }
 
   void serializeMessage(OutputStream out, Message msg) throws IOException {
-    // Serialize the protobuf message
-    /*UnsynchronizedBuffer buffer = threadLocalBuffer.get();
-    ByteString serializedMsg;
-    try {
-      msg.writeTo(buffer);
-      // Make a bytestring from it
-      serializedMsg = UnsafeByteOperations.unsafeWrap(buffer.toArray());
-    } finally {
-      buffer.reset();
-    }*/
+    serializeMessageWithObjectPool(out, msg);
+  }
 
+  void serializeMessageWithObjectPool(OutputStream out, Message msg) throws IOException {
+    try {
+      OutputStuff outputStuff = outputStuffObjectPool.borrowObject();
+      try {
+        ByteString serializedMsg = outputStuff.toByteString(msg);
+
+        // Wrap the serialized message in a WireMessage
+        WireMessage wireMsg = WireMessage.newBuilder()
+            .setNameBytes(getClassNameBytes(msg.getClass()))
+            .setWrappedMessage(serializedMsg).build();
+
+        // Write the WireMessage to the provided OutputStream
+        wireMsg.writeTo(out);
+      } finally {
+        outputStuffObjectPool.returnObject(outputStuff);
+      }
+    } catch (IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new RuntimeException("serializeMessage", e);
+    }
+  }
+
+
+  private void serializeMessageDirectly(OutputStream out, Message msg) throws IOException {
+    ByteString serializedMsg = msg.toByteString();
+
+    // Wrap the serialized message in a WireMessage
+    WireMessage wireMsg = WireMessage.newBuilder().setNameBytes(getClassNameBytes(msg.getClass()))
+        .setWrappedMessage(serializedMsg).build();
+
+    // Write the WireMessage to the provided OutputStream
+    wireMsg.writeTo(out);
+  }
+
+  private void serializeMessageWithThreadLocalOutputStuff(OutputStream out, Message msg)
+      throws IOException {
     OutputStuff outputStuff = outputStuffThreadLocal.get();
     try {
 
