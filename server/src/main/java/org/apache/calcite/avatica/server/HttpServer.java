@@ -319,6 +319,10 @@ public class HttpServer {
   }
 
   protected ServerConnector getServerConnector() {
+    return getHttp1ServerConnector();
+  }
+
+  protected ServerConnector getHttp2ServerConnector() {
     HttpConfiguration httpConfig = new HttpConfiguration();
     httpConfig.setRequestHeaderSize(maxAllowedHeaderSize);
     HttpConnectionFactory http11 = new HttpConnectionFactory(httpConfig);
@@ -330,6 +334,16 @@ public class HttpServer {
     }
     return new ServerConnector(server,
         AbstractConnectionFactory.getFactories(sslFactory, alpn, h2, http11));
+  }
+
+  protected ServerConnector getHttp1ServerConnector() {
+    HttpConnectionFactory factory = new HttpConnectionFactory();
+    factory.getHttpConfiguration().setRequestHeaderSize(maxAllowedHeaderSize);
+
+    if (null == sslFactory) {
+      return new ServerConnector(server, factory);
+    }
+    return new ServerConnector(server, AbstractConnectionFactory.getFactories(sslFactory, factory));
   }
 
   private RpcMetadataResponse createRpcServerMetadata(ServerConnector connector) throws
