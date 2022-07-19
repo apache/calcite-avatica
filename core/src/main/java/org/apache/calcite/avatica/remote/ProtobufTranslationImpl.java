@@ -48,6 +48,8 @@ import org.apache.calcite.avatica.proto.Responses.ErrorResponse;
 import org.apache.calcite.avatica.proto.Responses.ExecuteBatchResponse;
 import org.apache.calcite.avatica.proto.Responses.ExecuteResponse;
 import org.apache.calcite.avatica.proto.Responses.FetchResponse;
+import org.apache.calcite.avatica.proto.Responses.OneOfResponse;
+import org.apache.calcite.avatica.proto.Responses.OneOfResponse.Builder;
 import org.apache.calcite.avatica.proto.Responses.OpenConnectionResponse;
 import org.apache.calcite.avatica.proto.Responses.PrepareResponse;
 import org.apache.calcite.avatica.proto.Responses.ResultSetResponse;
@@ -418,6 +420,51 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
 
   @Override
   public byte[] serializeResponse(Response response) throws IOException {
+    return serializeResponseOld(response);
+  }
+
+
+  public byte[] serializeResponseOneOf(Response response) throws IOException {
+    Message msg = response.serialize();
+    Builder oneOfResponseBuilder = OneOfResponse.newBuilder();
+    if (msg instanceof ResultSetResponse) {
+      oneOfResponseBuilder.setResultSetResponse((ResultSetResponse) msg);
+    } else if (msg instanceof ExecuteResponse) {
+      oneOfResponseBuilder.setExecuteResponse((ExecuteResponse) msg);
+    } else if (msg instanceof PrepareResponse) {
+      oneOfResponseBuilder.setPrepareResponse((PrepareResponse) msg);
+    } else if (msg instanceof FetchResponse) {
+      oneOfResponseBuilder.setFetchResponse((FetchResponse) msg);
+    } else if (msg instanceof CreateStatementResponse) {
+      oneOfResponseBuilder.setCreateStatementResponse((CreateStatementResponse) msg);
+    } else if (msg instanceof CloseStatementResponse) {
+      oneOfResponseBuilder.setCloseStatementResponse((CloseStatementResponse) msg);
+    } else if (msg instanceof OpenConnectionResponse) {
+      oneOfResponseBuilder.setOpenConnectionResponse((OpenConnectionResponse) msg);
+    } else if (msg instanceof CloseConnectionResponse) {
+      oneOfResponseBuilder.setCloseConnectionResponse((CloseConnectionResponse) msg);
+    } else if (msg instanceof ConnectionSyncResponse) {
+      oneOfResponseBuilder.setConnectionSyncResponse((ConnectionSyncResponse) msg);
+    } else if (msg instanceof DatabasePropertyResponse) {
+      oneOfResponseBuilder.setDatabasePropertyResponse((DatabasePropertyResponse) msg);
+    } else if (msg instanceof ErrorResponse) {
+      oneOfResponseBuilder.setErrorResponse((ErrorResponse) msg);
+    } else if (msg instanceof SyncResultsResponse) {
+      oneOfResponseBuilder.setSyncResultsResponse((SyncResultsResponse) msg);
+    } else if (msg instanceof CommitResponse) {
+      oneOfResponseBuilder.setCommitResponse((CommitResponse) msg);
+    } else if (msg instanceof RollbackResponse) {
+      oneOfResponseBuilder.setRollbackResponse((RollbackResponse) msg);
+    } else if (msg instanceof ExecuteBatchResponse) {
+      oneOfResponseBuilder.setExecuteBatchResponse((ExecuteBatchResponse) msg);
+    } else {
+      throw new RuntimeException("Unknown message " + msg);
+    }
+    return oneOfResponseBuilder.build().toByteArray();
+  }
+
+
+  public byte[] serializeResponseOld(Response response) throws IOException {
     // Avoid BAOS for its synchronized write methods, we don't need that concurrency control
     UnsynchronizedBuffer out = threadLocalBuffer.get();
     try {
@@ -549,6 +596,65 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
 
   @Override
   public Response parseResponse(byte[] bytes) throws IOException {
+    return parseResponseOld(bytes);
+  }
+
+  public Response parseResponseOneOf(byte[] bytes) throws IOException {
+    OneOfResponse oneOfResponse = OneOfResponse.parseFrom(bytes);
+    switch (oneOfResponse.getContentCase()) {
+    case RESULTSETRESPONSE:
+      return Service.ResultSetResponse.fromProto(oneOfResponse.getResultSetResponse());
+    case EXECUTERESPONSE:
+      Service.ExecuteResponse executeResponse = new Service.ExecuteResponse();
+      return executeResponse.deserialize(oneOfResponse.getExecuteResponse());
+    case PREPARERESPONSE:
+      Service.PrepareResponse prepareResponse = new Service.PrepareResponse();
+      return prepareResponse.deserialize(oneOfResponse.getPrepareResponse());
+    case FETCHRESPONSE:
+      Service.FetchResponse fetchResponse = new Service.FetchResponse();
+      return fetchResponse.deserialize(oneOfResponse.getFetchResponse());
+    case CREATESTATEMENTRESPONSE:
+      Service.CreateStatementResponse createStatementResponse =
+          new Service.CreateStatementResponse();
+      return createStatementResponse.deserialize(oneOfResponse.getCreateStatementResponse());
+    case CLOSESTATEMENTRESPONSE:
+      Service.CloseStatementResponse closeStatementResponse = new Service.CloseStatementResponse();
+      return closeStatementResponse.deserialize(oneOfResponse.getCloseStatementResponse());
+    case OPENCONNECTIONRESPONSE:
+      Service.OpenConnectionResponse openConnectionResponse = new Service.OpenConnectionResponse();
+      return openConnectionResponse.deserialize(oneOfResponse.getOpenConnectionResponse());
+    case CLOSECONNECTIONRESPONSE:
+      Service.CloseConnectionResponse closeConnectionResponse =
+          new Service.CloseConnectionResponse();
+      return closeConnectionResponse.deserialize(oneOfResponse.getCloseConnectionResponse());
+    case CONNECTIONSYNCRESPONSE:
+      Service.ConnectionSyncResponse connectionSyncResponse = new Service.ConnectionSyncResponse();
+      return connectionSyncResponse.deserialize(oneOfResponse.getConnectionSyncResponse());
+    case DATABASEPROPERTYRESPONSE:
+      Service.DatabasePropertyResponse databasePropertyResponse =
+          new Service.DatabasePropertyResponse();
+      return databasePropertyResponse.deserialize(oneOfResponse.getDatabasePropertyResponse());
+    case ERRORRESPONSE:
+      Service.ErrorResponse errorResponse = new Service.ErrorResponse();
+      return errorResponse.deserialize(oneOfResponse.getErrorResponse());
+    case SYNCRESULTSRESPONSE:
+      Service.SyncResultsResponse syncResultsResponse = new Service.SyncResultsResponse();
+      return syncResultsResponse.deserialize(oneOfResponse.getSyncResultsResponse());
+    case COMMITRESPONSE:
+      Service.CommitResponse commitResponse = new Service.CommitResponse();
+      return commitResponse.deserialize(oneOfResponse.getCommitResponse());
+    case ROLLBACKRESPONSE:
+      Service.RollbackResponse rollbackResponse = new Service.RollbackResponse();
+      return rollbackResponse.deserialize(oneOfResponse.getRollbackResponse());
+    case EXECUTEBATCHRESPONSE:
+      Service.ExecuteBatchResponse executeBatchResponse = new Service.ExecuteBatchResponse();
+      return executeBatchResponse.deserialize(oneOfResponse.getExecuteBatchResponse());
+    default:
+      throw new RuntimeException("Unknown message " + oneOfResponse);
+    }
+  }
+
+  public Response parseResponseOld(byte[] bytes) throws IOException {
     ByteString byteString = UnsafeByteOperations.unsafeWrap(bytes);
     CodedInputStream inputStream = byteString.newCodedInput();
     // Enable aliasing to avoid an extra copy to get at the serialized Response inside of the
