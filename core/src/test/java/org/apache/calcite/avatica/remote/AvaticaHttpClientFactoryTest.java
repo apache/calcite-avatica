@@ -43,7 +43,7 @@ public class AvaticaHttpClientFactoryTest {
         client instanceof AvaticaCommonsHttpClientImpl);
   }
 
-  @Test public void testOverridenHttpClient() throws Exception {
+  @Test public void testOverriddenHttpClient() throws Exception {
     Properties props = new Properties();
     props.setProperty(BuiltInConnectionProperty.HTTP_CLIENT_IMPL.name(),
         AvaticaHttpClientImpl.class.getName());
@@ -54,6 +54,18 @@ public class AvaticaHttpClientFactoryTest {
     AvaticaHttpClient client = httpClientFactory.getClient(url, config, null);
     assertTrue("Client was an instance of " + client.getClass(),
         client instanceof AvaticaHttpClientImpl);
+  }
+
+  @Test(expected = RuntimeException.class) public void testInvalidHttpClient() throws Exception {
+    Properties props = new Properties();
+    props.setProperty(BuiltInConnectionProperty.HTTP_CLIENT_IMPL.name(),
+        Properties.class.getName()); // Properties is intentionally *not* a valid class
+    URL url = new URL("http://localhost:8765");
+    ConnectionConfig config = new ConnectionConfigImpl(props);
+    AvaticaHttpClientFactory httpClientFactory = new AvaticaHttpClientFactoryImpl();
+
+    // This should throw since the Properties class is invalid
+    httpClientFactory.getClient(url, config, null);
   }
 }
 
