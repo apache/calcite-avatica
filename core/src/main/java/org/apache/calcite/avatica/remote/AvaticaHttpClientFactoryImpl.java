@@ -138,14 +138,23 @@ public class AvaticaHttpClientFactoryImpl implements AvaticaHttpClientFactory {
   }
 
   private AvaticaHttpClient instantiateClient(String className, URL url) {
+    AvaticaHttpClient client = null;
+    Exception clientCreationException = null;
     try {
-      Class<?> clz = Class.forName(className);
-      Constructor<?> constructor = clz.getConstructor(URL.class);
-      Object instance = constructor.newInstance(Objects.requireNonNull(url));
-      return AvaticaHttpClient.class.cast(instance);
+      // Ensure that the given class is actually a subclass of AvaticaHttpClient
+      Class<? extends AvaticaHttpClient> clz =
+          Class.forName(className).asSubclass(AvaticaHttpClient.class);
+      Constructor<? extends AvaticaHttpClient> constructor = clz.getConstructor(URL.class);
+      client = constructor.newInstance(Objects.requireNonNull(url));
     } catch (Exception e) {
+      clientCreationException = e;
+    }
+
+    if (client == null) {
       throw new RuntimeException("Failed to construct AvaticaHttpClient implementation "
-          + className, e);
+          + className, clientCreationException);
+    } else {
+      return client;
     }
   }
 
