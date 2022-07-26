@@ -28,6 +28,33 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.22.0">1.22.0</a> / 2022-07-XX
+{: #v1-22-0}
+
+Apache Calcite Avatica 1.22.0 is a maintenance release to resolve `CVE-2022-36364`: Apache Calcite Avatica JDBC driver
+`httpclient_impl` connection property can be used as an RCE vector. Users of previous versions of Avatica MUST upgrade
+to mitigate this vulnerability.
+
+Compatibility: This release is tested
+on Linux, macOS, Microsoft Windows;
+using Oracle JDK 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18;
+using IBM Java 8;
+Guava versions 14.0.1 to 31.1-jre;
+other software versions as specified in `gradle.properties`.
+
+Contributors to this release:
+Francis Chuang (Release Manager),
+Ruben Quesada Lopez
+
+Features and bug fixes
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5218">CALCITE-5218</a>]
+  Verify HTTP client class before instantiating it
+
+Build and tests
+
+* Checkout release svn repository when promoting a release using the docker script
+
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.21.0">1.21.0</a> / 2022-05-08
 {: #v1-21-0}
 
