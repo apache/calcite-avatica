@@ -28,7 +28,7 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.22.0">1.22.0</a> / 2022-07-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.22.0">1.22.0</a> / 2022-07-28
 {: #v1-22-0}
 
 Apache Calcite Avatica 1.22.0 is a maintenance release to resolve `CVE-2022-36364`: Apache Calcite Avatica JDBC driver
