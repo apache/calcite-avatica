@@ -215,6 +215,7 @@ allprojects {
             // https://github.com/julianhyde/toolbox/issues/3
             //  toolVersion = "6.18"
             isShowViolations = true
+            maxErrors = 1000
             val dir = File(rootDir, "src/main/config/checkstyle")
             configDirectory.set(dir)
             configFile = File(dir, "checker.xml")

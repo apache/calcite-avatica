@@ -22,6 +22,8 @@ import org.apache.calcite.avatica.remote.Driver.Serialization;
 import org.apache.calcite.avatica.remote.Service;
 import org.apache.calcite.avatica.remote.Service.RpcMetadataResponse;
 
+import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
+import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory;
 import org.eclipse.jetty.security.Authenticator;
 import org.eclipse.jetty.security.ConfigurableSpnegoLoginService;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -35,6 +37,7 @@ import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 import org.eclipse.jetty.server.AbstractConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -316,6 +319,24 @@ public class HttpServer {
   }
 
   protected ServerConnector getServerConnector() {
+    return getHttp1ServerConnector();
+  }
+
+  protected ServerConnector getHttp2ServerConnector() {
+    HttpConfiguration httpConfig = new HttpConfiguration();
+    httpConfig.setRequestHeaderSize(maxAllowedHeaderSize);
+    HttpConnectionFactory http11 = new HttpConnectionFactory(httpConfig);
+    HTTP2ServerConnectionFactory h2 = new HTTP2ServerConnectionFactory(httpConfig);
+    ALPNServerConnectionFactory alpn = new ALPNServerConnectionFactory();
+    alpn.setDefaultProtocol(http11.getProtocol());
+    if (sslFactory == null) {
+      return new ServerConnector(server, http11, h2);
+    }
+    return new ServerConnector(server,
+        AbstractConnectionFactory.getFactories(sslFactory, alpn, h2, http11));
+  }
+
+  protected ServerConnector getHttp1ServerConnector() {
     HttpConnectionFactory factory = new HttpConnectionFactory();
     factory.getHttpConfiguration().setRequestHeaderSize(maxAllowedHeaderSize);
 

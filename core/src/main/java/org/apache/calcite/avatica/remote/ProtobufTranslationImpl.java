@@ -48,6 +48,8 @@ import org.apache.calcite.avatica.proto.Responses.ErrorResponse;
 import org.apache.calcite.avatica.proto.Responses.ExecuteBatchResponse;
 import org.apache.calcite.avatica.proto.Responses.ExecuteResponse;
 import org.apache.calcite.avatica.proto.Responses.FetchResponse;
+import org.apache.calcite.avatica.proto.Responses.OneOfResponse;
+import org.apache.calcite.avatica.proto.Responses.OneOfResponse.Builder;
 import org.apache.calcite.avatica.proto.Responses.OpenConnectionResponse;
 import org.apache.calcite.avatica.proto.Responses.PrepareResponse;
 import org.apache.calcite.avatica.proto.Responses.ResultSetResponse;
@@ -59,8 +61,17 @@ import org.apache.calcite.avatica.remote.Service.Response;
 import org.apache.calcite.avatica.remote.Service.RpcMetadataResponse;
 import org.apache.calcite.avatica.util.UnsynchronizedBuffer;
 
+import org.apache.commons.pool2.BasePooledObjectFactory;
+import org.apache.commons.pool2.ObjectPool;
+import org.apache.commons.pool2.PooledObject;
+import org.apache.commons.pool2.impl.DefaultPooledObject;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+
 import com.google.protobuf.ByteString;
+import com.google.protobuf.ByteString.Output;
 import com.google.protobuf.CodedInputStream;
+import com.google.protobuf.CodedOutputStream;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.Parser;
@@ -81,14 +92,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * Implementation of {@link ProtobufTranslationImpl} that translates
- * protobuf requests to POJO requests.
+ * Implementation of {@link ProtobufTranslationImpl} that translates protobuf requests to POJO
+ * requests.
  */
 public class ProtobufTranslationImpl implements ProtobufTranslation {
+
   private static final Logger LOG = LoggerFactory.getLogger(ProtobufTranslationImpl.class);
 
   /**
-   * Encapsulate the logic of transforming a protobuf Request message into the Avatica POJO request.
+   * Encapsulate the logic of transforming a protobuf Request message into the Avatica POJO
+   * request.
    */
   static class RequestTranslator {
 
@@ -156,7 +169,7 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
         new RequestTranslator(OpenConnectionRequest.parser(), new Service.OpenConnectionRequest()));
     reqParsers.put(CloseConnectionRequest.class.getName(),
         new RequestTranslator(CloseConnectionRequest.parser(),
-          new Service.CloseConnectionRequest()));
+            new Service.CloseConnectionRequest()));
     reqParsers.put(CloseStatementRequest.class.getName(),
         new RequestTranslator(CloseStatementRequest.parser(), new Service.CloseStatementRequest()));
     reqParsers.put(ColumnsRequest.class.getName(),
@@ -165,7 +178,7 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
         new RequestTranslator(ConnectionSyncRequest.parser(), new Service.ConnectionSyncRequest()));
     reqParsers.put(CreateStatementRequest.class.getName(),
         new RequestTranslator(CreateStatementRequest.parser(),
-          new Service.CreateStatementRequest()));
+            new Service.CreateStatementRequest()));
     reqParsers.put(DatabasePropertyRequest.class.getName(),
         new RequestTranslator(DatabasePropertyRequest.parser(),
             new Service.DatabasePropertyRequest()));
@@ -300,18 +313,74 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
 
   private final ThreadLocal<UnsynchronizedBuffer> threadLocalBuffer =
       new ThreadLocal<UnsynchronizedBuffer>() {
-        @Override protected UnsynchronizedBuffer initialValue() {
+        @Override
+        protected UnsynchronizedBuffer initialValue() {
           return new UnsynchronizedBuffer();
         }
       };
+
+  private static class OutputStuff {
+
+    private final Output output;
+    private final CodedOutputStream codedOutputStream;
+
+    private OutputStuff() {
+      output = ByteString.newOutput(1024 * 1024);
+      codedOutputStream = CodedOutputStream.newInstance(output);
+    }
+
+    void reset() throws IOException {
+      codedOutputStream.flush();
+      output.reset();
+    }
+
+    ByteString toByteString(Message message) throws IOException {
+      message.writeTo(codedOutputStream);
+      codedOutputStream.flush();
+      return output.toByteString();
+    }
+  }
+
+  private static class ObjectPoolFactory extends BasePooledObjectFactory<OutputStuff> {
+
+    private static final ObjectPoolFactory INSTANCE = new ObjectPoolFactory();
+
+    @Override
+    public OutputStuff create() throws Exception {
+      return new OutputStuff();
+    }
+
+    @Override
+    public PooledObject<OutputStuff> wrap(OutputStuff obj) {
+      return new DefaultPooledObject<>(obj);
+    }
+
+    @Override
+    public void passivateObject(PooledObject<OutputStuff> p) throws Exception {
+      p.getObject().reset();
+    }
+  }
+
+  private GenericObjectPoolConfig<OutputStuff> createObjectPoolConfig() {
+    GenericObjectPoolConfig<OutputStuff> config = new GenericObjectPoolConfig<OutputStuff>();
+    config.setMaxTotal(-1);
+    config.setMaxIdle(-1);
+    return config;
+  }
+
+  private final ObjectPool<OutputStuff> outputStuffObjectPool = new GenericObjectPool<>(
+      ObjectPoolFactory.INSTANCE, createObjectPoolConfig());
+
+  private final ThreadLocal<OutputStuff> outputStuffThreadLocal = ThreadLocal.withInitial(
+      OutputStuff::new);
 
   /**
    * Fetches the concrete message's Parser implementation.
    *
    * @param className The protocol buffer class name
    * @return The Parser for the class
-   * @throws IllegalArgumentException If the argument is null or if a Parser for the given
-   *     class name is not found.
+   * @throws IllegalArgumentException If the argument is null or if a Parser for the given class
+   *                                  name is not found.
    */
   public static RequestTranslator getParserForRequest(String className) {
     if (null == className || className.isEmpty()) {
@@ -332,8 +401,8 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
    *
    * @param className The protocol buffer class name
    * @return The Parser for the class
-   * @throws IllegalArgumentException If the argument is null or if a Parser for the given
-   *     class name is not found.
+   * @throws IllegalArgumentException If the argument is null or if a Parser for the given class
+   *                                  name is not found.
    */
   public static ResponseTranslator getParserForResponse(String className) {
     if (null == className || className.isEmpty()) {
@@ -349,7 +418,53 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
     return translator;
   }
 
-  @Override public byte[] serializeResponse(Response response) throws IOException {
+  @Override
+  public byte[] serializeResponse(Response response) throws IOException {
+    return serializeResponseOld(response);
+  }
+
+
+  public byte[] serializeResponseOneOf(Response response) throws IOException {
+    Message msg = response.serialize();
+    Builder oneOfResponseBuilder = OneOfResponse.newBuilder();
+    if (msg instanceof ResultSetResponse) {
+      oneOfResponseBuilder.setResultSetResponse((ResultSetResponse) msg);
+    } else if (msg instanceof ExecuteResponse) {
+      oneOfResponseBuilder.setExecuteResponse((ExecuteResponse) msg);
+    } else if (msg instanceof PrepareResponse) {
+      oneOfResponseBuilder.setPrepareResponse((PrepareResponse) msg);
+    } else if (msg instanceof FetchResponse) {
+      oneOfResponseBuilder.setFetchResponse((FetchResponse) msg);
+    } else if (msg instanceof CreateStatementResponse) {
+      oneOfResponseBuilder.setCreateStatementResponse((CreateStatementResponse) msg);
+    } else if (msg instanceof CloseStatementResponse) {
+      oneOfResponseBuilder.setCloseStatementResponse((CloseStatementResponse) msg);
+    } else if (msg instanceof OpenConnectionResponse) {
+      oneOfResponseBuilder.setOpenConnectionResponse((OpenConnectionResponse) msg);
+    } else if (msg instanceof CloseConnectionResponse) {
+      oneOfResponseBuilder.setCloseConnectionResponse((CloseConnectionResponse) msg);
+    } else if (msg instanceof ConnectionSyncResponse) {
+      oneOfResponseBuilder.setConnectionSyncResponse((ConnectionSyncResponse) msg);
+    } else if (msg instanceof DatabasePropertyResponse) {
+      oneOfResponseBuilder.setDatabasePropertyResponse((DatabasePropertyResponse) msg);
+    } else if (msg instanceof ErrorResponse) {
+      oneOfResponseBuilder.setErrorResponse((ErrorResponse) msg);
+    } else if (msg instanceof SyncResultsResponse) {
+      oneOfResponseBuilder.setSyncResultsResponse((SyncResultsResponse) msg);
+    } else if (msg instanceof CommitResponse) {
+      oneOfResponseBuilder.setCommitResponse((CommitResponse) msg);
+    } else if (msg instanceof RollbackResponse) {
+      oneOfResponseBuilder.setRollbackResponse((RollbackResponse) msg);
+    } else if (msg instanceof ExecuteBatchResponse) {
+      oneOfResponseBuilder.setExecuteBatchResponse((ExecuteBatchResponse) msg);
+    } else {
+      throw new RuntimeException("Unknown message " + msg);
+    }
+    return oneOfResponseBuilder.build().toByteArray();
+  }
+
+
+  public byte[] serializeResponseOld(Response response) throws IOException {
     // Avoid BAOS for its synchronized write methods, we don't need that concurrency control
     UnsynchronizedBuffer out = threadLocalBuffer.get();
     try {
@@ -369,7 +484,8 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
     }
   }
 
-  @Override public byte[] serializeRequest(Request request) throws IOException {
+  @Override
+  public byte[] serializeRequest(Request request) throws IOException {
     // Avoid BAOS for its synchronized write methods, we don't need that concurrency control
     UnsynchronizedBuffer out = threadLocalBuffer.get();
     try {
@@ -390,16 +506,35 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
   }
 
   void serializeMessage(OutputStream out, Message msg) throws IOException {
-    // Serialize the protobuf message
-    UnsynchronizedBuffer buffer = threadLocalBuffer.get();
-    ByteString serializedMsg;
+    serializeMessageDirectly(out, msg);
+  }
+
+  void serializeMessageWithObjectPool(OutputStream out, Message msg) throws IOException {
     try {
-      msg.writeTo(buffer);
-      // Make a bytestring from it
-      serializedMsg = UnsafeByteOperations.unsafeWrap(buffer.toArray());
-    } finally {
-      buffer.reset();
+      OutputStuff outputStuff = outputStuffObjectPool.borrowObject();
+      try {
+        ByteString serializedMsg = outputStuff.toByteString(msg);
+
+        // Wrap the serialized message in a WireMessage
+        WireMessage wireMsg = WireMessage.newBuilder()
+            .setNameBytes(getClassNameBytes(msg.getClass()))
+            .setWrappedMessage(serializedMsg).build();
+
+        // Write the WireMessage to the provided OutputStream
+        wireMsg.writeTo(out);
+      } finally {
+        outputStuffObjectPool.returnObject(outputStuff);
+      }
+    } catch (IOException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new RuntimeException("serializeMessage", e);
     }
+  }
+
+
+  private void serializeMessageDirectly(OutputStream out, Message msg) throws IOException {
+    ByteString serializedMsg = msg.toByteString();
 
     // Wrap the serialized message in a WireMessage
     WireMessage wireMsg = WireMessage.newBuilder().setNameBytes(getClassNameBytes(msg.getClass()))
@@ -407,6 +542,24 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
 
     // Write the WireMessage to the provided OutputStream
     wireMsg.writeTo(out);
+  }
+
+  private void serializeMessageWithThreadLocalOutputStuff(OutputStream out, Message msg)
+      throws IOException {
+    OutputStuff outputStuff = outputStuffThreadLocal.get();
+    try {
+
+      ByteString serializedMsg = outputStuff.toByteString(msg);
+
+      // Wrap the serialized message in a WireMessage
+      WireMessage wireMsg = WireMessage.newBuilder().setNameBytes(getClassNameBytes(msg.getClass()))
+          .setWrappedMessage(serializedMsg).build();
+
+      // Write the WireMessage to the provided OutputStream
+      wireMsg.writeTo(out);
+    } finally {
+      outputStuff.reset();
+    }
   }
 
   ByteString getClassNameBytes(Class<?> clz) {
@@ -417,7 +570,8 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
     return byteString;
   }
 
-  @Override public Request parseRequest(byte[] bytes) throws IOException {
+  @Override
+  public Request parseRequest(byte[] bytes) throws IOException {
     ByteString byteString = UnsafeByteOperations.unsafeWrap(bytes);
     CodedInputStream inputStream = byteString.newCodedInput();
     // Enable aliasing to avoid an extra copy to get at the serialized Request inside of the
@@ -440,7 +594,67 @@ public class ProtobufTranslationImpl implements ProtobufTranslation {
     }
   }
 
-  @Override public Response parseResponse(byte[] bytes) throws IOException {
+  @Override
+  public Response parseResponse(byte[] bytes) throws IOException {
+    return parseResponseOld(bytes);
+  }
+
+  public Response parseResponseOneOf(byte[] bytes) throws IOException {
+    OneOfResponse oneOfResponse = OneOfResponse.parseFrom(bytes);
+    switch (oneOfResponse.getContentCase()) {
+    case RESULTSETRESPONSE:
+      return Service.ResultSetResponse.fromProto(oneOfResponse.getResultSetResponse());
+    case EXECUTERESPONSE:
+      Service.ExecuteResponse executeResponse = new Service.ExecuteResponse();
+      return executeResponse.deserialize(oneOfResponse.getExecuteResponse());
+    case PREPARERESPONSE:
+      Service.PrepareResponse prepareResponse = new Service.PrepareResponse();
+      return prepareResponse.deserialize(oneOfResponse.getPrepareResponse());
+    case FETCHRESPONSE:
+      Service.FetchResponse fetchResponse = new Service.FetchResponse();
+      return fetchResponse.deserialize(oneOfResponse.getFetchResponse());
+    case CREATESTATEMENTRESPONSE:
+      Service.CreateStatementResponse createStatementResponse =
+          new Service.CreateStatementResponse();
+      return createStatementResponse.deserialize(oneOfResponse.getCreateStatementResponse());
+    case CLOSESTATEMENTRESPONSE:
+      Service.CloseStatementResponse closeStatementResponse = new Service.CloseStatementResponse();
+      return closeStatementResponse.deserialize(oneOfResponse.getCloseStatementResponse());
+    case OPENCONNECTIONRESPONSE:
+      Service.OpenConnectionResponse openConnectionResponse = new Service.OpenConnectionResponse();
+      return openConnectionResponse.deserialize(oneOfResponse.getOpenConnectionResponse());
+    case CLOSECONNECTIONRESPONSE:
+      Service.CloseConnectionResponse closeConnectionResponse =
+          new Service.CloseConnectionResponse();
+      return closeConnectionResponse.deserialize(oneOfResponse.getCloseConnectionResponse());
+    case CONNECTIONSYNCRESPONSE:
+      Service.ConnectionSyncResponse connectionSyncResponse = new Service.ConnectionSyncResponse();
+      return connectionSyncResponse.deserialize(oneOfResponse.getConnectionSyncResponse());
+    case DATABASEPROPERTYRESPONSE:
+      Service.DatabasePropertyResponse databasePropertyResponse =
+          new Service.DatabasePropertyResponse();
+      return databasePropertyResponse.deserialize(oneOfResponse.getDatabasePropertyResponse());
+    case ERRORRESPONSE:
+      Service.ErrorResponse errorResponse = new Service.ErrorResponse();
+      return errorResponse.deserialize(oneOfResponse.getErrorResponse());
+    case SYNCRESULTSRESPONSE:
+      Service.SyncResultsResponse syncResultsResponse = new Service.SyncResultsResponse();
+      return syncResultsResponse.deserialize(oneOfResponse.getSyncResultsResponse());
+    case COMMITRESPONSE:
+      Service.CommitResponse commitResponse = new Service.CommitResponse();
+      return commitResponse.deserialize(oneOfResponse.getCommitResponse());
+    case ROLLBACKRESPONSE:
+      Service.RollbackResponse rollbackResponse = new Service.RollbackResponse();
+      return rollbackResponse.deserialize(oneOfResponse.getRollbackResponse());
+    case EXECUTEBATCHRESPONSE:
+      Service.ExecuteBatchResponse executeBatchResponse = new Service.ExecuteBatchResponse();
+      return executeBatchResponse.deserialize(oneOfResponse.getExecuteBatchResponse());
+    default:
+      throw new RuntimeException("Unknown message " + oneOfResponse);
+    }
+  }
+
+  public Response parseResponseOld(byte[] bytes) throws IOException {
     ByteString byteString = UnsafeByteOperations.unsafeWrap(bytes);
     CodedInputStream inputStream = byteString.newCodedInput();
     // Enable aliasing to avoid an extra copy to get at the serialized Response inside of the

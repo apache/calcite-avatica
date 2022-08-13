@@ -27,6 +27,8 @@ dependencies {
     api("org.eclipse.jetty:jetty-security")
     api("org.eclipse.jetty:jetty-server")
     api("org.eclipse.jetty:jetty-util")
+    api("org.eclipse.jetty.http2:http2-server:9.4.44.v20210927")
+    api("org.eclipse.jetty:jetty-alpn-openjdk8-server:9.4.44.v20210927")
 
     implementation("org.slf4j:slf4j-api")
     implementation("com.google.guava:guava")

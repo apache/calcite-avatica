@@ -981,7 +981,7 @@ public interface Meta {
           final Common.TypedValue scalarListItem = serializeScalar(listItem);
           columnBuilder.addArrayValue(scalarListItem);
           // Add the deprecated 'value' repeated attribute for backwards compat
-          columnBuilder.addValue(scalarListItem);
+          // columnBuilder.addValue(scalarListItem);
         }
       } else {
         // The default value, but still explicit.
@@ -990,7 +990,7 @@ public interface Meta {
         final Common.TypedValue scalarVal = serializeScalar(column);
         columnBuilder.setScalarValue(scalarVal);
         // Add the deprecated 'value' repeated attribute for backwards compat
-        columnBuilder.addValue(scalarVal);
+        // columnBuilder.addValue(scalarVal);
       }
 
       // Add value to row

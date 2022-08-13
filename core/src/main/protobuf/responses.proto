@@ -28,7 +28,7 @@ message ResultSetResponse {
   Signature signature = 4;
   Frame first_frame = 5;
   uint64 update_count = 6; // -1 for normal result sets, else this response contains a dummy result set
-                                    // with no signature nor other data.
+  // with no signature nor other data.
   RpcMetadata metadata = 7;
 }
 
@@ -132,4 +132,24 @@ message ExecuteBatchResponse {
   repeated uint64 update_counts = 3;
   bool missing_statement = 4; // Did the request fail because of no-cached statement
   RpcMetadata metadata = 5;
+}
+
+message OneOfResponse {
+  oneof content {
+    ResultSetResponse ResultSetResponse = 1;
+    ExecuteResponse ExecuteResponse = 2;
+    PrepareResponse PrepareResponse = 3;
+    FetchResponse FetchResponse = 4;
+    CreateStatementResponse CreateStatementResponse = 5;
+    CloseStatementResponse CloseStatementResponse = 6;
+    OpenConnectionResponse OpenConnectionResponse = 7;
+    CloseConnectionResponse CloseConnectionResponse = 8;
+    ConnectionSyncResponse ConnectionSyncResponse = 9;
+    DatabasePropertyResponse DatabasePropertyResponse = 10;
+    ErrorResponse ErrorResponse = 11;
+    SyncResultsResponse SyncResultsResponse = 12;
+    CommitResponse CommitResponse = 13;
+    RollbackResponse RollbackResponse = 14;
+    ExecuteBatchResponse ExecuteBatchResponse = 15;
+  }
 }
