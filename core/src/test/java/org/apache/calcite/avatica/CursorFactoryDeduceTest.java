@@ -43,6 +43,8 @@ public class CursorFactoryDeduceTest {
       ColumnMetaData.scalar(Types.INTEGER, "INT", ColumnMetaData.Rep.PRIMITIVE_INT);
   static final ColumnMetaData.AvaticaType STRING_TYPE =
       ColumnMetaData.scalar(Types.VARCHAR, "STRING", ColumnMetaData.Rep.STRING);
+  static final ColumnMetaData.AvaticaType NVARCHAR_STRING_TYPE =
+      ColumnMetaData.scalar(Types.NVARCHAR, "STRING", ColumnMetaData.Rep.STRING);
   static final ColumnMetaData.AvaticaType DOUBLE_TYPE =
       ColumnMetaData.scalar(Types.DOUBLE, "DOUBLE", ColumnMetaData.Rep.DOUBLE);
 
@@ -212,6 +214,31 @@ public class CursorFactoryDeduceTest {
         SimplePOJO pjo = (SimplePOJO) row;
         assertEquals(pjo.stringField, strAccessor.getObject());
         assertEquals(pjo.doubleField, doubleAccessor.getObject());
+      }
+
+      assertFalse(cursor.next());
+    }
+  }
+
+  @Test public void deduceRecordCursorFactoryProjectedNvarcharField() throws Exception {
+    List<ColumnMetaData> columnsMetaDataList = Arrays.asList(
+        MetaImpl.columnMetaData("stringField", 1, NVARCHAR_STRING_TYPE, true),
+        MetaImpl.columnMetaData("doubleField", 2, DOUBLE_TYPE, true)
+    );
+    Meta.CursorFactory cursorFactory =
+        Meta.CursorFactory.deduce(columnsMetaDataList, SimplePOJO.class);
+
+    try (Cursor cursor = MetaImpl.createCursor(cursorFactory, ROWS)) {
+      List<Cursor.Accessor> accessors =
+          cursor.createAccessors(columnsMetaDataList, Unsafe.localCalendar(), null);
+
+      assertEquals(columnsMetaDataList.size(), accessors.size());
+      Cursor.Accessor strAccessor = accessors.get(0);
+
+      for (Object row : ROWS) {
+        assertTrue(cursor.next());
+        SimplePOJO pjo = (SimplePOJO) row;
+        assertEquals(pjo.stringField, strAccessor.getObject());
       }
 
       assertFalse(cursor.next());
