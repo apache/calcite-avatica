@@ -197,10 +197,18 @@ public class AvaticaUtils {
     return clazz;
   }
 
-  /** Creates an instance of a plugin class. First looks for a static
-   * member called INSTANCE, then calls a public default constructor.
+  /** Creates an instance of a plugin class.
    *
-   * <p>If className contains a "#" instead looks for a static field.
+   * <p>First looks for a static member called "{@code INSTANCE}",
+   * then calls a public default constructor.
+   *
+   * <p>If {@code className} contains a "#", instead looks for a static field.
+   *
+   * <p>In the "#" case, if the static field is a {@link ThreadLocal}, this
+   * method dereferences the {@code ThreadLocal} by calling
+   * {@link ThreadLocal#get()}. This behavior allows, for example, client code
+   * to pass an object to a JDBC driver. The JDBC driver needs to be running in
+   * the same JVM and the same thread as the client.
    *
    * @param pluginClass Class (or interface) to instantiate
    * @param className Name of implementing class
@@ -211,6 +219,7 @@ public class AvaticaUtils {
       String className) {
     String right = null;
     String left = null;
+    Object value = null;
     try {
       // Given a static field, say "com.example.MyClass#FOO_INSTANCE", return
       // the value of that static field.
@@ -222,7 +231,13 @@ public class AvaticaUtils {
         final Class<T> clazz = (Class) Class.forName(left);
         final Field field;
         field = clazz.getField(right);
-        return pluginClass.cast(field.get(null));
+        final Object fieldValue = field.get(null);
+        if (fieldValue instanceof ThreadLocal) {
+          value = ((ThreadLocal<?>) fieldValue).get();
+        } else {
+          value = fieldValue;
+        }
+        return pluginClass.cast(value);
       }
       //noinspection unchecked
       final Class<T> clazz = (Class) Class.forName(className);
@@ -230,7 +245,8 @@ public class AvaticaUtils {
         // We assume that if there is an INSTANCE field it is static and
         // has the right type.
         final Field field = clazz.getField("INSTANCE");
-        return pluginClass.cast(field.get(null));
+        value = field.get(null);
+        return pluginClass.cast(value);
       } catch (NoSuchFieldException e) {
         // ignore
       }
@@ -248,8 +264,10 @@ public class AvaticaUtils {
           + "' not valid as there is no '" + right + "' field in the class of '"
           + left + "'", e);
     } catch (ClassCastException e) {
-      throw new RuntimeException(
-          "Property '" + className + "' not valid as " + e.getMessage(), e);
+      throw new RuntimeException("Property '" + className
+          + "' not valid as cannot convert "
+          + (value == null ? "null" : value.getClass().getName())
+          + " to " + pluginClass.getCanonicalName(), e);
     } catch (NoSuchMethodException e) {
       throw new RuntimeException("Property '" + className + "' not valid as "
           + "the default constructor is necessary, "
