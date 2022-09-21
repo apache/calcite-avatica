@@ -222,7 +222,14 @@ public class AvaticaUtils {
         final Class<T> clazz = (Class) Class.forName(left);
         final Field field;
         field = clazz.getField(right);
-        return pluginClass.cast(field.get(null));
+        final Object fieldValue = field.get(null);
+        final Object o;
+        if (fieldValue instanceof ThreadLocal) {
+          o = ((ThreadLocal<?>) fieldValue).get();
+        } else {
+          o = fieldValue;
+        }
+        return pluginClass.cast(o);
       }
       //noinspection unchecked
       final Class<T> clazz = (Class) Class.forName(className);

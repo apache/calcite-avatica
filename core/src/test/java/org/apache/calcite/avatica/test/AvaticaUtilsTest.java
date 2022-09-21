@@ -50,6 +50,11 @@ import static org.junit.Assert.fail;
  * Unit test for Avatica utilities.
  */
 public class AvaticaUtilsTest {
+  /** Used by {@link #testInstantiatePlugin()}. */
+  public static final ThreadLocal<String> A_THREAD_LOCAL =
+      ThreadLocal.withInitial(() -> "not initialized");
+
+  /** Tests {@link AvaticaUtils#instantiatePlugin(Class, String)}. */
   @Test public void testInstantiatePlugin() {
     final String s =
         AvaticaUtils.instantiatePlugin(String.class, "java.lang.String");
@@ -109,6 +114,17 @@ public class AvaticaUtilsTest {
     } catch (Throwable e) {
       assertThat(e.getMessage(),
           is("Property 'java.lang.String' not valid for plugin type java.math.BigInteger"));
+    }
+
+    // Read from thread-local
+    try {
+      A_THREAD_LOCAL.set("abc");
+      final String s2 =
+          AvaticaUtils.instantiatePlugin(String.class,
+              AvaticaUtilsTest.class.getName() + "#A_THREAD_LOCAL");
+      assertThat(s2, is("abc"));
+    } finally {
+      A_THREAD_LOCAL.remove();
     }
   }
 
