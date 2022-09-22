@@ -51,8 +51,12 @@ import static org.junit.Assert.fail;
  */
 public class AvaticaUtilsTest {
   /** Used by {@link #testInstantiatePlugin()}. */
-  public static final ThreadLocal<String> A_THREAD_LOCAL =
+  public static final ThreadLocal<String> STRING_THREAD_LOCAL =
       ThreadLocal.withInitial(() -> "not initialized");
+
+  /** Also used by {@link #testInstantiatePlugin()}. */
+  public static final ThreadLocal<Float> FLOAT_THREAD_LOCAL =
+      ThreadLocal.withInitial(() -> Float.MIN_VALUE);
 
   /** Tests {@link AvaticaUtils#instantiatePlugin(Class, String)}. */
   @Test public void testInstantiatePlugin() {
@@ -61,18 +65,18 @@ public class AvaticaUtilsTest {
     assertThat(s, is(""));
 
     final BigInteger b =
-            AvaticaUtils.instantiatePlugin(BigInteger.class, "java.math.BigInteger#ONE");
+        AvaticaUtils.instantiatePlugin(BigInteger.class, "java.math.BigInteger#ONE");
     assertThat(b, is(BigInteger.ONE));
 
     // Class not found
     try {
       final BigInteger b2 =
-              AvaticaUtils.instantiatePlugin(BigInteger.class, "org.apache.calcite.Abc");
+          AvaticaUtils.instantiatePlugin(BigInteger.class, "org.apache.calcite.Abc");
       fail("expected error, got " + b2);
     } catch (Throwable e) {
       assertThat(e.getMessage(),
-              is("Property 'org.apache.calcite.Abc' not valid as "
-                      + "'org.apache.calcite.Abc' not found in the classpath"));
+          is("Property 'org.apache.calcite.Abc' not valid as "
+              + "'org.apache.calcite.Abc' not found in the classpath"));
     }
 
     // No instance of ABC
@@ -81,8 +85,8 @@ public class AvaticaUtilsTest {
       fail("expected error, got " + s2);
     } catch (Throwable e) {
       assertThat(e.getMessage(),
-              is("Property 'java.lang.String#ABC' not valid as "
-                      + "there is no 'ABC' field in the class of 'java.lang.String'"));
+          is("Property 'java.lang.String#ABC' not valid as "
+              + "there is no 'ABC' field in the class of 'java.lang.String'"));
     }
 
     // The instance type is not the plugin type
@@ -91,8 +95,8 @@ public class AvaticaUtilsTest {
       fail("expected error, got " + s2);
     } catch (Throwable e) {
       assertThat(e.getMessage(),
-              is("Property 'java.math.BigInteger#ONE' not valid as "
-                      + "Cannot cast java.math.BigInteger to java.lang.String"));
+          is("Property 'java.math.BigInteger#ONE' not valid as "
+              + "cannot convert java.math.BigInteger to java.lang.String"));
     }
 
     // No default constructor or INSTANCE member
@@ -103,7 +107,7 @@ public class AvaticaUtilsTest {
     } catch (Throwable e) {
       assertThat(e.getMessage(),
           is("Property 'java.lang.Integer' not valid as the default constructor is necessary,"
-                  + " but not found in the class of 'java.lang.Integer'"));
+              + " but not found in the class of 'java.lang.Integer'"));
     }
 
     // Not valid for plugin type
@@ -118,13 +122,96 @@ public class AvaticaUtilsTest {
 
     // Read from thread-local
     try {
-      A_THREAD_LOCAL.set("abc");
+      STRING_THREAD_LOCAL.set("abc");
       final String s2 =
           AvaticaUtils.instantiatePlugin(String.class,
-              AvaticaUtilsTest.class.getName() + "#A_THREAD_LOCAL");
+              AvaticaUtilsTest.class.getName() + "#STRING_THREAD_LOCAL");
       assertThat(s2, is("abc"));
     } finally {
-      A_THREAD_LOCAL.remove();
+      STRING_THREAD_LOCAL.remove();
+    }
+
+    // Read from thread-local, wrong type
+    try {
+      STRING_THREAD_LOCAL.set("abc");
+      final Integer i =
+          AvaticaUtils.instantiatePlugin(Integer.class,
+              AvaticaUtilsTest.class.getName() + "#STRING_THREAD_LOCAL");
+      fail("expected error, got " + i);
+    } catch (Throwable e) {
+      assertThat(e.getMessage(),
+          is("Property 'org.apache.calcite.avatica.test.AvaticaUtilsTest"
+              + "#STRING_THREAD_LOCAL' not valid as cannot convert java.lang.String "
+              + "to java.lang.Integer"));
+    } finally {
+      STRING_THREAD_LOCAL.remove();
+    }
+
+    // Read from thread-local, wrong type (array type, because it's tricky to
+    // print correctly).
+    try {
+      STRING_THREAD_LOCAL.set("abc");
+      final BigDecimal[] bigDecimals =
+          AvaticaUtils.instantiatePlugin(BigDecimal[].class,
+              AvaticaUtilsTest.class.getName() + "#STRING_THREAD_LOCAL");
+      fail("expected error, got " + Arrays.toString(bigDecimals));
+    } catch (Throwable e) {
+      assertThat(e.getMessage(),
+          is("Property 'org.apache.calcite.avatica.test.AvaticaUtilsTest"
+              + "#STRING_THREAD_LOCAL' not valid as cannot convert "
+              + "java.lang.String to java.math.BigDecimal[]"));
+    } finally {
+      STRING_THREAD_LOCAL.remove();
+    }
+
+    // Read from thread-local, wrong type (private enum type, because it's
+    // tricky to print correctly).
+    try {
+      STRING_THREAD_LOCAL.set("abc");
+      final Weight weight =
+          AvaticaUtils.instantiatePlugin(Weight.class,
+              AvaticaUtilsTest.class.getName() + "#STRING_THREAD_LOCAL");
+      fail("expected error, got " + weight);
+    } catch (Throwable e) {
+      assertThat(e.getMessage(),
+          is("Property 'org.apache.calcite.avatica.test.AvaticaUtilsTest"
+              + "#STRING_THREAD_LOCAL' not valid as cannot convert "
+              + "java.lang.String to "
+              + "org.apache.calcite.avatica.test.AvaticaUtilsTest.Weight"));
+    } finally {
+      STRING_THREAD_LOCAL.remove();
+    }
+
+    // Read from thread-local, wrong type (primitive type).
+    try {
+      STRING_THREAD_LOCAL.set("abc");
+      final float f =
+          AvaticaUtils.instantiatePlugin(float.class,
+              AvaticaUtilsTest.class.getName() + "#STRING_THREAD_LOCAL");
+      fail("expected error, got " + f);
+    } catch (Throwable e) {
+      assertThat(e.getMessage(),
+          is("Property 'org.apache.calcite.avatica.test.AvaticaUtilsTest"
+              + "#STRING_THREAD_LOCAL' not valid as cannot convert "
+              + "java.lang.String to float"));
+    } finally {
+      STRING_THREAD_LOCAL.remove();
+    }
+
+    // Read from thread-local, primitive type.
+    try {
+      FLOAT_THREAD_LOCAL.set(2.5f);
+      final float f =
+          AvaticaUtils.instantiatePlugin(float.class,
+              AvaticaUtilsTest.class.getName() + "#FLOAT_THREAD_LOCAL");
+      fail("expected error, got " + f);
+    } catch (Throwable e) {
+      assertThat(e.getMessage(),
+          is("Property 'org.apache.calcite.avatica.test.AvaticaUtilsTest"
+              + "#FLOAT_THREAD_LOCAL' not valid as cannot convert "
+              + "java.lang.Float to float"));
+    } finally {
+      FLOAT_THREAD_LOCAL.remove();
     }
   }
 

@@ -211,6 +211,7 @@ public class AvaticaUtils {
       String className) {
     String right = null;
     String left = null;
+    Object value = null;
     try {
       // Given a static field, say "com.example.MyClass#FOO_INSTANCE", return
       // the value of that static field.
@@ -223,13 +224,12 @@ public class AvaticaUtils {
         final Field field;
         field = clazz.getField(right);
         final Object fieldValue = field.get(null);
-        final Object o;
         if (fieldValue instanceof ThreadLocal) {
-          o = ((ThreadLocal<?>) fieldValue).get();
+          value = ((ThreadLocal<?>) fieldValue).get();
         } else {
-          o = fieldValue;
+          value = fieldValue;
         }
-        return pluginClass.cast(o);
+        return pluginClass.cast(value);
       }
       //noinspection unchecked
       final Class<T> clazz = (Class) Class.forName(className);
@@ -237,7 +237,8 @@ public class AvaticaUtils {
         // We assume that if there is an INSTANCE field it is static and
         // has the right type.
         final Field field = clazz.getField("INSTANCE");
-        return pluginClass.cast(field.get(null));
+        value = field.get(null);
+        return pluginClass.cast(value);
       } catch (NoSuchFieldException e) {
         // ignore
       }
@@ -255,8 +256,10 @@ public class AvaticaUtils {
           + "' not valid as there is no '" + right + "' field in the class of '"
           + left + "'", e);
     } catch (ClassCastException e) {
-      throw new RuntimeException(
-          "Property '" + className + "' not valid as " + e.getMessage(), e);
+      throw new RuntimeException("Property '" + className
+          + "' not valid as cannot convert "
+          + (value == null ? "null" : value.getClass().getName())
+          + " to " + pluginClass.getCanonicalName(), e);
     } catch (NoSuchMethodException e) {
       throw new RuntimeException("Property '" + className + "' not valid as "
           + "the default constructor is necessary, "
