@@ -784,9 +784,9 @@ public class DateTimeUtils {
     case DAY:
       return day;
     case DOW:
-      return (int) floorMod(julian + 1, 7) + 1; // sun=1, sat=7
+      return Math.floorMod(julian + 1, 7) + 1; // sun=1, sat=7
     case ISODOW:
-      return (int) floorMod(julian, 7) + 1; // mon=1, sun=7
+      return Math.floorMod(julian, 7) + 1; // mon=1, sun=7
     case WEEK:
       return getIso8601WeekNumber(julian, year, month, day);
     case DOY:
@@ -813,7 +813,7 @@ public class DateTimeUtils {
    * Sometimes it is in the year before the given year. */
   private static long firstMondayOfFirstWeek(int year) {
     final long janFirst = ymdToJulian(year, 1, 1);
-    final long janFirstDow = floorMod(janFirst + 1, 7); // sun=0, sat=6
+    final long janFirstDow = Math.floorMod(janFirst + 1, 7L); // sun=0, sat=6
     return janFirst + (11 - janFirstDow) % 7 - 3;
   }
 
@@ -824,15 +824,15 @@ public class DateTimeUtils {
   private static int getIso8601WeekNumber(int julian, int year, int month, int day) {
     long fmofw = firstMondayOfFirstWeek(year);
     if (month == 12 && day > 28) {
-      if (31 - day + 4 > 7 - ((int) floorMod(julian, 7) + 1)
-          && 31 - day + (int) (floorMod(julian, 7) + 1) >= 4) {
+      if (31 - day + 4 > 7 - (Math.floorMod(julian, 7) + 1)
+          && 31 - day + Math.floorMod(julian, 7) + 1 >= 4) {
         return (int) (julian - fmofw) / 7 + 1;
       } else {
         return 1;
       }
     } else if (month == 1 && day < 5) {
-      if (4 - day <= 7 - ((int) floorMod(julian, 7) + 1)
-          && day - ((int) (floorMod(julian, 7) + 1)) >= -3) {
+      if (4 - day <= 7 - (Math.floorMod(julian, 7) + 1)
+          && day - (Math.floorMod(julian, 7) + 1) >= -3) {
         return 1;
       } else {
         return (int) (julian - firstMondayOfFirstWeek(year - 1)) / 7 + 1;
@@ -844,7 +844,8 @@ public class DateTimeUtils {
   /** Extracts a time unit from a UNIX date (milliseconds since epoch). */
   public static int unixTimestampExtract(TimeUnitRange range,
       long timestamp) {
-    return unixTimeExtract(range, (int) floorMod(timestamp, MILLIS_PER_DAY));
+    return unixTimeExtract(range,
+        (int) Math.floorMod(timestamp, MILLIS_PER_DAY));
   }
 
   /** Extracts a time unit from a time value (milliseconds since midnight). */
@@ -873,7 +874,7 @@ public class DateTimeUtils {
 
   /** Resets to epoch (1970-01-01) the "date" part of a timestamp. */
   public static long resetDate(long timestamp) {
-    return floorMod(timestamp, MILLIS_PER_DAY);
+    return Math.floorMod(timestamp, MILLIS_PER_DAY);
   }
 
   public static long unixTimestampFloor(TimeUnitRange range, long timestamp) {
@@ -959,7 +960,7 @@ public class DateTimeUtils {
       }
       return ymdToUnixDate(year, month, 1);
     case WEEK:
-      final int dow = (int) floorMod(julian + 1, 7); // sun=0, sat=6
+      final int dow = Math.floorMod(julian + 1, 7); // sun=0, sat=6
       int offset = dow;
       if (!floor && offset > 0) {
         offset -= 7;
@@ -1015,7 +1016,7 @@ public class DateTimeUtils {
    * of milliseconds since the epoch. */
   public static long addMonths(long timestamp, int m) {
     final long millis =
-        DateTimeUtils.floorMod(timestamp, DateTimeUtils.MILLIS_PER_DAY);
+        Math.floorMod(timestamp, DateTimeUtils.MILLIS_PER_DAY);
     timestamp -= millis;
     final long x =
         addMonths((int) (timestamp / DateTimeUtils.MILLIS_PER_DAY), m);
@@ -1029,9 +1030,9 @@ public class DateTimeUtils {
     int m0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.MONTH, date);
     int d0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.DAY, date);
     m0 += m;
-    int deltaYear = (int) DateTimeUtils.floorDiv(m0, 12);
+    int deltaYear = Math.floorDiv(m0, 12);
     y0 += deltaYear;
-    m0 = (int) DateTimeUtils.floorMod(m0, 12);
+    m0 = Math.floorMod(m0, 12);
     if (m0 == 0) {
       y0 -= 1;
       m0 += 12;
@@ -1084,14 +1085,12 @@ public class DateTimeUtils {
   }
 
   public static int subtractMonths(long t0, long t1) {
-    final long millis0 =
-        DateTimeUtils.floorMod(t0, DateTimeUtils.MILLIS_PER_DAY);
-    final int d0 = (int) DateTimeUtils.floorDiv(t0 - millis0,
-        DateTimeUtils.MILLIS_PER_DAY);
-    final long millis1 =
-        DateTimeUtils.floorMod(t1, DateTimeUtils.MILLIS_PER_DAY);
-    final int d1 = (int) DateTimeUtils.floorDiv(t1 - millis1,
-        DateTimeUtils.MILLIS_PER_DAY);
+    final long millis0 = Math.floorMod(t0, DateTimeUtils.MILLIS_PER_DAY);
+    final int d0 =
+        (int) Math.floorDiv(t0 - millis0, DateTimeUtils.MILLIS_PER_DAY);
+    final long millis1 = Math.floorMod(t1, DateTimeUtils.MILLIS_PER_DAY);
+    final int d1 =
+        (int) Math.floorDiv(t1 - millis1, DateTimeUtils.MILLIS_PER_DAY);
     int x = subtractMonths(d0, d1);
     final long d2 = addMonths(d1, x);
     if (d2 == d0 && millis0 < millis1) {
@@ -1100,7 +1099,10 @@ public class DateTimeUtils {
     return x;
   }
 
-  /** Divide, rounding towards negative infinity. */
+  /** Divide, rounding towards negative infinity.
+   *
+   * @deprecated Use {@link Math#floorDiv(long, long)} */
+  @Deprecated // to be removed before 2.0
   public static long floorDiv(long x, long y) {
     long r = x / y;
     // if the signs are different and modulo not zero, round down
@@ -1110,7 +1112,10 @@ public class DateTimeUtils {
     return r;
   }
 
-  /** Modulo, always returning a non-negative result. */
+  /** Modulo, always returning a non-negative result.
+   *
+   * @deprecated Use {@link Math#floorMod(long, long)} */
+  @Deprecated // to be removed before 2.0
   public static long floorMod(long x, long y) {
     return x - floorDiv(x, y) * y;
   }

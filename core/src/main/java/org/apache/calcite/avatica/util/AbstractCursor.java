@@ -1052,7 +1052,7 @@ public abstract class AbstractCursor implements Cursor {
         return null;
       }
       return new Time(
-          DateTimeUtils.floorMod(timestamp.getTime(),
+          Math.floorMod(timestamp.getTime(),
               DateTimeUtils.MILLIS_PER_DAY));
     }
 
@@ -1190,7 +1190,7 @@ public abstract class AbstractCursor implements Cursor {
         return null;
       }
       return new Time(
-          DateTimeUtils.floorMod(timestamp.getTime(),
+          Math.floorMod(timestamp.getTime(),
               DateTimeUtils.MILLIS_PER_DAY));
     }
 
@@ -1248,7 +1248,7 @@ public abstract class AbstractCursor implements Cursor {
         return null;
       }
       return new Time(
-          DateTimeUtils.floorMod(timestamp.getTime(),
+          Math.floorMod(timestamp.getTime(),
               DateTimeUtils.MILLIS_PER_DAY));
     }
 

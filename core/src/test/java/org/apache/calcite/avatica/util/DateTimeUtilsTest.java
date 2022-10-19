@@ -27,8 +27,6 @@ import static org.apache.calcite.avatica.util.DateTimeUtils.EPOCH_JULIAN;
 import static org.apache.calcite.avatica.util.DateTimeUtils.addMonths;
 import static org.apache.calcite.avatica.util.DateTimeUtils.dateStringToUnixDate;
 import static org.apache.calcite.avatica.util.DateTimeUtils.digitCount;
-import static org.apache.calcite.avatica.util.DateTimeUtils.floorDiv;
-import static org.apache.calcite.avatica.util.DateTimeUtils.floorMod;
 import static org.apache.calcite.avatica.util.DateTimeUtils.intervalDayTimeToString;
 import static org.apache.calcite.avatica.util.DateTimeUtils.intervalYearMonthToString;
 import static org.apache.calcite.avatica.util.DateTimeUtils.subtractMonths;
@@ -69,28 +67,30 @@ public class DateTimeUtilsTest {
     assertEquals(3, digitCount(100));
   }
 
+  @SuppressWarnings("deprecation")
   @Test public void testFloorDiv() {
-    assertThat(floorDiv(13, 3), equalTo(4L));
-    assertThat(floorDiv(12, 3), equalTo(4L));
-    assertThat(floorDiv(11, 3), equalTo(3L));
-    assertThat(floorDiv(-13, 3), equalTo(-5L));
-    assertThat(floorDiv(-12, 3), equalTo(-4L));
-    assertThat(floorDiv(-11, 3), equalTo(-4L));
-    assertThat(floorDiv(0, 3), equalTo(0L));
-    assertThat(floorDiv(1, 3), equalTo(0L));
-    assertThat(floorDiv(-1, 3), is(-1L));
+    assertThat(DateTimeUtils.floorDiv(13, 3), equalTo(4L));
+    assertThat(DateTimeUtils.floorDiv(12, 3), equalTo(4L));
+    assertThat(DateTimeUtils.floorDiv(11, 3), equalTo(3L));
+    assertThat(DateTimeUtils.floorDiv(-13, 3), equalTo(-5L));
+    assertThat(DateTimeUtils.floorDiv(-12, 3), equalTo(-4L));
+    assertThat(DateTimeUtils.floorDiv(-11, 3), equalTo(-4L));
+    assertThat(DateTimeUtils.floorDiv(0, 3), equalTo(0L));
+    assertThat(DateTimeUtils.floorDiv(1, 3), equalTo(0L));
+    assertThat(DateTimeUtils.floorDiv(-1, 3), is(-1L));
   }
 
+  @SuppressWarnings("deprecation")
   @Test public void testFloorMod() {
-    assertThat(floorMod(13, 3), is(1L));
-    assertThat(floorMod(12, 3), is(0L));
-    assertThat(floorMod(11, 3), is(2L));
-    assertThat(floorMod(-13, 3), is(2L));
-    assertThat(floorMod(-12, 3), is(0L));
-    assertThat(floorMod(-11, 3), is(1L));
-    assertThat(floorMod(0, 3), is(0L));
-    assertThat(floorMod(1, 3), is(1L));
-    assertThat(floorMod(-1, 3), is(2L));
+    assertThat(DateTimeUtils.floorMod(13, 3), is(1L));
+    assertThat(DateTimeUtils.floorMod(12, 3), is(0L));
+    assertThat(DateTimeUtils.floorMod(11, 3), is(2L));
+    assertThat(DateTimeUtils.floorMod(-13, 3), is(2L));
+    assertThat(DateTimeUtils.floorMod(-12, 3), is(0L));
+    assertThat(DateTimeUtils.floorMod(-11, 3), is(1L));
+    assertThat(DateTimeUtils.floorMod(0, 3), is(0L));
+    assertThat(DateTimeUtils.floorMod(1, 3), is(1L));
+    assertThat(DateTimeUtils.floorMod(-1, 3), is(2L));
   }
 
   @Test public void testTimeUnitRange() {

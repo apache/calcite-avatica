@@ -406,9 +406,9 @@ public class TypedValue {
       }
       switch (rep) {
       case JAVA_SQL_DATE:
-        return (int) DateTimeUtils.floorDiv(t, DateTimeUtils.MILLIS_PER_DAY);
+        return (int) Math.floorDiv(t, DateTimeUtils.MILLIS_PER_DAY);
       case JAVA_SQL_TIME:
-        return (int) DateTimeUtils.floorMod(t, DateTimeUtils.MILLIS_PER_DAY);
+        return (int) Math.floorMod(t, DateTimeUtils.MILLIS_PER_DAY);
       default:
         return t;
       }
