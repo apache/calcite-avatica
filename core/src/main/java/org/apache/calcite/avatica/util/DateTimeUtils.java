@@ -1045,6 +1045,19 @@ public class DateTimeUtils {
     return DateTimeUtils.ymdToUnixDate(y0, m0, d0);
   }
 
+  /**
+   * SQL {@code LAST_DAY} function.
+   *
+   * @param date days since epoch
+   * @return days of the last day of the month since epoch
+   */
+  public static int lastDay(int date) {
+    int y0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.YEAR, date);
+    int m0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.MONTH, date);
+    int last = lastDay(y0, m0);
+    return DateTimeUtils.ymdToUnixDate(y0, m0, last);
+  }
+
   private static int lastDay(int y, int m) {
     switch (m) {
     case 2:
