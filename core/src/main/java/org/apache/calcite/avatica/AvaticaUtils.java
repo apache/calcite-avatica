@@ -197,10 +197,18 @@ public class AvaticaUtils {
     return clazz;
   }
 
-  /** Creates an instance of a plugin class. First looks for a static
-   * member called INSTANCE, then calls a public default constructor.
+  /** Creates an instance of a plugin class.
    *
-   * <p>If className contains a "#" instead looks for a static field.
+   * <p>First looks for a static member called "{@code INSTANCE}",
+   * then calls a public default constructor.
+   *
+   * <p>If {@code className} contains a "#", instead looks for a static field.
+   *
+   * <p>In the "#" case, if the static field is a {@link ThreadLocal}, this
+   * method dereferences the {@code ThreadLocal} by calling
+   * {@link ThreadLocal#get()}. This behavior allows, for example, client code
+   * to pass an object to a JDBC driver. The JDBC driver needs to be running in
+   * the same JVM and the same thread as the client.
    *
    * @param pluginClass Class (or interface) to instantiate
    * @param className Name of implementing class
