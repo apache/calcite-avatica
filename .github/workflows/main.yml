@@ -31,27 +31,45 @@ jobs:
     name: 'Windows (JDK 11)'
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 50
     - name: 'Set up JDK 11'
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
         java-version: 11
+        distribution: 'zulu'
     - name: 'Test'
       shell: cmd
       run: |
         ./gradlew --no-parallel --no-daemon build javadoc
 
-  linux-avatica:
+  linux-jdk8:
+    name: 'Linux (JDK 8)'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Set up JDK 8'
+        uses: actions/setup-java@v2
+        with:
+          java-version: 8
+          distribution: 'zulu'
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 50
+      - name: 'Test'
+        run: |
+          ./gradlew --no-parallel --no-daemon build javadoc
+
+  linux-jdk8-avatica:
     name: 'Linux (JDK 8), Avatica main'
     runs-on: ubuntu-latest
     steps:
     - name: 'Set up JDK 8'
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
         java-version: 8
-    - uses: actions/checkout@v2
+        distribution: 'zulu'
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 50
     - name: 'Install Avatica to Maven Local'
@@ -63,32 +81,125 @@ jobs:
         cd ../calcite
         ./gradlew --no-parallel --no-daemon build -Pcalcite.avatica.version=1.0.0-dev-main-SNAPSHOT -PenableMavenLocal
 
-  linux:
+  linux-jdk11-oldest-guava-tz:
+    name: 'Linux (JDK 11), Oldest Guava, Pacific/Chatham Timezone'
+    runs-on: ubuntu-latest
+    env:
+      GUAVA: 14.0.1 # oldest supported Guava version
+      TZ: Pacific/Chatham # flips between +12:45 and +13:45
+    steps:
+      - name: 'Set up JDK 11'
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'zulu'
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 50
+      - name: 'Test'
+        run: |
+          ./gradlew --no-parallel --no-daemon -Pguava.version=${GUAVA:-14.0.1} build
+
+  linux-jdk11-minimum-guava-tz:
+    name: 'Linux (JDK 11), Calcite Minimum Guava, America/New_York Timezone'
+    runs-on: ubuntu-latest
+    env:
+      GUAVA: '19.0' # Calcite's minimum Guava version
+      TZ: America/New_York # flips between −05:00 and −04:00
+    steps:
+      - name: 'Set up JDK 11'
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'zulu'
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 50
+      - name: 'Test'
+        run: |
+          ./gradlew --no-parallel --no-daemon -Pguava.version=${GUAVA:-14.0.1} build
+
+  linux-jdk11-middle-aged-guava:
+    name: 'Linux (JDK 11), Middle-Aged Guava'
+    runs-on: ubuntu-latest
+    env:
+      GUAVA: '23.0' # a middle-aged Guava version
+    steps:
+      - name: 'Set up JDK 11'
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'zulu'
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 50
+      - name: 'Test'
+        run: |
+          # Disable getLicenses for Guava 22..29 because of [CALCITE-4815]
+          ./gradlew --no-parallel --no-daemon -Pguava.version=${GUAVA:-14.0.1} build -x :standalone-server:licenseCopySpec -x :standalone-server:getLicenses -x :standalone-server:license -x :tck:licenseCopySpec -x :tck:getLicenses -x :tck:license
+
+  linux-jdk11-newest-guava:
+    name: 'Linux (JDK 11), Newest Guava'
+    runs-on: ubuntu-latest
+    env:
+      GUAVA: 31.1-jre # newest supported Guava version
+    steps:
+      - name: 'Set up JDK 11'
+        uses: actions/setup-java@v2
+        with:
+          java-version: 11
+          distribution: 'zulu'
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 50
+      - name: 'Test'
+        run: |
+          ./gradlew --no-parallel --no-daemon -Pguava.version=${GUAVA:-14.0.1} build
+
+  linux-jdk17:
     name: 'Linux (JDK 17)'
     runs-on: ubuntu-latest
     steps:
     - name: 'Set up JDK 17'
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
         java-version: 17
-    - uses: actions/checkout@v2
+        distribution: 'zulu'
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 50
     - name: 'Test'
       run: |
         ./gradlew --no-parallel --no-daemon build javadoc
 
+  linux-jdk18:
+    name: 'Linux (JDK 18)'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Set up JDK 18'
+        uses: actions/setup-java@v2
+        with:
+          java-version: 18
+          distribution: 'zulu'
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 50
+      - name: 'Test'
+        run: |
+          ./gradlew --no-parallel --no-daemon build
+
   mac:
     name: 'macOS (JDK 18)'
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 50
     - name: 'Set up JDK 18'
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v2
       with:
         java-version: 18
+        distribution: 'zulu'
     - name: 'Test'
       run: |
         ./gradlew --no-parallel --no-daemon build javadoc
