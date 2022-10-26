@@ -79,6 +79,8 @@ public class HttpServer {
   private static final Logger LOG = LoggerFactory.getLogger(HttpServer.class);
   private static final int MAX_ALLOWED_HEADER_SIZE = 1024 * 64;
 
+  private static final String DEFAULT_KEYSTORE_TYPE = "JKS";
+
   private Server server;
   private int port = -1;
   private final AvaticaHandler handler;
@@ -515,6 +517,8 @@ public class HttpServer {
     private File truststore;
     private String truststorePassword;
 
+    private String keystoreType;
+
     private List<ServerCustomizer<T>> serverCustomizers = Collections.emptyList();
 
     // The maximum size in bytes of an http header the server will read (64KB)
@@ -768,6 +772,23 @@ public class HttpServer {
     }
 
     /**
+     * Configures the server to use TLS for wire encryption.
+     *
+     * @param keystore The server's keystore
+     * @param keystorePassword The keystore's password
+     * @param truststore The truststore containing the key used to generate the server's key
+     * @param truststorePassword The truststore's password
+     * @param keystoreType The keystore's type
+     * @return <code>this</code>
+     */
+    public Builder<T> withTLS(File keystore, String keystorePassword, File truststore,
+                              String truststorePassword, String keystoreType) {
+      this.withTLS(keystore, keystorePassword, truststore, truststorePassword);
+      this.keystoreType = Objects.requireNonNull(keystoreType);
+      return this;
+    }
+
+    /**
      * Adds customizers to configure a Server before startup.
      *
      * @param serverCustomizers The customizers to use
@@ -850,6 +871,9 @@ public class HttpServer {
         sslFactory.setKeyStorePassword(keystorePassword);
         sslFactory.setTrustStorePath(truststore.getAbsolutePath());
         sslFactory.setTrustStorePassword(truststorePassword);
+        if (keystoreType != null && !keystoreType.equals(DEFAULT_KEYSTORE_TYPE)) {
+          sslFactory.setKeyStoreType(keystoreType);
+        }
       }
       return sslFactory;
     }
