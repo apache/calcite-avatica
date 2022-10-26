@@ -344,3 +344,6 @@ HttpServer server = new HttpServer.Builder()
         new File("/avatica/truststore.jks"), "MyTruststorePassword")
     .build();
 {% endhighlight %}
+
+If you wish to change the default `JKS` keystore format to for example, `BCFKS` use the method
+`withTls(File, String, File, String, String)` to provide the keystore format as a fifth parameter.
