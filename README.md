@@ -28,3 +28,6 @@ For more details, see the [home page](https://calcite.apache.org/avatica).
 
 Release notes for all published versions are available on the [history
 page](https://calcite.apache.org/avatica/docs/history.html).
+
+The project uses [JIRA](https://issues.apache.org/jira/browse/CALCITE)
+for issue tracking. For further information, please see the [JIRA accounts guide](https://calcite.apache.org/develop/#jira-accounts).
