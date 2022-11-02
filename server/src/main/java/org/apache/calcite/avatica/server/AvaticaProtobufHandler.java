@@ -139,6 +139,9 @@ public class AvaticaProtobufHandler extends AbstractAvaticaHandler {
       } catch (RemoteUserDisallowedException e) {
         LOG.debug("Remote user is not authorized", e);
         handlerResponse = pbHandler.unauthorizedErrorResponse(e);
+      } catch (BadRequestException e) {
+        LOG.debug("Bad request exception", e);
+        handlerResponse = pbHandler.badRequestErrorResponse(e);
       } catch (Exception e) {
         LOG.debug("Error invoking request from {}", baseRequest.getRemoteAddr(), e);
         // Catch at the highest level of exceptions
