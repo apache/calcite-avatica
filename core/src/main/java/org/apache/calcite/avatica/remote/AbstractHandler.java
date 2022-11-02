@@ -110,6 +110,13 @@ public abstract class AbstractHandler<T> implements Handler<T> {
   }
 
   /**
+   * Attempts to convert an Exception to an ErrorResponse with an HTTP status code of {@code 400}.
+   */
+  public HandlerResponse<T> badRequestErrorResponse(Exception e) {
+    return createErrorResponse(e, HTTP_BAD_REQUEST);
+  }
+
+  /**
    * Attempts to convert an Exception to an ErrorResponse with an HTTP status code of {@code 401}.
    */
   public HandlerResponse<T> unauthenticatedErrorResponse(Exception e) {

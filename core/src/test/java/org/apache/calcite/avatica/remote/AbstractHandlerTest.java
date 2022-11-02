@@ -164,6 +164,19 @@ public class AbstractHandlerTest {
     assertEquals(serializedErrorResponse, response.getResponse());
     assertEquals(500, response.getStatusCode());
   }
+
+  @Test public void testUsingBadRequestExceptionResponse() throws IOException {
+    final AbstractHandler<String> handler = Mockito.mock(AbstractHandler.class);
+    final Exception exception = new Exception("Bad request");
+    final ErrorResponse errorResponse = Mockito.mock(ErrorResponse.class);
+    final String serializedErrorResponse = "An ErrorResponse";
+    Mockito.when(handler.unwrapException(exception)).thenReturn(errorResponse);
+    Mockito.when(handler.encode(errorResponse)).thenReturn(serializedErrorResponse);
+
+    Mockito.when(handler.badRequestErrorResponse(Mockito.any())).thenCallRealMethod();
+    HandlerResponse<String> response = handler.badRequestErrorResponse(exception);
+    assertEquals(400, response.getStatusCode());
+  }
 }
 
 // End AbstractHandlerTest.java
