@@ -46,7 +46,8 @@ import java.util.Locale;
  * might make a call like this:</p>
  *
  * <code>String encoded = Base64.encodeBytes( mybytes, Base64.GZIP | Base64.DO_BREAK_LINES );</code>
- * <p>to compress the data before encoding it and then making the output have newline characters.</p>
+ * <p>to compress the data before encoding it and
+ * then making the output have newline characters.</p>
  * <p>Also...</p>
  * <code>String encoded = Base64.encodeBytes( crazyString.getBytes() );</code>
  *
@@ -848,7 +849,8 @@ public class Base64
    * @throws IllegalArgumentException if source array, offset, or length are invalid
    * @since 2.0
    */
-  public static String encodeBytes( byte[] source, int off, int len, int options ) throws java.io.IOException {
+  public static String encodeBytes( byte[] source, int off, int len, int options )
+      throws java.io.IOException {
     byte[] encoded = encodeBytesToBytes( source, off, len, options );
 
     // Return value according to relevant encoding.
@@ -880,7 +882,8 @@ public class Base64
     try {
       encoded = encodeBytesToBytes( source, 0, source.length, Base64.NO_OPTIONS );
     } catch( java.io.IOException ex ) {
-      assert false : "IOExceptions only come from GZipping, which is turned off: " + ex.getMessage();
+      assert false : "IOExceptions only come from GZipping, which is turned off: " +
+          ex.getMessage();
     }
     return encoded;
   }
@@ -904,7 +907,8 @@ public class Base64
    * @throws IllegalArgumentException if source array, offset, or length are invalid
    * @since 2.3.1
    */
-  public static byte[] encodeBytesToBytes( byte[] source, int off, int len, int options ) throws java.io.IOException {
+  public static byte[] encodeBytesToBytes( byte[] source, int off, int len, int options )
+      throws java.io.IOException {
 
     if( source == null ){
       throw new NullPointerException( "Cannot serialize a null array." );
@@ -1063,11 +1067,13 @@ public class Base64
     }   // end if
     if( srcOffset < 0 || srcOffset + 3 >= source.length ){
       throw new IllegalArgumentException( String.format( Locale.ROOT,
-          "Source array with length %d cannot have offset of %d and still process four bytes.", source.length, srcOffset ) );
+          "Source array with length %d cannot have offset of %d and still process four bytes.",
+          source.length, srcOffset ) );
     }   // end if
     if( destOffset < 0 || destOffset +2 >= destination.length ){
       throw new IllegalArgumentException( String.format( Locale.ROOT,
-          "Destination array with length %d cannot have offset of %d and still store three bytes.", destination.length, destOffset ) );
+          "Destination array with length %d cannot have offset of %d and still store three bytes.",
+          destination.length, destOffset ) );
     }   // end if
 
 
@@ -1144,7 +1150,8 @@ public class Base64
 //        try {
     decoded = decode( source, 0, source.length, Base64.NO_OPTIONS );
 //        } catch( java.io.IOException ex ) {
-//            assert false : "IOExceptions only come from GZipping, which is turned off: " + ex.getMessage();
+//            assert false : "IOExceptions only come from GZipping, which is turned off: " +
+//                ex.getMessage();
 //        }
     return decoded;
   }
@@ -1177,14 +1184,16 @@ public class Base64
     }   // end if
     if( off < 0 || off + len > source.length ){
       throw new IllegalArgumentException( String.format( Locale.ROOT,
-          "Source array with length %d cannot have offset of %d and process %d bytes.", source.length, off, len ) );
+          "Source array with length %d cannot have offset of %d and process %d bytes.",
+          source.length, off, len ) );
     }   // end if
 
     if( len == 0 ){
       return new byte[0];
     }else if( len < 4 ){
       throw new IllegalArgumentException(
-          "Base64-encoded string must have at least four characters, but length specified was " + len );
+          "Base64-encoded string must have at least four characters, but length specified was " +
+              len );
     }   // end if
 
     byte[] DECODABET = getDecodabet( options );
@@ -1512,7 +1521,8 @@ public class Base64
       // Check for size of file
       if( file.length() > Integer.MAX_VALUE )
       {
-        throw new java.io.IOException( "File is too big for this convenience method (" + file.length() + " bytes)." );
+        throw new java.io.IOException( "File is too big for this convenience method (" +
+            file.length() + " bytes)." );
       }   // end if: file too big for int index
       buffer = new byte[ (int)file.length() ];
 
@@ -1566,7 +1576,8 @@ public class Base64
     {
       // Set up some useful variables
       java.io.File file = new java.io.File( filename );
-      byte[] buffer = new byte[ Math.max((int)(file.length() * 1.4+1),40) ]; // Need max() for math on small files (v2.2.1); Need +1 for a few corner cases (v2.3.5)
+      byte[] buffer = new byte[ Math.max((int)(file.length() * 1.4+1),40) ];
+      // Need max() for math on small files (v2.2.1); Need +1 for a few corner cases (v2.3.5)
       int length   = 0;
       int numBytes = 0;
 

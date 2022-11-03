@@ -16,6 +16,8 @@
  */
 package org.apache.calcite.avatica.remote;
 
+import org.apache.calcite.avatica.AvaticaUtils;
+
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -32,7 +34,7 @@ public class RemoteService extends JsonService {
 
   @Override public String apply(String request) {
     byte[] response = client.send(request.getBytes(StandardCharsets.UTF_8));
-    return new String(response, StandardCharsets.UTF_8);
+    return AvaticaUtils.newStringUtf8(response);
   }
 }
 

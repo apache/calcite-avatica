@@ -26,7 +26,7 @@ public interface Timer extends Metric {
   /**
    * A object that tracks an active timing state.
    */
-  public interface Context extends AutoCloseable {
+  interface Context extends AutoCloseable {
     /**
      * Stops the timer.
      */

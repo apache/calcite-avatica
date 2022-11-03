@@ -16,6 +16,7 @@
  */
 package org.apache.calcite.avatica.server;
 
+import org.apache.calcite.avatica.AvaticaUtils;
 import org.apache.calcite.avatica.remote.AuthenticationType;
 
 import org.eclipse.jetty.server.Request;
@@ -25,7 +26,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.net.HttpURLConnection;
-import java.nio.charset.StandardCharsets;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -84,7 +84,7 @@ public class AbstractAvaticaHandlerTest {
       }
 
       @Override public boolean matches(Object item) {
-        String msg = new String((byte[]) item, StandardCharsets.UTF_8);
+        String msg = AvaticaUtils.newStringUtf8((byte[]) item);
         return msg.contains("User is not authenticated");
       }
 

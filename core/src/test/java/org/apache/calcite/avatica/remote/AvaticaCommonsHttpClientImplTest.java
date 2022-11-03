@@ -16,6 +16,8 @@
  */
 package org.apache.calcite.avatica.remote;
 
+import org.apache.calcite.avatica.AvaticaUtils;
+
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
@@ -72,7 +74,7 @@ public class AvaticaCommonsHttpClientImplTest {
     when(goodResponse.getEntity()).thenReturn(responseEntity);
 
     byte[] responseBytes = client.send(requestBytes);
-    assertEquals("success", new String(responseBytes, UTF_8));
+    assertEquals("success", AvaticaUtils.newStringUtf8(responseBytes));
   }
 
   @Test public void testRetryOnMissingHttpResponse() throws Exception {
@@ -104,7 +106,7 @@ public class AvaticaCommonsHttpClientImplTest {
     when(goodResponse.getEntity()).thenReturn(responseEntity);
 
     byte[] responseBytes = client.send(requestBytes);
-    assertEquals("success", new String(responseBytes, UTF_8));
+    assertEquals("success", AvaticaUtils.newStringUtf8(responseBytes));
   }
 
 }

@@ -47,13 +47,13 @@ public class ProtobufHandler extends AbstractHandler<byte[]> {
   }
 
   @Override Service.Request decode(byte[] serializedRequest) throws IOException {
-    try (final Context ctx = serializationTimer.start()) {
+    try (Context ctx = serializationTimer.start()) {
       return translation.parseRequest(serializedRequest);
     }
   }
 
   @Override byte[] encode(Response response) throws IOException {
-    try (final Context ctx = serializationTimer.start()) {
+    try (Context ctx = serializationTimer.start()) {
       return translation.serializeResponse(response);
     }
   }

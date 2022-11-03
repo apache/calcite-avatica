@@ -194,7 +194,7 @@ public class LocalService implements Service {
   }
 
   public PrepareResponse apply(PrepareRequest request) {
-    try (final Context ignore = prepareTimer.start()) {
+    try (Context ignore = prepareTimer.start()) {
       final Meta.ConnectionHandle ch =
           new Meta.ConnectionHandle(request.connectionId);
       final Meta.StatementHandle h =
@@ -204,7 +204,7 @@ public class LocalService implements Service {
   }
 
   public ExecuteResponse apply(PrepareAndExecuteRequest request) {
-    try (final Context ignore = prepareAndExecuteTimer.start()) {
+    try (Context ignore = prepareAndExecuteTimer.start()) {
       final Meta.StatementHandle sh =
           new Meta.StatementHandle(request.connectionId, request.statementId, null);
       try {
@@ -255,7 +255,7 @@ public class LocalService implements Service {
   }
 
   public ExecuteResponse apply(ExecuteRequest request) {
-    try (final Context ignore = executeTimer.start()) {
+    try (Context ignore = executeTimer.start()) {
       try {
         final Meta.ExecuteResult executeResult = meta.execute(request.statementHandle,
             request.parameterValues, AvaticaUtils.toSaturatedInt(request.maxRowCount));
@@ -300,7 +300,7 @@ public class LocalService implements Service {
   }
 
   public ConnectionSyncResponse apply(ConnectionSyncRequest request) {
-    try (final Context ignore = connectionSyncTimer.start()) {
+    try (Context ignore = connectionSyncTimer.start()) {
       final Meta.ConnectionHandle ch =
           new Meta.ConnectionHandle(request.connectionId);
       final Meta.ConnectionProperties connProps =
@@ -332,7 +332,7 @@ public class LocalService implements Service {
   }
 
   public CommitResponse apply(CommitRequest request) {
-    try (final Context ignore = commitTimer.start()) {
+    try (Context ignore = commitTimer.start()) {
       meta.commit(new Meta.ConnectionHandle(request.connectionId));
 
       // If commit() errors, let the ErrorResponse be sent back via an uncaught Exception.

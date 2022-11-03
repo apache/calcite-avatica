@@ -138,18 +138,18 @@ public class ColumnMetaData {
 
     // Primitive fields (can't be null)
     builder.setOrdinal(ordinal)
-      .setAutoIncrement(autoIncrement)
-      .setCaseSensitive(caseSensitive)
-      .setSearchable(searchable)
-      .setCurrency(currency)
-      .setNullable(nullable)
-      .setSigned(signed)
-      .setDisplaySize(displaySize)
-      .setPrecision(precision)
-      .setScale(scale)
-      .setReadOnly(readOnly)
-      .setWritable(writable)
-      .setDefinitelyWritable(definitelyWritable);
+        .setAutoIncrement(autoIncrement)
+        .setCaseSensitive(caseSensitive)
+        .setSearchable(searchable)
+        .setCurrency(currency)
+        .setNullable(nullable)
+        .setSigned(signed)
+        .setDisplaySize(displaySize)
+        .setPrecision(precision)
+        .setScale(scale)
+        .setReadOnly(readOnly)
+        .setWritable(writable)
+        .setDefinitelyWritable(definitelyWritable);
 
     // Potentially null fields
     if (null != label) {

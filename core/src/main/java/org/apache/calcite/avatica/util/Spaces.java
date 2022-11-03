@@ -171,7 +171,7 @@ public class Spaces {
       addAll(
           new AbstractList<String>() {
             public String get(int index) {
-              return new String(chars, 0, offset + index);
+              return String.valueOf(chars, 0, offset + index);
             }
 
             public int size() {

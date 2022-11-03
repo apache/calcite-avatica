@@ -20,10 +20,12 @@ import org.apache.calcite.avatica.util.UnsynchronizedBuffer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -288,7 +290,7 @@ public class AvaticaUtils {
       throws IOException {
     // Variant that lets us use a pooled Buffer
     final byte[] bytes = _readFully(inputStream, buffer);
-    return new String(bytes, 0, bytes.length, StandardCharsets.UTF_8);
+    return AvaticaUtils.newStringUtf8(bytes);
   }
 
   /** Reads the contents of an input stream and returns as a string. */
@@ -474,6 +476,22 @@ public class AvaticaUtils {
     }
     return longs;
   }
+
+  public static String newStringUtf8(final byte[] bytes) {
+    return newString(bytes, StandardCharsets.UTF_8);
+  }
+
+//CHECKSTYLE: OFF
+  public static String newString(final byte[] bytes, final Charset charset) {
+    return new String(bytes, charset);
+  }
+
+  public static String newString(final byte[] bytes, final String charsetName)
+      throws UnsupportedEncodingException {
+    return new String(bytes, charsetName);
+  }
+//CHECKSTYLE:ON
+
 }
 
 // End AvaticaUtils.java
