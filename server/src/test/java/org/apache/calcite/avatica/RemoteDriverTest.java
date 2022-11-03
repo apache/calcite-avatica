@@ -579,7 +579,7 @@ public class RemoteDriverTest {
     assertEquals(2, metaData.getColumnCount());
     assertEquals("C1", metaData.getColumnName(1));
     assertEquals("C2", metaData.getColumnName(2));
-    for (int i = 0; i < maxRowCount || (maxRowCount == 0 && i < 3); i++) {
+    for (int i = 0; i < maxRowCount || maxRowCount == 0 && i < 3; i++) {
       assertTrue(resultSet.next());
     }
     assertFalse(resultSet.next());
@@ -1334,7 +1334,7 @@ public class RemoteDriverTest {
             + " (id varchar(1) not null, col1 varchar(1) not null)";
         assertFalse(stmt.execute(sql));
       }
-      try (final PreparedStatement pstmt =
+      try (PreparedStatement pstmt =
           conn.prepareStatement("INSERT INTO " + tableName + " values(?, ?)")) {
         pstmt.setString(1, "a");
         pstmt.setString(2, "b");

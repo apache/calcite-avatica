@@ -208,7 +208,6 @@ allprojects {
         apply<CheckstylePlugin>()
         dependencies {
             checkstyle("com.puppycrawl.tools:checkstyle:${"checkstyle".v}")
-            checkstyle("net.hydromatic:toolbox:${"hydromatic-toolbox".v}")
         }
         checkstyle {
             // Current one is ~8.8

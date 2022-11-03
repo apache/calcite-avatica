@@ -88,7 +88,7 @@ public class AvaticaJsonHandler extends AbstractAvaticaHandler {
   public void handle(String target, Request baseRequest,
       HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
-    try (final Context ctx = requestTimer.start()) {
+    try (Context ctx = requestTimer.start()) {
       if (!isUserPermitted(serverConfig, baseRequest, request, response)) {
         LOG.debug("HTTP request from {} is unauthenticated and authentication is required",
             request.getRemoteAddr());
@@ -110,7 +110,7 @@ public class AvaticaJsonHandler extends AbstractAvaticaHandler {
             if (encoding == null) {
               encoding = "UTF-8";
             }
-            rawRequest = new String(bytes, encoding);
+            rawRequest = AvaticaUtils.newString(bytes, encoding);
           } finally {
             // Reset the offset into the buffer after we're done
             buffer.reset();

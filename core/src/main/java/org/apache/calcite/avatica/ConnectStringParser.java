@@ -174,7 +174,7 @@ public class ConnectStringParser {
       switch (c) {
       case '=':
         i++;
-        if ((i < n) && ((c = s.charAt(i)) == '=')) {
+        if (i < n && (c = s.charAt(i)) == '=') {
           // doubled equals sign; take one of them, and carry on
           i++;
           nameBuf.append(c);
@@ -216,7 +216,7 @@ public class ConnectStringParser {
         return "";
       }
     }
-    if ((c == '"') || (c == '\'')) {
+    if (c == '"' || c == '\'') {
       String value = parseQuoted(c);
 
       // skip over trailing white space

@@ -257,7 +257,7 @@ public class RemoteMetaTest {
       final Map<String, ConnectionPropertiesImpl> m = ((RemoteMeta) getMeta(conn)).propsMap;
       assertFalse("remote connection map should start ignorant", m.containsKey(id));
       // force creating a connection object on the remote side.
-      try (final Statement stmt = conn.createStatement()) {
+      try (Statement stmt = conn.createStatement()) {
         assertTrue("creating a statement starts a local object.", m.containsKey(id));
         assertTrue(stmt.execute("select count(1) from EMP"));
       }
@@ -274,7 +274,7 @@ public class RemoteMetaTest {
           defaultAutoCommit, remoteConn.getAutoCommit());
 
       // further interaction with the connection will force a sync
-      try (final Statement stmt = conn.createStatement()) {
+      try (Statement stmt = conn.createStatement()) {
         assertEquals(!defaultAutoCommit, remoteConn.getAutoCommit());
         assertFalse("local values should be clean", m.get(id).isDirty());
       }
@@ -391,8 +391,8 @@ public class RemoteMetaTest {
   @Test public void testExceptionPropagation() throws Exception {
     final String sql = "SELECT * from EMP LIMIT FOOBARBAZ";
     ConnectionSpec.getDatabaseLock().lock();
-    try (final AvaticaConnection conn = (AvaticaConnection) DriverManager.getConnection(url);
-        final Statement stmt = conn.createStatement()) {
+    try (AvaticaConnection conn = (AvaticaConnection) DriverManager.getConnection(url);
+        Statement stmt = conn.createStatement()) {
       try {
         // invalid SQL
         stmt.execute(sql);
@@ -459,11 +459,11 @@ public class RemoteMetaTest {
     final String tableName = "testbinaryandstrs";
     final byte[] data = "asdf".getBytes(StandardCharsets.UTF_8);
     ConnectionSpec.getDatabaseLock().lock();
-    try (final Connection conn = DriverManager.getConnection(url);
-        final Statement stmt = conn.createStatement()) {
+    try (Connection conn = DriverManager.getConnection(url);
+        Statement stmt = conn.createStatement()) {
       assertFalse(stmt.execute("DROP TABLE IF EXISTS " + tableName));
       assertFalse(stmt.execute("CREATE TABLE " + tableName + "(id int, bin BINARY(4))"));
-      try (final PreparedStatement prepStmt = conn.prepareStatement(
+      try (PreparedStatement prepStmt = conn.prepareStatement(
           "INSERT INTO " + tableName + " values(1, ?)")) {
         prepStmt.setBytes(1, data);
         assertFalse(prepStmt.execute());
@@ -475,7 +475,7 @@ public class RemoteMetaTest {
         assertArrayEquals("Bytes were " + Arrays.toString(results.getBytes(2)),
             data, results.getBytes(2));
         // as should string
-        assertEquals(new String(data, StandardCharsets.UTF_8), results.getString(2));
+        assertEquals(AvaticaUtils.newStringUtf8(data), results.getString(2));
         assertFalse(results.next());
       }
     } finally {
@@ -552,8 +552,8 @@ public class RemoteMetaTest {
     final String productTable = "commitrollback_products";
     final String salesTable = "commitrollback_sales";
     ConnectionSpec.getDatabaseLock().lock();
-    try (final Connection conn = DriverManager.getConnection(url);
-        final Statement stmt = conn.createStatement()) {
+    try (Connection conn = DriverManager.getConnection(url);
+        Statement stmt = conn.createStatement()) {
       assertFalse(stmt.execute("DROP TABLE IF EXISTS " + productTable));
       assertFalse(
           stmt.execute(
@@ -652,7 +652,7 @@ public class RemoteMetaTest {
 
   @Test public void getAvaticaVersion() throws Exception {
     ConnectionSpec.getDatabaseLock().lock();
-    try (final Connection conn = DriverManager.getConnection(url)) {
+    try (Connection conn = DriverManager.getConnection(url)) {
       DatabaseMetaData metadata = conn.getMetaData();
       assertTrue("DatabaseMetaData is not an instance of AvaticaDatabaseMetaData",
           metadata instanceof AvaticaSpecificDatabaseMetaData);
@@ -713,7 +713,7 @@ public class RemoteMetaTest {
     final Properties props = new Properties();
     props.setProperty("foo", "bar");
     final Properties originalProps = (Properties) props.clone();
-    try (final Connection conn = DriverManager.getConnection(url, props)) {
+    try (Connection conn = DriverManager.getConnection(url, props)) {
       // The contents of the two properties objects should not have changed after connecting.
       assertEquals(props, originalProps);
     }

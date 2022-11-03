@@ -230,7 +230,7 @@ public class DateTimeUtils {
         }
         NumberFormat nf = NumberFormat.getIntegerInstance(Locale.ROOT);
         Number num = nf.parse(s, pp);
-        if ((num == null) || (pp.getIndex() != s.length())) {
+        if (num == null || pp.getIndex() != s.length()) {
           // Invalid decimal portion
           return null;
         }
@@ -1119,7 +1119,7 @@ public class DateTimeUtils {
   public static long floorDiv(long x, long y) {
     long r = x / y;
     // if the signs are different and modulo not zero, round down
-    if ((x ^ y) < 0 && (r * y != x)) {
+    if ((x ^ y) < 0 && r * y != x) {
       r--;
     }
     return r;

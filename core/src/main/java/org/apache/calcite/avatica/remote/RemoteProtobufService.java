@@ -16,11 +16,12 @@
  */
 package org.apache.calcite.avatica.remote;
 
+import org.apache.calcite.avatica.AvaticaUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 /**
  * ProtobufService implementation that queries against a remote implementation, using
@@ -52,7 +53,7 @@ public class RemoteProtobufService extends ProtobufService {
       resp = translation.parseResponse(response);
     } catch (IOException e) {
       LOG.debug("Failed to deserialize reponse to {}. '{}'", request,
-          new String(response, StandardCharsets.UTF_8));
+          AvaticaUtils.newStringUtf8(response));
       // Not a protobuf that we could parse.
       throw new RuntimeException(e);
     }

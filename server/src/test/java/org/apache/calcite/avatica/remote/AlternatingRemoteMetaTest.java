@@ -321,7 +321,7 @@ public class AlternatingRemoteMetaTest {
       final Map<String, ConnectionPropertiesImpl> m = ((RemoteMeta) getMeta(conn)).propsMap;
       assertFalse("remote connection map should start ignorant", m.containsKey(id));
       // force creating a connection object on the remote side.
-      try (final Statement stmt = conn.createStatement()) {
+      try (Statement stmt = conn.createStatement()) {
         assertTrue("creating a statement starts a local object.", m.containsKey(id));
         assertTrue(stmt.execute("select count(1) from EMP"));
       }
@@ -338,7 +338,7 @@ public class AlternatingRemoteMetaTest {
           defaultAutoCommit, remoteConn.getAutoCommit());
 
       // further interaction with the connection will force a sync
-      try (final Statement stmt = conn.createStatement()) {
+      try (Statement stmt = conn.createStatement()) {
         assertEquals(!defaultAutoCommit, remoteConn.getAutoCommit());
         assertFalse("local values should be clean", m.get(id).isDirty());
       }

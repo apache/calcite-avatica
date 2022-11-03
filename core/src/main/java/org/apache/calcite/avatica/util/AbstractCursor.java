@@ -26,7 +26,6 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
@@ -852,7 +851,7 @@ public abstract class AbstractCursor implements Cursor {
         return null;
       }
       if (o instanceof byte[]) {
-        return new String((byte[]) o, StandardCharsets.UTF_8);
+        return AvaticaUtils.newStringUtf8((byte[]) o);
       } else if (o instanceof ByteString) {
         return ((ByteString) o).toString();
       }
@@ -901,7 +900,7 @@ public abstract class AbstractCursor implements Cursor {
         return null;
       }
       // Need to base64 decode the string.
-      return new String(bytes, StandardCharsets.UTF_8);
+      return AvaticaUtils.newStringUtf8(bytes);
     }
   }
 

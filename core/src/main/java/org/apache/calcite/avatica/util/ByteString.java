@@ -134,7 +134,7 @@ public class ByteString implements Comparable<ByteString>, Serializable {
     default:
       throw new IllegalArgumentException("bad base " + base);
     }
-    return new String(chars, 0, j);
+    return String.valueOf(chars, 0, j);
   }
 
   /**

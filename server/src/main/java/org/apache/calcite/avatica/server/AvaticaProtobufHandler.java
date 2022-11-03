@@ -90,7 +90,7 @@ public class AvaticaProtobufHandler extends AbstractAvaticaHandler {
   public void handle(String target, Request baseRequest,
       HttpServletRequest request, HttpServletResponse response)
       throws IOException, ServletException {
-    try (final Context ctx = this.requestTimer.start()) {
+    try (Context ctx = this.requestTimer.start()) {
       if (!request.getMethod().equals("POST")) {
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         response.getOutputStream().write(

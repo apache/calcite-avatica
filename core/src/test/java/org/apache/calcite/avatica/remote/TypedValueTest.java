@@ -16,6 +16,7 @@
  */
 package org.apache.calcite.avatica.remote;
 
+import org.apache.calcite.avatica.AvaticaUtils;
 import org.apache.calcite.avatica.ColumnMetaData;
 import org.apache.calcite.avatica.ColumnMetaData.Rep;
 import org.apache.calcite.avatica.ColumnMetaData.ScalarType;
@@ -180,7 +181,7 @@ public class TypedValueTest {
     final byte[] b64Bytes = Base64.encodeBytes(bytes).getBytes(UTF_8);
     TypedValue tv = TypedValue.ofLocal(Rep.BYTE_STRING, new ByteString(bytes));
     // JSON encodes it as base64
-    assertEquals(new String(b64Bytes, UTF_8), tv.value);
+    assertEquals(AvaticaUtils.newStringUtf8(b64Bytes), tv.value);
 
     // Get the protobuf variant
     Common.TypedValue protoTv = tv.toProto();
@@ -193,7 +194,7 @@ public class TypedValueTest {
     assertArrayEquals(bytes, protoByteString.toByteArray());
 
     // We should have the b64 string as a backwards compatibility feature
-    assertEquals(new String(b64Bytes, UTF_8),
+    assertEquals(AvaticaUtils.newStringUtf8(b64Bytes),
         protoTv.getStringValue());
   }
 

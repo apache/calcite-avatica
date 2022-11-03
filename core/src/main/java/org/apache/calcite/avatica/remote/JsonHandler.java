@@ -53,7 +53,7 @@ public class JsonHandler extends AbstractHandler<String> {
   }
 
   @Override Request decode(String request) throws IOException {
-    try (final Context ctx = serializationTimer.start()) {
+    try (Context ctx = serializationTimer.start()) {
       return MAPPER.readValue(request, Service.Request.class);
     }
   }
@@ -65,7 +65,7 @@ public class JsonHandler extends AbstractHandler<String> {
    * @return A JSON string.
    */
   @Override String encode(Response response) throws IOException {
-    try (final Context ctx = serializationTimer.start()) {
+    try (Context ctx = serializationTimer.start()) {
       final StringWriter w = new StringWriter();
       MAPPER.writeValue(w, response);
       return w.toString();

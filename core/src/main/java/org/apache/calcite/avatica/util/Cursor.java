@@ -78,7 +78,7 @@ public interface Cursor extends AutoCloseable {
   /**
    * Accessor of a column value.
    */
-  public interface Accessor {
+  interface Accessor {
     boolean wasNull() throws SQLException;
 
     String getString() throws SQLException;
