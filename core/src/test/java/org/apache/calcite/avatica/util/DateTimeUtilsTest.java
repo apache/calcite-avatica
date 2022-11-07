@@ -20,6 +20,8 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.IsoFields;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -782,6 +784,8 @@ public class DateTimeUtilsTest {
 
   private void thereAndBack(int year, int month, int day) {
     final int unixDate = ymdToUnixDate(year, month, day);
+    final LocalDate javaDate = LocalDate.of(year, month, day); // ref impl
+
     assertThat(unixDateExtract(TimeUnitRange.YEAR, unixDate),
         is((long) year));
     assertThat(unixDateExtract(TimeUnitRange.MONTH, unixDate),
@@ -792,20 +796,43 @@ public class DateTimeUtilsTest {
     assertTrue(isoYear >= year - 1 && isoYear <= year + 1);
     final long w = unixDateExtract(TimeUnitRange.WEEK, unixDate);
     assertTrue(w >= 1 && w <= 53);
+    assertThat(w, is((long) javaDate.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)));
     final long dow = unixDateExtract(TimeUnitRange.DOW, unixDate);
     assertTrue(dow >= 1 && dow <= 7);
     final long iso_dow = unixDateExtract(TimeUnitRange.ISODOW, unixDate);
     assertTrue(iso_dow >= 1 && iso_dow <= 7);
+
+    final long isoYearFloor = unixDateFloor(TimeUnitRange.ISOYEAR, unixDate);
+    assertThat(unixDateExtract(TimeUnitRange.ISOYEAR, isoYearFloor),
+        is(isoYear));
+    assertThat(unixDateExtract(TimeUnitRange.ISOYEAR, isoYearFloor - 1),
+        is(isoYear - 1));
+
+    final long isoYearCeil = unixDateCeil(TimeUnitRange.ISOYEAR, unixDate);
+    if (isoYearFloor == unixDate) {
+      assertThat(unixDateExtract(TimeUnitRange.ISOYEAR, isoYearCeil),
+          is(isoYear));
+      assertThat(unixDateExtract(TimeUnitRange.ISOYEAR, isoYearCeil - 1),
+          is(isoYear - 1));
+    } else {
+      assertThat(unixDateExtract(TimeUnitRange.ISOYEAR, isoYearCeil),
+          is(isoYear + 1));
+      assertThat(unixDateExtract(TimeUnitRange.ISOYEAR, isoYearCeil - 1),
+          is(isoYear));
+    }
+
     final long doy = unixDateExtract(TimeUnitRange.DOY, unixDate);
     assertTrue(doy >= 1 && doy <= 366);
     final long q = unixDateExtract(TimeUnitRange.QUARTER, unixDate);
     assertTrue(q >= 1 && q <= 4);
     final long d = unixDateExtract(TimeUnitRange.DECADE, unixDate);
-    assertTrue(d == year / 10);
+    assertThat(d, is((long) year / 10));
     final long c = unixDateExtract(TimeUnitRange.CENTURY, unixDate);
-    assertTrue(c == (year > 0 ? (year + 99) / 100 : (year - 99) / 100));
+    assertThat(c,
+        is(year > 0 ? ((long) year + 99) / 100 : ((long) year - 99) / 100));
     final long m = unixDateExtract(TimeUnitRange.MILLENNIUM, unixDate);
-    assertTrue(m == (year > 0 ? (year + 999) / 1000 : (year - 999) / 1000));
+    assertThat(m,
+        is(year > 0 ? ((long) year + 999) / 1000 : ((long) year - 999) / 1000));
   }
 
   @Test public void testAddMonths() {
@@ -932,6 +959,7 @@ public class DateTimeUtilsTest {
     final long y1900_0701 = y1900 - 1 + 31 + 28 + 31 + 30 + 31 + 30 + 1;
     final long y1900_1001 = y1900 - 1 + 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 1;
     final long y1900_1002 = y1900 - 1 + 31 + 28 + 31 + 30 + 31 + 30 + 31 + 31 + 30 + 2;
+    final long y1900_1231 = y1901 - 1;
     checkDateString("1801-01-01", (int) y1801);
     checkDateString("1900-01-01", (int) y1900);
     checkDateString("1900-01-02", (int) y1900_0102);
@@ -968,6 +996,15 @@ public class DateTimeUtilsTest {
     assertThat(unixDateCeil(TimeUnitRange.WEEK, y1900_0512), is(y1900_0513));
     assertThat(unixDateFloor(TimeUnitRange.DAY, y1900_0514), is(y1900_0514));
     assertThat(unixDateCeil(TimeUnitRange.DAY, y1900_0514), is(y1900_0514));
+
+    // 1900/01/01 is a Monday, therefore the first day of the ISO year;
+    // the next ISO year starts on 1900/12/31
+    assertThat(unixDateFloor(TimeUnitRange.ISOYEAR, y1900), is(y1900));
+    assertThat(unixDateCeil(TimeUnitRange.ISOYEAR, y1900), is(y1900));
+    assertThat(unixDateFloor(TimeUnitRange.ISOYEAR, y1900_0102), is(y1900));
+    assertThat(unixDateCeil(TimeUnitRange.ISOYEAR, y1900_0102), is(y1900_1231));
+    assertThat(unixDateFloor(TimeUnitRange.ISOYEAR, y1900_1231), is(y1900_1231));
+    assertThat(unixDateCeil(TimeUnitRange.ISOYEAR, y1900_1231), is(y1900_1231));
   }
 }
 

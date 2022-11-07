@@ -939,6 +939,17 @@ public class DateTimeUtils {
         ++year;
       }
       return ymdToUnixDate(year, 1, 1);
+    case ISOYEAR:
+      final int isoWeek = getIso8601WeekNumber(julian, year, month, day);
+      final int dowMon = Math.floorMod(julian, 7); // mon=0, sun=6
+      final int isoYearFloor = julian - 7 * (isoWeek - 1) - dowMon;
+      if (floor || isoYearFloor == julian) {
+        return isoYearFloor - EPOCH_JULIAN;
+      } else {
+        // CEIL of this date is the FLOOR of the date 53 weeks later.
+        // (Usually 52 weeks later, sometimes 53 weeks later.)
+        return julianDateFloor(range, isoYearFloor + 7 * 53, true);
+      }
     case QUARTER:
       final int q = (month - 1) / 3;
       if (!floor) {
