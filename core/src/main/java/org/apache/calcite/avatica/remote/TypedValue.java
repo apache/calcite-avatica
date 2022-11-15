@@ -332,15 +332,13 @@ public class TypedValue {
     case BYTE_STRING:
       return ByteString.ofBase64((String) value).getBytes();
     case JAVA_UTIL_DATE:
-      return new java.util.Date(adjust((Number) value, calendar));
+      return DateTimeUtils.unixTimestampToUtilDate((Long) value, calendar);
     case JAVA_SQL_DATE:
-      return new java.sql.Date(
-          adjust(((Number) value).longValue() * DateTimeUtils.MILLIS_PER_DAY,
-              calendar));
+      return DateTimeUtils.unixDateToSqlDate((Integer) value, calendar);
     case JAVA_SQL_TIME:
-      return new java.sql.Time(adjust((Number) value, calendar));
+      return DateTimeUtils.unixTimeToSqlTime((Integer) value, calendar);
     case JAVA_SQL_TIMESTAMP:
-      return new java.sql.Timestamp(adjust((Number) value, calendar));
+      return DateTimeUtils.unixTimestampToSqlTimestamp((Long) value, calendar);
     case ARRAY:
       if (null == value) {
         return null;
@@ -373,14 +371,6 @@ public class TypedValue {
     }
   }
 
-  private static long adjust(Number number, Calendar calendar) {
-    long t = number.longValue();
-    if (calendar != null) {
-      t -= calendar.getTimeZone().getOffset(t);
-    }
-    return t;
-  }
-
   private static Object jdbcToSerial(ColumnMetaData.Rep rep, Object value,
       Calendar calendar) {
     return jdbcToSerial(rep, value, calendar, null);
@@ -397,21 +387,13 @@ public class TypedValue {
     case BYTE_STRING:
       return new ByteString((byte[]) value).toBase64String();
     case JAVA_UTIL_DATE:
+      return DateTimeUtils.utilDateToUnixTimestamp((Date) value, calendar);
     case JAVA_SQL_TIMESTAMP:
+      return DateTimeUtils.sqlTimestampToUnixTimestamp((Timestamp) value, calendar);
     case JAVA_SQL_DATE:
+      return DateTimeUtils.sqlDateToUnixDate((java.sql.Date) value, calendar);
     case JAVA_SQL_TIME:
-      long t = ((Date) value).getTime();
-      if (calendar != null) {
-        t += calendar.getTimeZone().getOffset(t);
-      }
-      switch (rep) {
-      case JAVA_SQL_DATE:
-        return (int) Math.floorDiv(t, DateTimeUtils.MILLIS_PER_DAY);
-      case JAVA_SQL_TIME:
-        return (int) Math.floorMod(t, DateTimeUtils.MILLIS_PER_DAY);
-      default:
-        return t;
-      }
+      return DateTimeUtils.sqlTimeToUnixTime((Time) value, calendar);
     case ARRAY:
       Array array = (Array) value;
       Objects.requireNonNull(componentType, "Component Type must not be null for ARRAYs");

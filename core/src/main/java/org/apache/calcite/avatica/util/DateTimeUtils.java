@@ -16,10 +16,16 @@
  */
 package org.apache.calcite.avatica.util;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -90,6 +96,11 @@ public class DateTimeUtils {
    * The number of seconds in a day.
    */
   public static final long SECONDS_PER_DAY = 86_400; // = 24 * 60 * 60
+
+  /**
+   * The number of nanoseconds in a millisecond.
+   */
+  public static final long NANOS_PER_MILLI = 1000000L;
 
   /**
    * Calendar set to the epoch (1970-01-01 00:00:00 UTC). Useful for
@@ -1158,6 +1169,235 @@ public class DateTimeUtils {
   /** Returns the value of a {@code OffsetDateTime} as a string. */
   public static String offsetDateTimeValue(Object o) {
     return OFFSET_DATE_TIME_HANDLER.stringValue(o);
+  }
+
+  /**
+   * Calculates the unix date as the number of days since January 1st, 1970 UTC for the given SQL
+   * date.
+   *
+   * @see #sqlDateToUnixDate(java.sql.Date, TimeZone)
+   */
+  public static int sqlDateToUnixDate(java.sql.Date date, Calendar calendar) {
+    return sqlDateToUnixDate(date, calendar != null ? calendar.getTimeZone() : null);
+  }
+
+  /**
+   * Calculates the unix date as the number of days since January 1st, 1970 UTC for the given SQL
+   * date.
+   *
+   * <p>The {@link java.sql.Date} class uses the standard Gregorian calendar which switches from
+   * the Julian calendar to the Gregorian calendar in October 1582. For compatibility with
+   * ISO-8601, the value is converted to a {@link LocalDate} which uses the proleptic Gregorian
+   * calendar.
+   *
+   * <p>For backwards compatibility, timezone offsets are calculated in relation to the local
+   * timezone instead of UTC. Providing the default timezone or {@code null} will return the date
+   * unmodified.
+   *
+   * <p>If the date contains a partial day, it will be rounded to a full day depending on the
+   * milliseconds value. If the milliseconds value is positive, it will be rounded down to the
+   * closest full day. If the milliseconds value is negative, it will be rounded up to the closest
+   * full day.
+   */
+  public static int sqlDateToUnixDate(java.sql.Date date, TimeZone timeZone) {
+    final long time = date.getTime();
+
+    // Convert from standard Gregorian calendar to ISO calendar system
+    // Use a SQL timestamp to include the time offset from UTC in the unix timestamp
+    final LocalDateTime dateTime = new Timestamp(time).toLocalDateTime();
+    long unixTimestamp = dateTime.toEpochSecond(ZoneOffset.UTC)
+        * DateTimeUtils.MILLIS_PER_SECOND
+        + dateTime.get(ChronoField.MILLI_OF_SECOND);
+
+    // Calculate timezone offset in relation to local time
+    if (timeZone != null) {
+      unixTimestamp += timeZone.getOffset(time);
+    }
+    unixTimestamp -= DEFAULT_ZONE.getOffset(time);
+
+    return (int) (unixTimestamp / DateTimeUtils.MILLIS_PER_DAY);
+  }
+
+  /**
+   * Converts the given unix date to a SQL date.
+   *
+   * <p>The unix date should be the number of days since January 1st, 1970 UTC using the proleptic
+   * Gregorian calendar as defined by ISO-8601. The returned {@link java.sql.Date} object will use
+   * the standard Gregorian calendar which switches from the Julian calendar to the Gregorian
+   * calendar in October 1582. This conversion is handled by the {@link java.sql.Date} class when
+   * converting from a {@link LocalDate} object.
+   *
+   * <p>For backwards compatibility, timezone offsets are calculated in relation to the local
+   * timezone instead of UTC. Providing the default timezone or {@code null} will return the date
+   * unmodified.
+   */
+  public static java.sql.Date unixDateToSqlDate(int date, Calendar calendar) {
+    // Convert unix date from the ISO calendar system to the standard Gregorian calendar
+    final LocalDate localDate = LocalDate.ofEpochDay(date);
+    final java.sql.Date sqlDate = java.sql.Date.valueOf(localDate);
+
+    // Calculate timezone offset in relation to local time
+    final long time = sqlDate.getTime();
+    final int offset = calendar != null ? calendar.getTimeZone().getOffset(time) : 0;
+    sqlDate.setTime(time + DEFAULT_ZONE.getOffset(time) - offset);
+
+    return sqlDate;
+  }
+
+  /**
+   * Calculates the unix date as the number of milliseconds since January 1st, 1970 UTC for the
+   * given date.
+   *
+   * @see #utilDateToUnixTimestamp(Date, TimeZone)
+   */
+  public static long utilDateToUnixTimestamp(Date date, Calendar calendar) {
+    return utilDateToUnixTimestamp(date, calendar != null ? calendar.getTimeZone() : null);
+  }
+
+  /**
+   * Calculates the unix date as the number of milliseconds since January 1st, 1970 UTC for the
+   * given date.
+   *
+   * <p>The {@link Date} class uses the standard Gregorian calendar which switches from the Julian
+   * calendar to the Gregorian calendar in October 1582. For compatibility with ISO-8601, the value
+   * is converted to a {@code java.time} object which uses the proleptic Gregorian calendar.
+   *
+   * <p>For backwards compatibility, timezone offsets are calculated in relation to the local
+   * timezone instead of UTC. Providing the default timezone or {@code null} will return the date
+   * unmodified.
+   */
+  public static long utilDateToUnixTimestamp(Date date, TimeZone timeZone) {
+    final Timestamp timestamp = new Timestamp(date.getTime());
+    return sqlTimestampToUnixTimestamp(timestamp, timeZone);
+  }
+
+  /**
+   * Converts the given unix timestamp to a Java date.
+   *
+   * <p>The unix timestamp should be the number of milliseconds since January 1st, 1970 UTC using
+   * the proleptic Gregorian calendar as defined by ISO-8601. The returned {@link Date} object will
+   * use the standard Gregorian calendar which switches from the Julian calendar to the Gregorian
+   * calendar in October 1582. This conversion is handled by the {@code java.sql} package when
+   * converting from a {@code java.time} object.
+   *
+   * <p>For backwards compatibility, timezone offsets are calculated in relation to the local
+   * timezone instead of UTC. Providing the default timezone or {@code null} will return the date
+   * unmodified.
+   */
+  public static Date unixTimestampToUtilDate(long timestamp, Calendar calendar) {
+    final Timestamp sqlTimestamp = unixTimestampToSqlTimestamp(timestamp, calendar);
+    return new Date(sqlTimestamp.getTime());
+  }
+
+  /**
+   * Calculates the unix time as the number of milliseconds since the previous day in UTC for the
+   * given SQL time.
+   *
+   * @see #sqlTimeToUnixTime(Time, TimeZone)
+   */
+  public static int sqlTimeToUnixTime(Time time, Calendar calendar) {
+    return sqlTimeToUnixTime(time, calendar != null ? calendar.getTimeZone() : null);
+  }
+
+  /**
+   * Calculates the unix time as the number of milliseconds since the previous day in UTC for the
+   * given SQL time.
+   *
+   * <p>For backwards compatibility, timezone offsets are calculated in relation to the local
+   * timezone instead of UTC. Providing the default timezone or {@code null} will return the time
+   * unmodified.
+   */
+  public static int sqlTimeToUnixTime(Time time, TimeZone timeZone) {
+    long unixTime = time.getTime();
+    if (timeZone != null) {
+      unixTime += timeZone.getOffset(unixTime);
+    }
+    return (int) Math.floorMod(unixTime, MILLIS_PER_DAY);
+  }
+
+  /**
+   * Converts the given unix time to a SQL time.
+   *
+   * <p>The unix time should be the number of milliseconds since the previous day in UTC.
+   *
+   * <p>For backwards compatibility, timezone offsets are calculated in relation to the local
+   * timezone instead of UTC. Providing the default timezone or {@code null} will return the time
+   * unmodified.
+   */
+  public static Time unixTimeToSqlTime(int time, Calendar calendar) {
+    if (calendar != null) {
+      time -= calendar.getTimeZone().getOffset(time);
+    }
+    return new Time(time);
+  }
+
+  /**
+   * Calculates the unix date as the number of milliseconds since January 1st, 1970 UTC for the
+   * given SQL timestamp.
+   *
+   * @see #sqlTimestampToUnixTimestamp(Timestamp, TimeZone)
+   */
+  public static long sqlTimestampToUnixTimestamp(Timestamp timestamp, Calendar calendar) {
+    return sqlTimestampToUnixTimestamp(timestamp, calendar != null ? calendar.getTimeZone() : null);
+  }
+
+  /**
+   * Calculates the unix date as the number of milliseconds since January 1st, 1970 UTC for the
+   * given SQL timestamp.
+   *
+   * <p>The {@link Timestamp} class uses the standard Gregorian calendar which switches from the
+   * Julian calendar to the Gregorian calendar in October 1582. For compatibility with ISO-8601,
+   * the value is converted to a {@link LocalDateTime} which uses the proleptic Gregorian calendar.
+   *
+   * <p>For backwards compatibility, timezone offsets are calculated in relation to the local
+   * timezone instead of UTC. Providing the default timezone or {@code null} will return the
+   * timestamp unmodified.
+   */
+  public static long sqlTimestampToUnixTimestamp(Timestamp timestamp, TimeZone timeZone) {
+    final long time = timestamp.getTime();
+
+    // Convert SQL timestamp from standard Gregorian calendar to ISO calendar system
+    final LocalDateTime dateTime = timestamp.toLocalDateTime();
+    long unixTimestamp = dateTime.toEpochSecond(ZoneOffset.UTC)
+        * DateTimeUtils.MILLIS_PER_SECOND
+        + dateTime.get(ChronoField.MILLI_OF_SECOND);
+
+    // Calculate timezone offset in relation to local time
+    if (timeZone != null) {
+      unixTimestamp += timeZone.getOffset(time);
+    }
+    unixTimestamp -= DEFAULT_ZONE.getOffset(time);
+
+    return unixTimestamp;
+  }
+
+  /**
+   * Converts the given unix timestamp to a SQL timestamp.
+   *
+   * <p>The unix timestamp should be the number of milliseconds since January 1st, 1970 UTC using
+   * the proleptic Gregorian calendar as defined by ISO-8601. The returned {@link Timestamp} object
+   * will use the standard Gregorian calendar which switches from the Julian calendar to the
+   * Gregorian calendar in October 1582. This conversion is handled by the {@link Timestamp} class
+   * when converting from a {@link LocalDateTime} object.
+   *
+   * <p>For backwards compatibility, timezone offsets are calculated in relation to the local
+   * timezone instead of UTC. Providing the default timezone or {@code null} will return the
+   * timestamp unmodified.
+   */
+  public static Timestamp unixTimestampToSqlTimestamp(long timestamp, Calendar calendar) {
+    // Convert unix timestamp from the ISO calendar system to the standard Gregorian calendar
+    final LocalDateTime localDateTime = LocalDateTime.ofEpochSecond(
+        Math.floorDiv(timestamp, DateTimeUtils.MILLIS_PER_SECOND),
+        (int) (Math.floorMod(timestamp, DateTimeUtils.MILLIS_PER_SECOND) * NANOS_PER_MILLI),
+        ZoneOffset.UTC);
+    final Timestamp sqlTimestamp = Timestamp.valueOf(localDateTime);
+
+    // Calculate timezone offset in relation to local time
+    final long time = sqlTimestamp.getTime();
+    final int offset = calendar != null ? calendar.getTimeZone().getOffset(time) : 0;
+    sqlTimestamp.setTime(time + DEFAULT_ZONE.getOffset(time) - offset);
+
+    return sqlTimestamp;
   }
 
   //~ Inner Classes ----------------------------------------------------------
