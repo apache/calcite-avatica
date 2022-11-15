@@ -32,10 +32,15 @@ import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.sql.Array;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
@@ -143,22 +148,50 @@ public class TypedValueTest {
   @Test public void testSqlDate() {
     // days since epoch
     serializeAndEqualityCheck(TypedValue.ofLocal(Rep.JAVA_SQL_DATE, 25));
+
+    // From JDBC to local
+    final Calendar calendar = Calendar.getInstance(TimeZone.getDefault(), Locale.ROOT);
+    final TypedValue value =
+        TypedValue.ofJdbc(Rep.JAVA_SQL_DATE, Date.valueOf("1500-04-30"), calendar);
+    assertThat(value.value, is(-171545));
   }
 
   @Test public void testUtilDate() {
-    serializeAndEqualityCheck(
-        TypedValue.ofLocal(Rep.JAVA_UTIL_DATE, System.currentTimeMillis()));
+    final long time = System.currentTimeMillis();
+    serializeAndEqualityCheck(TypedValue.ofLocal(Rep.JAVA_UTIL_DATE, time));
+
+    // From JDBC to local
+    final Calendar calendar = Calendar.getInstance(TimeZone.getDefault(), Locale.ROOT);
+    final TypedValue value = TypedValue.ofJdbc(
+        Rep.JAVA_UTIL_DATE,
+        new Timestamp(time - calendar.getTimeZone().getOffset(time)),
+        calendar);
+    assertThat(value.value, is(time));
   }
 
   @Test public void testSqlTime() {
     // millis since epoch
     serializeAndEqualityCheck(
         TypedValue.ofLocal(Rep.JAVA_SQL_TIME, 42 * 1024 * 1024));
+
+    // From JDBC to local
+    final Calendar calendar = Calendar.getInstance(TimeZone.getDefault(), Locale.ROOT);
+    final TypedValue value =
+        TypedValue.ofJdbc(Rep.JAVA_SQL_TIME, Time.valueOf("00:00:00"), calendar);
+    assertThat(value.value, is(0));
   }
 
   @Test public void testSqlTimestamp() {
     serializeAndEqualityCheck(
         TypedValue.ofLocal(Rep.JAVA_SQL_TIMESTAMP, 42L * 1024 * 1024 * 1024));
+
+    // From JDBC to local
+    final Calendar calendar = Calendar.getInstance(TimeZone.getDefault(), Locale.ROOT);
+    final TypedValue value = TypedValue.ofJdbc(
+        Rep.JAVA_SQL_TIMESTAMP,
+        Timestamp.valueOf("1500-04-30 15:28:27.356"),
+        calendar);
+    assertThat(value.value, is(-14821432292644L));
   }
 
   @Test public void testLegacyDecimalParsing() {

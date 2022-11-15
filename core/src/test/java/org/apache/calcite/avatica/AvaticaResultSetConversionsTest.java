@@ -1088,9 +1088,7 @@ public class AvaticaResultSetConversionsTest {
     }
 
     @Override public void testGetTime(ResultSet resultSet, Calendar calendar) throws SQLException {
-      // how come both are different? DST...
-      //assertEquals(new Time(1476130718123L), g.getTime(label, calendar));
-      assertEquals(new Time(73118123L), g.getTime(resultSet, calendar));
+      assertEquals(new Time(1476130718123L), g.getTime(resultSet, calendar));
     }
 
     @Override public void testGetTimestamp(ResultSet resultSet, Calendar calendar)
