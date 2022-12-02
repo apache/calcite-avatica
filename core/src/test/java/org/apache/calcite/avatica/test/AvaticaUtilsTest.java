@@ -411,6 +411,47 @@ public class AvaticaUtilsTest {
     copyBytes[3] = 11;
     assertThat(s.getBytes()[3], is((byte) 92));
     assertThat(s, is(s2));
+
+    // startsWith
+    assertThat(s.startsWith(s), is(true));
+    assertThat(s.startsWith(s.substring(0, 1)), is(true));
+    assertThat(s.startsWith(s.substring(0, 3)), is(true));
+    assertThat(s.startsWith(s3), is(true)); // ""
+    assertThat(s.startsWith(s4), is(false)); // "\0"
+    assertThat(s3.startsWith(s3), is(true)); // "" starts with ""
+
+    // startsWith offset 0
+    assertThat(s.startsWith(s, 0), is(true));
+    assertThat(s.startsWith(s.substring(0, 1), 0), is(true));
+    assertThat(s.startsWith(s.substring(0, 3), 0), is(true));
+    assertThat(s.startsWith(s3, 0), is(true)); // ""
+    assertThat(s.startsWith(s4, 0), is(false)); // "\0"
+    assertThat(s3.startsWith(s3, 0), is(true)); // "" starts with ""
+
+    // startsWith, other offsets
+    assertThat(s.startsWith(s, 1), is(false));
+    assertThat(s.startsWith(s3, 1), is(true));
+    assertThat(s.startsWith(s3, s.length() - 1), is(true));
+    assertThat(s.startsWith(s3, s.length()), is(true));
+    assertThat(s.startsWith(s3, s.length() + 1), is(false));
+
+    // endsWith
+    assertThat(reverse(s).endsWith(reverse(s)), is(true));
+    assertThat(reverse(s).endsWith(reverse(s.substring(0, 1))), is(true));
+    assertThat(reverse(s).endsWith(reverse(s.substring(0, 3))), is(true));
+    assertThat(reverse(s).endsWith(reverse(s3)), is(true)); // ""
+    assertThat(reverse(s).endsWith(reverse(s4)), is(false)); // "\0"
+    assertThat(reverse(s3).endsWith(reverse(s3)), is(true));
+  }
+
+  private ByteString reverse(ByteString s) {
+    final byte[] bytes = s.getBytes();
+    for (int i = 0, j = bytes.length - 1; i < j; i++, j--) {
+      byte b = bytes[i];
+      bytes[i] = bytes[j];
+      bytes[j] = b;
+    }
+    return new ByteString(bytes);
   }
 
   @Test public void testSkipFully() throws IOException {
