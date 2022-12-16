@@ -182,3 +182,14 @@ on-hover images for the permalink, but oh well.
 : _Default_: `100`.
 
 : _Required_: No.
+
+<strong><a name="transparent_reconnection" href="#transparent_reconnection">transparent_reconnection</a></strong>
+
+: _Description_: The Java client versions between 1.5.0 and 1.20.0 transparently re-created
+  the Connection object on the client side if it expired from the server cache. This behaviour broke
+  JDBC compliance and could cause data loss for transactional write workloads, and has been removed
+  in 1.21.0. Setting this property to `true` restores the 1.20.0 behaviour.
+
+: _Default_: `false`.
+
+: _Required_: No.
