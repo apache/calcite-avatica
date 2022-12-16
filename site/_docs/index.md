@@ -169,11 +169,11 @@ highly welcomed!
 * *Maintainer*: Apache Calcite community
 
 ### Apache Phoenix database adapter for Python
-* [Home page](https://bitbucket.org/lalinsky/python-phoenixdb)
+* [Home page](https://phoenix.apache.org/python.html)
 * Language: Python
 * *License*: [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)
-* Avatica version 1.2.0 to 1.6.0
-* *Maintainer*: Lukáš Lalinský
+* Avatica version 1.2.0 onwards
+* *Maintainer*: Apache Phoenix community
 
 ### JavaScript binding to Calcite Avatica Server
 * [Home page](https://github.com/waylayio/avatica-js)
