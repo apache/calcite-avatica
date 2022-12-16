@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -64,6 +65,14 @@ public class AvaticaStatementTest {
     assertFalse(statement.getMoreResults());
     verify(resultSet).close();
   }
+
+  @Test public void testFetchSize() throws SQLException {
+    doCallRealMethod().when(statement).setFetchSize(anyInt());
+    when(statement.getFetchSize()).thenCallRealMethod();
+    statement.setFetchSize(50);
+    assertEquals(50, statement.getFetchSize());
+  }
+
 }
 
 // End AvaticaStatementTest.java

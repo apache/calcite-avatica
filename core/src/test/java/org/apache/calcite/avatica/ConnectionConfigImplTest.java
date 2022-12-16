@@ -52,6 +52,18 @@ public class ConnectionConfigImplTest {
     assertNull(config.truststore());
     assertEquals(config.truststorePassword(), "");
   }
+
+  @Test public void testFetchSizeDefault() {
+    ConnectionConfigImpl config = new ConnectionConfigImpl(new Properties());
+    assertEquals(100, config.fetchSize());
+  }
+
+  @Test public void testFetchSizeExplicit() {
+    Properties props = new Properties();
+    props.setProperty("fetch_size", "50");
+    ConnectionConfigImpl config = new ConnectionConfigImpl(props);
+    assertEquals(50, config.fetchSize());
+  }
 }
 
 // End ConnectionConfigImplTest.java
