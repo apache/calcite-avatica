@@ -54,16 +54,41 @@ public class AvaticaStatementTest {
     assertArrayEquals(longValues, statement.executeLargeBatch());
   }
 
-  @Test public void testGetMoreResults() throws SQLException {
+  /** Test case for
+   * <a href="https://issues.apache.org/jira/browse/CALCITE-2140>[CALCITE-2140]
+   * Basic implementation of Statement#getMoreResults()</a> that verifies result
+   * sets are closed after a call to {@code getMoreResults()}. */
+  @Test public void testGetMoreResultsWithResultSet() throws SQLException {
     AvaticaResultSet resultSet = mock(AvaticaResultSet.class);
     statement.openResultSet = resultSet;
 
     doCallRealMethod().when(statement).onResultSetClose(any(ResultSet.class));
     when(statement.getMoreResults()).thenCallRealMethod();
     when(statement.getMoreResults(anyInt())).thenCallRealMethod();
+    when(statement.getUpdateCount()).thenCallRealMethod();
 
     assertFalse(statement.getMoreResults());
+    assertEquals(-1, statement.getUpdateCount());
     verify(resultSet).close();
+  }
+
+  /** Test case for
+   * <a href="https://issues.apache.org/jira/browse/CALCITE-5443>[CALCITE-5443]
+   * After Statement.getMoreResults() has returned false,
+   * Statement.getUpdateCount() should return -1</a> that verifies that the
+   * update count is reset after a call to
+   * {@link java.sql.Statement#getMoreResults()}. */
+  @Test public void testGetMoreResultsWithUpdateCount() throws SQLException {
+    statement.updateCount = 1;
+
+    when(statement.getMoreResults()).thenCallRealMethod();
+    when(statement.getMoreResults(anyInt())).thenCallRealMethod();
+    when(statement.getUpdateCount()).thenCallRealMethod();
+    when(statement.getLargeUpdateCount()).thenCallRealMethod();
+
+    assertFalse(statement.getMoreResults());
+    assertEquals(-1, statement.getUpdateCount());
+    assertEquals(-1, statement.getLargeUpdateCount());
   }
 
   @Test public void testFetchSize() throws SQLException {
@@ -72,7 +97,6 @@ public class AvaticaStatementTest {
     statement.setFetchSize(50);
     assertEquals(50, statement.getFetchSize());
   }
-
 }
 
 // End AvaticaStatementTest.java
