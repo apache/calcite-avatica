@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -53,16 +54,39 @@ public class AvaticaStatementTest {
     assertArrayEquals(longValues, statement.executeLargeBatch());
   }
 
-  @Test public void testGetMoreResults() throws SQLException {
+  /**
+   * Test case for <a href="https://issues.apache.org/jira/browse/CALCITE-2140>[CALCITE-2140]</a>
+   * that verifies result sets are closed after a call to {@code getMoreResults()}.
+   */
+  @Test public void testGetMoreResultsWithResultSet() throws SQLException {
     AvaticaResultSet resultSet = mock(AvaticaResultSet.class);
     statement.openResultSet = resultSet;
 
     doCallRealMethod().when(statement).onResultSetClose(any(ResultSet.class));
     when(statement.getMoreResults()).thenCallRealMethod();
     when(statement.getMoreResults(anyInt())).thenCallRealMethod();
+    when(statement.getUpdateCount()).thenCallRealMethod();
 
     assertFalse(statement.getMoreResults());
+    assertEquals(-1, statement.getUpdateCount());
     verify(resultSet).close();
+  }
+
+  /**
+   * Test case for <a href="https://issues.apache.org/jira/browse/CALCITE-5443>[CALCITE-5443]</a>
+   * that verifies the update count is reset after a call to {@code getMoreResults()}.
+   */
+  @Test public void testGetMoreResultsWithUpdateCount() throws SQLException {
+    statement.updateCount = 1;
+
+    when(statement.getMoreResults()).thenCallRealMethod();
+    when(statement.getMoreResults(anyInt())).thenCallRealMethod();
+    when(statement.getUpdateCount()).thenCallRealMethod();
+    when(statement.getLargeUpdateCount()).thenCallRealMethod();
+
+    assertFalse(statement.getMoreResults());
+    assertEquals(-1, statement.getUpdateCount());
+    assertEquals(-1, statement.getLargeUpdateCount());
   }
 }
 

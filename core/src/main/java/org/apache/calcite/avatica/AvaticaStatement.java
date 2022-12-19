@@ -475,6 +475,7 @@ public abstract class AvaticaStatement
     if (openResultSet != null) {
       openResultSet.close();
     }
+    updateCount = -1;
     return false;
   }
 
