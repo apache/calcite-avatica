@@ -32,14 +32,14 @@ public class UnregisteredDriverTest {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  @Test public void testNullUrlForAcceptsURL() throws SQLException {
+  @Test public void testAcceptsURLWithNull() throws SQLException {
     final Driver driver = new UnregisteredTestDriver();
     thrown.expect(SQLException.class);
     thrown.expectMessage("url can not be null!");
     driver.acceptsURL(null);
   }
 
-  @Test public void testNullUrlForConnect() throws SQLException {
+  @Test public void testConnectWithNullURL() throws SQLException {
     final Driver driver = new UnregisteredTestDriver();
     thrown.expect(SQLException.class);
     thrown.expectMessage("url can not be null!");
