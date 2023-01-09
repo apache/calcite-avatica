@@ -31,14 +31,14 @@ public class UnregisteredDriverTest {
   @Rule
   public ExpectedException thrown = ExpectedException.none();
 
-  @Test public void testNullUrl() throws SQLException {
+  @Test public void testNullUrlForAcceptsURL() throws SQLException {
     final Driver driver = new UnregisteredTestDriver();
     thrown.expect(SQLException.class);
     thrown.expectMessage("url can not be null!");
     driver.acceptsURL(null);
   }
 
-  private static final class UnregisteredTestDriver extends UnregisteredDriver{
+  private static final class UnregisteredTestDriver extends UnregisteredDriver {
 
     @Override
     protected DriverVersion createDriverVersion() {
