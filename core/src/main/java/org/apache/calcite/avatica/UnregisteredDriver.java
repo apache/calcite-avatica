@@ -141,6 +141,9 @@ public abstract class UnregisteredDriver implements java.sql.Driver {
   }
 
   public boolean acceptsURL(String url) throws SQLException {
+    if (url == null) {
+      throw new SQLException("url can not be null!");
+    }
     return url.startsWith(getConnectStringPrefix());
   }
 
