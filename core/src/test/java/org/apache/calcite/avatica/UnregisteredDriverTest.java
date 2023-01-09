@@ -22,6 +22,7 @@ import org.junit.rules.ExpectedException;
 
 import java.sql.Driver;
 import java.sql.SQLException;
+import java.util.Properties;
 
 /**
  * Test class for {@link UnregisteredDriver}.
@@ -36,6 +37,13 @@ public class UnregisteredDriverTest {
     thrown.expect(SQLException.class);
     thrown.expectMessage("url can not be null!");
     driver.acceptsURL(null);
+  }
+
+  @Test public void testNullUrlForConnect() throws SQLException {
+    final Driver driver = new UnregisteredTestDriver();
+    thrown.expect(SQLException.class);
+    thrown.expectMessage("url can not be null!");
+    driver.connect(null, new Properties());
   }
 
   private static final class UnregisteredTestDriver extends UnregisteredDriver {
