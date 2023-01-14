@@ -27,8 +27,6 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import static org.apache.calcite.avatica.util.DateTimeUtils.*;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -36,7 +34,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Test conversions from SQL {@link Timestamp} to JDBC types in
  * {@link AbstractCursor.TimestampAccessor}.
  */
-public class TimestampAccessorTest {
+public class TimestampWithLocalTimeZoneAccessorTest {
 
   private static final Calendar UTC =
       Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ROOT);
@@ -79,7 +77,7 @@ public class TimestampAccessorTest {
   @Before public void before() {
     final AbstractCursor.Getter getter = new LocalGetter();
     localCalendar = Calendar.getInstance(IST_ZONE, Locale.ROOT);
-    instance = new AbstractCursor.TimestampAccessor(getter, localCalendar, false);
+    instance = new AbstractCursor.TimestampAccessor(getter, localCalendar, true);
   }
 
   /**
@@ -110,12 +108,12 @@ public class TimestampAccessorTest {
     final TimeZone minusFiveZone = TimeZone.getTimeZone("GMT-5:00");
     final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
     assertThat(instance.getTimestamp(minusFiveCal).getTime(),
-        is(5 * MILLIS_PER_HOUR));
+        is(0L));
 
     final TimeZone plusFiveZone = TimeZone.getTimeZone("GMT+5:00");
     final Calendar plusFiveCal = Calendar.getInstance(plusFiveZone, Locale.ROOT);
     assertThat(instance.getTimestamp(plusFiveCal).getTime(),
-        is(-5 * MILLIS_PER_HOUR));
+        is(0L));
   }
 
   /**
@@ -142,12 +140,12 @@ public class TimestampAccessorTest {
     final TimeZone minusFiveZone = TimeZone.getTimeZone("GMT-5:00");
     final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
     assertThat(instance.getDate(minusFiveCal).getTime(),
-        is(5 * DateTimeUtils.MILLIS_PER_HOUR));
+        is(0L));
 
     final TimeZone plusFiveZone = TimeZone.getTimeZone("GMT+5:00");
     final Calendar plusFiveCal = Calendar.getInstance(plusFiveZone, Locale.ROOT);
     assertThat(instance.getDate(plusFiveCal).getTime(),
-        is(-5 * DateTimeUtils.MILLIS_PER_HOUR));
+        is(0L));
   }
 
   /**
@@ -174,12 +172,12 @@ public class TimestampAccessorTest {
     final TimeZone minusFiveZone = TimeZone.getTimeZone("GMT-5:00");
     final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
     assertThat(instance.getTime(minusFiveCal).getTime(),
-        is(5 * DateTimeUtils.MILLIS_PER_HOUR));
+        is(0L));
 
     final TimeZone plusFiveZone = TimeZone.getTimeZone("GMT+5:00");
     final Calendar plusFiveCal = Calendar.getInstance(plusFiveZone, Locale.ROOT);
     assertThat(instance.getTime(plusFiveCal).getTime(),
-        is(-5 * DateTimeUtils.MILLIS_PER_HOUR));
+        is(0L));
   }
 
   /**
@@ -204,6 +202,8 @@ public class TimestampAccessorTest {
    * Gregorian calendar.
    */
   @Test public void testStringWithGregorianShift() throws SQLException {
+    localCalendar.setTimeZone(UTC.getTimeZone());
+
     value = new Timestamp(SHIFT_INSTANT_1);
     assertThat(instance.getString(), is(SHIFT_STRING_1));
     value = new Timestamp(SHIFT_INSTANT_2);

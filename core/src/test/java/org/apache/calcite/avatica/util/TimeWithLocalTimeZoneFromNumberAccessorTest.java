@@ -34,7 +34,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Test conversions from SQL TIME as the number of milliseconds since 1970-01-01 00:00:00 to JDBC
  * types in {@link AbstractCursor.TimeFromNumberAccessor}.
  */
-public class TimeFromNumberAccessorTest {
+public class TimeWithLocalTimeZoneFromNumberAccessorTest {
+
+  // UTC+5:30
+  private static final TimeZone IST_ZONE = TimeZone.getTimeZone("Asia/Kolkata");
 
   private Cursor.Accessor instance;
   private Calendar localCalendar;
@@ -46,36 +49,37 @@ public class TimeFromNumberAccessorTest {
    */
   @Before public void before() {
     final AbstractCursor.Getter getter = new LocalGetter();
-    localCalendar = Calendar.getInstance(TimeZone.getDefault(), Locale.ROOT);
+    localCalendar = Calendar.getInstance(IST_ZONE, Locale.ROOT);
     instance = new AbstractCursor.TimeFromNumberAccessor(getter,
-        localCalendar, false);
+        localCalendar, true);
   }
 
   /**
-   * Test {@code getString()} returns the same value as the input time.
+   * Test {@code getString()} adjusts the string representation based on the default time zone.
    */
   @Test public void testString() throws SQLException {
     value = 0;
-    assertThat(instance.getString(), is("00:00:00"));
+    assertThat(instance.getString(), is("05:30:00"));
 
     value = DateTimeUtils.MILLIS_PER_DAY - 1000;
-    assertThat(instance.getString(), is("23:59:59"));
+    assertThat(instance.getString(), is("05:29:59"));
   }
 
   /**
-   * Test {@code getTime()} returns the same value as the input time for the local calendar.
+   * Test {@code getTime()} does no time zone conversion because {@code TIME WITH LOCAL TIME ZONE}
+   * represents a global instant in time.
    */
   @Test public void testTime() throws SQLException {
     value = 0;
-    assertThat(instance.getTime(localCalendar), is(Time.valueOf("00:00:00")));
+    assertThat(instance.getTime(localCalendar), is(new Time(0L)));
 
     value = DateTimeUtils.MILLIS_PER_DAY - 1000;
-    assertThat(instance.getTime(localCalendar), is(Time.valueOf("23:59:59")));
+    assertThat(instance.getTime(localCalendar), is(new Time(DateTimeUtils.MILLIS_PER_DAY - 1000)));
   }
 
   /**
-   * Test {@code getTime()} handles time zone conversions relative to the local calendar and not
-   * UTC.
+   * Test {@code getTime()} does no time zone conversion because {@code TIME WITH LOCAL TIME ZONE}
+   * represents a global instant in time.
    */
   @Test public void testTimeWithCalendar() throws SQLException {
     final int offset = localCalendar.getTimeZone().getOffset(0);
@@ -88,9 +92,9 @@ public class TimeFromNumberAccessorTest {
 
     value = 0;
     assertThat(instance.getTime(Calendar.getInstance(east, Locale.ROOT)),
-        is(Timestamp.valueOf("1969-12-31 23:00:00")));
+        is(new Time(0L)));
     assertThat(instance.getTime(Calendar.getInstance(west, Locale.ROOT)),
-        is(Timestamp.valueOf("1970-01-01 01:00:00")));
+        is(new Time(0L)));
   }
 
   /**
@@ -103,21 +107,22 @@ public class TimeFromNumberAccessorTest {
   }
 
   /**
-   * Test {@code getTimestamp()} returns the same value as the input time.
+   * Test {@code getTimestamp()} does no time zone conversion because
+   * {@code TIME WITH LOCAL TIME ZONE} represents a global instant in time.
    */
   @Test public void testTimestamp() throws SQLException {
     value = 0;
     assertThat(instance.getTimestamp(localCalendar),
-        is(Timestamp.valueOf("1970-01-01 00:00:00.0")));
+        is(new Timestamp(0L)));
 
     value = DateTimeUtils.MILLIS_PER_DAY - 1000;
     assertThat(instance.getTimestamp(localCalendar),
-        is(Timestamp.valueOf("1970-01-01 23:59:59.0")));
+        is(new Timestamp(DateTimeUtils.MILLIS_PER_DAY - 1000)));
   }
 
   /**
-   * Test {@code getTimestamp()} handles time zone conversions relative to the local calendar and
-   * not UTC.
+   * Test {@code getTimestamp()} does no time zone conversion because
+   * {@code TIME WITH LOCAL TIME ZONE} represents a global instant in time.
    */
   @Test public void testTimestampWithCalendar() throws SQLException {
     final int offset = localCalendar.getTimeZone().getOffset(0);
@@ -130,9 +135,9 @@ public class TimeFromNumberAccessorTest {
 
     value = 0;
     assertThat(instance.getTimestamp(Calendar.getInstance(east, Locale.ROOT)),
-        is(Timestamp.valueOf("1969-12-31 23:00:00.0")));
+        is(new Timestamp(0L)));
     assertThat(instance.getTimestamp(Calendar.getInstance(west, Locale.ROOT)),
-        is(Timestamp.valueOf("1970-01-01 01:00:00.0")));
+        is(new Timestamp(0L)));
   }
 
   /**

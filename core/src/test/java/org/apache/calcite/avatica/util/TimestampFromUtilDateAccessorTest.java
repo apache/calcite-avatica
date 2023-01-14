@@ -42,6 +42,30 @@ public class TimestampFromUtilDateAccessorTest {
   private static final Calendar UTC =
       Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ROOT);
 
+  // UTC: 2014-09-30 15:28:27.356
+  private static final long DST_INSTANT = 1412090907356L;
+  private static final String DST_STRING = "2014-09-30 15:28:27";
+
+  // UTC: 1500-04-30 12:00:00.123
+  private static final long PRE_GREG_INSTANT = -14820580799877L;
+  private static final String PRE_GREG_STRING = "1500-04-30 12:00:00";
+
+  // These values are used to test timestamps around the Gregorian shift.
+  // Unix timestamps use the proleptic Gregorian calendar (Gregorian applied retroactively).
+  // JDBC uses the Julian calendar and skips 10 days in October 1582 to shift to the Gregorian.
+  // UTC: 1582-10-04 00:00:00
+  private static final long SHIFT_INSTANT_1 = -12219379200000L;
+  private static final String SHIFT_STRING_1 = "1582-10-04 00:00:00";
+  // UTC: 1582-10-05 00:00:00
+  private static final long SHIFT_INSTANT_2 = SHIFT_INSTANT_1 + DateTimeUtils.MILLIS_PER_DAY;
+  private static final String SHIFT_STRING_2 = "1582-10-05 00:00:00";
+  // UTC: 1582-10-16 00:00:00
+  private static final long SHIFT_INSTANT_3 = SHIFT_INSTANT_2 + DateTimeUtils.MILLIS_PER_DAY;
+  private static final String SHIFT_STRING_3 = "1582-10-16 00:00:00";
+  // UTC: 1582-10-17 00:00:00
+  private static final long SHIFT_INSTANT_4 = SHIFT_INSTANT_3 + DateTimeUtils.MILLIS_PER_DAY;
+  private static final String SHIFT_STRING_4 = "1582-10-17 00:00:00";
+
   private Cursor.Accessor instance;
   private Calendar localCalendar;
   private Date value;
@@ -53,7 +77,7 @@ public class TimestampFromUtilDateAccessorTest {
   @Before public void before() {
     final AbstractCursor.Getter getter = new LocalGetter();
     localCalendar = Calendar.getInstance(TimeZone.getDefault(), Locale.ROOT);
-    instance = new AbstractCursor.TimestampFromUtilDateAccessor(getter, localCalendar);
+    instance = new AbstractCursor.TimestampFromUtilDateAccessor(getter, localCalendar, false);
   }
 
   /**
@@ -162,14 +186,14 @@ public class TimestampFromUtilDateAccessorTest {
    * Test {@code getString()} returns the same value as the input timestamp.
    */
   @Test public void testStringWithLocalTimeZone() throws SQLException {
-    value = Timestamp.valueOf("1970-01-01 00:00:00");
+    value = new Timestamp(0L);
     assertThat(instance.getString(), is("1970-01-01 00:00:00"));
 
-    value = Timestamp.valueOf("2014-09-30 15:28:27.356");
-    assertThat(instance.getString(), is("2014-09-30 15:28:27"));
+    value = new Timestamp(DST_INSTANT);
+    assertThat(instance.getString(), is(DST_STRING));
 
-    value = Timestamp.valueOf("1500-04-30 12:00:00.123");
-    assertThat(instance.getString(), is("1500-04-30 12:00:00"));
+    value = new Timestamp(PRE_GREG_INSTANT);
+    assertThat(instance.getString(), is(PRE_GREG_STRING));
   }
 
   /**
@@ -177,12 +201,14 @@ public class TimestampFromUtilDateAccessorTest {
    * Gregorian calendar.
    */
   @Test public void testStringWithGregorianShift() throws SQLException {
-    value = Timestamp.valueOf("1582-10-04 00:00:00");
-    assertThat(instance.getString(), is("1582-10-04 00:00:00"));
-    value = Timestamp.valueOf("1582-10-05 00:00:00");
-    assertThat(instance.getString(), is("1582-10-15 00:00:00"));
-    value = Timestamp.valueOf("1582-10-15 00:00:00");
-    assertThat(instance.getString(), is("1582-10-15 00:00:00"));
+    value = new Timestamp(SHIFT_INSTANT_1);
+    assertThat(instance.getString(), is(SHIFT_STRING_1));
+    value = new Timestamp(SHIFT_INSTANT_2);
+    assertThat(instance.getString(), is(SHIFT_STRING_2));
+    value = new Timestamp(SHIFT_INSTANT_3);
+    assertThat(instance.getString(), is(SHIFT_STRING_3));
+    value = new Timestamp(SHIFT_INSTANT_4);
+    assertThat(instance.getString(), is(SHIFT_STRING_4));
   }
 
   /**
@@ -194,11 +220,11 @@ public class TimestampFromUtilDateAccessorTest {
     value = new Timestamp(0L);
     assertThat(instance.getString(), is("1970-01-01 00:00:00"));
 
-    value = new Timestamp(1412090907356L /* 2014-09-30 15:28:27.356 UTC */);
-    assertThat(instance.getString(), is("2014-09-30 15:28:27"));
+    value = new Timestamp(DST_INSTANT);
+    assertThat(instance.getString(), is(DST_STRING));
 
-    value = new Timestamp(-14820580799877L /* 1500-04-30 12:00:00.123 UTC */);
-    assertThat(instance.getString(), is("1500-04-30 12:00:00"));
+    value = new Timestamp(PRE_GREG_INSTANT);
+    assertThat(instance.getString(), is(PRE_GREG_STRING));
   }
 
   /**
