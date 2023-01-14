@@ -161,26 +161,33 @@ public abstract class AbstractCursor implements Cursor {
         throw new AssertionError("bad " + columnMetaData.type.rep);
       }
     case Types.TIMESTAMP:
+      // TIMESTAMP WITH LOCAL TIME ZONE is a standard ISO type without proper JDBC support.
+      // It represents a global instant in time, as opposed to local clock/calendar parameters,
+      // so avoid normalizing against the local calendar by setting that to null for this type.
+      Calendar effectiveCalendar =
+          "TIMESTAMP_WITH_LOCAL_TIME_ZONE".equals(columnMetaData.type.getName())
+              ? null
+              : localCalendar;
       switch (columnMetaData.type.rep) {
       case PRIMITIVE_LONG:
       case LONG:
       case NUMBER:
-        return new TimestampFromNumberAccessor(getter, localCalendar);
+        return new TimestampFromNumberAccessor(getter, effectiveCalendar);
       case JAVA_SQL_TIMESTAMP:
-        return new TimestampAccessor(getter, localCalendar);
+        return new TimestampAccessor(getter, effectiveCalendar);
       case JAVA_UTIL_DATE:
-        return new TimestampFromUtilDateAccessor(getter, localCalendar);
+        return new TimestampFromUtilDateAccessor(getter, effectiveCalendar);
       default:
         throw new AssertionError("bad " + columnMetaData.type.rep);
       }
-    case 2013: // TIME_WITH_TIMEZONE
+    case Types.TIME_WITH_TIMEZONE:
       switch (columnMetaData.type.rep) {
       case STRING:
         return new StringAccessor(getter);
       default:
         throw new AssertionError("bad " + columnMetaData.type.rep);
       }
-    case 2014: // TIMESTAMP_WITH_TIMEZONE
+    case Types.TIMESTAMP_WITH_TIMEZONE:
       switch (columnMetaData.type.rep) {
       case STRING:
         return new StringAccessor(getter);
