@@ -39,6 +39,7 @@ import java.sql.Struct;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -161,26 +162,33 @@ public abstract class AbstractCursor implements Cursor {
         throw new AssertionError("bad " + columnMetaData.type.rep);
       }
     case Types.TIMESTAMP:
+      // TIMESTAMP WITH LOCAL TIME ZONE is a standard ISO type without proper JDBC support.
+      // It represents a global instant in time, as opposed to local clock/calendar parameters,
+      // so avoid normalizing against the local calendar by setting that to null for this type.
+      Calendar effectiveCalendar =
+          "TIMESTAMP_WITH_LOCAL_TIME_ZONE".equals(columnMetaData.type.getName())
+              ? null
+              : localCalendar;
       switch (columnMetaData.type.rep) {
       case PRIMITIVE_LONG:
       case LONG:
       case NUMBER:
-        return new TimestampFromNumberAccessor(getter, localCalendar);
+        return new TimestampFromNumberAccessor(getter, effectiveCalendar);
       case JAVA_SQL_TIMESTAMP:
         return new TimestampAccessor(getter);
       case JAVA_UTIL_DATE:
-        return new TimestampFromUtilDateAccessor(getter, localCalendar);
+        return new TimestampFromUtilDateAccessor(getter, effectiveCalendar);
       default:
         throw new AssertionError("bad " + columnMetaData.type.rep);
       }
-    case 2013: // TIME_WITH_TIMEZONE
+    case Types.TIME_WITH_TIMEZONE:
       switch (columnMetaData.type.rep) {
       case STRING:
         return new StringAccessor(getter);
       default:
         throw new AssertionError("bad " + columnMetaData.type.rep);
       }
-    case 2014: // TIMESTAMP_WITH_TIMEZONE
+    case Types.TIMESTAMP_WITH_TIMEZONE:
       switch (columnMetaData.type.rep) {
       case STRING:
         return new StringAccessor(getter);
@@ -276,11 +284,31 @@ public abstract class AbstractCursor implements Cursor {
     return new Time(v);
   }
 
-  static Timestamp longToTimestamp(long v, Calendar calendar) {
-    if (calendar != null) {
-      v -= calendar.getTimeZone().getOffset(v);
+  /**
+   * Interpret a {@link Number} as a {@link Timestamp}.
+   *
+   * If the number is a {@link BigDecimal}, assume it represents seconds since epoch with up to
+   * nanosecond precision. If it is any other {@link Number}, truncate it to an integer and assume
+   * it represents milliseconds since epoch.
+   *
+   * @param v The number to convert
+   * @param calendar Subtract the time zone offset of this calendar from the result
+   */
+  static Timestamp numberToTimestamp(Number v, Calendar calendar) {
+    Instant instant;
+    if (v instanceof BigDecimal) {
+      // May overflow if the value is > ~292 *billion* years away from epoch in either direction.
+      long wholeSeconds = v.longValue();
+      long nanoSeconds = ((BigDecimal) v).remainder(BigDecimal.ONE).movePointRight(9).longValue();
+      instant = Instant.ofEpochSecond(wholeSeconds, nanoSeconds);
+    } else {
+      // May overflow if the value is > ~292 *million* years away from epoch in either direction.
+      instant = Instant.ofEpochMilli(v.longValue());
     }
-    return new Timestamp(v);
+    if (calendar != null) {
+      instant = instant.minusMillis(calendar.getTimeZone().getOffset(instant.toEpochMilli()));
+    }
+    return Timestamp.from(instant);
   }
 
   /** Implementation of {@link Cursor.Accessor}. */
@@ -934,8 +962,7 @@ public abstract class AbstractCursor implements Cursor {
       if (v == null) {
         return null;
       }
-      return longToTimestamp(v.longValue() * DateTimeUtils.MILLIS_PER_DAY,
-          calendar);
+      return numberToTimestamp(v.longValue() * DateTimeUtils.MILLIS_PER_DAY, calendar);
     }
 
     @Override public String getString() throws SQLException {
@@ -990,7 +1017,7 @@ public abstract class AbstractCursor implements Cursor {
       if (v == null) {
         return null;
       }
-      return longToTimestamp(v.longValue(), calendar);
+      return numberToTimestamp(v, calendar);
     }
 
     @Override public String getString() throws SQLException {
@@ -1018,10 +1045,10 @@ public abstract class AbstractCursor implements Cursor {
    * in its default representation {@code long};
    * corresponds to {@link java.sql.Types#TIMESTAMP}.
    */
-  private static class TimestampFromNumberAccessor extends NumberAccessor {
+  static class TimestampFromNumberAccessor extends NumberAccessor {
     private final Calendar localCalendar;
 
-    private TimestampFromNumberAccessor(Getter getter, Calendar localCalendar) {
+    TimestampFromNumberAccessor(Getter getter, Calendar localCalendar) {
       super(getter, 0);
       this.localCalendar = localCalendar;
     }
@@ -1035,7 +1062,7 @@ public abstract class AbstractCursor implements Cursor {
       if (v == null) {
         return null;
       }
-      return longToTimestamp(v.longValue(), calendar);
+      return numberToTimestamp(v, calendar);
     }
 
     @Override public Date getDate(Calendar calendar) throws SQLException {
