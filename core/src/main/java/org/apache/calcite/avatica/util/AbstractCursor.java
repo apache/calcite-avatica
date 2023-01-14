@@ -43,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * Base class for implementing a cursor.
@@ -150,26 +151,34 @@ public abstract class AbstractCursor implements Cursor {
         throw new AssertionError("bad " + columnMetaData.type.rep);
       }
     case Types.TIME:
+      // TIME WITH LOCAL TIME ZONE is a standard ISO type without proper JDBC support.
+      // It represents a global instant in time, as opposed to local clock parameters.
+      boolean fixedInstant =
+          "TIME_WITH_LOCAL_TIME_ZONE".equals(columnMetaData.type.getName());
       switch (columnMetaData.type.rep) {
       case PRIMITIVE_INT:
       case INTEGER:
       case NUMBER:
-        return new TimeFromNumberAccessor(getter, localCalendar);
+        return new TimeFromNumberAccessor(getter, localCalendar, fixedInstant);
       case JAVA_SQL_TIME:
-        return new TimeAccessor(getter, localCalendar);
+        return new TimeAccessor(getter, localCalendar, fixedInstant);
       default:
         throw new AssertionError("bad " + columnMetaData.type.rep);
       }
     case Types.TIMESTAMP:
+      // TIMESTAMP WITH LOCAL TIME ZONE is a standard ISO type without proper JDBC support.
+      // It represents a global instant in time, as opposed to local clock/calendar parameters.
+      fixedInstant =
+          "TIMESTAMP_WITH_LOCAL_TIME_ZONE".equals(columnMetaData.type.getName());
       switch (columnMetaData.type.rep) {
       case PRIMITIVE_LONG:
       case LONG:
       case NUMBER:
-        return new TimestampFromNumberAccessor(getter, localCalendar);
+        return new TimestampFromNumberAccessor(getter, localCalendar, fixedInstant);
       case JAVA_SQL_TIMESTAMP:
-        return new TimestampAccessor(getter, localCalendar);
+        return new TimestampAccessor(getter, localCalendar, fixedInstant);
       case JAVA_UTIL_DATE:
-        return new TimestampFromUtilDateAccessor(getter, localCalendar);
+        return new TimestampFromUtilDateAccessor(getter, localCalendar, fixedInstant);
       default:
         throw new AssertionError("bad " + columnMetaData.type.rep);
       }
@@ -238,12 +247,18 @@ public abstract class AbstractCursor implements Cursor {
 
   public abstract boolean next();
 
-  /** Accesses a timestamp value as a string.
+  /**
+   * Accesses a timestamp value as a string.
    * The timestamp is in SQL format (e.g. "2013-09-22 22:30:32"),
-   * not Java format ("2013-09-22 22:30:32.123"). */
+   * not Java format ("2013-09-22 22:30:32.123").
+   *
+   * <p>Note that, when a TIMESTAMP is adjusted to a calendar, the offset is subtracted.
+   * Here, on the other hand, to adjust the string to the calendar (which only happens for type
+   * TIMESTAMP WITH LOCAL TIME ZONE), the offset is added. These are meant to be inverse operations.
+   */
   private static String timestampAsString(long v, Calendar calendar) {
     if (calendar != null) {
-      v -= calendar.getTimeZone().getOffset(v);
+      v += calendar.getTimeZone().getOffset(v);
     }
     return DateTimeUtils.unixTimestampToString(v);
   }
@@ -254,12 +269,18 @@ public abstract class AbstractCursor implements Cursor {
     return DateTimeUtils.unixDateToString(v);
   }
 
-  /** Accesses a time value as a string, e.g. "22:30:32". */
+  /**
+   * Accesses a time value as a string, e.g. "22:30:32".
+   *
+   * <p>Note that, when a TIME is adjusted to a calendar, the offset is subtracted.
+   * Here, on the other hand, to adjust the string to the calendar (which only happens for type
+   * TIME WITH LOCAL TIME ZONE), the offset is added. These are meant to be inverse operations.
+   */
   private static String timeAsString(int v, Calendar calendar) {
     if (calendar != null) {
-      v -= calendar.getTimeZone().getOffset(v);
+      v += calendar.getTimeZone().getOffset(v);
     }
-    return DateTimeUtils.unixTimeToString(v);
+    return DateTimeUtils.unixTimeToString(v % (int) DateTimeUtils.MILLIS_PER_DAY);
   }
 
   /** Implementation of {@link Cursor.Accessor}. */
@@ -955,10 +976,12 @@ public abstract class AbstractCursor implements Cursor {
    */
   static class TimeFromNumberAccessor extends NumberAccessor {
     private final Calendar localCalendar;
+    private final boolean fixedInstant;
 
-    TimeFromNumberAccessor(Getter getter, Calendar localCalendar) {
+    TimeFromNumberAccessor(Getter getter, Calendar localCalendar, boolean fixedInstant) {
       super(getter, 0);
       this.localCalendar = localCalendar;
+      this.fixedInstant = fixedInstant;
     }
 
     @Override public Object getObject() throws SQLException {
@@ -970,6 +993,9 @@ public abstract class AbstractCursor implements Cursor {
       if (v == null) {
         return null;
       }
+      if (fixedInstant) {
+        calendar = null;
+      }
       return DateTimeUtils.unixTimeToSqlTime(v.intValue(), calendar);
     }
 
@@ -977,6 +1003,9 @@ public abstract class AbstractCursor implements Cursor {
       final Number v = getNumber();
       if (v == null) {
         return null;
+      }
+      if (fixedInstant) {
+        calendar = null;
       }
       return DateTimeUtils.unixTimestampToSqlTimestamp(v.longValue(), calendar);
     }
@@ -986,7 +1015,7 @@ public abstract class AbstractCursor implements Cursor {
       if (v == null) {
         return null;
       }
-      return timeAsString(v.intValue(), null);
+      return timeAsString(v.intValue(), fixedInstant ? localCalendar : null);
     }
 
     protected Number getNumber() throws SQLException {
@@ -1013,10 +1042,13 @@ public abstract class AbstractCursor implements Cursor {
    */
   static class TimestampFromNumberAccessor extends NumberAccessor {
     private final Calendar localCalendar;
+    private final boolean fixedInstant;
 
-    TimestampFromNumberAccessor(Getter getter, Calendar localCalendar) {
+    TimestampFromNumberAccessor(
+        Getter getter, Calendar localCalendar, boolean fixedInstant) {
       super(getter, 0);
       this.localCalendar = localCalendar;
+      this.fixedInstant = fixedInstant;
     }
 
     @Override public Object getObject() throws SQLException {
@@ -1027,6 +1059,9 @@ public abstract class AbstractCursor implements Cursor {
       final Number v = getNumber();
       if (v == null) {
         return null;
+      }
+      if (fixedInstant) {
+        calendar = null;
       }
       return DateTimeUtils.unixTimestampToSqlTimestamp(v.longValue(), calendar);
     }
@@ -1052,7 +1087,7 @@ public abstract class AbstractCursor implements Cursor {
       if (v == null) {
         return null;
       }
-      return timestampAsString(v.longValue(), null);
+      return timestampAsString(v.longValue(), fixedInstant ? localCalendar : null);
     }
 
     protected Number getNumber() throws SQLException {
@@ -1130,10 +1165,12 @@ public abstract class AbstractCursor implements Cursor {
    */
   static class TimeAccessor extends ObjectAccessor {
     private final Calendar localCalendar;
+    private final boolean fixedInstant;
 
-    TimeAccessor(Getter getter, Calendar localCalendar) {
+    TimeAccessor(Getter getter, Calendar localCalendar, boolean fixedInstant) {
       super(getter);
       this.localCalendar = localCalendar;
+      this.fixedInstant = fixedInstant;
     }
 
     @Override public Time getTime(Calendar calendar) throws SQLException {
@@ -1141,7 +1178,7 @@ public abstract class AbstractCursor implements Cursor {
       if (date == null) {
         return null;
       }
-      if (calendar != null) {
+      if (calendar != null && !fixedInstant) {
         long v = date.getTime();
         v -= calendar.getTimeZone().getOffset(v);
         date = new Time(v);
@@ -1154,8 +1191,8 @@ public abstract class AbstractCursor implements Cursor {
       if (time == null) {
         return null;
       }
-      final int unix = DateTimeUtils.sqlTimeToUnixTime(time, localCalendar);
-      return timeAsString(unix, null);
+      final int unix = DateTimeUtils.sqlTimeToUnixTime(time, (TimeZone) null);
+      return timeAsString(unix, fixedInstant ? localCalendar : null);
     }
 
     @Override public long getLong() throws SQLException {
@@ -1178,10 +1215,12 @@ public abstract class AbstractCursor implements Cursor {
    */
   static class TimestampAccessor extends ObjectAccessor {
     private final Calendar localCalendar;
+    private final boolean fixedInstant;
 
-    TimestampAccessor(Getter getter, Calendar localCalendar) {
+    TimestampAccessor(Getter getter, Calendar localCalendar, boolean fixedInstant) {
       super(getter);
       this.localCalendar = localCalendar;
+      this.fixedInstant = fixedInstant;
     }
 
     @Override public Timestamp getTimestamp(Calendar calendar) throws SQLException {
@@ -1189,7 +1228,7 @@ public abstract class AbstractCursor implements Cursor {
       if (timestamp == null) {
         return null;
       }
-      if (calendar != null) {
+      if (calendar != null && !fixedInstant) {
         long v = timestamp.getTime();
         v -= calendar.getTimeZone().getOffset(v);
         timestamp = new Timestamp(v);
@@ -1219,8 +1258,8 @@ public abstract class AbstractCursor implements Cursor {
         return null;
       }
       final long unix =
-          DateTimeUtils.sqlTimestampToUnixTimestamp(timestamp, localCalendar);
-      return timestampAsString(unix, null);
+          DateTimeUtils.sqlTimestampToUnixTimestamp(timestamp, (TimeZone) null);
+      return timestampAsString(unix, fixedInstant ? localCalendar : null);
     }
 
     @Override public long getLong() throws SQLException {
@@ -1241,11 +1280,13 @@ public abstract class AbstractCursor implements Cursor {
    */
   static class TimestampFromUtilDateAccessor extends ObjectAccessor {
     private final Calendar localCalendar;
+    private final boolean fixedInstant;
 
-    TimestampFromUtilDateAccessor(Getter getter,
-        Calendar localCalendar) {
+    TimestampFromUtilDateAccessor(
+        Getter getter, Calendar localCalendar, boolean fixedInstant) {
       super(getter);
       this.localCalendar = localCalendar;
+      this.fixedInstant = fixedInstant;
     }
 
     @Override public Timestamp getTimestamp(Calendar calendar) throws SQLException {
@@ -1254,7 +1295,7 @@ public abstract class AbstractCursor implements Cursor {
         return null;
       }
       long v = date.getTime();
-      if (calendar != null) {
+      if (calendar != null && !fixedInstant) {
         v -= calendar.getTimeZone().getOffset(v);
       }
       return new Timestamp(v);
@@ -1281,8 +1322,8 @@ public abstract class AbstractCursor implements Cursor {
       if (date == null) {
         return null;
       }
-      final long unix = DateTimeUtils.utilDateToUnixTimestamp(date, localCalendar);
-      return timestampAsString(unix, null);
+      final long unix = DateTimeUtils.utilDateToUnixTimestamp(date, (TimeZone) null);
+      return timestampAsString(unix, fixedInstant ? localCalendar : null);
     }
 
     @Override public long getLong() throws SQLException {
