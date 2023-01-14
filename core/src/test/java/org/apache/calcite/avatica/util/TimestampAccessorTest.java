@@ -41,13 +41,31 @@ public class TimestampAccessorTest {
   private static final Calendar UTC =
       Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ROOT);
 
+  // UTC+5:30
+  private static final TimeZone IST_ZONE = TimeZone.getTimeZone("Asia/Kolkata");
+
   // UTC: 2014-09-30 15:28:27.356
   private static final long DST_INSTANT = 1412090907356L;
   private static final String DST_STRING = "2014-09-30 15:28:27";
 
-  // UTC: 1500-04-30 12:00:00.123 (PROLEPTIC GREGORIAN CALENDAR)
+  // UTC: 1500-04-30 12:00:00.123
   private static final long PRE_GREG_INSTANT = -14820580799877L;
   private static final String PRE_GREG_STRING = "1500-04-30 12:00:00";
+
+  // These values are used to test timestamps around the Gregorian shift.
+  // Unix timestamps use the proleptic Gregorian calendar (Gregorian applied retroactively).
+  // JDBC uses the Julian calendar and skips 10 days in October 1582 to shift to the Gregorian.
+  // UTC: 1582-10-04 00:00:00
+  private static final long SHIFT_INSTANT_1 = -12219379200000L;
+  private static final String SHIFT_STRING_1 = "1582-10-04 00:00:00";
+  // UTC: 1582-10-05 00:00:00
+  private static final long SHIFT_INSTANT_2 = SHIFT_INSTANT_1 + DateTimeUtils.MILLIS_PER_DAY;
+  // UTC: 1582-10-16 00:00:00
+  private static final long SHIFT_INSTANT_3 = SHIFT_INSTANT_2 + DateTimeUtils.MILLIS_PER_DAY;
+  private static final String SHIFT_STRING_3 = "1582-10-16 00:00:00";
+  // UTC: 1582-10-17 00:00:00
+  private static final long SHIFT_INSTANT_4 = SHIFT_INSTANT_3 + DateTimeUtils.MILLIS_PER_DAY;
+  private static final String SHIFT_STRING_4 = "1582-10-17 00:00:00";
 
   private Cursor.Accessor instance;
   private Calendar localCalendar;
@@ -59,8 +77,8 @@ public class TimestampAccessorTest {
    */
   @Before public void before() {
     final AbstractCursor.Getter getter = new LocalGetter();
-    localCalendar = Calendar.getInstance(TimeZone.getDefault(), Locale.ROOT);
-    instance = new AbstractCursor.TimestampAccessor(getter, localCalendar, 0);
+    localCalendar = Calendar.getInstance(IST_ZONE, Locale.ROOT);
+    instance = new AbstractCursor.TimestampAccessor(getter, localCalendar, false);
   }
 
   /**
@@ -164,17 +182,20 @@ public class TimestampAccessorTest {
   }
 
   /**
-   * Test {@code getString()} returns the same value as the input timestamp.
+   * Test {@code getString()} always returns the same string, regardless of the connection default
+   * calendar.
    */
   @Test public void testString() throws SQLException {
-    value = Timestamp.valueOf("1970-01-01 00:00:00");
+    localCalendar.setTimeZone(UTC.getTimeZone());
+
+    value = new Timestamp(0L);
     assertThat(instance.getString(), is("1970-01-01 00:00:00"));
 
-    value = Timestamp.valueOf("2014-09-30 15:28:27.356");
-    assertThat(instance.getString(), is("2014-09-30 15:28:27"));
+    value = new Timestamp(DST_INSTANT);
+    assertThat(instance.getString(), is(DST_STRING));
 
-    value = Timestamp.valueOf("1500-04-30 12:00:00.123");
-    assertThat(instance.getString(), is("1500-04-30 12:00:00"));
+    value = new Timestamp(PRE_GREG_INSTANT);
+    assertThat(instance.getString(), is(PRE_GREG_STRING));
   }
 
   /**
@@ -182,16 +203,17 @@ public class TimestampAccessorTest {
    * Gregorian calendar.
    */
   @Test public void testStringWithGregorianShift() throws SQLException {
-    value = Timestamp.valueOf("1582-10-04 00:00:00");
-    assertThat(instance.getString(), is("1582-10-04 00:00:00"));
-    value = Timestamp.valueOf("1582-10-05 00:00:00");
-    assertThat(instance.getString(), is("1582-10-15 00:00:00"));
-    value = Timestamp.valueOf("1582-10-15 00:00:00");
-    assertThat(instance.getString(), is("1582-10-15 00:00:00"));
+    value = new Timestamp(SHIFT_INSTANT_1);
+    assertThat(instance.getString(), is(SHIFT_STRING_1));
+    value = new Timestamp(SHIFT_INSTANT_3);
+    assertThat(instance.getString(), is(SHIFT_STRING_3));
+    value = new Timestamp(SHIFT_INSTANT_4);
+    assertThat(instance.getString(), is(SHIFT_STRING_4));
   }
 
   /**
-   * Test {@code getString()} returns dates relative to the local calendar.
+   * Test {@code getString()} always returns the same string, regardless of the connection default
+   * calendar.
    */
   @Test public void testStringWithUtc() throws SQLException {
     localCalendar.setTimeZone(UTC.getTimeZone());

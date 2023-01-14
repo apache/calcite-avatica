@@ -35,19 +35,36 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Test conversions from SQL TIMESTAMP as the number of milliseconds since 1970-01-01 00:00:00 to
  * JDBC types in {@link AbstractCursor.TimestampFromNumberAccessor}.
  */
-public class TimestampFromNumberAccessorTest {
+public class TimestampWithLocalTimeZoneFromNumberAccessorTest {
+
+  // UTC+5:30
+  private static final TimeZone IST_ZONE = TimeZone.getTimeZone("Asia/Kolkata");
+
+  // Shifting from the Julian to Gregorian calendar required skipping 10 days.
+  private static final long GREGORIAN_SHIFT = 10 * DateTimeUtils.MILLIS_PER_DAY;
 
   // UTC: 2014-09-30 15:28:27.356
   private static final long DST_INSTANT = 1412090907356L;
   private static final String DST_STRING = "2014-09-30 15:28:27";
-  // With precision 2
-  private static final String DST_STRING_2 = "2014-09-30 15:28:27.35";
-  // With precision 3
-  private static final String DST_STRING_3 = "2014-09-30 15:28:27.356";
+  private static final String DST_OFFSET_STRING = "2014-09-30 20:58:27";
 
-  // UTC: 1500-04-30 12:00:00.123 (JULIAN CALENDAR)
-  private static final long PRE_GREG_INSTANT = -14821444799877L;
+  // UTC: 1500-04-30 12:00:00.123
+  private static final long PRE_GREG_INSTANT = -14820580799877L;
   private static final String PRE_GREG_STRING = "1500-04-30 12:00:00";
+  private static final String PRE_GREG_SHIFT_STRING = "1500-05-10 12:00:00";
+  private static final String PRE_GREG_OFFSET_STRING = "1500-05-10 17:30:00";
+
+  // These values are used to test timestamps around the Gregorian shift.
+  // Unix timestamps use the proleptic Gregorian calendar (Gregorian applied retroactively).
+  // JDBC uses the Julian calendar and skips 10 days in October 1582 to shift to the Gregorian.
+  // UTC: 1582-10-04 00:00:00
+  private static final long SHIFT_INSTANT_1 = -12219379200000L;
+  // UTC: 1582-10-05 00:00:00
+  private static final long SHIFT_INSTANT_2 = SHIFT_INSTANT_1 + DateTimeUtils.MILLIS_PER_DAY;
+  // UTC: 1582-10-16 00:00:00
+  private static final long SHIFT_INSTANT_3 = SHIFT_INSTANT_2 + DateTimeUtils.MILLIS_PER_DAY;
+  // UTC: 1582-10-17 00:00:00
+  private static final long SHIFT_INSTANT_4 = SHIFT_INSTANT_3 + DateTimeUtils.MILLIS_PER_DAY;
 
   private Cursor.Accessor instance;
   private Calendar localCalendar;
@@ -59,51 +76,27 @@ public class TimestampFromNumberAccessorTest {
    */
   @Before public void before() {
     final AbstractCursor.Getter getter = new LocalGetter();
-    localCalendar = Calendar.getInstance(TimeZone.getDefault(), Locale.ROOT);
-    instance = new AbstractCursor.TimestampFromNumberAccessor(getter, localCalendar, false);
+    localCalendar = Calendar.getInstance(IST_ZONE, Locale.ROOT);
+    instance = new AbstractCursor.TimestampFromNumberAccessor(getter, localCalendar, true);
   }
 
   /**
-   * Test {@code getDate()} returns the same value as the input timestamp for the local calendar.
+   * Test {@code getDate()} does no time zone conversion because
+   * {@code TIMESTAMP WITH LOCAL TIME ZONE} represents a global instant in time.
    */
   @Test public void testDate() throws SQLException {
     value = 0L;
     assertThat(instance.getDate(localCalendar),
-        is(Date.valueOf("1970-01-01")));
+        is(new Date(0L)));
 
-    value = DateTimeUtils.timestampStringToUnixDate("1500-04-30 12:00:00");
+    value = PRE_GREG_INSTANT;
     assertThat(instance.getDate(localCalendar),
-        is(Timestamp.valueOf("1500-04-30 12:00:00")));
+        is(new Date(PRE_GREG_INSTANT + GREGORIAN_SHIFT)));
   }
 
   /**
-   * Test case for <a href="https://issues.apache.org/jira/browse/CALCITE-6282">
-   * [CALCITE-6282] Avatica ignores time precision when returning TIME results</a>. */
-  @Test public void testPrecision() throws SQLException {
-    final AbstractCursor.Getter getter = new AbstractCursor.Getter() {
-      @Override
-      public Object getObject() throws SQLException {
-        return DST_INSTANT;
-      }
-
-      @Override
-      public boolean wasNull() throws SQLException {
-        return false;
-      }
-    };
-    AbstractCursor.TimestampFromNumberAccessor accessor =
-        new AbstractCursor.TimestampFromNumberAccessor(getter, null, 2);
-    String string = accessor.getString();
-    assertThat(string, is(DST_STRING_2));
-    accessor = new AbstractCursor.TimestampFromNumberAccessor(
-        getter, null, 3);
-    string = accessor.getString();
-    assertThat(string, is(DST_STRING_3));
-  }
-
-  /**
-   * Test {@code getDate()} handles time zone conversions relative to the local calendar and not
-   * UTC.
+   * Test {@code getDate()} does no time zone conversion because
+   * {@code TIMESTAMP WITH LOCAL TIME ZONE} represents a global instant in time.
    */
   @Test public void testDateWithCalendar() throws SQLException {
     value = 0L;
@@ -111,12 +104,12 @@ public class TimestampFromNumberAccessorTest {
     final TimeZone minusFiveZone = TimeZone.getTimeZone("GMT-5:00");
     final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
     assertThat(instance.getDate(minusFiveCal).getTime(),
-        is(5 * DateTimeUtils.MILLIS_PER_HOUR));
+        is(0L));
 
     final TimeZone plusFiveZone = TimeZone.getTimeZone("GMT+5:00");
     final Calendar plusFiveCal = Calendar.getInstance(plusFiveZone, Locale.ROOT);
     assertThat(instance.getDate(plusFiveCal).getTime(),
-        is(-5 * DateTimeUtils.MILLIS_PER_HOUR));
+        is(0L));
   }
 
   /**
@@ -128,23 +121,17 @@ public class TimestampFromNumberAccessorTest {
   }
 
   /**
-   * Test {@code getString()} returns the same value as the input timestamp.
+   * Test {@code getString()} adjusts the string representation based on the default time zone.
    */
   @Test public void testString() throws SQLException {
     value = 0;
-    assertThat(instance.getString(), is("1970-01-01 00:00:00"));
+    assertThat(instance.getString(), is("1970-01-01 05:30:00"));
 
-    value = DateTimeUtils.timestampStringToUnixDate("2014-09-30 15:28:27.356");
-    assertThat(instance.getString(), is("2014-09-30 15:28:27"));
+    value = DST_INSTANT;
+    assertThat(instance.getString(), is(DST_OFFSET_STRING));
 
-    value = DateTimeUtils.timestampStringToUnixDate("1500-04-30 12:00:00.123");
-    assertThat(instance.getString(), is("1500-04-30 12:00:00"));
-
-    value = DateTimeUtils.timestampStringToUnixDate("2023-09-30 15:28:27.6789012345");
-    assertThat(instance.getString(), is("2023-09-30 15:28:27"));
-
-    value = DateTimeUtils.timestampStringToUnixDate("2023-09-30 15:28:27.");
-    assertThat(instance.getString(), is("2023-09-30 15:28:27"));
+    value = PRE_GREG_INSTANT;
+    assertThat(instance.getString(), is(PRE_GREG_OFFSET_STRING));
   }
 
   /**
@@ -154,8 +141,9 @@ public class TimestampFromNumberAccessorTest {
   @Test public void testStringWithGregorianShift() throws SQLException {
     for (int i = 4; i <= 15; ++i) {
       final String str = String.format(Locale.ROOT, "1582-10-%02d 00:00:00", i);
+      final String offset = String.format(Locale.ROOT, "1582-10-%02d 05:30:00", i);
       value = DateTimeUtils.timestampStringToUnixDate(str);
-      assertThat(instance.getString(), is(str));
+      assertThat(instance.getString(), is(offset));
     }
   }
 
@@ -172,7 +160,7 @@ public class TimestampFromNumberAccessorTest {
     assertThat(instance.getString(), is(DST_STRING));
 
     value = PRE_GREG_INSTANT;
-    assertThat(instance.getString(), is(PRE_GREG_STRING));
+    assertThat(instance.getString(), is(PRE_GREG_SHIFT_STRING));
   }
 
   /**
@@ -182,11 +170,36 @@ public class TimestampFromNumberAccessorTest {
    * 12:00am for every year.
    */
   @Test public void testStringWithAnsiDateRange() throws SQLException {
-    for (int i = 1; i <= 9999; ++i) {
-      final String str = String.format(Locale.ROOT, "%04d-01-01 00:00:00", i);
-      value = DateTimeUtils.timestampStringToUnixDate(str);
-      assertThat(instance.getString(), is(str));
+    for (int i = 1; i < 1900; ++i) {
+      assertString(
+          String.format(Locale.ROOT, "%04d-01-01 00:00:00", i),
+          String.format(Locale.ROOT, "%04d-01-01 05:30:00", i));
     }
+    for (int i = 1900; i < 1906; ++i) {
+      assertString(
+          String.format(Locale.ROOT, "%04d-01-01 00:00:00", i),
+          String.format(Locale.ROOT, "%04d-01-01 05:21:10", i));
+    }
+    for (int i = 1906; i < 1942; ++i) {
+      assertString(
+          String.format(Locale.ROOT, "%04d-01-01 00:00:00", i),
+          String.format(Locale.ROOT, "%04d-01-01 05:30:00", i));
+    }
+    for (int i = 1942; i < 1946; ++i) {
+      assertString(
+          String.format(Locale.ROOT, "%04d-01-01 00:00:00", i),
+          String.format(Locale.ROOT, "%04d-01-01 06:30:00", i));
+    }
+    for (int i = 1946; i < 10000; ++i) {
+      assertString(
+          String.format(Locale.ROOT, "%04d-01-01 00:00:00", i),
+          String.format(Locale.ROOT, "%04d-01-01 05:30:00", i));
+    }
+  }
+
+  private void assertString(String valueString, String expected) throws SQLException {
+    value = DateTimeUtils.timestampStringToUnixDate(valueString);
+    assertThat(instance.getString(), is(expected));
   }
 
   /**
@@ -194,10 +207,10 @@ public class TimestampFromNumberAccessorTest {
    */
   @Test public void testTime() throws SQLException {
     value = 0L;
-    assertThat(instance.getTime(localCalendar).toString(), is("00:00:00"));
+    assertThat(instance.getTime(localCalendar), is(new Time(0L)));
 
-    value = DateTimeUtils.timestampStringToUnixDate("2014-09-30 15:28:27.356");
-    assertThat(instance.getTime(localCalendar).toString(), is("15:28:27"));
+    value = DST_INSTANT;
+    assertThat(instance.getTime(localCalendar), is(new Time(DST_INSTANT)));
   }
 
   /**
@@ -215,9 +228,9 @@ public class TimestampFromNumberAccessorTest {
 
     value = 0;
     assertThat(instance.getTime(Calendar.getInstance(east, Locale.ROOT)),
-        is(Timestamp.valueOf("1969-12-31 23:00:00")));
+        is(new Time(0L)));
     assertThat(instance.getTime(Calendar.getInstance(west, Locale.ROOT)),
-        is(Timestamp.valueOf("1970-01-01 01:00:00")));
+        is(new Time(0L)));
   }
 
   /**
@@ -235,15 +248,15 @@ public class TimestampFromNumberAccessorTest {
   @Test public void testTimestamp() throws SQLException {
     value = 0L;
     assertThat(instance.getTimestamp(localCalendar),
-        is(Timestamp.valueOf("1970-01-01 00:00:00.0")));
+        is(new Timestamp(0L)));
 
-    value = DateTimeUtils.timestampStringToUnixDate("2014-09-30 15:28:27.356");
+    value = DST_INSTANT;
     assertThat(instance.getTimestamp(localCalendar),
-        is(Timestamp.valueOf("2014-09-30 15:28:27.356")));
+        is(new Timestamp(DST_INSTANT)));
 
-    value = DateTimeUtils.timestampStringToUnixDate("1500-04-30 12:00:00");
+    value = PRE_GREG_INSTANT;
     assertThat(instance.getTimestamp(localCalendar),
-        is(Timestamp.valueOf("1500-04-30 12:00:00.0")));
+        is(new Timestamp(PRE_GREG_INSTANT + GREGORIAN_SHIFT)));
   }
 
   /**
@@ -251,29 +264,46 @@ public class TimestampFromNumberAccessorTest {
    * Gregorian calendar.
    */
   @Test public void testTimestampWithGregorianShift() throws SQLException {
-    value = DateTimeUtils.timestampStringToUnixDate("1582-10-04 00:00:00");
+    value = SHIFT_INSTANT_1;
     assertThat(instance.getTimestamp(localCalendar),
-        is(Timestamp.valueOf("1582-10-04 00:00:00.0")));
+        is(new Timestamp(SHIFT_INSTANT_1 + GREGORIAN_SHIFT)));
 
-    value = DateTimeUtils.timestampStringToUnixDate("1582-10-05 00:00:00");
-    assertThat(instance.getTimestamp(localCalendar),
-        is(Timestamp.valueOf("1582-10-15 00:00:00.0")));
+    value = SHIFT_INSTANT_2;
+    assertThat(instance.getTimestamp(localCalendar), is(new Timestamp(SHIFT_INSTANT_2)));
 
-    value = DateTimeUtils.timestampStringToUnixDate("1582-10-15 00:00:00");
-    assertThat(instance.getTimestamp(localCalendar),
-        is(Timestamp.valueOf("1582-10-15 00:00:00.0")));
+    value = SHIFT_INSTANT_3;
+    assertThat(instance.getTimestamp(localCalendar), is(new Timestamp(SHIFT_INSTANT_3)));
+
+    value = SHIFT_INSTANT_4;
+    assertThat(instance.getTimestamp(localCalendar), is(new Timestamp(SHIFT_INSTANT_4)));
   }
 
   /**
    * Test {@code getTimestamp()} supports date range 0001-01-01 to 9999-12-31 required by ANSI SQL.
    */
   @Test public void testTimestampWithAnsiDateRange() throws SQLException {
-    for (int i = 1; i <= 9999; ++i) {
-      final String str = String.format(Locale.ROOT, "%04d-01-01 00:00:00.0", i);
-      value = DateTimeUtils.timestampStringToUnixDate(str);
-      assertThat(instance.getTimestamp(localCalendar),
-          is(Timestamp.valueOf(str)));
+    for (int i = 1; i < 1943; ++i) {
+      assertTimestamp(i,  TimeZone.getDefault().getRawOffset());
     }
+    for (int i = 1943; i < 1946; ++i) {
+      assertTimestamp(i,  TimeZone.getDefault().getRawOffset() + DateTimeUtils.MILLIS_PER_HOUR);
+    }
+    for (int i = 1946; i < 1949; ++i) {
+      assertTimestamp(i,  TimeZone.getDefault().getRawOffset());
+    }
+    for (int i = 1949; i < 1950; ++i) {
+      assertTimestamp(i,  TimeZone.getDefault().getRawOffset() + DateTimeUtils.MILLIS_PER_HOUR);
+    }
+    for (int i = 1950; i < 10000; ++i) {
+      assertTimestamp(i,  TimeZone.getDefault().getRawOffset());
+    }
+  }
+
+  private void assertTimestamp(int year, long offset) throws SQLException {
+    final String valueString = String.format(Locale.ROOT, "%04d-01-01 00:00:00.0", year);
+    value = DateTimeUtils.timestampStringToUnixDate(valueString);
+    assertThat(instance.getTimestamp(localCalendar),
+        is(new Timestamp(Timestamp.valueOf(valueString).getTime() + offset)));
   }
 
   /**
@@ -291,9 +321,9 @@ public class TimestampFromNumberAccessorTest {
 
     value = 0;
     assertThat(instance.getTimestamp(Calendar.getInstance(east, Locale.ROOT)),
-        is(Timestamp.valueOf("1969-12-31 23:00:00.0")));
+        is(new Timestamp(0L)));
     assertThat(instance.getTimestamp(Calendar.getInstance(west, Locale.ROOT)),
-        is(Timestamp.valueOf("1970-01-01 01:00:00.0")));
+        is(new Timestamp(0L)));
   }
 
   /**

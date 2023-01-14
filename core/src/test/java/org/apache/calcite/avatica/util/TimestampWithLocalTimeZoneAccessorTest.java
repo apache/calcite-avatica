@@ -19,28 +19,28 @@ package org.apache.calcite.avatica.util;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
-import java.util.SimpleTimeZone;
 import java.util.TimeZone;
-
-import static org.apache.calcite.avatica.util.DateTimeUtils.MILLIS_PER_HOUR;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Test conversions from SQL {@link java.util.Date} to JDBC types in
- * {@link AbstractCursor.TimestampFromUtilDateAccessor}.
+ * Test conversions from SQL {@link Timestamp} to JDBC types in
+ * {@link AbstractCursor.TimestampAccessor}.
  */
-public class TimestampFromUtilDateAccessorTest {
+public class TimestampWithLocalTimeZoneAccessorTest {
 
   private static final Calendar UTC =
       Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ROOT);
+
+  // UTC+5:30
+  private static final TimeZone IST_ZONE = TimeZone.getTimeZone("Asia/Kolkata");
 
   // UTC: 2014-09-30 15:28:27.356
   private static final long DST_INSTANT = 1412090907356L;
@@ -58,6 +58,7 @@ public class TimestampFromUtilDateAccessorTest {
   private static final String SHIFT_STRING_1 = "1582-10-04 00:00:00";
   // UTC: 1582-10-05 00:00:00
   private static final long SHIFT_INSTANT_2 = SHIFT_INSTANT_1 + DateTimeUtils.MILLIS_PER_DAY;
+  private static final String SHIFT_STRING_2 = "1582-10-05 00:00:00";
   // UTC: 1582-10-16 00:00:00
   private static final long SHIFT_INSTANT_3 = SHIFT_INSTANT_2 + DateTimeUtils.MILLIS_PER_DAY;
   private static final String SHIFT_STRING_3 = "1582-10-16 00:00:00";
@@ -67,16 +68,16 @@ public class TimestampFromUtilDateAccessorTest {
 
   private Cursor.Accessor instance;
   private Calendar localCalendar;
-  private Date value;
+  private Timestamp value;
 
   /**
-   * Setup test environment by creating a {@link AbstractCursor.TimestampFromUtilDateAccessor} that
-   * reads from the instance variable {@code value}.
+   * Setup test environment by creating a {@link AbstractCursor.TimestampAccessor} that reads from
+   * the instance variable {@code value}.
    */
   @Before public void before() {
     final AbstractCursor.Getter getter = new LocalGetter();
-    localCalendar = Calendar.getInstance(TimeZone.getDefault(), Locale.ROOT);
-    instance = new AbstractCursor.TimestampFromUtilDateAccessor(getter, localCalendar, false);
+    localCalendar = Calendar.getInstance(IST_ZONE, Locale.ROOT);
+    instance = new AbstractCursor.TimestampAccessor(getter, localCalendar, true);
   }
 
   /**
@@ -107,26 +108,26 @@ public class TimestampFromUtilDateAccessorTest {
     final TimeZone minusFiveZone = TimeZone.getTimeZone("GMT-5:00");
     final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
     assertThat(instance.getTimestamp(minusFiveCal).getTime(),
-        is(5 * MILLIS_PER_HOUR));
+        is(0L));
 
     final TimeZone plusFiveZone = TimeZone.getTimeZone("GMT+5:00");
     final Calendar plusFiveCal = Calendar.getInstance(plusFiveZone, Locale.ROOT);
     assertThat(instance.getTimestamp(plusFiveCal).getTime(),
-        is(-5 * MILLIS_PER_HOUR));
+        is(0L));
   }
 
   /**
    * Test {@code getDate()} returns the same value as the input timestamp for the local calendar.
    */
   @Test public void testDate() throws SQLException {
-    value = new java.sql.Date(0L);
-    assertThat(instance.getDate(null), is(value));
+    value = new Timestamp(0L);
+    assertThat(instance.getDate(null), is(new Date(0L)));
 
-    value = java.sql.Date.valueOf("1970-01-01");
-    assertThat(instance.getDate(UTC), is(value));
+    value = Timestamp.valueOf("1970-01-01 00:00:00");
+    assertThat(instance.getDate(UTC), is(Date.valueOf("1970-01-01")));
 
-    value = java.sql.Date.valueOf("1500-04-30");
-    assertThat(instance.getDate(UTC), is(value));
+    value = Timestamp.valueOf("1500-04-30 00:00:00");
+    assertThat(instance.getDate(UTC), is(Date.valueOf("1500-04-30")));
   }
 
   /**
@@ -134,31 +135,31 @@ public class TimestampFromUtilDateAccessorTest {
    * UTC.
    */
   @Test public void testDateWithCalendar() throws SQLException {
-    value = new java.sql.Date(0L);
+    value = new Timestamp(0L);
 
     final TimeZone minusFiveZone = TimeZone.getTimeZone("GMT-5:00");
     final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
     assertThat(instance.getDate(minusFiveCal).getTime(),
-        is(5 * DateTimeUtils.MILLIS_PER_HOUR));
+        is(0L));
 
     final TimeZone plusFiveZone = TimeZone.getTimeZone("GMT+5:00");
     final Calendar plusFiveCal = Calendar.getInstance(plusFiveZone, Locale.ROOT);
     assertThat(instance.getDate(plusFiveCal).getTime(),
-        is(-5 * DateTimeUtils.MILLIS_PER_HOUR));
+        is(0L));
   }
 
   /**
    * Test {@code getTime()} returns the same value as the input timestamp for the local calendar.
    */
   @Test public void testTime() throws SQLException {
-    value = new Time(0L);
-    assertThat(instance.getTime(null), is(value));
+    value = new Timestamp(0L);
+    assertThat(instance.getTime(null), is(new Time(0L)));
 
-    value = Time.valueOf("00:00:00");
-    assertThat(instance.getTime(UTC), is(value));
+    value = Timestamp.valueOf("1970-01-01 00:00:00");
+    assertThat(instance.getTime(UTC), is(Time.valueOf("00:00:00")));
 
-    value = Time.valueOf("23:59:59");
-    assertThat(instance.getTime(UTC).toString(), is("23:59:59"));
+    value = Timestamp.valueOf("2014-09-30 15:28:27.356");
+    assertThat(instance.getTime(UTC).toString(), is("15:28:27"));
   }
 
   /**
@@ -166,25 +167,26 @@ public class TimestampFromUtilDateAccessorTest {
    * UTC.
    */
   @Test public void testTimeWithCalendar() throws SQLException {
-    final int offset = localCalendar.getTimeZone().getOffset(0);
-    final TimeZone east = new SimpleTimeZone(
-        offset + (int) DateTimeUtils.MILLIS_PER_HOUR,
-        "EAST");
-    final TimeZone west = new SimpleTimeZone(
-        offset - (int) DateTimeUtils.MILLIS_PER_HOUR,
-        "WEST");
+    value = new Timestamp(0L);
 
-    value = new Time(0L);
-    assertThat(instance.getTime(Calendar.getInstance(east, Locale.ROOT)),
-        is(Timestamp.valueOf("1969-12-31 23:00:00")));
-    assertThat(instance.getTime(Calendar.getInstance(west, Locale.ROOT)),
-        is(Timestamp.valueOf("1970-01-01 01:00:00")));
+    final TimeZone minusFiveZone = TimeZone.getTimeZone("GMT-5:00");
+    final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
+    assertThat(instance.getTime(minusFiveCal).getTime(),
+        is(0L));
+
+    final TimeZone plusFiveZone = TimeZone.getTimeZone("GMT+5:00");
+    final Calendar plusFiveCal = Calendar.getInstance(plusFiveZone, Locale.ROOT);
+    assertThat(instance.getTime(plusFiveCal).getTime(),
+        is(0L));
   }
 
   /**
-   * Test {@code getString()} returns the same value as the input timestamp.
+   * Test {@code getString()} always returns the same string, regardless of the connection default
+   * calendar.
    */
-  @Test public void testStringWithLocalTimeZone() throws SQLException {
+  @Test public void testString() throws SQLException {
+    localCalendar.setTimeZone(UTC.getTimeZone());
+
     value = new Timestamp(0L);
     assertThat(instance.getString(), is("1970-01-01 00:00:00"));
 
@@ -200,8 +202,12 @@ public class TimestampFromUtilDateAccessorTest {
    * Gregorian calendar.
    */
   @Test public void testStringWithGregorianShift() throws SQLException {
+    localCalendar.setTimeZone(UTC.getTimeZone());
+
     value = new Timestamp(SHIFT_INSTANT_1);
     assertThat(instance.getString(), is(SHIFT_STRING_1));
+    value = new Timestamp(SHIFT_INSTANT_2);
+    assertThat(instance.getString(), is(SHIFT_STRING_2));
     value = new Timestamp(SHIFT_INSTANT_3);
     assertThat(instance.getString(), is(SHIFT_STRING_3));
     value = new Timestamp(SHIFT_INSTANT_4);
@@ -209,7 +215,8 @@ public class TimestampFromUtilDateAccessorTest {
   }
 
   /**
-   * Test {@code getString()} returns timestamps relative to the local calendar.
+   * Test {@code getString()} always returns the same string, regardless of the connection default
+   * calendar.
    */
   @Test public void testStringWithUtc() throws SQLException {
     localCalendar.setTimeZone(UTC.getTimeZone());
@@ -250,15 +257,13 @@ public class TimestampFromUtilDateAccessorTest {
    */
   @Test public void testLong() throws SQLException {
     value = new Timestamp(0L);
-    assertThat(instance.getLong(), is((long) -localCalendar.getTimeZone().getOffset(0L)));
+    assertThat(instance.getLong(), is(0L));
 
     value = Timestamp.valueOf("2014-09-30 15:28:27.356");
-    assertThat(instance.getLong(),
-        is(value.getTime() - localCalendar.getTimeZone().getOffset(value.getTime())));
+    assertThat(instance.getLong(), is(value.getTime()));
 
     value = Timestamp.valueOf("1500-04-30 00:00:00");
-    assertThat(instance.getLong(),
-        is(value.getTime() - localCalendar.getTimeZone().getOffset(value.getTime())));
+    assertThat(instance.getLong(), is(value.getTime()));
   }
 
   /**
