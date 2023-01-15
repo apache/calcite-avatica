@@ -28,6 +28,121 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.23.0">1.23.0</a> / 2023-01-19
+{: #v1-23-0}
+
+Apache Calcite Avatica 1.23.0
+fixes bugs in
+<a href="https://issues.apache.org/jira/browse/CALCITE-5443">`Statement.getUpdateCount()`</a>,
+<a href="https://issues.apache.org/jira/browse/CALCITE-3557">`ResultSet.getObject`</a>;
+and supports
+<a href="https://issues.apache.org/jira/browse/CALCITE-5358">`HTTP_BAD_REQUEST`</a>
+and configuring
+<a href="https://issues.apache.org/jira/browse/CALCITE-2322">fetch size</a>
+and
+<a href="https://issues.apache.org/jira/browse/CALCITE-5327">SSL key-store type</a>.
+Also,
+<a href="https://issues.apache.org/jira/browse/CALCITE-5338">there</a>
+<a href="https://issues.apache.org/jira/browse/CALCITE-3078">are</a>
+<a href="https://issues.apache.org/jira/browse/CALCITE-5369">various</a>
+<a href="https://issues.apache.org/jira/browse/CALCITE-2989">improvements</a>
+<a href="https://issues.apache.org/jira/browse/CALCITE-1639">to</a>
+`DateTimeUtils` and
+<a href="https://issues.apache.org/jira/browse/CALCITE-5415">`ByteString`</a>.
+
+Compatibility: This release is tested
+on Linux, macOS, Microsoft Windows;
+using Oracle JDK 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18;
+using IBM Java 8;
+Guava versions 14.0.1 to 31.1-jre;
+other software versions as specified in `gradle.properties`.
+
+Contributors to this release:
+Aleksey Stavrov,
+Francis Chuang,
+Greg Hart,
+Hongbin Ma,
+Istvan Toth,
+Jiajun Bernoulli,
+Julian Hyde (Release Manager),
+Kevin Minder,
+Oliver Lee,
+Richard Antal,
+Sergey Nuyanzin,
+Stamatis Zampetakis,
+Zhe Hu,
+zoudan
+
+Features and bug fixes
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5443">CALCITE-5443</a>]
+  After `Statement.getMoreResults()` has returned false,
+  `Statement.getUpdateCount()` should return -1
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3557">CALCITE-3557</a>]
+  `ResultSet.getObject` throws `ClassCastException` when applied to an `ARRAY`
+  or `MULTISET` value inside a `MULTISET`
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5120">CALCITE-5120</a>]
+  `UnregisteredDriver.connect` should throw `SQLException`, not
+  `NullPointerException`, if URL is null
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2989">CALCITE-2989</a>]
+  Use ISO calendar when converting between `java.sql` types and UNIX timestamps
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-2322">CALCITE-2322</a>]
+  Support fetch size in connection url and JDBC statement
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5415">CALCITE-5415</a>]
+  In `ByteString`, add `startsWith` and `endsWith` methods
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5374">CALCITE-5374</a>]
+  Upgrade jackson from 2.10.0 to 2.14.1
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5379">CALCITE-5379</a>]
+  Upgrade protobuf to 3.21.9
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5373">CALCITE-5373</a>]
+  Upgrade bouncycastle to 1.70
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5369">CALCITE-5369</a>]
+  In Avatica `DateTimeUtils`, add support for `FLOOR` and `CEIL` to `ISOYEAR`
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5358">CALCITE-5358</a>]
+  Add in `HTTP_BAD_REQUEST`
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5372">CALCITE-5372</a>]
+  Upgrade vlsi-release-plugins to 1.84
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5329">CALCITE-5329</a>]
+  Upgrade Checkstyle version from 6.18 to 10.3.2
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5327">CALCITE-5327</a>]
+  Make SSL key-store type configurable
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5295">CALCITE-5295</a>]
+  Read the values of plugins (such as connect string properties) from
+  `ThreadLocal` fields
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-3078">CALCITE-3078</a>]
+  Move public `lastDay` method from Calcite to Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5257">CALCITE-5257</a>]
+  `NVARCHAR` is treated as 'UNKNOWN TYPE' when searching Oracle
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4900">CALCITE-4900</a>]
+  `NullPointerException` when send ExecuteRequest via protobuf with no
+  parameters
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5338">CALCITE-5338</a>]
+  In `DateTimeUtils`, deprecate `floorMod` and `floorDiv`, and use equivalents
+  in `java.lang.Math`
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-1639">CALCITE-1639</a>]
+  `TIMESTAMPADD(MONTH, ...)` should return last day of month if the day
+  overflows
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5232">CALCITE-5232</a>]
+  Upgrade protobuf-java from 3.17.1 to 3.21.5
+
+Build and tests
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5458">CALCITE-5458</a>]
+  Label and link pull requests with JIRA issues automatically
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5453">CALCITE-5453</a>]
+  Add tests for fetch size configuration via connection URL and statement
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5344">CALCITE-5344</a>]
+  Migrate Travis CI configuration to Github Actions
+
+Website and documentation
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5353">CALCITE-5353</a>]
+  Document new procedure for requesting JIRA accounts and becoming a contributor
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5065">CALCITE-5065</a>]
+  Update phoenixdb information on website
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5438">CALCITE-5438</a>]
+  Document `transparent_reconnection` property
+
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.22.0">1.22.0</a> / 2022-07-28
 {: #v1-22-0}
 
@@ -113,7 +228,7 @@ Build and tests
   Build fails due to rat check on Gemfile.lock
 * Silence standard out messages in tests
 
-Web site and documentation
+Website and documentation
 
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-5108">CALCITE-5108</a>]
   Make website GDPR-compliant
@@ -121,7 +236,7 @@ Web site and documentation
   Upgrade to Jekyll 4 and remove unnecessary dependencies from gemfile for site
 * Fix formatting in howto
 * Add instructions for release managers to uncomment commented out release history
-* Comment out release notes for next release, so that they don't appear on the web site
+* Comment out release notes for next release, so that they don't appear on the website
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-5102">CALCITE-5102</a>]
   Update github-pages gem for site build
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-3129">CALCITE-3129</a>]
@@ -176,7 +291,7 @@ Build and tests
   [<a href="https://issues.apache.org/jira/browse/CALCITE-4877">CALCITE-4877</a>]
   is fixed
 
-Web site and documentation
+Website and documentation
 
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-4840">CALCITE-4840</a>]
   Make `README` easier to scan
@@ -263,25 +378,38 @@ Guava versions 14.0 to 29.0;
 other software versions as specified in `gradle.properties`.
 
 ***Breaking changes***
-* [<a href="https://issues.apache.org/jira/browse/CALCITE-4503">CALCITE-4503</a>] Order of fields in records should follow that of the SQL types
 
-`Meta#deduce(List<ColumnMetaData> columns, Class resultClazz)` now only derives the order of the fields from the list of provided column metadata `columns` when generating a record from the given Java class `resultClazz`, instead of relying on the field order provided by `Object#getFields()`, which is a JVM-dependent feature.
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-4503">CALCITE-4503</a>]
+  Order of fields in records should follow that of the SQL types
 
-Before, the field names where not checked against the field names of the provided class. Now, if `resultClazz` is not null, the provided field names are expected to match existing fields in that class. If a column metadata has name `column`, and no public field in `resultClazz` with that name exists, the following exception is thrown:
-`java.lang.RuntimeException: java.lang.NoSuchFieldException: C`.
+`Meta#deduce(List<ColumnMetaData> columns, Class resultClazz)` now only derives
+the order of the fields from the list of provided column metadata `columns` when
+generating a record from the given Java class `resultClazz`, instead of relying
+on the field order provided by `Object#getFields()`, which is a JVM-dependent
+feature.
+
+Before, the field names where not checked against the field names of the
+provided class. Now, if `resultClazz` is not null, the provided field names are
+expected to match existing fields in that class. If a column metadata has name
+`column`, and no public field in `resultClazz` with that name exists, the
+following exception is thrown: `java.lang.RuntimeException:
+java.lang.NoSuchFieldException: C`.
 
 Features and bug fixes
+
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-4138">CALCITE-4138</a>]
   Metadata operations via Avatica turn empty string args to null (Istvan Toth)
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-4095">CALCITE-4095</a>]
-  Update Jetty to 9.4.31.v20200723 and use `SslContextFactory.Server` instead of `SslContextFactory` (Peter Somogyi)
+  Update Jetty to 9.4.31.v20200723 and use `SslContextFactory.Server` instead of
+  `SslContextFactory` (Peter Somogyi)
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-4196">CALCITE-4196</a>]
   Consume all data from client before replying with HTTP/401
 * Upgrade gradle from 6.3 to 6.7
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-4379">CALCITE-4379</a>]
-  Meta.Frame created with java float values in rows hits a ClassCastException in toProto() (Dmitri Bourlatchkov)
+  Meta.Frame created with java float values in rows hits a `ClassCastException`
+  in `toProto()` (Dmitri Bourlatchkov)
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-4181">CALCITE-4181</a>]
-  Avatica throws exception when select field is a List<Object> (Kent Nguyen)
+  Avatica throws exception when select field is a `List<Object>` (Kent Nguyen)
 * Upgrade Gradle from 6.7 to 6.8.1
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-4476">CALCITE-4476</a>]
   DateTimeUtils.timeStringToUnixDate may produce wrong time (Vladimir Ozerov)
@@ -299,13 +427,15 @@ Features and bug fixes
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-4576">CALCITE-4576</a>]
   Release process should not overwrite LICENSE file
 
-Tests
+Build and tests
+
 * Remove files that change often from Travis cache and remove broken files automatically
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-3163">CALCITE-3163</a>]
   Improve test coverage for float/real/double array types (Alessandro Solimando)
 * Replace AssertTestUtils with custom Hamcrest matcher for accessors content
 
-Website and Documentation
+Website and documentation
+
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-3841">CALCITE-3841</a>]
   Change downloads page to use downloads.apache.org
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-4367">CALCITE-4367</a>]
@@ -324,6 +454,7 @@ Guava versions 14.0 to 29.0;
 other software versions as specified in `gradle.properties`.
 
 Features and bug fixes
+
 * Upgrade RAT to 0.5.3 and print violations in the console.
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-3610">CALCITE-3610</a>]
   Fix dockerhub dockerfiles to point to the right JARs on nexus
@@ -339,10 +470,12 @@ Features and bug fixes
 * Upgrade Gradle to 6.3 in docker-compose files.
 
 Tests
+
 * Upgrade Github Actions' Checkout action to v2.
 * Add gradle wrapper validation job to Github Actions.
 
-Website and Documentation
+Website and documentation
+
 * Fix broken link to Javascript binding in the documentation.
 
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.16.0">1.16.0</a> / 2019-12-19
@@ -406,6 +539,7 @@ Features and bug fixes
 * Stop building zip archives when building using gradle
 
 Tests
+
 * Use GitHub Actions for Windows CI
 * Add Travis job with building Calcite master
 * Show standard streams in Gradle tests
@@ -417,7 +551,8 @@ Tests
 * Fetch Calcite from apache/calcite repository for integration testing
 * GitHub Actions: actions/checkout@master -> v1.1.0 to avoid unexpected failures
 
-Website and Documentation
+Website and documentation
+
 * Add JavaScript client to client list
 * Update avatica/docs/howto.md: SVN -> Git, fix wording
 * Exclude "site/target" from Jekyll build: It prevents generation of unwanted site/target/avatica/target directory
@@ -445,7 +580,7 @@ Features and bug fixes
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-3040">CALCITE-3040</a>]
   Revert CALCITE-2845 due to incompatibilities with downstream clients
 
-Website and Documentation
+Website and documentation
 
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-3033">CALCITE-3033</a>]
   Add navigation item for avatica-go HOWTO documentation
@@ -495,7 +630,7 @@ Tests
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-2961">CALCITE-2961</a>]
   Enable Travis to test against JDK 13
 
-Website and Documentation
+Website and documentation
 
 * Update to new git URL (switch to gitbox)
 * Add links to git commits back to download pages
@@ -574,7 +709,7 @@ Tests
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-2412">CALCITE-2412</a>]
   Add appveyor.yml to run Windows tests
 
-Website and Documentation
+Website and documentation
 
 * Fix broken links to Github release on the history page
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-2381">CALCITE-2381</a>]
@@ -660,7 +795,7 @@ Tests
   Add dynamic drive calculation to correctly determine trust store location when
   testing on Windows (Sergey Nuyanzin)
 
-Website and Documentation
+Website and documentation
 
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-1160">CALCITE-1160</a>]
   Redirect from Avatica community to Calcite community
@@ -735,7 +870,7 @@ Tests
   (Alessandro Solimando)
 * Fix tests on Windows; disable SPNEGO test on Windows
 
-Web site and documentation
+Website and documentation
 
 * Update description of the `signature` field in `ResultSetResponse`
 * Correct field name in `PrepareAndExecuteRequest` documentation (Lukáš Lalinský)
@@ -831,7 +966,7 @@ Tests
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-1568">CALCITE-1568</a>]
   Upgrade `mockito` to 2.5.5
 
-Web site and documentation
+Website and documentation
 
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-1743">CALCITE-1743</a>]
   Add instructions to release docs to move git tag from `rcN` to `rel/`
@@ -909,10 +1044,10 @@ Tests
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-1226">CALCITE-1226</a>]
   Disable `AvaticaSpnegoTest` due to intermittent failures
 
-Web site and documentation
+Website and documentation
 
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-1369">CALCITE-1369</a>]
-  Add list of Avatica clients to the web site
+  Add list of Avatica clients to the website
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-1229">CALCITE-1229</a>]
   Restore API and Test API links to site
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-1287">CALCITE-1287</a>]
@@ -1007,7 +1142,7 @@ Tests
 * [<a href='https://issues.apache.org/jira/browse/CALCITE-835'>CALCITE-835</a>]
   Unicode character seems to be handled incorrectly in Avatica
 
-Web site and documentation
+Website and documentation
 
 * [<a href='https://issues.apache.org/jira/browse/CALCITE-1251'>CALCITE-1251</a>]
   Write release notes
@@ -1094,7 +1229,7 @@ Features and bug fixes
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-999">CALCITE-999</a>]
   Clean up maven POM files
 
-Web site and documentation
+Website and documentation
 
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-1142">CALCITE-1142</a>]
   Create a `README` for Avatica
