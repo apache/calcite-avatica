@@ -59,6 +59,7 @@ other software versions as specified in `gradle.properties`.
 
 Contributors to this release:
 Aleksey Stavrov,
+Dan Zou,
 Francis Chuang,
 Greg Hart,
 Hongbin Ma,
@@ -70,8 +71,7 @@ Oliver Lee,
 Richard Antal,
 Sergey Nuyanzin,
 Stamatis Zampetakis,
-Zhe Hu,
-zoudan
+Zhe Hu
 
 Features and bug fixes
 

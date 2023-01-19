@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: HOWTO
+title: Avatica HOWTO
 permalink: /docs/howto.html
 ---
 
