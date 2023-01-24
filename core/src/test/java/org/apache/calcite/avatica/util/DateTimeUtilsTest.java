@@ -1110,12 +1110,12 @@ public class DateTimeUtilsTest {
     assertThat(sqlDateToUnixDate(new java.sql.Date(utcCal.getTimeInMillis()), utcCal), is(0));
 
     final TimeZone minusDayZone = TimeZone.getDefault();
-    minusDayZone.setRawOffset((int) (minusDayZone.getOffset(0L) - MILLIS_PER_DAY));
+    minusDayZone.setRawOffset((int) (minusDayZone.getRawOffset() - MILLIS_PER_DAY));
     final Calendar minusDayCal = Calendar.getInstance(minusDayZone, Locale.ROOT);
     assertThat(sqlDateToUnixDate(epoch, minusDayCal), is(-1));
 
     final TimeZone plusDayZone = TimeZone.getDefault();
-    plusDayZone.setRawOffset((int) (plusDayZone.getOffset(0L) + MILLIS_PER_DAY));
+    plusDayZone.setRawOffset((int) (plusDayZone.getRawOffset() + MILLIS_PER_DAY));
     final Calendar plusDayCal = Calendar.getInstance(plusDayZone, Locale.ROOT);
     assertThat(sqlDateToUnixDate(epoch, plusDayCal), is(1));
   }
@@ -1358,12 +1358,12 @@ public class DateTimeUtilsTest {
     assertThat(sqlTimeToUnixTime(new Time(utcCal.getTimeInMillis()), utcCal), is(0));
 
     final TimeZone minusFiveZone = TimeZone.getDefault();
-    minusFiveZone.setRawOffset((int) (minusFiveZone.getOffset(0L) - 5 * MILLIS_PER_HOUR));
+    minusFiveZone.setRawOffset((int) (minusFiveZone.getRawOffset() - 5 * MILLIS_PER_HOUR));
     final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
     assertEquals(19 * MILLIS_PER_HOUR, sqlTimeToUnixTime(epoch, minusFiveCal));
 
     final TimeZone plusFiveZone = TimeZone.getDefault();
-    plusFiveZone.setRawOffset((int) (plusFiveZone.getOffset(0L) + 5 * MILLIS_PER_HOUR));
+    plusFiveZone.setRawOffset((int) (plusFiveZone.getRawOffset() + 5 * MILLIS_PER_HOUR));
     final Calendar plusFiveCal = Calendar.getInstance(plusFiveZone, Locale.ROOT);
     assertEquals(5 * MILLIS_PER_HOUR, sqlTimeToUnixTime(epoch, plusFiveCal));
   }
@@ -1399,12 +1399,12 @@ public class DateTimeUtilsTest {
     assertThat(unixTimeToSqlTime(0, utcCal).getTime(), is(utcCal.getTimeInMillis()));
 
     final TimeZone minusFiveZone = TimeZone.getDefault();
-    minusFiveZone.setRawOffset((int) (minusFiveZone.getOffset(0L) - 5 * MILLIS_PER_HOUR));
+    minusFiveZone.setRawOffset((int) (minusFiveZone.getRawOffset() - 5 * MILLIS_PER_HOUR));
     final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
     assertThat(unixTimeToSqlTime(0, minusFiveCal).toString(), is("05:00:00"));
 
     final TimeZone plusFiveZone = TimeZone.getDefault();
-    plusFiveZone.setRawOffset((int) (plusFiveZone.getOffset(0L) + 5 * MILLIS_PER_HOUR));
+    plusFiveZone.setRawOffset((int) (plusFiveZone.getRawOffset() + 5 * MILLIS_PER_HOUR));
     final Calendar plusFiveCal = Calendar.getInstance(plusFiveZone, Locale.ROOT);
     assertThat(unixTimeToSqlTime(0, plusFiveCal).toString(), is("19:00:00"));
   }
@@ -1451,13 +1451,13 @@ public class DateTimeUtilsTest {
         is(0L));
 
     final TimeZone minusFiveZone = TimeZone.getDefault();
-    minusFiveZone.setRawOffset((int) (minusFiveZone.getOffset(0L) - 5 * MILLIS_PER_HOUR));
+    minusFiveZone.setRawOffset((int) (minusFiveZone.getRawOffset() - 5 * MILLIS_PER_HOUR));
     final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
     assertThat(sqlTimestampToUnixTimestamp(epoch, minusFiveCal),
         is(-5 * MILLIS_PER_HOUR));
 
     final TimeZone plusFiveZone = TimeZone.getDefault();
-    plusFiveZone.setRawOffset((int) (plusFiveZone.getOffset(0L) + 5 * MILLIS_PER_HOUR));
+    plusFiveZone.setRawOffset((int) (plusFiveZone.getRawOffset() + 5 * MILLIS_PER_HOUR));
     final Calendar plusFiveCal = Calendar.getInstance(plusFiveZone, Locale.ROOT);
     assertThat(sqlTimestampToUnixTimestamp(epoch, plusFiveCal),
         is(5 * MILLIS_PER_HOUR));
@@ -1557,13 +1557,13 @@ public class DateTimeUtilsTest {
     assertThat(unixTimestampToSqlTimestamp(0L, utcCal).getTime(), is(utcCal.getTimeInMillis()));
 
     final TimeZone minusFiveZone = TimeZone.getDefault();
-    minusFiveZone.setRawOffset((int) (minusFiveZone.getOffset(0L) - 5 * MILLIS_PER_HOUR));
+    minusFiveZone.setRawOffset((int) (minusFiveZone.getRawOffset() - 5 * MILLIS_PER_HOUR));
     final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
     assertThat(unixTimestampToSqlTimestamp(0L, minusFiveCal),
         is(Timestamp.valueOf("1970-01-01 05:00:00")));
 
     final TimeZone plusFiveZone = TimeZone.getDefault();
-    plusFiveZone.setRawOffset((int) (plusFiveZone.getOffset(0L) + 5 * MILLIS_PER_HOUR));
+    plusFiveZone.setRawOffset((int) (plusFiveZone.getRawOffset() + 5 * MILLIS_PER_HOUR));
     final Calendar plusFiveCal = Calendar.getInstance(plusFiveZone, Locale.ROOT);
     assertThat(unixTimestampToSqlTimestamp(0L, plusFiveCal),
         is(Timestamp.valueOf("1969-12-31 19:00:00")));
