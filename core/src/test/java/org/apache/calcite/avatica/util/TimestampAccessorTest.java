@@ -83,21 +83,12 @@ public class TimestampAccessorTest {
   }
 
   /**
-   * Test {@code getTimestamp()} returns the same value as the input timestamp for the local
+   * Test {@code getTimestamp()} returns the same instant as the input timestamp for the local
    * calendar.
    */
   @Test public void testTimestamp() throws SQLException {
-    value = new Timestamp(0L);
+    value = new Timestamp(123456L);
     assertThat(instance.getTimestamp(null), is(value));
-
-    value = Timestamp.valueOf("1970-01-01 00:00:00");
-    assertThat(instance.getTimestamp(UTC), is(value));
-
-    value = Timestamp.valueOf("2014-09-30 15:28:27.356");
-    assertThat(instance.getTimestamp(UTC), is(value));
-
-    value = Timestamp.valueOf("1500-04-30 12:00:00.123");
-    assertThat(instance.getTimestamp(UTC), is(value));
   }
 
   /**
@@ -109,13 +100,43 @@ public class TimestampAccessorTest {
 
     final TimeZone minusFiveZone = TimeZone.getTimeZone("GMT-5:00");
     final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
-    assertThat(instance.getTimestamp(minusFiveCal).getTime(),
-        is(5 * MILLIS_PER_HOUR));
+    assertThat(
+        instance.getTimestamp(minusFiveCal),
+        is(new Timestamp(5 * MILLIS_PER_HOUR)));
 
     final TimeZone plusFiveZone = TimeZone.getTimeZone("GMT+5:00");
     final Calendar plusFiveCal = Calendar.getInstance(plusFiveZone, Locale.ROOT);
-    assertThat(instance.getTimestamp(plusFiveCal).getTime(),
-        is(-5 * MILLIS_PER_HOUR));
+    assertThat(
+        instance.getTimestamp(plusFiveCal),
+        is(new Timestamp(-5 * MILLIS_PER_HOUR)));
+  }
+
+  /**
+   * Test {@code getString()} returns the clock representation in UTC when the connection default
+   * calendar is UTC.
+   */
+  @Test public void testStringWithUtc() throws SQLException {
+    localCalendar.setTimeZone(UTC.getTimeZone());
+    helpTestGetString();
+  }
+
+  /**
+   * Test {@code getString()} also returns the clock representation in UTC when the connection
+   * default calendar is *not* UTC.
+   */
+  @Test public void testStringWithDefaultTimeZone() throws SQLException {
+    helpTestGetString();
+  }
+
+  private void helpTestGetString() throws SQLException {
+    value = new Timestamp(0L);
+    assertThat(instance.getString(), is("1970-01-01 00:00:00"));
+
+    value = new Timestamp(DST_INSTANT);
+    assertThat(instance.getString(), is(DST_STRING));
+
+    value = new Timestamp(PRE_GREG_INSTANT);
+    assertThat(instance.getString(), is(PRE_GREG_STRING));
   }
 
   /**
@@ -126,10 +147,10 @@ public class TimestampAccessorTest {
     assertThat(instance.getDate(null), is(new Date(0L)));
 
     value = Timestamp.valueOf("1970-01-01 00:00:00");
-    assertThat(instance.getDate(UTC), is(Date.valueOf("1970-01-01")));
+    assertThat(instance.getDate(null), is(Date.valueOf("1970-01-01")));
 
     value = Timestamp.valueOf("1500-04-30 00:00:00");
-    assertThat(instance.getDate(UTC), is(Date.valueOf("1500-04-30")));
+    assertThat(instance.getDate(null), is(Date.valueOf("1500-04-30")));
   }
 
   /**
@@ -158,10 +179,10 @@ public class TimestampAccessorTest {
     assertThat(instance.getTime(null), is(new Time(0L)));
 
     value = Timestamp.valueOf("1970-01-01 00:00:00");
-    assertThat(instance.getTime(UTC), is(Time.valueOf("00:00:00")));
+    assertThat(instance.getTime(null), is(Time.valueOf("00:00:00")));
 
     value = Timestamp.valueOf("2014-09-30 15:28:27.356");
-    assertThat(instance.getTime(UTC).toString(), is("15:28:27"));
+    assertThat(instance.getTime(null).toString(), is("15:28:27"));
   }
 
   /**
@@ -212,23 +233,6 @@ public class TimestampAccessorTest {
     assertThat(instance.getString(), is(SHIFT_STRING_3));
     value = new Timestamp(SHIFT_INSTANT_4);
     assertThat(instance.getString(), is(SHIFT_STRING_4));
-  }
-
-  /**
-   * Test {@code getString()} always returns the same string, regardless of the connection default
-   * calendar.
-   */
-  @Test public void testStringWithUtc() throws SQLException {
-    localCalendar.setTimeZone(UTC.getTimeZone());
-
-    value = new Timestamp(0L);
-    assertThat(instance.getString(), is("1970-01-01 00:00:00"));
-
-    value = new Timestamp(DST_INSTANT);
-    assertThat(instance.getString(), is(DST_STRING));
-
-    value = new Timestamp(PRE_GREG_INSTANT);
-    assertThat(instance.getString(), is(PRE_GREG_STRING));
   }
 
   /**

@@ -280,7 +280,10 @@ public abstract class AbstractCursor implements Cursor {
     if (calendar != null) {
       v += calendar.getTimeZone().getOffset(v);
     }
-    return DateTimeUtils.unixTimeToString(v % (int) DateTimeUtils.MILLIS_PER_DAY);
+    return DateTimeUtils.unixTimeToString(
+        Math.floorMod(
+            v,
+            (int) DateTimeUtils.MILLIS_PER_DAY));
   }
 
   /** Implementation of {@link Cursor.Accessor}. */
@@ -1198,7 +1201,7 @@ public abstract class AbstractCursor implements Cursor {
     @Override public long getLong() throws SQLException {
       Time time = getTime(null);
       return time == null ? 0L
-          : (time.getTime() % DateTimeUtils.MILLIS_PER_DAY);
+          : Math.floorMod(time.getTime(), DateTimeUtils.MILLIS_PER_DAY);
     }
   }
 
