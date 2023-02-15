@@ -173,14 +173,14 @@ public abstract class AbstractCursor implements Cursor {
       default:
         throw new AssertionError("bad " + columnMetaData.type.rep);
       }
-    case 2013: // TIME_WITH_TIMEZONE
+    case Types.TIME_WITH_TIMEZONE:
       switch (columnMetaData.type.rep) {
       case STRING:
         return new StringAccessor(getter);
       default:
         throw new AssertionError("bad " + columnMetaData.type.rep);
       }
-    case 2014: // TIMESTAMP_WITH_TIMEZONE
+    case Types.TIMESTAMP_WITH_TIMEZONE:
       switch (columnMetaData.type.rep) {
       case STRING:
         return new StringAccessor(getter);

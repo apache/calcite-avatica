@@ -42,6 +42,14 @@ public class TimestampFromUtilDateAccessorTest {
   private static final Calendar UTC =
       Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ROOT);
 
+  // UTC: 2014-09-30 15:28:27.356
+  private static final long DST_INSTANT = 1412090907356L;
+  private static final String DST_STRING = "2014-09-30 15:28:27";
+
+  // UTC: 1500-04-30 12:00:00.123 (PROLEPTIC GREGORIAN CALENDAR)
+  private static final long PRE_GREG_INSTANT = -14820580799877L;
+  private static final String PRE_GREG_STRING = "1500-04-30 12:00:00";
+
   private Cursor.Accessor instance;
   private Calendar localCalendar;
   private Date value;
@@ -194,11 +202,11 @@ public class TimestampFromUtilDateAccessorTest {
     value = new Timestamp(0L);
     assertThat(instance.getString(), is("1970-01-01 00:00:00"));
 
-    value = new Timestamp(1412090907356L /* 2014-09-30 15:28:27.356 UTC */);
-    assertThat(instance.getString(), is("2014-09-30 15:28:27"));
+    value = new Timestamp(DST_INSTANT);
+    assertThat(instance.getString(), is(DST_STRING));
 
-    value = new Timestamp(-14820580799877L /* 1500-04-30 12:00:00.123 UTC */);
-    assertThat(instance.getString(), is("1500-04-30 12:00:00"));
+    value = new Timestamp(PRE_GREG_INSTANT);
+    assertThat(instance.getString(), is(PRE_GREG_STRING));
   }
 
   /**
