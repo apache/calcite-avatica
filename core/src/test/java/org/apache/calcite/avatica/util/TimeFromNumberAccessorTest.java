@@ -43,7 +43,7 @@ public class TimeFromNumberAccessorTest {
 
   private Cursor.Accessor instance;
   private Calendar localCalendar;
-  private Long value;
+  private Integer value;
 
   /**
    * Setup test environment by creating a {@link AbstractCursor.TimeFromNumberAccessor} that reads
@@ -61,7 +61,7 @@ public class TimeFromNumberAccessorTest {
    * the connection default calendar.
    */
   @Test public void testTime() throws SQLException {
-    value = 12345L;
+    value = 12345;
 
     assertThat(instance.getTime(null), is(new Time(value)));
     assertThat(instance.getTimestamp(null), is(new Timestamp(value)));
@@ -72,7 +72,7 @@ public class TimeFromNumberAccessorTest {
    * provided calendar.
    */
   @Test public void testTimeWithCalendar() throws SQLException {
-    value = 0L;
+    value = 0;
 
     final TimeZone minusFiveZone = TimeZone.getTimeZone("GMT-5:00");
     final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
@@ -111,14 +111,31 @@ public class TimeFromNumberAccessorTest {
   }
 
   private void helpTestGetString() throws SQLException {
-    value = 0L;
+    value = 0;
     assertThat(instance.getString(), is("00:00:00"));
 
-    value = DateTimeUtils.MILLIS_PER_DAY - 1000;
+    value = (int) (DateTimeUtils.MILLIS_PER_DAY - 1000);
     assertThat(instance.getString(), is("23:59:59"));
 
-    value = DateTimeUtils.MILLIS_PER_DAY + 1000;
+    value = (int) (DateTimeUtils.MILLIS_PER_DAY + 1000);
     assertThat(instance.getString(), is("00:00:01"));
+
+    value = -1000;
+    assertThat(instance.getString(), is("23:59:59"));
+  }
+
+  /**
+   * Test {@code getLong()} returns the same value as the input time.
+   */
+  @Test public void testLong() throws SQLException {
+    value = 123456;
+    assertThat(instance.getLong(), is(123456L));
+
+    value = (int) (DateTimeUtils.MILLIS_PER_DAY + 1000L);
+    assertThat(instance.getLong(), is(1000L));
+
+    value = -1000;
+    assertThat(instance.getLong(), is(DateTimeUtils.MILLIS_PER_DAY - 1000L));
   }
 
   /**

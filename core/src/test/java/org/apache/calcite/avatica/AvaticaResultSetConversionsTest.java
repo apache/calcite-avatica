@@ -84,6 +84,8 @@ public class AvaticaResultSetConversionsTest {
   private static final String DST_DATE_STRING = "2016-10-10";
   private static final String DST_TIME_STRING = "20:18:38";
   private static final String DST_TIMESTAMP_STRING = "2016-10-10 20:18:38";
+  // Equivalent to `DST_INSTANT % DateTimeUtils.MILLIS_PER_DAY`:
+  private static final long DST_INSTANT_TIME_OF_DAY = 73118123;
 
   // In order to test normalization based on the system default time zone, offset values cannot be
   // hardcoded; they're subject to change from run to run depending on the host system.
@@ -1098,22 +1100,25 @@ public class AvaticaResultSetConversionsTest {
     }
 
     @Override public void testGetByte(ResultSet resultSet) throws SQLException {
-      assertEquals((byte) DST_INSTANT, g.getByte(resultSet));
+      assertEquals((byte) DST_INSTANT_TIME_OF_DAY, g.getByte(resultSet));
     }
 
     @Override public void testGetShort(ResultSet resultSet) throws SQLException {
-      assertEquals((short) (DST_INSTANT % DateTimeUtils.MILLIS_PER_DAY), g.getShort(resultSet));
+      assertEquals((short) DST_INSTANT_TIME_OF_DAY, g.getShort(resultSet));
     }
 
     @Override public void testGetInt(ResultSet resultSet) throws SQLException {
-      assertEquals((int) (DST_INSTANT % DateTimeUtils.MILLIS_PER_DAY), g.getInt(resultSet));
+      assertEquals((int) DST_INSTANT_TIME_OF_DAY, g.getInt(resultSet));
     }
 
     @Override public void testGetLong(ResultSet resultSet) throws SQLException {
-      assertEquals(DST_INSTANT % DateTimeUtils.MILLIS_PER_DAY, g.getLong(resultSet));
+      assertEquals(DST_INSTANT_TIME_OF_DAY, g.getLong(resultSet));
     }
 
     @Override public void testGetTime(ResultSet resultSet, Calendar calendar) throws SQLException {
+      // Unlike the primitive number getters, the time object getter should not truncate the instant
+      // value to the number of milliseconds in a single day. This matters when the instant occurs
+      // during daylight saving time.
       assertEquals(new Time(DST_INSTANT), g.getTime(resultSet, calendar));
     }
   }

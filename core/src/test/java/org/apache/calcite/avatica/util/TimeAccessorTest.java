@@ -105,6 +105,9 @@ public class TimeAccessorTest {
 
     value = new Time(DateTimeUtils.MILLIS_PER_DAY + 1000);
     assertThat(instance.getString(), is("00:00:01"));
+
+    value = new Time(-1000);
+    assertThat(instance.getString(), is("23:59:59"));
   }
 
   /**
@@ -112,11 +115,14 @@ public class TimeAccessorTest {
    * the number of milliseconds in a day.
    */
   @Test public void testLong() throws SQLException {
-    value = new Time(5000L);
-    assertThat(instance.getLong(), is(5000L));
+    value = new Time(123456L);
+    assertThat(instance.getLong(), is(123456L));
 
     value = new Time(DateTimeUtils.MILLIS_PER_DAY + 1000L);
     assertThat(instance.getLong(), is(1000L));
+
+    value = new Time(-1000L);
+    assertThat(instance.getLong(), is(DateTimeUtils.MILLIS_PER_DAY - 1000L));
   }
 
   /**
