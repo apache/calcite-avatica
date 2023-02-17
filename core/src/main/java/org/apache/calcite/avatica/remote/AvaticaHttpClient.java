@@ -29,6 +29,14 @@ public interface AvaticaHttpClient {
    */
   byte[] send(byte[] request);
 
+  /**
+   * Sets the "User-Agent" HTTP header for all request to the Avatica server.
+   *
+   * @param userAgent The "User-Agent" to use. Configurable via
+   * {@link org.apache.calcite.avatica.BuiltInConnectionProperty#USER_AGENT}
+   */
+  void setUserAgent(String userAgent);
+
 }
 
 // End AvaticaHttpClient.java

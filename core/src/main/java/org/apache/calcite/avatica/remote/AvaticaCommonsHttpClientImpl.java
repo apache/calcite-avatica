@@ -86,6 +86,7 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
   protected CredentialsProvider credentialsProvider = null;
   protected Lookup<AuthSchemeFactory> authRegistry = null;
   protected Object userToken;
+  protected String userAgent;
 
   public AvaticaCommonsHttpClientImpl(URL url) {
     this.uri = toURI(Objects.requireNonNull(url));
@@ -119,6 +120,10 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
       HttpPost post = new HttpPost(uri);
       post.setEntity(entity);
 
+      if (null != userAgent) {
+        post.addHeader("User-Agent", userAgent);
+      }
+
       try (CloseableHttpResponse response = execute(post, context)) {
         final int statusCode = response.getCode();
         if (HttpURLConnection.HTTP_OK == statusCode
@@ -143,6 +148,11 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
         throw new RuntimeException(e);
       }
     }
+  }
+
+  @Override
+  public void setUserAgent(String userAgent) {
+    this.userAgent = userAgent;
   }
 
   // Visible for testing

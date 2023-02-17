@@ -91,7 +91,10 @@ public enum BuiltInConnectionProperty implements ConnectionProperty {
   TRANSPARENT_RECONNECTION("transparent_reconnection", Type.BOOLEAN, Boolean.FALSE, false),
 
   /** Number of rows to fetch per call. */
-  FETCH_SIZE("fetch_size", Type.NUMBER, AvaticaStatement.DEFAULT_FETCH_SIZE, false);
+  FETCH_SIZE("fetch_size", Type.NUMBER, AvaticaStatement.DEFAULT_FETCH_SIZE, false),
+
+  /** User-Agent header to identify requests performed by a particular application **/
+  USER_AGENT("userAgent", Type.STRING, "", false);
 
   private final String camelName;
   private final Type type;

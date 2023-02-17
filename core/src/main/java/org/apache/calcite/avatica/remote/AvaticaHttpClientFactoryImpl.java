@@ -134,6 +134,10 @@ public class AvaticaHttpClientFactoryImpl implements AvaticaHttpClientFactory {
       client = new DoAsAvaticaHttpClient(client, kerberosUtil);
     }
 
+    if (!config.userAgent().isEmpty()) {
+      client.setUserAgent(config.userAgent());
+    }
+
     return client;
   }
 
