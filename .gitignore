@@ -1,6 +1,7 @@
 **/.editorconfig
 *~
 /.idea
+!/.idea/vcs.xml
 *.iml
 settings.xml
 .classpath.txt

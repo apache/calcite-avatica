@@ -1,6 +1,7 @@
 **/.gitattributes
 **/.gitignore
 .ratignore
+.idea/vcs.xml
 # Third-party license files
 src/main/config/licenses/
 #
