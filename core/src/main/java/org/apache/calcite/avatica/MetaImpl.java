@@ -352,9 +352,9 @@ public abstract class MetaImpl implements Meta {
     public final String scopeTable = null;
     public final Short sourceDataType = null;
     @ColumnNoNulls
-    public final String isAutoincrement = "";
+    public final String isAutoincrement;
     @ColumnNoNulls
-    public final String isGeneratedcolumn = "";
+    public final String isGeneratedcolumn;
 
     public MetaColumn(
         String tableCat,
@@ -369,7 +369,9 @@ public abstract class MetaImpl implements Meta {
         int nullable,
         Integer charOctetLength,
         int ordinalPosition,
-        String isNullable) {
+        String isNullable,
+        String isAutoincrement,
+        String isGeneratedcolumn) {
       this.tableCat = tableCat;
       this.tableSchem = tableSchem;
       this.tableName = tableName;
@@ -383,6 +385,8 @@ public abstract class MetaImpl implements Meta {
       this.charOctetLength = charOctetLength;
       this.ordinalPosition = ordinalPosition;
       this.isNullable = isNullable;
+      this.isAutoincrement = isAutoincrement;
+      this.isGeneratedcolumn = isGeneratedcolumn;
     }
 
     public String getName() {
