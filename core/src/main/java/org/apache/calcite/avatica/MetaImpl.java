@@ -46,6 +46,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 /**
  * Basic implementation of {@link Meta}.
@@ -352,10 +353,13 @@ public abstract class MetaImpl implements Meta {
     public final String scopeTable = null;
     public final Short sourceDataType = null;
     @ColumnNoNulls
-    public final String isAutoincrement = "";
+    public final String isAutoincrement;
     @ColumnNoNulls
-    public final String isGeneratedcolumn = "";
+    public final String isGeneratedcolumn;
 
+    // TODO: https://issues.apache.org/jira/browse/CALCITE-5549
+    //  mark as deprecated once Calcite uses updated constructor.
+    @SuppressWarnings("unused")
     public MetaColumn(
         String tableCat,
         String tableSchem,
@@ -370,6 +374,27 @@ public abstract class MetaImpl implements Meta {
         Integer charOctetLength,
         int ordinalPosition,
         String isNullable) {
+      this(tableCat, tableSchem, tableName, columnName, dataType, typeName, columnSize,
+          decimalDigits, numPrecRadix, nullable, charOctetLength, ordinalPosition, isNullable, "",
+          "");
+    }
+
+    public MetaColumn(
+        String tableCat,
+        String tableSchem,
+        String tableName,
+        String columnName,
+        int dataType,
+        String typeName,
+        Integer columnSize,
+        Integer decimalDigits,
+        Integer numPrecRadix,
+        int nullable,
+        Integer charOctetLength,
+        int ordinalPosition,
+        String isNullable,
+        String isAutoincrement,
+        String isGeneratedcolumn) {
       this.tableCat = tableCat;
       this.tableSchem = tableSchem;
       this.tableName = tableName;
@@ -383,10 +408,28 @@ public abstract class MetaImpl implements Meta {
       this.charOctetLength = charOctetLength;
       this.ordinalPosition = ordinalPosition;
       this.isNullable = isNullable;
+      this.isAutoincrement = isAutoincrement;
+      this.isGeneratedcolumn = isGeneratedcolumn;
     }
 
     public String getName() {
       return columnName;
+    }
+
+    /** Returns a copy of this MetaColumn, overriding the value of {@code isAutoincrement}. */
+    @SuppressWarnings("unused") // called from Calcite
+    public MetaColumn withIsAutoincrement(String isAutoincrement) {
+      return new MetaColumn(tableCat, tableSchem, tableName, columnName, dataType, typeName,
+          columnSize, decimalDigits, numPrecRadix, nullable, charOctetLength, ordinalPosition,
+          isNullable, Objects.requireNonNull(isAutoincrement), isGeneratedcolumn);
+    }
+
+    /** Returns a copy of this MetaColumn, overriding the value of {@code isGeneratedcolumn}. */
+    @SuppressWarnings("unused") // called from Calcite
+    public MetaColumn withIsGeneratedcolumn(String isGeneratedcolumn) {
+      return new MetaColumn(tableCat, tableSchem, tableName, columnName, dataType, typeName,
+          columnSize, decimalDigits, numPrecRadix, nullable, charOctetLength, ordinalPosition,
+          isNullable, isAutoincrement, Objects.requireNonNull(isGeneratedcolumn));
     }
   }
 
