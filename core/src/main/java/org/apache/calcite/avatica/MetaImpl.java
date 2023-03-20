@@ -373,25 +373,6 @@ public abstract class MetaImpl implements Meta {
         int nullable,
         Integer charOctetLength,
         int ordinalPosition,
-        String isNullable) {
-      this(tableCat, tableSchem, tableName, columnName, dataType, typeName, columnSize,
-          decimalDigits, numPrecRadix, nullable, charOctetLength, ordinalPosition, isNullable, "",
-          "");
-    }
-
-    public MetaColumn(
-        String tableCat,
-        String tableSchem,
-        String tableName,
-        String columnName,
-        int dataType,
-        String typeName,
-        Integer columnSize,
-        Integer decimalDigits,
-        Integer numPrecRadix,
-        int nullable,
-        Integer charOctetLength,
-        int ordinalPosition,
         String isNullable,
         String isAutoincrement,
         String isGeneratedcolumn) {
