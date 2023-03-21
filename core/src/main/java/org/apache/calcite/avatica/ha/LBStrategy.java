@@ -14,25 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.calcite.avatica.remote;
+package org.apache.calcite.avatica.ha;
 
 import org.apache.calcite.avatica.ConnectionConfig;
 
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 
-/**
- * Allows a http connection pool to be provided to enable TLS authentication.
- * On clients with this interface setHttpClientPool() MUST be called before using them.
- */
-public interface HttpClientPoolConfigurable {
+public interface LBStrategy {
   /**
-   * Sets a PoolingHttpClientConnectionManager containing the collection of SSL/TLS server
-   * keys and truststores to use for HTTPS calls.
-   *
-   * @param pool   The http connection pool
-   * @param config The connection config
+   * Get load balanced URL given the connection configuration.
    */
-  void setHttpClientPool(PoolingHttpClientConnectionManager pool, ConnectionConfig config);
+  String getLbURL(ConnectionConfig config);
 }
-
-// End HttpClientPoolConfigurable.java

@@ -16,6 +16,7 @@
  */
 package org.apache.calcite.avatica;
 
+import org.apache.calcite.avatica.ha.LBStrategy;
 import org.apache.calcite.avatica.remote.AvaticaHttpClientFactory;
 import org.apache.calcite.avatica.remote.HostnameVerificationConfigurable.HostnameVerification;
 import org.apache.calcite.avatica.remote.Service;
@@ -29,6 +30,7 @@ import java.util.Properties;
 
 /** Implementation of {@link ConnectionConfig}. */
 public class ConnectionConfigImpl implements ConnectionConfig {
+
   protected final Properties properties;
 
   public ConnectionConfigImpl(Properties properties) {
@@ -135,6 +137,31 @@ public class ConnectionConfigImpl implements ConnectionConfig {
 
   public int fetchSize() {
     return BuiltInConnectionProperty.FETCH_SIZE.wrap(properties).getInt();
+  }
+
+  @Override public boolean useClientSideLb() {
+    return BuiltInConnectionProperty.USE_CLIENT_SIDE_LB.wrap(properties).getBoolean();
+  }
+
+  public String getLbURLs() {
+    return BuiltInConnectionProperty.LB_URLS.wrap(properties).getString();
+  }
+
+  public LBStrategy getLBStrategy() {
+    return BuiltInConnectionProperty.LB_STRATEGY.wrap(properties)
+        .getPlugin(LBStrategy.class, null);
+  }
+
+  public int getLBConnectionFailoverRetries() {
+    return BuiltInConnectionProperty.LB_CONNECTION_FAILOVER_RETRIES.wrap(properties).getInt();
+  }
+
+  public long getLBConnectionFailoverSleepTime() {
+    return BuiltInConnectionProperty.LB_CONNECTION_FAILOVER_SLEEP_TIME.wrap(properties).getLong();
+  }
+
+  public long getHttpConnectionTimeout() {
+    return BuiltInConnectionProperty.HTTP_CONNECTION_TIMEOUT.wrap(properties).getLong();
   }
 
   /** Converts a {@link Properties} object containing (name, value)

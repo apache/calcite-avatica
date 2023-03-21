@@ -14,25 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.calcite.avatica.remote;
+package org.apache.calcite.avatica.ha;
 
 import org.apache.calcite.avatica.ConnectionConfig;
 
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.junit.Assert;
+import org.junit.Test;
+import org.mockito.Mockito;
 
-/**
- * Allows a http connection pool to be provided to enable TLS authentication.
- * On clients with this interface setHttpClientPool() MUST be called before using them.
- */
-public interface HttpClientPoolConfigurable {
-  /**
-   * Sets a PoolingHttpClientConnectionManager containing the collection of SSL/TLS server
-   * keys and truststores to use for HTTPS calls.
-   *
-   * @param pool   The http connection pool
-   * @param config The connection config
-   */
-  void setHttpClientPool(PoolingHttpClientConnectionManager pool, ConnectionConfig config);
+public class RoundRobinLBStrategyTest {
+
+  ConnectionConfig mockedConnectionConfig = Mockito.mock(ConnectionConfig.class);
+  RoundRobinLBStrategy roundRobinLBStrategy = RoundRobinLBStrategy.INSTANCE;
+
+  @Test
+  public void getLbURL() {
+    String inputString = "http://host1.com,http://host2.com,http://host3.com";
+    Mockito.when(mockedConnectionConfig.getLbURLs()).thenReturn(inputString);
+    String[] urls = inputString.split(",");
+
+    Assert.assertEquals(urls[0], roundRobinLBStrategy.getLbURL(mockedConnectionConfig));
+    Assert.assertEquals(urls[1], roundRobinLBStrategy.getLbURL(mockedConnectionConfig));
+    Assert.assertEquals(urls[2], roundRobinLBStrategy.getLbURL(mockedConnectionConfig));
+  }
+
 }
-
-// End HttpClientPoolConfigurable.java
