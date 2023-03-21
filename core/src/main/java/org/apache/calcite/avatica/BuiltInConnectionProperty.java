@@ -16,8 +16,11 @@
  */
 package org.apache.calcite.avatica;
 
+import org.apache.calcite.avatica.ha.ShuffledRoundRobinLBStrategy;
 import org.apache.calcite.avatica.remote.AvaticaHttpClientFactoryImpl;
 import org.apache.calcite.avatica.remote.HostnameVerificationConfigurable.HostnameVerification;
+
+import org.apache.hc.core5.util.Timeout;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,6 +36,7 @@ import static org.apache.calcite.avatica.ConnectionConfigImpl.parse;
  * Enumeration of Avatica's built-in connection properties.
  */
 public enum BuiltInConnectionProperty implements ConnectionProperty {
+
   /** Factory. */
   FACTORY("factory", Type.PLUGIN, null, false),
 
@@ -91,7 +95,36 @@ public enum BuiltInConnectionProperty implements ConnectionProperty {
   TRANSPARENT_RECONNECTION("transparent_reconnection", Type.BOOLEAN, Boolean.FALSE, false),
 
   /** Number of rows to fetch per call. */
-  FETCH_SIZE("fetch_size", Type.NUMBER, AvaticaStatement.DEFAULT_FETCH_SIZE, false);
+  FETCH_SIZE("fetch_size", Type.NUMBER, AvaticaStatement.DEFAULT_FETCH_SIZE, false),
+
+  /** Avatica connection HA property  - use client side load balancing **/
+  USE_CLIENT_SIDE_LB("use_client_side_lb", Type.BOOLEAN, Boolean.FALSE, false),
+
+  /** Avatica connection HA property  - Load balanced URLs **/
+  LB_URLS("lb_urls", Type.STRING, "", false),
+
+  /** Avatica connection HA property  - Load balancing strategy **/
+  LB_STRATEGY("lb_strategy", Type.PLUGIN,
+      ShuffledRoundRobinLBStrategy.class.getName(), false),
+
+  /**
+   * The number of retries we need for failover during client side load balancing.
+   */
+  LB_CONNECTION_FAILOVER_RETRIES("lb_connection_failover_retries",
+      Type.NUMBER, 3, false),
+
+  /**
+   * The amount of time in millis that the driver should wait before attempting
+   * connection failover
+   */
+  LB_CONNECTION_FAILOVER_SLEEP_TIME("lb_connection_failover_sleep_time",
+      Type.NUMBER, 1000, false),
+
+  /**
+   * HTTP Connection Timeout in milliseconds.
+   */
+  HTTP_CONNECTION_TIMEOUT("http_connection_timeout",
+      Type.NUMBER, Timeout.ofMinutes(3).toMilliseconds(), false);
 
   private final String camelName;
   private final Type type;
@@ -117,6 +150,7 @@ public enum BuiltInConnectionProperty implements ConnectionProperty {
     for (BuiltInConnectionProperty p : BuiltInConnectionProperty.values()) {
       LOCAL_PROPS.add(p.camelName());
     }
+
   }
 
   BuiltInConnectionProperty(String camelName, Type type, Object defaultValue,

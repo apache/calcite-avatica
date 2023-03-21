@@ -64,7 +64,7 @@ public class AvaticaHttpClientFactoryImpl implements AvaticaHttpClientFactory {
 
     if (client instanceof HttpClientPoolConfigurable) {
       PoolingHttpClientConnectionManager pool = CommonsHttpClientPoolCache.getPool(config);
-      ((HttpClientPoolConfigurable) client).setHttpClientPool(pool);
+      ((HttpClientPoolConfigurable) client).setHttpClientPool(pool, config);
     } else {
       // Kept for backwards compatibility, the current AvaticaCommonsHttpClientImpl
       // does not implement these interfaces

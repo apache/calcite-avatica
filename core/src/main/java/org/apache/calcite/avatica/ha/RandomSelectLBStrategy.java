@@ -14,25 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.calcite.avatica.remote;
+package org.apache.calcite.avatica.ha;
 
 import org.apache.calcite.avatica.ConnectionConfig;
 
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Random;
 
 /**
- * Allows a http connection pool to be provided to enable TLS authentication.
- * On clients with this interface setHttpClientPool() MUST be called before using them.
+ * Random Select strategy for client side load balancing.
  */
-public interface HttpClientPoolConfigurable {
-  /**
-   * Sets a PoolingHttpClientConnectionManager containing the collection of SSL/TLS server
-   * keys and truststores to use for HTTPS calls.
-   *
-   * @param pool   The http connection pool
-   * @param config The connection config
-   */
-  void setHttpClientPool(PoolingHttpClientConnectionManager pool, ConnectionConfig config);
+public class RandomSelectLBStrategy implements LBStrategy {
+  private static final Logger LOG = LoggerFactory.getLogger(RandomSelectLBStrategy.class);
+  public static final String URL_SEPERATOR_CHAR = ",";
+  private final Random random = new Random();
+  @Override
+  public String getLbURL(ConnectionConfig config) {
+    String[] urls = config.getLbURLs().split(URL_SEPERATOR_CHAR);
+    String url = urls[random.nextInt(urls.length)];
+    LOG.info("Selected URL:{}", url);
+    return url;
+  }
 }
-
-// End HttpClientPoolConfigurable.java

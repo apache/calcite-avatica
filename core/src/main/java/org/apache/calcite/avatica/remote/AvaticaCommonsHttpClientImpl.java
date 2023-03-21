@@ -16,6 +16,8 @@
  */
 package org.apache.calcite.avatica.remote;
 
+import org.apache.calcite.avatica.ConnectionConfig;
+
 import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.SystemDefaultDnsResolver;
 import org.apache.hc.client5.http.auth.AuthSchemeFactory;
@@ -27,6 +29,7 @@ import org.apache.hc.client5.http.auth.KerberosCredentials;
 import org.apache.hc.client5.http.auth.StandardAuthScheme;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.auth.BasicSchemeFactory;
@@ -34,6 +37,7 @@ import org.apache.hc.client5.http.impl.auth.DigestSchemeFactory;
 import org.apache.hc.client5.http.impl.auth.SPNegoSchemeFactory;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
@@ -57,6 +61,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.Principal;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A common class to invoke HTTP requests against the Avatica server agnostic of the data being
@@ -91,11 +96,18 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
     this.uri = toURI(Objects.requireNonNull(url));
   }
 
-  protected void initializeClient(PoolingHttpClientConnectionManager pool) {
+  protected void initializeClient(PoolingHttpClientConnectionManager pool,
+                                  ConnectionConfig config) {
     this.authCache = new BasicAuthCache();
     // A single thread-safe HttpClient, pooling connections via the
     // ConnectionManager
-    this.client = HttpClients.custom().setConnectionManager(pool).build();
+    RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
+    RequestConfig requestConfig = requestConfigBuilder
+        .setConnectTimeout(config.getHttpConnectionTimeout(), TimeUnit.MILLISECONDS)
+        .build();
+    HttpClientBuilder httpClientBuilder = HttpClients.custom().setConnectionManager(pool)
+        .setDefaultRequestConfig(requestConfig);
+    this.client = httpClientBuilder.build();
   }
 
   @Override public byte[] send(byte[] request) {
@@ -217,8 +229,9 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
     }
   }
 
-  @Override public void setHttpClientPool(PoolingHttpClientConnectionManager pool) {
-    initializeClient(pool);
+  @Override public void setHttpClientPool(PoolingHttpClientConnectionManager pool,
+                                          ConnectionConfig config) {
+    initializeClient(pool, config);
   }
 
 }

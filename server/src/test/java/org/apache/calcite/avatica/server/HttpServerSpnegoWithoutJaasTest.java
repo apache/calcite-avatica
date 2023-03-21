@@ -225,7 +225,7 @@ public class HttpServerSpnegoWithoutJaasTest {
         final AvaticaCommonsHttpClientImpl httpClient =
             new AvaticaCommonsHttpClientImpl(httpServerUrl);
         httpClient.setGSSCredential(credential);
-        httpClient.setHttpClientPool(pool);
+        httpClient.setHttpClientPool(pool, config);
 
         return httpClient.send(new byte[0]);
       }
