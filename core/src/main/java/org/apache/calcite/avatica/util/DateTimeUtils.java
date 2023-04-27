@@ -24,7 +24,9 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
@@ -729,15 +731,37 @@ public class DateTimeUtils {
     return r;
   }
 
+  private static void validateDate(String s) {
+    LocalDate.parse(s);
+  }
+
+  private static void validateTime(String s) {
+    LocalTime.parse(s);
+  }
+
   public static long timestampStringToUnixDate(String s) {
+    try {
+      return timestampStringToUnixDate0(s);
+    } catch (DateTimeParseException e) {
+      throw new IllegalArgumentException(e.getMessage());
+    }
+  }
+
+  private static long timestampStringToUnixDate0(String s) {
     final long d;
     final long t;
     s = s.trim();
     int space = s.indexOf(' ');
     if (space >= 0) {
-      d = dateStringToUnixDate(s.substring(0, space));
-      t = timeStringToUnixDate(s, space + 1);
+      String datePart = s.substring(0, space);
+      validateDate(datePart);
+      d = dateStringToUnixDate(datePart);
+
+      String timePart = s.substring(space + 1);
+      validateTime(timePart);
+      t = timeStringToUnixDate(timePart);
     } else {
+      validateDate(s);
       d = dateStringToUnixDate(s);
       t = 0;
     }

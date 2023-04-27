@@ -106,6 +106,20 @@ public class TimestampFromNumberAccessorTest {
   }
 
   /**
+   * Test exception is raised if date in inappropriate meaning.
+   */
+  @Test(expected = IllegalArgumentException.class) public void testBrokenDate() {
+    DateTimeUtils.timestampStringToUnixDate("2023-02-29 12:00:00.123");
+  }
+
+  /**
+   * Test exception is raised if time in inappropriate meaning.
+   */
+  @Test(expected = IllegalArgumentException.class) public void testBrokenTime() {
+    DateTimeUtils.timestampStringToUnixDate("2023-02-28 24:00:00.123");
+  }
+
+  /**
    * Test {@code getString()} shifts between the standard Gregorian calendar and the proleptic
    * Gregorian calendar.
    */
