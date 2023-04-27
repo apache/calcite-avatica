@@ -30,6 +30,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Utility functions for datetime types: date, time, timestamp.
@@ -122,6 +124,10 @@ public class DateTimeUtils {
     }
     OFFSET_DATE_TIME_HANDLER = h;
   }
+
+  private static Pattern isoDate = Pattern.compile("^(\\d{4})-([0]\\d|1[0-2])-([0-2]\\d|3[01])$");
+
+  private static Pattern isoTime = Pattern.compile("^([0-2]\\d):[0-5]\\d:[0-5]\\d(\\.\\d*)*$");
 
   //~ Methods ----------------------------------------------------------------
 
@@ -729,15 +735,82 @@ public class DateTimeUtils {
     return r;
   }
 
+  private static void validateDate(String s, String full) {
+    Matcher res = isoDate.matcher(s);
+
+    if (res.find()) {
+      int year = Integer.parseInt(res.group(1));
+      int month = Integer.parseInt(res.group(2));
+      int day = Integer.parseInt(res.group(3));
+      if (month == 2) {
+        if (isLeapYear(year)) {
+          if (day > 29) {
+            throw new IllegalArgumentException("Field value out of range: " + full);
+          }
+        } else if (day > 28) {
+          throw new IllegalArgumentException("Field value out of range: " + full);
+        }
+      } else {
+        if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10
+            || month == 12) {
+          if (day > 31) {
+            throw new IllegalArgumentException("Field value out of range: " + full);
+          }
+        } else {
+          if (day > 30) {
+            throw new IllegalArgumentException("Field value out of range: " + full);
+          }
+        }
+      }
+    } else {
+      throw new IllegalArgumentException("Illegal field value: " + full);
+    }
+  }
+
+  private static boolean isLeapYear(int year) {
+    if (year % 400 == 0 && year % 100 == 0) {
+      return true;
+    } else {
+      return year % 4 == 0 && year % 100 != 0;
+    }
+  }
+
+  private static void validateTime(String time, String full) {
+    Matcher res = isoTime.matcher(time);
+
+    if (res.find()) {
+      int hour = Integer.parseInt(res.group(1));
+      if (hour > 23) {
+        throw new IllegalArgumentException("Unexpected field value: " + full);
+      }
+    } else {
+      throw new IllegalArgumentException("Unexpected field value: " + full);
+    }
+  }
+
   public static long timestampStringToUnixDate(String s) {
+    try {
+      return timestampStringToUnixDate0(s);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException(e.getMessage());
+    }
+  }
+
+  private static long timestampStringToUnixDate0(String s) {
     final long d;
     final long t;
     s = s.trim();
     int space = s.indexOf(' ');
     if (space >= 0) {
-      d = dateStringToUnixDate(s.substring(0, space));
-      t = timeStringToUnixDate(s, space + 1);
+      String datePart = s.substring(0, space);
+      validateDate(datePart, s);
+      d = dateStringToUnixDate(datePart);
+
+      String timePart = s.substring(space + 1);
+      validateTime(timePart, s);
+      t = timeStringToUnixDate(timePart);
     } else {
+      validateDate(s, s);
       d = dateStringToUnixDate(s);
       t = 0;
     }

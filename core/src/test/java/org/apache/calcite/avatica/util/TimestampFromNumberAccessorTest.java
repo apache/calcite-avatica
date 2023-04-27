@@ -16,6 +16,7 @@
  */
 package org.apache.calcite.avatica.util;
 
+import org.hamcrest.core.StringContains;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -103,6 +104,85 @@ public class TimestampFromNumberAccessorTest {
 
     value = DateTimeUtils.timestampStringToUnixDate("1500-04-30 12:00:00.123");
     assertThat(instance.getString(), is("1500-04-30 12:00:00"));
+
+    value = DateTimeUtils.timestampStringToUnixDate("2023-09-30 15:28:27.6789012345");
+    assertThat(instance.getString(), is("2023-09-30 15:28:27"));
+
+    value = DateTimeUtils.timestampStringToUnixDate("2023-09-30 15:28:27.");
+    assertThat(instance.getString(), is("2023-09-30 15:28:27"));
+  }
+
+  /**
+   * Test exception is raised if date in inappropriate meaning.
+   */
+  @Test public void testBrokenDate() {
+    try {
+      DateTimeUtils.timestampStringToUnixDate("2023-02-29 12:00:00.123");
+
+      throw new AssertionError("Exception not raised");
+    } catch (IllegalArgumentException e) {
+      assertThat(e.getMessage(), is(StringContains.containsString(
+          "Field value out of range: 2023-02-29")));
+    }
+
+    try {
+      DateTimeUtils.timestampStringToUnixDate("2023-04-31 12:00:00.123");
+
+      throw new AssertionError("Exception not raised");
+    } catch (IllegalArgumentException e) {
+      assertThat(e.getMessage(), is(StringContains.containsString(
+          "Field value out of range: 2023-04-31 12:00:00.123")));
+    }
+
+    try {
+      DateTimeUtils.timestampStringToUnixDate("2023-13-29 12:00:00.123");
+
+      throw new AssertionError("Exception not raised");
+    } catch (IllegalArgumentException e) {
+      assertThat(e.getMessage(), is(StringContains.containsString(
+          "Illegal field value: 2023-13-29 12:00:00.123")));
+    }
+
+    try {
+      DateTimeUtils.timestampStringToUnixDate("2023--3-29 12:00:00.123");
+
+      throw new AssertionError("Exception not raised");
+    } catch (IllegalArgumentException e) {
+      assertThat(e.getMessage(), is(StringContains.containsString(
+          "Illegal field value: 2023--3-29 12:00:00.123")));
+    }
+
+    try {
+      DateTimeUtils.timestampStringToUnixDate("2023-02-27 12:00:00.123-1");
+
+      throw new AssertionError("Exception not raised");
+    } catch (IllegalArgumentException e) {
+      assertThat(e.getMessage(), is(StringContains.containsString(
+          "2023-02-27 12:00:00.123-1")));
+    }
+
+    try {
+      DateTimeUtils.timestampStringToUnixDate("2023-02-270 12:00:00.123");
+
+      throw new AssertionError("Exception not raised");
+    } catch (IllegalArgumentException e) {
+      assertThat(e.getMessage(), is(StringContains.containsString(
+          "Illegal field value: 2023-02-270 12:00:00.123")));
+    }
+  }
+
+  /**
+   * Test exception is raised if time in inappropriate meaning.
+   */
+  @Test(expected = IllegalArgumentException.class) public void testBrokenDate2() {
+    DateTimeUtils.timestampStringToUnixDate("2023-02-27 12:00:00.123-1");
+  }
+
+  /**
+   * Test exception is raised if time in inappropriate meaning.
+   */
+  @Test(expected = IllegalArgumentException.class) public void testBrokenTime() {
+    DateTimeUtils.timestampStringToUnixDate("2023-02-28 24:00:00.123");
   }
 
   /**
