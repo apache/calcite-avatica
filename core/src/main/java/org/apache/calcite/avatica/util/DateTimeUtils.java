@@ -26,20 +26,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import static java.time.format.SignStyle.NOT_NEGATIVE;
-import static java.time.temporal.ChronoField.HOUR_OF_DAY;
-import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
-import static java.time.temporal.ChronoField.NANO_OF_SECOND;
-import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Utility functions for datetime types: date, time, timestamp.
@@ -133,20 +127,7 @@ public class DateTimeUtils {
     OFFSET_DATE_TIME_HANDLER = h;
   }
 
-  private static final DateTimeFormatter ISO_LOCAL_TIME_EX;
-  static {
-    ISO_LOCAL_TIME_EX = new DateTimeFormatterBuilder()
-        .appendValue(HOUR_OF_DAY, 2)
-        .appendLiteral(':')
-        .appendValue(MINUTE_OF_HOUR, 2)
-        .optionalStart()
-        .appendLiteral(':')
-        .appendValue(SECOND_OF_MINUTE, 2)
-        .optionalStart()
-        .appendLiteral('.')
-        .appendValue(NANO_OF_SECOND, 1, 19, NOT_NEGATIVE)
-        .toFormatter(Locale.ROOT);
-  }
+  private static Pattern numbers = Pattern.compile("\\d+");
 
   //~ Methods ----------------------------------------------------------------
 
@@ -759,7 +740,19 @@ public class DateTimeUtils {
   }
 
   private static void validateTime(String s) {
-    LocalTime.parse(s, ISO_LOCAL_TIME_EX);
+    int dot = s.indexOf('.');
+    if (dot != -1) {
+      String subst = s.substring(dot + 1);
+      Matcher res = numbers.matcher(subst);
+      boolean res0 = res.matches();
+      if (!res0 && !subst.isEmpty()) {
+        throw new IllegalArgumentException("Illegal time representation: " + s);
+      }
+      if (subst.length() > 9) {
+        s = s.substring(0, dot + 1 + 9);
+      }
+    }
+    LocalTime.parse(s);
   }
 
   public static long timestampStringToUnixDate(String s) {

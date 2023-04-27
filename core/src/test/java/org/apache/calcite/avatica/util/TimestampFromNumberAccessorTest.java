@@ -104,15 +104,25 @@ public class TimestampFromNumberAccessorTest {
     value = DateTimeUtils.timestampStringToUnixDate("1500-04-30 12:00:00.123");
     assertThat(instance.getString(), is("1500-04-30 12:00:00"));
 
-    value = DateTimeUtils.timestampStringToUnixDate("2023-09-30 15:28:27.000000000000001");
+    value = DateTimeUtils.timestampStringToUnixDate("2023-09-30 15:28:27.6789012345");
+    assertThat(instance.getString(), is("2023-09-30 15:28:27"));
+
+    value = DateTimeUtils.timestampStringToUnixDate("2023-09-30 15:28:27.");
     assertThat(instance.getString(), is("2023-09-30 15:28:27"));
   }
 
   /**
    * Test exception is raised if date in inappropriate meaning.
    */
-  @Test(expected = IllegalArgumentException.class) public void testBrokenDate() {
+  @Test(expected = IllegalArgumentException.class) public void testBrokenDate1() {
     DateTimeUtils.timestampStringToUnixDate("2023-02-29 12:00:00.123");
+  }
+
+  /**
+   * Test exception is raised if time in inappropriate meaning.
+   */
+  @Test(expected = IllegalArgumentException.class) public void testBrokenDate2() {
+    DateTimeUtils.timestampStringToUnixDate("2023-02-27 12:00:00.123-1");
   }
 
   /**
