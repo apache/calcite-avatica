@@ -30,6 +30,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Utility functions for datetime types: date, time, timestamp.
@@ -56,6 +58,14 @@ public class DateTimeUtils {
   /** The SimpleDateFormat string for ISO timestamps, "yyyy-MM-dd HH:mm:ss". */
   public static final String TIMESTAMP_FORMAT_STRING =
       DATE_FORMAT_STRING + " " + TIME_FORMAT_STRING;
+
+  /** Regex for date, YYYY-MM-DD. */
+  private static final Pattern ISO_DATE_PATTERN =
+      Pattern.compile("^(\\d{4})-([0]\\d|1[0-2])-([0-2]\\d|3[01])$");
+
+  /** Regex for time, HH:MM:SS. */
+  private static final Pattern ISO_TIME_PATTERN =
+      Pattern.compile("^([0-2]\\d):[0-5]\\d:[0-5]\\d(\\.\\d*)*$");
 
   /** The GMT time zone.
    *
@@ -729,15 +739,100 @@ public class DateTimeUtils {
     return r;
   }
 
+  private static void validateDate(String s, String full) {
+    Matcher matcher = ISO_DATE_PATTERN.matcher(s);
+    if (matcher.find()) {
+      int year = Integer.parseInt(matcher.group(1));
+      int month = Integer.parseInt(matcher.group(2));
+      int day = Integer.parseInt(matcher.group(3));
+      if (day > daysInMonth(year, month)) {
+        throw fieldOutOfRange("DAY", full);
+      }
+    } else {
+      throw invalidType("DATE", full);
+    }
+  }
+
+  /** Returns the number of days in a month in the proleptic Gregorian calendar
+   * used by ISO-8601.
+   *
+   * <p>"Proleptic" means that we apply the calendar to dates before the
+   * Gregorian calendar was invented (in 1582). Thus, years 0 and 1200 are
+   * considered leap years, and 1500 is not. */
+  private static int daysInMonth(int year, int month) {
+    switch (month) {
+    case 9:
+    case 4:
+    case 6:
+    case 11:
+        // Thirty days hath September,
+        // April, June, and November,
+      return 30;
+
+    default:
+      // All the rest have thirty-one,
+      return 31;
+
+    case 2:
+      // Except February, twenty-eight days clear,
+      // And twenty-nine in each leap year.
+      return isLeapYear(year) ? 29 : 28;
+    }
+  }
+
+  /** Whether a year is considered a leap year in the proleptic Gregorian
+   * calendar. */
+  private static boolean isLeapYear(int year) {
+    return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
+  }
+
+  private static void validateTime(String time, String full) {
+    Matcher matcher = ISO_TIME_PATTERN.matcher(time);
+    if (matcher.find()) {
+      int hour = Integer.parseInt(matcher.group(1));
+      if (hour > 23) {
+        throw fieldOutOfRange("HOUR", full);
+      }
+    } else {
+      throw invalidType("TIME", full);
+    }
+  }
+
+  private static IllegalArgumentException fieldOutOfRange(String field,
+      String full) {
+    return new IllegalArgumentException("Value of " + field
+        + " field is out of range in '" + full + "'");
+  }
+
+  private static IllegalArgumentException invalidType(String type,
+      String full) {
+    return new IllegalArgumentException("Invalid " + type + " value, '"
+        + full + "'");
+  }
+
   public static long timestampStringToUnixDate(String s) {
+    try {
+      return timestampStringToUnixDate0(s);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException(e.getMessage());
+    }
+  }
+
+  private static long timestampStringToUnixDate0(String s) {
     final long d;
     final long t;
     s = s.trim();
     int space = s.indexOf(' ');
     if (space >= 0) {
-      d = dateStringToUnixDate(s.substring(0, space));
-      t = timeStringToUnixDate(s, space + 1);
+      String datePart = s.substring(0, space);
+      validateDate(datePart, s);
+      d = dateStringToUnixDate(datePart);
+
+      String timePart = s.substring(space + 1);
+      validateTime(timePart, s);
+      t = timeStringToUnixDate(timePart);
     } else {
+      validateDate(s, s);
       d = dateStringToUnixDate(s);
       t = 0;
     }

@@ -16,6 +16,7 @@
  */
 package org.apache.calcite.avatica.util;
 
+import org.hamcrest.Matcher;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -1574,15 +1575,18 @@ public class DateTimeUtilsTest {
    * proleptic Gregorian calendar used by unix timestamps.
    */
   @Test public void testUnixTimestampToSqlTimestampWithGregorianShift() {
-    assertThat(unixTimestampToSqlTimestamp(
+    assertThat(
+        unixTimestampToSqlTimestamp(
             timestampStringToUnixDate("1582-10-04 00:00:00"),
             CALENDAR),
         is(Timestamp.valueOf("1582-10-04 00:00:00.0")));
-    assertThat(unixTimestampToSqlTimestamp(
+    assertThat(
+        unixTimestampToSqlTimestamp(
             timestampStringToUnixDate("1582-10-05 00:00:00"),
             CALENDAR),
         is(Timestamp.valueOf("1582-10-15 00:00:00.0")));
-    assertThat(unixTimestampToSqlTimestamp(
+    assertThat(
+        unixTimestampToSqlTimestamp(
             timestampStringToUnixDate("1582-10-15 00:00:00"),
             CALENDAR),
         is(Timestamp.valueOf("1582-10-15 00:00:00.0")));
@@ -1604,6 +1608,98 @@ public class DateTimeUtilsTest {
     assertThat(
         unixTimestampToSqlTimestamp(timestampStringToUnixDate("9999-12-31 00:00:00"), CALENDAR),
         is(Timestamp.valueOf("9999-12-31 00:00:00")));
+  }
+
+  /** Until we upgrade to Junit5. */
+  private static void assertThrows(Runnable runnable,
+      Class<? extends Throwable> throwableClass,
+      Matcher<String> messageMatcher) {
+    try {
+      runnable.run();
+      throw new AssertionError("Exception not raised");
+    } catch (Throwable e) {
+      assertThat(throwableClass.isInstance(e), is(true));
+      assertThat(e.getMessage(), messageMatcher);
+    }
+  }
+
+  /**
+   * Test exception is raised if date in inappropriate meaning.
+   */
+  @Test public void testBrokenDate() {
+    // 2023 is not a leap year
+    assertThrows(() ->
+            DateTimeUtils.timestampStringToUnixDate("2023-02-29 12:00:00.123"),
+        IllegalArgumentException.class,
+        is("Value of DAY field is out of range in '2023-02-29 12:00:00.123'"));
+
+    // 2000 is a leap year
+    long x = timestampStringToUnixDate("2000-02-29 12:00:00.123");
+    assertThat(x, is(951825600123L));
+
+    // 1900 is not a leap year
+    assertThrows(() ->
+            DateTimeUtils.timestampStringToUnixDate("1900-02-29 12:00:00.123"),
+        IllegalArgumentException.class,
+        is("Value of DAY field is out of range in '1900-02-29 12:00:00.123'"));
+
+    // 2100 is not a leap year
+    assertThrows(() ->
+            DateTimeUtils.timestampStringToUnixDate("2100-02-29 12:00:00.123"),
+        IllegalArgumentException.class,
+        is("Value of DAY field is out of range in '2100-02-29 12:00:00.123'"));
+
+    // 1600 is a leap year
+    long x2 = timestampStringToUnixDate("1600-02-29 12:00:00.123");
+    assertThat(x2, is(-11670955199877L));
+
+    // 1500 is not a leap year
+    assertThrows(() ->
+            DateTimeUtils.timestampStringToUnixDate("1500-02-29 12:00:00.123"),
+        IllegalArgumentException.class,
+        is("Value of DAY field is out of range in '1500-02-29 12:00:00.123'"));
+
+    // April has only 30 days
+    assertThrows(() ->
+            DateTimeUtils.timestampStringToUnixDate("2023-04-31 12:00:00.123"),
+        IllegalArgumentException.class,
+        is("Value of DAY field is out of range in '2023-04-31 12:00:00.123'"));
+
+    // Month 13 is invalid
+    assertThrows(() ->
+            DateTimeUtils.timestampStringToUnixDate("2023-13-29 12:00:00.123"),
+        IllegalArgumentException.class,
+        is("Invalid DATE value, '2023-13-29 12:00:00.123'"));
+
+    // Month -3 is invalid
+    assertThrows(() ->
+            DateTimeUtils.timestampStringToUnixDate("2023--3-29 12:00:00.123"),
+        IllegalArgumentException.class,
+        is("Invalid DATE value, '2023--3-29 12:00:00.123'"));
+
+    // '123-1' is an invalid fractional second
+    assertThrows(() ->
+            DateTimeUtils.timestampStringToUnixDate("2023-02-27 12:00:00.123-1"),
+        IllegalArgumentException.class,
+        is("Invalid TIME value, '2023-02-27 12:00:00.123-1'"));
+
+    // Invalid day 270
+    assertThrows(() ->
+            DateTimeUtils.timestampStringToUnixDate("2023-02-270 12:00:00.123"),
+        IllegalArgumentException.class,
+        is("Invalid DATE value, '2023-02-270 12:00:00.123'"));
+
+    // Invalid fractional seconds '123-1'
+    assertThrows(() ->
+            DateTimeUtils.timestampStringToUnixDate("2023-02-27 12:00:00.123-1"),
+        IllegalArgumentException.class,
+        is("Invalid TIME value, '2023-02-27 12:00:00.123-1'"));
+
+    // Hour 24 is invalid
+    assertThrows(() ->
+        DateTimeUtils.timestampStringToUnixDate("2023-02-28 24:00:00.123"),
+        IllegalArgumentException.class,
+        is("Value of HOUR field is out of range in '2023-02-28 24:00:00.123'"));
   }
 }
 
