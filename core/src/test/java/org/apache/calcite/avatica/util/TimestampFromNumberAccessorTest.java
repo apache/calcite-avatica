@@ -103,6 +103,9 @@ public class TimestampFromNumberAccessorTest {
 
     value = DateTimeUtils.timestampStringToUnixDate("1500-04-30 12:00:00.123");
     assertThat(instance.getString(), is("1500-04-30 12:00:00"));
+
+    value = DateTimeUtils.timestampStringToUnixDate("2023-09-30 15:28:27.000000000000001");
+    assertThat(instance.getString(), is("2023-09-30 15:28:27"));
   }
 
   /**
