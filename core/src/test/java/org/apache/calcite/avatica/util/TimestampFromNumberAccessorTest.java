@@ -16,6 +16,7 @@
  */
 package org.apache.calcite.avatica.util;
 
+import org.hamcrest.core.StringContains;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -114,8 +115,33 @@ public class TimestampFromNumberAccessorTest {
   /**
    * Test exception is raised if date in inappropriate meaning.
    */
-  @Test(expected = IllegalArgumentException.class) public void testBrokenDate1() {
-    DateTimeUtils.timestampStringToUnixDate("2023-02-29 12:00:00.123");
+  @Test public void testBrokenDate() {
+    try {
+      DateTimeUtils.timestampStringToUnixDate("2023-02-29 12:00:00.123");
+
+      throw new AssertionError("Exception not raised");
+    } catch (IllegalArgumentException e) {
+      assertThat(e.getMessage(), is(StringContains.containsString(
+          "Invalid date 'February 29' as '2023' is not a leap year")));
+    }
+
+    try {
+      DateTimeUtils.timestampStringToUnixDate("2023-02-27 12:00:00.123-1");
+
+      throw new AssertionError("Exception not raised");
+    } catch (IllegalArgumentException e) {
+      assertThat(e.getMessage(), is(StringContains.containsString(
+          "Illegal time representation: 12:00:00.123-1")));
+    }
+
+    try {
+      DateTimeUtils.timestampStringToUnixDate("2023-02-270 12:00:00.123");
+
+      throw new AssertionError("Exception not raised");
+    } catch (IllegalArgumentException e) {
+      assertThat(e.getMessage(), is(StringContains.containsString(
+          "Text '2023-02-270' could not be parsed, unparsed text found at index 10")));
+    }
   }
 
   /**
