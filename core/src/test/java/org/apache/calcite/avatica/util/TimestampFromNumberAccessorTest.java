@@ -131,7 +131,8 @@ public class TimestampFromNumberAccessorTest {
       throw new AssertionError("Exception not raised");
     } catch (IllegalArgumentException e) {
       assertThat(e.getMessage(), is(StringContains.containsString(
-          "Illegal time representation: 12:00:00.123-1")));
+          "Text '2023-02-27 12:00:00.123-1' could not be parsed, "
+              + "unparsed text found at index 23")));
     }
 
     try {
@@ -140,7 +141,7 @@ public class TimestampFromNumberAccessorTest {
       throw new AssertionError("Exception not raised");
     } catch (IllegalArgumentException e) {
       assertThat(e.getMessage(), is(StringContains.containsString(
-          "Text '2023-02-270' could not be parsed, unparsed text found at index 10")));
+          "Text '2023-02-270 12:00:00.123' could not be parsed at index 10")));
     }
   }
 

@@ -26,14 +26,21 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
+import static java.time.format.DateTimeFormatter.ISO_LOCAL_TIME;
 
 /**
  * Utility functions for datetime types: date, time, timestamp.
@@ -48,6 +55,17 @@ public class DateTimeUtils {
   public static final int EPOCH_JULIAN = 2440588;
 
   private DateTimeUtils() {}
+
+  private static final DateTimeFormatter ISO_LOCAL_DATE_TIME_EX;
+
+  static {
+    ISO_LOCAL_DATE_TIME_EX = new DateTimeFormatterBuilder()
+        .parseCaseInsensitive()
+        .append(ISO_LOCAL_DATE)
+        .appendLiteral(' ')
+        .append(ISO_LOCAL_TIME)
+        .toFormatter(Locale.ROOT);
+  }
 
   //~ Static fields/initializers ---------------------------------------------
 
@@ -764,24 +782,17 @@ public class DateTimeUtils {
   }
 
   private static long timestampStringToUnixDate0(String s) {
-    final long d;
-    final long t;
     s = s.trim();
-    int space = s.indexOf(' ');
-    if (space >= 0) {
-      String datePart = s.substring(0, space);
-      validateDate(datePart);
-      d = dateStringToUnixDate(datePart);
-
-      String timePart = s.substring(space + 1);
-      validateTime(timePart);
-      t = timeStringToUnixDate(timePart);
-    } else {
-      validateDate(s);
-      d = dateStringToUnixDate(s);
-      t = 0;
+    //"YYYY-MM-dd HH:mm:ss.ninenanos"
+    if (s.length() > 29) {
+      s = s.substring(0, 29);
     }
-    return d * MILLIS_PER_DAY + t;
+
+    LocalDateTime dt = LocalDateTime.parse(s,
+        ISO_LOCAL_DATE_TIME_EX.withResolverStyle(ResolverStyle.STRICT));
+
+    return TimeUnit.SECONDS.toMillis(dt.toEpochSecond(ZoneOffset.UTC))
+        + TimeUnit.NANOSECONDS.toMillis(dt.getNano());
   }
 
   public static long unixDateExtract(TimeUnitRange range, long date) {
