@@ -24,7 +24,7 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -36,8 +36,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_DATE;
 import static java.time.format.DateTimeFormatter.ISO_LOCAL_TIME;
@@ -144,8 +142,6 @@ public class DateTimeUtils {
     }
     OFFSET_DATE_TIME_HANDLER = h;
   }
-
-  private static Pattern numbers = Pattern.compile("\\d+");
 
   //~ Methods ----------------------------------------------------------------
 
@@ -753,26 +749,6 @@ public class DateTimeUtils {
     return r;
   }
 
-  private static void validateDate(String s) {
-    LocalDate.parse(s);
-  }
-
-  private static void validateTime(String s) {
-    int dot = s.indexOf('.');
-    if (dot != -1) {
-      String subst = s.substring(dot + 1);
-      Matcher res = numbers.matcher(subst);
-      boolean res0 = res.matches();
-      if (!res0 && !subst.isEmpty()) {
-        throw new IllegalArgumentException("Illegal time representation: " + s);
-      }
-      if (subst.length() > 9) {
-        s = s.substring(0, dot + 1 + 9);
-      }
-    }
-    LocalTime.parse(s);
-  }
-
   public static long timestampStringToUnixDate(String s) {
     try {
       return timestampStringToUnixDate0(s);
@@ -788,11 +764,19 @@ public class DateTimeUtils {
       s = s.substring(0, 29);
     }
 
-    LocalDateTime dt = LocalDateTime.parse(s,
-        ISO_LOCAL_DATE_TIME_EX.withResolverStyle(ResolverStyle.STRICT));
+    long millis;
 
-    return TimeUnit.SECONDS.toMillis(dt.toEpochSecond(ZoneOffset.UTC))
-        + TimeUnit.NANOSECONDS.toMillis(dt.getNano());
+    if (s.indexOf(' ') != -1) {
+      LocalDateTime dt = LocalDateTime.parse(s,
+          ISO_LOCAL_DATE_TIME_EX.withResolverStyle(ResolverStyle.STRICT));
+      millis = TimeUnit.SECONDS.toMillis(dt.toEpochSecond(ZoneOffset.UTC))
+          + TimeUnit.NANOSECONDS.toMillis(dt.getNano());
+    } else {
+      LocalDate dt = LocalDate.parse(s);
+      millis = dt.atStartOfDay(ZoneId.of("UTC")).toEpochSecond();
+    }
+
+    return millis;
   }
 
   public static long unixDateExtract(TimeUnitRange range, long date) {
