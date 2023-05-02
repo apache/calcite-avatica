@@ -773,7 +773,7 @@ public class DateTimeUtils {
           + TimeUnit.NANOSECONDS.toMillis(dt.getNano());
     } else {
       LocalDate dt = LocalDate.parse(s);
-      millis = dt.atStartOfDay(ZoneId.of("UTC")).toEpochSecond();
+      millis = TimeUnit.SECONDS.toMillis(dt.atStartOfDay(ZoneId.of("UTC")).toEpochSecond());
     }
 
     return millis;
