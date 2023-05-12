@@ -18,6 +18,7 @@ package org.apache.calcite.avatica.remote;
 
 import org.apache.calcite.avatica.AvaticaConnection;
 import org.apache.calcite.avatica.BuiltInConnectionProperty;
+import org.apache.calcite.avatica.ConnectStringParser;
 import org.apache.calcite.avatica.ConnectionConfig;
 import org.apache.calcite.avatica.ConnectionProperty;
 import org.apache.calcite.avatica.DriverVersion;
@@ -173,9 +174,13 @@ public class Driver extends UnregisteredDriver {
     // super.connect(...) should be creating a service and setting it in the AvaticaConnection
     assert null != service;
 
+    // extract the parameters passed in the URL info
+    final String urlSuffix = url.substring(getConnectStringPrefix().length());
+    final Properties info2 = ConnectStringParser.parse(urlSuffix, info);
+
     service.apply(
         new Service.OpenConnectionRequest(conn.id,
-            Service.OpenConnectionRequest.serializeProperties(info)));
+            Service.OpenConnectionRequest.serializeProperties(info2)));
 
     return conn;
   }
