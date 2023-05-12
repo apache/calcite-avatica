@@ -30,6 +30,7 @@ import java.net.URL;
  */
 public class AvaticaHttpClientImpl implements AvaticaHttpClient {
   protected final URL url;
+  protected String userAgent;
 
   public AvaticaHttpClientImpl(URL url) {
     this.url = url;
@@ -43,6 +44,11 @@ public class AvaticaHttpClientImpl implements AvaticaHttpClient {
         connection.setRequestMethod("POST");
         connection.setDoInput(true);
         connection.setDoOutput(true);
+
+        if (null != userAgent) {
+          connection.setRequestProperty("User-Agent", userAgent);
+        }
+
         try (DataOutputStream wr = new DataOutputStream(connection.getOutputStream())) {
           wr.write(request);
           wr.flush();
@@ -67,6 +73,11 @@ public class AvaticaHttpClientImpl implements AvaticaHttpClient {
         throw new RuntimeException(e);
       }
     }
+  }
+
+  @Override
+  public void setUserAgent(String userAgent) {
+    this.userAgent = userAgent;
   }
 
   HttpURLConnection openConnection() throws IOException {

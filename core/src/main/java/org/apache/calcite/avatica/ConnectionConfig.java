@@ -66,6 +66,8 @@ public interface ConnectionConfig {
   boolean transparentReconnectionEnabled();
   /** @see BuiltInConnectionProperty#FETCH_SIZE */
   int fetchSize();
+  /** @see BuiltInConnectionProperty#USER_AGENT */
+  String userAgent();
 }
 
 // End ConnectionConfig.java

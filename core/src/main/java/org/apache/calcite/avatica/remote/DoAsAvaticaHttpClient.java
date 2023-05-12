@@ -40,6 +40,11 @@ public class DoAsAvaticaHttpClient implements AvaticaHttpClient {
       }
     });
   }
+
+  @Override
+  public void setUserAgent(String userAgent) {
+    wrapped.setUserAgent(userAgent);
+  }
 }
 
 // End DoAsAvaticaHttpClient.java

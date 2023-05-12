@@ -124,6 +124,9 @@ public class AlternatingRemoteMetaTest {
       return client.send(request);
     }
 
+    @Override
+    public void setUserAgent(String userAgent) {}
+
   }
 
   /**
