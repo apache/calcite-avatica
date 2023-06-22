@@ -413,8 +413,8 @@ allprojects {
                     description = "$description (skipped by default, to enable it add -Dspotbugs)"
                 }
                 reports {
-                    html.isEnabled = reportsForHumans()
-                    xml.isEnabled = !reportsForHumans()
+                    html.getRequired().set(reportsForHumans())
+                    xml.getRequired().set(reportsForHumans())
                 }
                 enabled = enableSpotBugs
             }
