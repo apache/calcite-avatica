@@ -58,7 +58,7 @@ jobs:
           fetch-depth: 50
       - name: 'Test'
         run: |
-          ./gradlew --no-parallel --no-daemon build javadoc -Pcheckstyle.version=9.3
+          ./gradlew --no-parallel --no-daemon tasks build javadoc -Pcheckstyle.version=9.3
 
   linux-jdk8-avatica:
     name: 'Linux (JDK 8), Avatica main'
@@ -117,7 +117,7 @@ jobs:
           fetch-depth: 50
       - name: 'Test'
         run: |
-          ./gradlew --no-parallel --no-daemon -Pguava.version=${GUAVA:-14.0.1} build
+          ./gradlew --no-parallel --no-daemon -Pguava.version=${GUAVA:-14.0.1} tasks build
 
   linux-jdk11-middle-aged-guava:
     name: 'Linux (JDK 11), Middle-Aged Guava'
@@ -202,4 +202,4 @@ jobs:
         distribution: 'zulu'
     - name: 'Test'
       run: |
-        ./gradlew --no-parallel --no-daemon build javadoc
+        ./gradlew --no-parallel --no-daemon tasks build javadoc
