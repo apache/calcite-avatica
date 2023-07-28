@@ -337,6 +337,19 @@ public class ConnectionConfigImpl implements ConnectionConfig {
       return get_(pluginConverter(pluginClass, defaultInstance),
           defaultClassName);
     }
+
+    /** Returns the class value of this property. Throws if not set and no
+     * default. */
+    public Class<?> getClazz(Class<?> clazz, Class<?> defaultValue) {
+      return getClazz(clazz, property.defaultValue().toString(), defaultValue); }
+
+    /** Returns the class value of this property. Throws if not set and no
+     * default. */
+    public Class<?>  getClazz(Class<?> clazz, String defaultClassName,
+        Class<?> defaultValue) {
+      assert property.type() == ConnectionProperty.Type.CLASS;
+      return get_(clazzConverter(clazz, defaultValue), defaultClassName);
+    }
   }
 
   /** Callback to parse a property from string to its native type.
@@ -431,6 +444,30 @@ public class ConnectionConfigImpl implements ConnectionConfig {
               + connectionProperty.camelName() + "' not specified");
         }
         return AvaticaUtils.instantiatePlugin(pluginClass, s);
+      }
+    };
+  }
+
+  public static <T> Converter<T> clazzConverter(final T clazz,
+      final T defaultClass) {
+    return new Converter<T>() {
+      public T apply(ConnectionProperty connectionProperty, String s) {
+        if (s == null) {
+          if (defaultClass != null) {
+            return defaultClass;
+          }
+          if (!connectionProperty.required()) {
+            return null;
+          }
+          throw new RuntimeException("Required property '"
+              + connectionProperty.camelName() + "' not specified");
+        }
+        try {
+          return (T) Class.forName(s);
+        } catch (ClassNotFoundException e) {
+          return defaultClass;
+        }
+
       }
     };
   }

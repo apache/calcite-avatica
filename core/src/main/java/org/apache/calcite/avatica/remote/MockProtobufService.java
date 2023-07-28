@@ -103,6 +103,13 @@ public class MockProtobufService extends ProtobufService {
             Meta.Frame.create(0, true,
                 Arrays.<Object>asList(new Object[] {new Object[]{"my_table", 10}})), -1, null));
 
+    // Get the tables, no tables exist
+    mappings.put(
+        new TablesRequest(connectionId, null, null,
+            "additionalColumnsTest", Collections.<String>emptyList()),
+        // ownStatement=false just to avoid the extra close statement call.
+        new ResultSetResponse(null, 150, false, null, Meta.Frame.EMPTY, -1, null));
+
     return Collections.unmodifiableMap(mappings);
   }
 

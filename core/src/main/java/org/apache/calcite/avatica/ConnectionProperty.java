@@ -55,7 +55,8 @@ public interface ConnectionProperty {
     STRING,
     NUMBER,
     ENUM,
-    PLUGIN;
+    PLUGIN,
+    CLASS;
 
     /** Deduces the class of a property of this type, given the default value
      * and the user-specified value class (each of which may be null, unless
@@ -94,6 +95,9 @@ public interface ConnectionProperty {
       case ENUM:
         return Enum.class.isAssignableFrom(clazz)
             && (defaultValue == null || clazz.isInstance(defaultValue));
+      case CLASS:
+        return clazz == Class.class
+            && (defaultValue == null || defaultValue instanceof Class);
       default:
         throw new AssertionError();
       }
@@ -107,6 +111,7 @@ public interface ConnectionProperty {
         return Number.class;
       case STRING:
         return String.class;
+      case CLASS:
       case PLUGIN:
         return Object.class;
       default:
