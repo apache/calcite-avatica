@@ -173,6 +173,18 @@ on-hover images for the permalink, but oh well.
 
 : _Required_: Only if `truststore` was provided.
 
+<strong><a name="keystore_type" href="#keystore_type">keystore_type</a></strong>
+
+: _Description_: The format of the truststore file specified by 
+  <a href="#truststore">truststore</a>. This needs to be specified if non JKS format keystores are
+  used (i.e. BCFKS). This setting applies both to keystore and truststore files.
+  For formats not included in the default JVM the corresponding security provider must be installed
+  and configured into the JVM, or added to the application classpath and configured.
+
+: _Default_: `null`.
+
+: _Required_: No.
+
 <strong><a name="fetch_size" href="#fetch_size">fetch_size</a></strong>
 
 : _Description_: The number of rows to fetch. If

@@ -35,6 +35,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeFalse;
 
 /**
@@ -104,6 +105,30 @@ public class SslDriverTest extends HttpBaseTest {
     }
   }
 
+  @Test
+  public void testJksKeyStoreType() throws Exception {
+    final String tableName = "testReadWrite";
+    String urlWithJks = jdbcUrl + ";keystore_type=jks";
+    try (Connection conn = DriverManager.getConnection(urlWithJks);
+        Statement stmt = conn.createStatement()) {
+      // Just make sure that the https connection is established
+      assertFalse(stmt.execute("DROP TABLE IF EXISTS " + tableName));
+    }
+  }
+
+  @Test
+  public void testInvalidKeyStoreType() throws Exception {
+    final String tableName = "testReadWrite";
+    String urlWithInvalid = jdbcUrl + ";keystore_type=invalid";
+    try (Connection conn = DriverManager.getConnection(urlWithInvalid);
+        Statement stmt = conn.createStatement()) {
+      // Just make sure that an https connection attempt is made
+      assertFalse(stmt.execute("DROP TABLE IF EXISTS " + tableName));
+      fail("Exception should have been thrown for the url: " + urlWithInvalid);
+    } catch (Exception e) {
+      assertTrue(e.getCause() instanceof java.security.KeyStoreException);
+    }
+  }
 }
 
 // End SslDriverTest.java
