@@ -107,6 +107,9 @@ public class CommonsHttpClientPoolCache {
 
   private static SSLContext getSSLContext(ConnectionConfig config) throws Exception {
     SSLContextBuilder sslContextBuilder = SSLContexts.custom();
+    if (null != config.keystoreType()) {
+      sslContextBuilder.setKeyStoreType(config.keystoreType());
+    }
     if (null != config.truststore() && null != config.truststorePassword()) {
       loadTrustStore(sslContextBuilder, config);
     }

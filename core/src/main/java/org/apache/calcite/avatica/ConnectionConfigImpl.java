@@ -96,6 +96,11 @@ public class ConnectionConfigImpl implements ConnectionConfig {
     return keytab;
   }
 
+  @Override
+  public String keystoreType() {
+    return BuiltInConnectionProperty.KEYSTORE_TYPE.wrap(properties).getString();
+  }
+
   public File truststore() {
     String filename = BuiltInConnectionProperty.TRUSTSTORE.wrap(properties).getString();
     if (null == filename) {

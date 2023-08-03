@@ -51,6 +51,8 @@ public interface ConnectionConfig {
   String kerberosPrincipal();
   /** @see BuiltInConnectionProperty#KEYTAB */
   File kerberosKeytab();
+  /** @see BuiltInConnectionProperty#KEYSTORE_TYPE */
+  String keystoreType();
   /** @see BuiltInConnectionProperty#TRUSTSTORE */
   File truststore();
   /** @see BuiltInConnectionProperty#TRUSTSTORE_PASSWORD */

@@ -80,6 +80,9 @@ public enum BuiltInConnectionProperty implements ConnectionProperty {
   /** Password for the truststore */
   TRUSTSTORE_PASSWORD("truststore_password", Type.STRING, "", false),
 
+  /** Keystore type (applies both to key and truststores) */
+  KEYSTORE_TYPE("keystore_type", Type.STRING, null, false),
+
   /** Keystore for MTLS authentication */
   KEYSTORE("keystore", Type.STRING, null, false),
 
