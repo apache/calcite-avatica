@@ -111,8 +111,8 @@ public class SslDriverTest extends HttpBaseTest {
     String urlWithJks = jdbcUrl + ";keystore_type=jks";
     try (Connection conn = DriverManager.getConnection(urlWithJks);
         Statement stmt = conn.createStatement()) {
-        // Just make sure that the https connection is established
-        assertFalse(stmt.execute("DROP TABLE IF EXISTS " + tableName));
+      // Just make sure that the https connection is established
+      assertFalse(stmt.execute("DROP TABLE IF EXISTS " + tableName));
     }
   }
 
@@ -122,11 +122,11 @@ public class SslDriverTest extends HttpBaseTest {
     String urlWithInvalid = jdbcUrl + ";keystore_type=invalid";
     try (Connection conn = DriverManager.getConnection(urlWithInvalid);
         Statement stmt = conn.createStatement()) {
-        // Just make sure that the https connection attempt is made
-        assertFalse(stmt.execute("DROP TABLE IF EXISTS " + tableName));
-        fail("Exception should have been thrown for the url: " + urlWithInvalid);
+      // Just make sure that an https connection attempt is made
+      assertFalse(stmt.execute("DROP TABLE IF EXISTS " + tableName));
+      fail("Exception should have been thrown for the url: " + urlWithInvalid);
     } catch (Exception e) {
-        assertTrue(e.getCause() instanceof java.security.KeyStoreException);
+      assertTrue(e.getCause() instanceof java.security.KeyStoreException);
     }
   }
 }
