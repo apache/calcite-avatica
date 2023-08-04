@@ -185,6 +185,7 @@ public class CommonsHttpClientPoolCache {
     }
     StringBuilder sb = new StringBuilder();
     sb.append(config.hostnameVerification().toString()).append(":")
+    .append(config.keystoreType()).append(":")
     .append(config.truststore()).append(":")
     .append(config.truststorePassword()).append(":")
     .append(config.keystore()).append(":")
