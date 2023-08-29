@@ -61,11 +61,11 @@ public class DateTimeUtils {
 
   /** Regex for date, YYYY-MM-DD. */
   private static final Pattern ISO_DATE_PATTERN =
-      Pattern.compile("^(\\d{4})-([0]\\d|1[0-2])-([0-2]\\d|3[01])$");
+      Pattern.compile("^(\\d{4})-([0]?\\d|1[0-2])-([0-2]?\\d|3[01])$");
 
   /** Regex for time, HH:MM:SS. */
   private static final Pattern ISO_TIME_PATTERN =
-      Pattern.compile("^([0-2]\\d):[0-5]\\d:[0-5]\\d(\\.\\d*)*$");
+      Pattern.compile("^([0-2]?\\d):[0-5]?\\d:[0-5]?\\d(\\.\\d*)*$");
 
   /** The GMT time zone.
    *
@@ -772,7 +772,6 @@ public class DateTimeUtils {
     default:
       // All the rest have thirty-one,
       return 31;
-
     case 2:
       // Except February, twenty-eight days clear,
       // And twenty-nine in each leap year.
