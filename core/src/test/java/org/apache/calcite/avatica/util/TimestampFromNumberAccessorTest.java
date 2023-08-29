@@ -101,6 +101,24 @@ public class TimestampFromNumberAccessorTest {
     value = DateTimeUtils.timestampStringToUnixDate("2014-09-30 15:28:27.356");
     assertThat(instance.getString(), is("2014-09-30 15:28:27"));
 
+    value = DateTimeUtils.timestampStringToUnixDate("2014-2-2 15:28:27.356");
+    assertThat(instance.getString(), is("2014-02-02 15:28:27"));
+
+    value = DateTimeUtils.timestampStringToUnixDate("1945-2-2 12:2:5");
+    assertThat(instance.getString(), is("1945-02-02 12:02:05"));
+
+    value = DateTimeUtils.timestampStringToUnixDate("1945-2-2 2:2:5");
+    assertThat(instance.getString(), is("1945-02-02 02:02:05"));
+
+    value = DateTimeUtils.timestampStringToUnixDate("900-2-2 2:2:5");
+    assertThat(instance.getString(), is("0900-02-02 02:02:05"));
+
+    value = DateTimeUtils.timestampStringToUnixDate("9-2-2 2:2:5");
+    assertThat(instance.getString(), is("0009-02-02 02:02:05"));
+
+    value = DateTimeUtils.timestampStringToUnixDate("2023-01-01 22:00:00.123.123");
+    assertThat(instance.getString(), is("2023-01-01 22:00:00"));
+
     value = DateTimeUtils.timestampStringToUnixDate("1500-04-30 12:00:00.123");
     assertThat(instance.getString(), is("1500-04-30 12:00:00"));
 
