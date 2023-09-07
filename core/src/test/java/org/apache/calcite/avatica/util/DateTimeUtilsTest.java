@@ -883,13 +883,13 @@ public class DateTimeUtilsTest {
     assertThat((int) date, is(date1));
 
     assertThat(subtractMonths(date1, date0),
-        anyOf(is(months), is(months + 1)));
+        anyOf(is(months - 1), is(months), is(months + 1)));
     assertThat(subtractMonths(date1 + 1, date0),
         anyOf(is(months), is(months + 1)));
     assertThat(subtractMonths(date1, date0 + 1),
         anyOf(is(months), is(months - 1)));
     assertThat(subtractMonths(d2ts(date1, 1), d2ts(date0, 0)),
-        anyOf(is(months), is(months + 1)));
+        anyOf(is(months - 1), is(months), is(months + 1)));
     assertThat(subtractMonths(d2ts(date1, 0), d2ts(date0, 1)),
         anyOf(is(months - 1), is(months), is(months + 1)));
   }
@@ -898,6 +898,60 @@ public class DateTimeUtilsTest {
    * into a timestamp (milliseconds since epoch). */
   private long d2ts(int date, int millis) {
     return date * DateTimeUtils.MILLIS_PER_DAY + millis;
+  }
+
+  @Test public void testSubtractMonths() {
+    assertThat(subtractMonths(
+            ymdToUnixDate(2004, 9, 11),
+            ymdToUnixDate(2004, 9, 11)), is(0));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2005, 9, 11),
+            ymdToUnixDate(2004, 9, 11)), is(12));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2006, 9, 11),
+            ymdToUnixDate(2004, 9, 11)), is(24));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2007, 9, 11),
+            ymdToUnixDate(2004, 9, 11)), is(36));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2004, 9, 11),
+            ymdToUnixDate(2005, 9, 11)), is(-12));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2003, 9, 11),
+            ymdToUnixDate(2005, 9, 11)), is(-24));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2005, 2, 28),
+            ymdToUnixDate(2004, 2, 28)), is(12));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2005, 2, 28),
+            ymdToUnixDate(2004, 2, 29)), is(11));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2005, 2, 28),
+            ymdToUnixDate(2004, 2, 28)), is(12));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2005, 3, 28),
+            ymdToUnixDate(2004, 3, 29)), is(11));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2004, 2, 29),
+            ymdToUnixDate(2003, 2, 28)), is(12));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2005, 2, 28),
+            ymdToUnixDate(2003, 2, 28)), is(24));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2001, 10, 10),
+            ymdToUnixDate(1999, 9, 11)), is(24));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2001, 9, 11),
+            ymdToUnixDate(1999, 9, 11)), is(24));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2001, 5, 1),
+            ymdToUnixDate(2001, 2, 1)), is(3));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2000, 2, 29),
+            ymdToUnixDate(2000, 3, 28)), is(0));
+    assertThat(subtractMonths(
+            ymdToUnixDate(2000, 2, 29),
+            ymdToUnixDate(1991, 3, 28)), is(107));
   }
 
   @Test public void testUnixTimestamp() {

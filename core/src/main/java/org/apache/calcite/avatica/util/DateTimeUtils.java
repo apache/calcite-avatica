@@ -1198,20 +1198,33 @@ public class DateTimeUtils {
     if (date0 < date1) {
       return -subtractMonths(date1, date0);
     }
-    // Start with an estimate.
-    // Since no month has more than 31 days, the estimate is <= the true value.
-    int m = (date0 - date1) / 31;
-    for (;;) {
-      int date2 = addMonths(date1, m);
-      if (date2 >= date0) {
-        return m;
-      }
-      int date3 = addMonths(date1, m + 1);
-      if (date3 > date0) {
-        return m;
-      }
-      ++m;
+
+    int y0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.YEAR, date0);
+    int m0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.MONTH, date0);
+    int d0 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.DAY, date0);
+
+    int y1 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.YEAR, date1);
+    int m1 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.MONTH, date1);
+    int d1 = (int) DateTimeUtils.unixDateExtract(TimeUnitRange.DAY, date1);
+
+    int years = y0 - y1;
+    boolean adjust = m0 < m1 || m0 == m1 && d0 < d1;
+    if (adjust) {
+      years--;
     }
+
+    int months = 12 * years;
+    if (adjust) {
+      months += 12 - (m1 - m0);
+    } else {
+      months += m0 - m1;
+    }
+
+    if (d0 < d1) {
+      months--;
+    }
+
+    return months;
   }
 
   public static int subtractMonths(long t0, long t1) {
