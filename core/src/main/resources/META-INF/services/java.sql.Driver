@@ -1,1 +1,2 @@
 org.apache.calcite.avatica.remote.Driver
+org.apache.calcite.avatica.remote.looker.LookerDriver

@@ -39,12 +39,12 @@ import java.util.Map;
  * Implementation of {@link org.apache.calcite.avatica.Meta} for the remote
  * driver.
  */
-class RemoteMeta extends MetaImpl {
+public class RemoteMeta extends MetaImpl {
   final Service service;
   final Map<String, ConnectionPropertiesImpl> propsMap = new HashMap<>();
   private Map<DatabaseProperty, Object> databaseProperties;
 
-  RemoteMeta(AvaticaConnection connection, Service service) {
+  protected RemoteMeta(AvaticaConnection connection, Service service) {
     super(connection);
     this.service = service;
   }

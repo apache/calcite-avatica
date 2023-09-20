@@ -53,7 +53,9 @@ public class Helper {
       return new AvaticaSqlException(message, rte.getSqlState(), rte.getErrorCode(),
           rte.getServerExceptions(), serverAddress);
     }
-    return new SQLException(message, e);
+    // TODO b/300529001: Tableau only surfaces the message to users but the important details
+    //  are often in the main exception so present that as well.
+    return new SQLException(message + ": " + e.getMessage(), e);
   }
 
   public SQLException createException(String message) {

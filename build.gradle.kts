@@ -176,6 +176,8 @@ allprojects {
     plugins.withId("java-library") {
         dependencies {
             "implementation"(platform(project(":bom")))
+            // Add the locally bundled LookerSDK fat jar
+            "implementation"(files("../libs/looker-kotlin-sdk-a48011f.jar"))
         }
     }
     if (!skipAutostyle) {

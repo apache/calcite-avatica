@@ -25,6 +25,7 @@ import org.apache.calcite.avatica.remote.Service;
 import org.apache.calcite.avatica.remote.Service.ErrorResponse;
 import org.apache.calcite.avatica.remote.Service.OpenConnectionRequest;
 import org.apache.calcite.avatica.remote.TypedValue;
+import org.apache.calcite.avatica.remote.looker.LookerRemoteMeta;
 import org.apache.calcite.avatica.util.ArrayFactoryImpl;
 
 import java.sql.Array;
@@ -691,9 +692,15 @@ public abstract class AvaticaConnection implements Connection {
     // These are all the metadata operations, no updates
     ResultSet resultSet = executeQueryInternal(statement, metaResultSet.signature.sanitize(),
         metaResultSet.firstFrame, state, false);
-    if (metaResultSet.ownStatement) {
+
+    // TODO (b/300522680): All metadata responses from the Calcite adapter are being treated as
+    //  "ownStatement" since there is no Avatica server to handle the result set response. We get
+    //   the raw response from CalciteMetaImpl which correctly sets `closeOnCompletion`. We don't
+    //   want that behavior here since metadata statements should remain open for multiple requests.
+    if (metaResultSet.ownStatement && !(meta instanceof LookerRemoteMeta)) {
       resultSet.getStatement().closeOnCompletion();
     }
+
     return resultSet;
   }
 
