@@ -772,6 +772,7 @@ public class DateTimeUtils {
     default:
       // All the rest have thirty-one,
       return 31;
+
     case 2:
       // Except February, twenty-eight days clear,
       // And twenty-nine in each leap year.
