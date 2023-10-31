@@ -31,7 +31,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * Test conversions from SQL {@link Time} to JDBC types in {@link AbstractCursor.TimeAccessor}.
  */
-public class TimeAccessorTest {
+public class TimeWithLocalTimeZoneAccessorTest {
 
   private static final Calendar UTC =
       Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ROOT);
@@ -50,79 +50,56 @@ public class TimeAccessorTest {
   @Before public void before() {
     final AbstractCursor.Getter getter = new LocalGetter();
     localCalendar = Calendar.getInstance(IST_ZONE, Locale.ROOT);
-    instance = new AbstractCursor.TimeAccessor(getter, localCalendar, false);
+    instance = new AbstractCursor.TimeAccessor(getter, localCalendar, true);
   }
 
   /**
-   * Test {@code getTime()} returns the same value as the input time for the connection default
-   * calendar.
+   * Test {@code getTime()} does no time zone conversion because {@code TIME WITH LOCAL TIME ZONE}
+   * represents a global instant in time.
    */
   @Test public void testTime() throws SQLException {
     value = new Time(12345L);
+
     assertThat(instance.getTime(null), is(value));
-  }
-
-  /** Test {@code getTime()} handles time zone conversions relative to the provided calendar. */
-  @Test public void testTimeWithCalendar() throws SQLException {
-    value = new Time(0L);
-
-    final TimeZone minusFiveZone = TimeZone.getTimeZone("GMT-5:00");
-    final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
-    assertThat(
-        instance.getTime(minusFiveCal).getTime(),
-        is(5 * DateTimeUtils.MILLIS_PER_HOUR));
-
-    final TimeZone plusFiveZone = TimeZone.getTimeZone("GMT+5:00");
-    final Calendar plusFiveCal = Calendar.getInstance(plusFiveZone, Locale.ROOT);
-    assertThat(
-        instance.getTime(plusFiveCal).getTime(),
-        is(-5 * DateTimeUtils.MILLIS_PER_HOUR));
+    assertThat(instance.getTime(UTC), is(value));
+    assertThat(instance.getTime(localCalendar), is(value));
   }
 
   /**
-   * Test {@code getString()} returns the clock representation in UTC when the connection default
-   * calendar is UTC.
+   * Test {@code getString()} adjusts the string representation based on the default time zone.
+   */
+  @Test public void testStringWithDefaultTimeZone() throws SQLException {
+    value = new Time(0);
+    assertThat(instance.getString(), is("05:30:00"));
+
+    value = new Time(DateTimeUtils.MILLIS_PER_DAY - 1000);
+    assertThat(instance.getString(), is("05:29:59"));
+  }
+
+  /**
+   * Test {@code getString()} adjusts the string representation based on an explicit time zone.
    */
   @Test public void testStringWithUtc() throws SQLException {
     localCalendar.setTimeZone(UTC.getTimeZone());
-    helpTestGetString();
-  }
 
-  /**
-   * Test {@code getString()} also returns the clock representation in UTC when the connection
-   * default calendar is *not* UTC.
-   */
-  @Test public void testStringWithDefaultTimeZone() throws SQLException {
-    helpTestGetString();
-  }
-
-  private void helpTestGetString() throws SQLException {
     value = new Time(0L);
     assertThat(instance.getString(), is("00:00:00"));
 
     value = new Time(DateTimeUtils.MILLIS_PER_DAY - 1000);
     assertThat(instance.getString(), is("23:59:59"));
-
-    value = new Time(DateTimeUtils.MILLIS_PER_DAY + 1000);
-    assertThat(instance.getString(), is("00:00:01"));
-
-    value = new Time(-1000);
-    assertThat(instance.getString(), is("23:59:59"));
   }
 
   /**
-   * Test {@code getLong()} returns the same value as the input time's millisecond instant, modulo
-   * the number of milliseconds in a day.
+   * Test {@code getLong()} returns the same value as the input time.
    */
   @Test public void testLong() throws SQLException {
-    value = new Time(123456L);
-    assertThat(instance.getLong(), is(123456L));
+    value = new Time(0L);
+    assertThat(instance.getLong(), is(0L));
 
-    value = new Time(DateTimeUtils.MILLIS_PER_DAY + 1000L);
-    assertThat(instance.getLong(), is(1000L));
-
-    value = new Time(-1000L);
-    assertThat(instance.getLong(), is(DateTimeUtils.MILLIS_PER_DAY - 1000L));
+    value = Time.valueOf("23:59:59");
+    assertThat(instance.getLong(), is(value.getTime() % DateTimeUtils.MILLIS_PER_DAY));
+    final Time longTime = new Time(instance.getLong());
+    assertThat(longTime.toString(), is("23:59:59"));
   }
 
   /**
