@@ -21,7 +21,6 @@ import org.junit.Test;
 
 import java.sql.SQLException;
 import java.sql.Time;
-import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -30,10 +29,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Test conversions from SQL TIME as the number of milliseconds since 1970-01-01 00:00:00 to JDBC
- * types in {@link AbstractCursor.TimeFromNumberAccessor}.
+ * Test conversions from SQL {@link Time} to JDBC types in {@link AbstractCursor.TimeAccessor}.
  */
-public class TimeFromNumberAccessorTest {
+public class TimeWithLocalTimeZoneAccessorTest {
 
   private static final Calendar UTC =
       Calendar.getInstance(TimeZone.getTimeZone("UTC"), Locale.ROOT);
@@ -43,82 +41,86 @@ public class TimeFromNumberAccessorTest {
 
   private Cursor.Accessor instance;
   private Calendar localCalendar;
-  private Long value;
+  private Time value;
 
   /**
-   * Setup test environment by creating a {@link AbstractCursor.TimeFromNumberAccessor} that reads
-   * from the instance variable {@code value}.
+   * Setup test environment by creating a {@link AbstractCursor.TimeAccessor} that reads from the
+   * instance variable {@code value}.
    */
   @Before public void before() {
     final AbstractCursor.Getter getter = new LocalGetter();
     localCalendar = Calendar.getInstance(IST_ZONE, Locale.ROOT);
-    instance = new AbstractCursor.TimeFromNumberAccessor(getter,
-        localCalendar, false);
+    instance = new AbstractCursor.TimeAccessor(getter, localCalendar, true);
   }
 
   /**
-   * Test {@code getTime()} and {@code getTimestamp()} return the same instant as the input time for
-   * the connection default calendar.
+   * Test {@code getTime()} does no time zone conversion because {@code TIME WITH LOCAL TIME ZONE}
+   * represents a global instant in time.
    */
   @Test public void testTime() throws SQLException {
-    value = 12345L;
+    value = new Time(0L);
+    assertThat(instance.getTime(null), is(value));
 
-    assertThat(instance.getTime(null), is(new Time(value)));
-    assertThat(instance.getTimestamp(null), is(new Timestamp(value)));
+    value = Time.valueOf("00:00:00");
+    assertThat(instance.getTime(UTC), is(value));
+
+    value = Time.valueOf("23:59:59");
+    assertThat(instance.getTime(UTC), is(value));
   }
 
   /**
-   * Test {@code getTime()} and {@code getTimestamp()} handle time zone conversions relative to the
-   * provided calendar.
+   * Test {@code getTime()} does no time zone conversion because {@code TIME WITH LOCAL TIME ZONE}
+   * represents a global instant in time.
    */
   @Test public void testTimeWithCalendar() throws SQLException {
-    value = 0L;
+    value = new Time(0L);
 
     final TimeZone minusFiveZone = TimeZone.getTimeZone("GMT-5:00");
     final Calendar minusFiveCal = Calendar.getInstance(minusFiveZone, Locale.ROOT);
-    assertThat(
-        instance.getTime(minusFiveCal),
-        is(new Time(5 * DateTimeUtils.MILLIS_PER_HOUR)));
-    assertThat(
-        instance.getTimestamp(minusFiveCal),
-        is(new Timestamp(5 * DateTimeUtils.MILLIS_PER_HOUR)));
+    assertThat(instance.getTime(minusFiveCal).getTime(),
+        is(0L));
 
     final TimeZone plusFiveZone = TimeZone.getTimeZone("GMT+5:00");
     final Calendar plusFiveCal = Calendar.getInstance(plusFiveZone, Locale.ROOT);
-    assertThat(
-        instance.getTime(plusFiveCal),
-        is(new Time(-5 * DateTimeUtils.MILLIS_PER_HOUR)));
-    assertThat(
-        instance.getTimestamp(plusFiveCal),
-        is(new Timestamp(-5 * DateTimeUtils.MILLIS_PER_HOUR)));
+    assertThat(instance.getTime(plusFiveCal).getTime(),
+        is(0L));
   }
 
   /**
-   * Test {@code getString()} returns the clock representation in UTC when the connection default
-   * calendar is UTC.
+   * Test {@code getString()} adjusts the string representation based on the default time zone.
+   */
+  @Test public void testStringWithDefaultTimeZone() throws SQLException {
+    value = new Time(0);
+    assertThat(instance.getString(), is("05:30:00"));
+
+    value = new Time(DateTimeUtils.MILLIS_PER_DAY - 1000);
+    assertThat(instance.getString(), is("05:29:59"));
+  }
+
+  /**
+   * Test {@code getString()} adjusts the string representation based on an explicit time zone.
    */
   @Test public void testStringWithUtc() throws SQLException {
     localCalendar.setTimeZone(UTC.getTimeZone());
-    helpTestGetString();
+
+    value = new Time(0L);
+    assertThat(instance.getString(), is("00:00:00"));
+
+    value = new Time(DateTimeUtils.MILLIS_PER_DAY - 1000);
+    assertThat(instance.getString(), is("23:59:59"));
   }
 
   /**
-   * Test {@code getString()} also returns the clock representation in UTC when the connection
-   * default calendar is *not* UTC.
+   * Test {@code getLong()} returns the same value as the input time.
    */
-  @Test public void testStringWithDefaultTimeZone() throws SQLException {
-    helpTestGetString();
-  }
+  @Test public void testLong() throws SQLException {
+    value = new Time(0L);
+    assertThat(instance.getLong(), is(0L));
 
-  private void helpTestGetString() throws SQLException {
-    value = 0L;
-    assertThat(instance.getString(), is("00:00:00"));
-
-    value = DateTimeUtils.MILLIS_PER_DAY - 1000;
-    assertThat(instance.getString(), is("23:59:59"));
-
-    value = DateTimeUtils.MILLIS_PER_DAY + 1000;
-    assertThat(instance.getString(), is("00:00:01"));
+    value = Time.valueOf("23:59:59");
+    assertThat(instance.getLong(), is(value.getTime() % DateTimeUtils.MILLIS_PER_DAY));
+    final Time longTime = new Time(instance.getLong());
+    assertThat(longTime.toString(), is("23:59:59"));
   }
 
   /**
