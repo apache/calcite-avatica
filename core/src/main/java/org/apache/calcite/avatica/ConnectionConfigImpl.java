@@ -169,6 +169,14 @@ public class ConnectionConfigImpl implements ConnectionConfig {
     return BuiltInConnectionProperty.HTTP_CONNECTION_TIMEOUT.wrap(properties).getLong();
   }
 
+  public String tokenFile() {
+    return BuiltInConnectionProperty.TOKEN_FILE.wrap(properties).getString();
+  }
+
+  public String bearerToken() {
+    return BuiltInConnectionProperty.BEARER_TOKEN.wrap(properties).getString();
+  }
+
   /** Converts a {@link Properties} object containing (name, value)
    * pairs into a map whose keys are
    * {@link org.apache.calcite.avatica.InternalProperty} objects.

@@ -60,6 +60,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.Principal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -68,7 +71,7 @@ import java.util.concurrent.TimeUnit;
  * sent and received across the wire.
  */
 public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClientPoolConfigurable,
-    UsernamePasswordAuthenticateable, GSSAuthenticateable {
+    UsernamePasswordAuthenticateable, GSSAuthenticateable, BearerAuthenticateable {
   private static final Logger LOG = LoggerFactory.getLogger(AvaticaCommonsHttpClientImpl.class);
 
   // SPNEGO specific settings
@@ -91,6 +94,10 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
   protected CredentialsProvider credentialsProvider = null;
   protected Lookup<AuthSchemeFactory> authRegistry = null;
   protected Object userToken;
+  private static final List<String> AVATICA_SCHEME_PRIORITY =
+      Collections.unmodifiableList(Arrays.asList(StandardAuthScheme.BASIC,
+          StandardAuthScheme.DIGEST, StandardAuthScheme.SPNEGO, StandardAuthScheme.NTLM,
+          StandardAuthScheme.KERBEROS, "Bearer"));
 
   public AvaticaCommonsHttpClientImpl(URL url) {
     this.uri = toURI(Objects.requireNonNull(url));
@@ -104,6 +111,7 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
     RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
     RequestConfig requestConfig = requestConfigBuilder
         .setConnectTimeout(config.getHttpConnectionTimeout(), TimeUnit.MILLISECONDS)
+        .setTargetPreferredAuthSchemes(AVATICA_SCHEME_PRIORITY)
         .build();
     HttpClientBuilder httpClientBuilder = HttpClients.custom().setConnectionManager(pool)
         .setDefaultRequestConfig(requestConfig);
@@ -204,6 +212,17 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
       ((BasicCredentialsProvider) this.credentialsProvider)
               .setCredentials(anyAuthScope, EmptyCredentials.INSTANCE);
     }
+  }
+
+  @Override public void setTokenProvider(String username, BearerTokenProvider tokenProvider) {
+    this.credentialsProvider = new BasicCredentialsProvider();
+    ((BasicCredentialsProvider) this.credentialsProvider)
+        .setCredentials(anyAuthScope, new BearerCredentials(username, tokenProvider));
+
+    this.authRegistry = RegistryBuilder.<AuthSchemeFactory>create()
+        .register("Bearer",
+            new BearerSchemeFactory())
+        .build();
   }
 
   /**
