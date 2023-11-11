@@ -248,7 +248,7 @@ promote_release(){
     fi
 
     get_asf_credentials
-    gradle publishDist -Pasf -PasfSvnUsername=$ASF_USERNAME -PasfSvnPassword=$ASF_PASSWORD -PasfNexusUsername=$ASF_USERNAME -PasfNexusPassword=$ASF_PASSWORD -PasfGitSourceUsername=$ASF_USERNAME -PasfGitSourcePassword=$ASF_PASSWORD -Prc=$RC_NUMBER -Pasf.git.pushRepositoryProvider=GITBOX
+    ./gradlew publishDist -Pasf -PasfSvnUsername=$ASF_USERNAME -PasfSvnPassword=$ASF_PASSWORD -PasfNexusUsername=$ASF_USERNAME -PasfNexusPassword=$ASF_PASSWORD -PasfGitSourceUsername=$ASF_USERNAME -PasfGitSourcePassword=$ASF_PASSWORD -Prc=$RC_NUMBER -Pasf.git.pushRepositoryProvider=GITBOX
 
     # If there is more than 1 release, delete all of them, except for the newest one
     # To do this, we do the following:
@@ -285,7 +285,7 @@ case $1 in
         select_gpg_key
         get_dry_run_build_configuration
 
-        gradle prepareVote -PasfTestSvnUsername=test -PasfTestSvnPassword=test -PasfTestNexusUsername=test -PasfTestNexusPassword=test -PasfTestGitSourceUsername=test -PasfTestGitSourcePassword=test -Prc=$RC_NUMBER -PuseGpgCmd -Psigning.gnupg.keyName=$SELECTED_GPG_KEY
+        ./gradlew prepareVote -PasfTestSvnUsername=test -PasfTestSvnPassword=test -PasfTestNexusUsername=test -PasfTestNexusPassword=test -PasfTestGitSourceUsername=test -PasfTestGitSourcePassword=test -Prc=$RC_NUMBER -PuseGpgCmd -Psigning.gnupg.keyName=$SELECTED_GPG_KEY
         ;;
 
     publish-release-for-voting)
@@ -295,11 +295,11 @@ case $1 in
         get_build_configuration
         get_asf_credentials
 
-        gradle prepareVote -Pasf -PasfCommitterId=$ASF_USERNAME -PasfSvnUsername=$ASF_USERNAME -PasfSvnPassword=$ASF_PASSWORD -PasfNexusUsername=$ASF_USERNAME -PasfNexusPassword=$ASF_PASSWORD -PasfGitSourceUsername=$ASF_USERNAME -PasfGitSourcePassword=$ASF_PASSWORD -Prc=$RC_NUMBER -PuseGpgCmd -Psigning.gnupg.keyName=$SELECTED_GPG_KEY -Pasf.git.pushRepositoryProvider=GITBOX
+        ./gradlew prepareVote -Pasf -PasfCommitterId=$ASF_USERNAME -PasfSvnUsername=$ASF_USERNAME -PasfSvnPassword=$ASF_PASSWORD -PasfNexusUsername=$ASF_USERNAME -PasfNexusPassword=$ASF_PASSWORD -PasfGitSourceUsername=$ASF_USERNAME -PasfGitSourcePassword=$ASF_PASSWORD -Prc=$RC_NUMBER -PuseGpgCmd -Psigning.gnupg.keyName=$SELECTED_GPG_KEY -Pasf.git.pushRepositoryProvider=GITBOX
         ;;
 
     clean)
-        gradle clean
+        ./gradlew clean
         ;;
 
     promote-release)
@@ -307,7 +307,7 @@ case $1 in
         ;;
 
     test)
-        gradle test
+        ./gradlew test
         ;;
 
     *)
