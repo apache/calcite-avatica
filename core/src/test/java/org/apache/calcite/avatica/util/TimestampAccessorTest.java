@@ -52,7 +52,7 @@ public class TimestampAccessorTest {
   @Before public void before() {
     final AbstractCursor.Getter getter = new LocalGetter();
     localCalendar = Calendar.getInstance(TimeZone.getDefault(), Locale.ROOT);
-    instance = new AbstractCursor.TimestampAccessor(getter, localCalendar);
+    instance = new AbstractCursor.TimestampAccessor(getter, localCalendar, false);
   }
 
   /**

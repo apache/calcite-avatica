@@ -19,6 +19,7 @@ package org.apache.calcite.avatica;
 import org.apache.calcite.avatica.remote.TypedValue;
 import org.apache.calcite.avatica.util.ArrayFactoryImpl;
 import org.apache.calcite.avatica.util.Cursor;
+import org.apache.calcite.avatica.util.DateTimeUtils;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -77,7 +78,9 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
       ResultSetMetaData resultSetMetaData,
       TimeZone timeZone,
       Meta.Frame firstFrame) throws SQLException {
-    super(timeZone);
+    // Initialize the parent ArrayFactory with the UTC time zone because otherwise an array of
+    // date/time values would get double-adjusted by a client that calls Array.getResultSet().
+    super(DateTimeUtils.UTC_ZONE);
     this.statement = statement;
     this.state = state;
     this.signature = signature;
