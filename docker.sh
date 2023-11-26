@@ -32,9 +32,9 @@ KEYS=()
 
 GPG_COMMAND="gpg"
 
-install_gnupg2(){
+install_gnupg2_and_svn(){
   apt update
-  apt install gnupg2 -y
+  apt install gnupg2 subversion -y
 }
 
 get_gpg_keys(){
@@ -280,7 +280,7 @@ promote_release(){
 
 case $1 in
     dry-run)
-        install_gnupg2
+        install_gnupg2_and_svn
         mount_gpg_keys
         select_gpg_key
         get_dry_run_build_configuration
@@ -289,7 +289,7 @@ case $1 in
         ;;
 
     publish-release-for-voting)
-        install_gnupg2
+        install_gnupg2_and_svn
         mount_gpg_keys
         select_gpg_key
         get_build_configuration
