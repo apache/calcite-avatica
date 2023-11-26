@@ -28,6 +28,73 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.24.0">1.24.0</a> / 2023-12-XX
+{: #v1-24-0}
+
+Apache Calcite Avatica 1.24.0 features mostly dependency upgrades with some minor bug fixes and features.
+
+Compatibility: This release is tested
+on Linux, macOS, Microsoft Windows;
+using Oracle JDK 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
+using IBM Java 8;
+Guava versions 14.0.1 to 32.1.1-jre;
+other software versions as specified in `gradle.properties`.
+
+Contributors to this release:
+Evgeniy Stanilovskiy,
+Francis Chuang (Release Manager),
+Greg Hart,
+Istvan Toth,
+Mihai Budiu,
+Richard Antal,
+Sergey Nuyanzin,
+TJ Banghart
+Vaibhav Joshi,
+Will Noble
+
+Features and bug fixes
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5494">CALCITE-5494</a>]
+  Time zone tests in DateTimeUtilsTest should pass in Europe/London
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5440">CALCITE-5440</a>]
+  Bump gradle from 7.4.2 to 7.6.1
+* Bump forbidden apis from 3.2 to 3.4
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5567">CALCITE-5567</a>]
+  Update mockito from 4.4.0 to 4.11.0 and enable jdk19
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5678">CALCITE-5678</a>]
+  Validate date, time and timestamp literals per ISO-8601
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5581">CALCITE-5581</a>]
+  Implement Basic client side load balancing in Avatica Driver
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5803">CALCITE-5803</a>]
+  Migrate Avatica to Gradle 8.1.1
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5812">CALCITE-5812</a>]
+  Gradle tasks fails when creating the javadoc aggregation
+  Exclude "bom" project from the javadoc aggregation since it does not have "main" and "test" objects causing "tasks" to
+  fail.
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5804">CALCITE-5804</a>]
+  Upgrade jackson version from 2.14.1 to 2.15.2
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5748">CALCITE-5748</a>]
+  Support Guava 32.1.1-jre
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5890">CALCITE-5890</a>]
+  Handle non-JKS truststores in Avatica client
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5981">CALCITE-5981</a>]
+  `TIMESTAMPDIFF` function returns incorrect result
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6034">CALCITE-6034</a>]
+  Add `isAutoIncrement` and `isGenerated` args to `MetaColumn` constructor
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5536">CALCITE-5536</a>]
+  Clean up some of the magic numbers in `AvaticaResultSetConversionsTest` and `AbstractCursor`
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6113">CALCITE-6113</a>]
+  Update HttpComponents Core to 5.2.3 and HttpComponents Client to 5.2.1 in Avatica
+
+Build and tests
+
+* Install svn in docker release script
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6106">CALCITE-6106</a>]
+  Switch from gradle to eclipse-temurin image for avatica docker-compose release commands
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6107">CALCITE-6107</a>]
+  Upgrade vlsi-release-plugins to 1.90
+* Use eclipse-temurin:8 images
+
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.23.0">1.23.0</a> / 2023-01-19
 {: #v1-23-0}
 
