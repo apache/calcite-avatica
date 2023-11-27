@@ -209,7 +209,9 @@ allprojects {
     if (!skipCheckstyle) {
         apply<CheckstylePlugin>()
         dependencies {
-            checkstyle("com.puppycrawl.tools:checkstyle:${"checkstyle".v}")
+            val checkstyleVersion = if (JavaVersion.current() == JavaVersion.VERSION_1_8)
+                "jdk8.checkstyle".v else "checkstyle".v
+            checkstyle("com.puppycrawl.tools:checkstyle:$checkstyleVersion")
         }
         checkstyle {
             // Current one is ~8.8
