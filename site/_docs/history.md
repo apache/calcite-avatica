@@ -28,6 +28,41 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+<!--
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.25.0">1.25.0</a> / XXXX-XX-XX
+{: #v1-25-0}
+
+This release comes x months after [1.24.0](#v1-24-0),
+contains contributions from x contributors, and resolves x issues.
+
+Contributors to this release:
+x,
+y (release manager),
+z.
+
+#### Breaking Changes
+{: #breaking-1-25-0}
+
+Compatibility: This release is tested on Linux, macOS, Microsoft Windows;
+using JDK/OpenJDK versions 8, 11, 17, 21;
+other software versions as specified in `gradle.properties`.
+
+#### New features
+{: #new-features-1-25-0}
+
+#### Dependency version upgrade
+{: #dependency-1-25-0}
+
+#### Bug-fixes, API changes and minor enhancements
+{: #fixes-1-25-0}
+
+#### Build and test suite
+{: #build-1-25-0}
+
+#### Web site and documentation
+{: #site-1-25-0}
+-->
+
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.24.0">1.24.0</a> / 2023-12-04
 {: #v1-24-0}
 
