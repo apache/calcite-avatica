@@ -16,16 +16,13 @@
  */
 package org.apache.calcite.avatica.remote;
 
-/**
- * An enumeration for support types of authentication for the HttpServer.
- */
-public enum AuthenticationType {
-  NONE,
-  BASIC,
-  DIGEST,
-  SPNEGO,
-  BEARER,
-  CUSTOM;
-}
+import org.apache.calcite.avatica.ConnectionConfig;
 
-// End AuthenticationType.java
+import java.io.IOException;
+
+public interface BearerTokenProvider {
+
+  void init(ConnectionConfig config) throws IOException;
+
+  String obtain(String username);
+}

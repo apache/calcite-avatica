@@ -16,16 +16,7 @@
  */
 package org.apache.calcite.avatica.remote;
 
-/**
- * An enumeration for support types of authentication for the HttpServer.
- */
-public enum AuthenticationType {
-  NONE,
-  BASIC,
-  DIGEST,
-  SPNEGO,
-  BEARER,
-  CUSTOM;
-}
+public interface BearerAuthenticateable {
 
-// End AuthenticationType.java
+  void setTokenProvider(String username, BearerTokenProvider tokenProvider);
+}

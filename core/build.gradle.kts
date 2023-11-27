@@ -42,6 +42,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-inline")
     testImplementation("org.hamcrest:hamcrest-core")
+    testImplementation("commons-io:commons-io")
     testRuntimeOnly("org.apache.logging.log4j:log4j-slf4j-impl")
 }
 

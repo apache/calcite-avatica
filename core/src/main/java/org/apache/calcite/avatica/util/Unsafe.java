@@ -45,6 +45,11 @@ public class Unsafe {
     o.wait();
   }
 
+  /** Calls {@link Object#wait(long timeout)}. */
+  public static void wait(Object o, long timeout) throws InterruptedException {
+    o.wait(timeout);
+  }
+
   /** Returns a {@link java.util.Calendar} with the local time zone and root
    * locale. */
   public static Calendar localCalendar() {
