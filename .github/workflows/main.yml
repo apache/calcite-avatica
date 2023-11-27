@@ -58,7 +58,7 @@ jobs:
           fetch-depth: 50
       - name: 'Test'
         run: |
-          ./gradlew --no-parallel --no-daemon tasks build javadoc -Pcheckstyle.version=9.3
+          ./gradlew --no-parallel --no-daemon tasks build javadoc
 
   linux-jdk8-avatica:
     name: 'Linux (JDK 8), Avatica main'
@@ -74,7 +74,7 @@ jobs:
         fetch-depth: 50
     - name: 'Install Avatica to Maven Local'
       run: |
-        ./gradlew publishToMavenLocal -Pcalcite.avatica.version=1.0.0-dev-main -PskipJavadoc -Pcheckstyle.version=9.3
+        ./gradlew publishToMavenLocal -Pcalcite.avatica.version=1.0.0-dev-main -PskipJavadoc
     - name: 'Test Calcite'
       run: |
         git clone --depth 100 https://github.com/apache/calcite.git ../calcite
