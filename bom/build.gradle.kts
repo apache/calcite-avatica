@@ -55,6 +55,8 @@ dependencies {
         apiv("com.h2database:h2")
         apiv("javax.servlet:javax.servlet-api", "servlet")
         apiv("junit:junit")
+        apiv("net.bytebuddy:byte-buddy", "bytebuddy")
+        apiv("net.bytebuddy:byte-buddy-agent", "bytebuddy")
         apiv("net.hydromatic:scott-data-hsqldb")
         apiv("org.apache.httpcomponents.client5:httpclient5")
         apiv("org.apache.httpcomponents.core5:httpcore5")
