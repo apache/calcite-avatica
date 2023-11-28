@@ -37,6 +37,11 @@ install_gnupg2_and_svn(){
   apt install gnupg2 subversion -y
 }
 
+install_svn(){
+  apt update
+  apt install subversion -y
+}
+
 get_gpg_keys(){
     GPG_KEYS=$($GPG_COMMAND --list-keys --with-colons --keyid-format LONG)
 
@@ -303,6 +308,7 @@ case $1 in
         ;;
 
     promote-release)
+        install_svn
         promote_release
         ;;
 
