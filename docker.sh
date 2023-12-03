@@ -37,9 +37,9 @@ install_gnupg2_and_svn(){
   apt install gnupg2 subversion -y
 }
 
-install_svn(){
+install_git_and_svn(){
   apt update
-  apt install subversion -y
+  apt install git subversion -y
 }
 
 get_gpg_keys(){
@@ -236,6 +236,8 @@ get_asf_credentials(){
 
 promote_release(){
 
+    git config --global --add safe.directory /src
+
     LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
 
     if [[ ! $LATEST_TAG =~ .+-rc[[:digit:]]+$ ]]; then
@@ -308,7 +310,7 @@ case $1 in
         ;;
 
     promote-release)
-        install_svn
+        install_git_and_svn
         promote_release
         ;;
 
