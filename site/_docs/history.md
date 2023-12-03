@@ -28,10 +28,13 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.24.0">1.24.0</a> / 2023-12-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.24.0">1.24.0</a> / 2023-12-04
 {: #v1-24-0}
 
 Apache Calcite Avatica 1.24.0 features mostly dependency upgrades with some minor bug fixes and features.
+
+*Breaking Change*: Due to [CALCITE-5678](https://issues.apache.org/jira/browse/CALCITE-5678), date literals not
+satisfying the Gregorian calendar will be rejected.
 
 Compatibility: This release is tested
 on Linux, macOS, Microsoft Windows;
