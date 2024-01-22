@@ -18,6 +18,7 @@ package org.apache.calcite.avatica.remote;
 
 import org.apache.calcite.avatica.ConnectionSpec;
 import org.apache.calcite.avatica.Meta;
+import org.apache.calcite.avatica.NoSuchStatementException;
 import org.apache.calcite.avatica.jdbc.JdbcMeta;
 import org.apache.calcite.avatica.metrics.MetricsSystemConfiguration;
 import org.apache.calcite.avatica.remote.Driver.Serialization;
@@ -29,6 +30,10 @@ import org.apache.calcite.avatica.server.HandlerFactory;
 import org.apache.calcite.avatica.server.HttpServer;
 import org.apache.calcite.avatica.server.Main;
 
+import org.mockito.Mockito;
+import org.mockito.internal.stubbing.answers.CallsRealMethods;
+import org.mockito.invocation.InvocationOnMock;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +42,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.matches;
 /**
  * Utility class which encapsulates the setup required to write Avatica tests that run against
  * servers using each serialization approach.
@@ -186,10 +195,27 @@ public class AvaticaServersForTest {
     static JdbcMeta getInstance() {
       if (instance == null) {
         try {
-          instance = new JdbcMeta(CONNECTION_SPEC.url, CONNECTION_SPEC.username,
+          JdbcMeta realInstance = new JdbcMeta(CONNECTION_SPEC.url, CONNECTION_SPEC.username,
                   CONNECTION_SPEC.password);
-        } catch (SQLException e) {
-          throw new RuntimeException(e);
+          // Add a configurable delay to the Statement.execute() method based on a DELAY SQL comment
+          instance = Mockito.spy(realInstance);
+          Mockito.doAnswer(new CallsRealMethods() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+              Pattern pattern = Pattern.compile("/\\* DELAY=(\\d+) \\*/");
+              Matcher matcher = pattern.matcher((String) invocation.getArgument(1));
+              if (matcher.find()) {
+                long delay =  Long.parseLong(matcher.group(1));
+                Thread.sleep(delay);
+              }
+              return super.answer(invocation);
+            }
+          })
+              .when(instance).prepareAndExecute(any(Meta.StatementHandle.class),
+              matches("/\\* DELAY=(\\d+) \\*/"),
+              any(long.class), any(int.class), any(Meta.PrepareCallback.class));
+        } catch (SQLException | NoSuchStatementException e) {
+          throw new RuntimeException("Error when applying test DELAY via Mockito", e);
         }
       }
       return instance;

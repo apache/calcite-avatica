@@ -37,6 +37,7 @@ import com.google.common.base.Throwables;
 import com.google.common.cache.Cache;
 
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -793,6 +794,37 @@ public class RemoteMetaTest {
         assertEquals(4000L, rs.getLong(1));
         assertEquals(4000, rs.getInt(1));
       }
+    }
+  }
+
+  @Test public void testNoTimeout() throws Exception {
+    ConnectionSpec.getDatabaseLock().lock();
+    try (AvaticaConnection conn = (AvaticaConnection) DriverManager.getConnection(url)) {
+      final AvaticaStatement statement = conn.createStatement();
+      // Well within the default 180 seconds
+      statement.execute(
+          "select * from (values ('a', 1), ('b', 2)) /* DELAY=5000 */");
+      statement.getResultSet();
+      // We only care whether it times out
+      statement.close();
+      conn.close();
+    } finally {
+      ConnectionSpec.getDatabaseLock().unlock();
+    }
+  }
+
+  @Test public void testTimeout() throws Exception {
+    ConnectionSpec.getDatabaseLock().lock();
+    try (AvaticaConnection conn = (AvaticaConnection) DriverManager.getConnection(
+        url + ";http_response_timeout=1000")) {
+      final AvaticaStatement statement = conn.createStatement();
+      statement.execute(
+          "select * from (values ('a', 1), ('b', 2)) /* DELAY=5000 */");
+      Assert.fail("Should have timed out");
+    } catch (SQLException e) {
+        // Expected outcome
+    } finally {
+      ConnectionSpec.getDatabaseLock().unlock();
     }
   }
 }

@@ -127,6 +127,12 @@ public enum BuiltInConnectionProperty implements ConnectionProperty {
    * HTTP Connection Timeout in milliseconds.
    */
   HTTP_CONNECTION_TIMEOUT("http_connection_timeout",
+      Type.NUMBER, Timeout.ofMinutes(3).toMilliseconds(), false),
+
+  /**
+   * HTTP Response Timeout (socket timeout) in milliseconds.
+   */
+  HTTP_RESPONSE_TIMEOUT("http_response_timeout",
       Type.NUMBER, Timeout.ofMinutes(3).toMilliseconds(), false);
 
   private final String camelName;
