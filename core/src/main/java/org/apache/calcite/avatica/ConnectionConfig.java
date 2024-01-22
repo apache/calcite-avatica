@@ -81,6 +81,8 @@ public interface ConnectionConfig {
   long getLBConnectionFailoverSleepTime();
   /** @see BuiltInConnectionProperty#HTTP_CONNECTION_TIMEOUT **/
   long getHttpConnectionTimeout();
+  /** @see BuiltInConnectionProperty#HTTP_RESPONSE_TIMEOUT **/
+  long getHttpResponseTimeout();
 }
 
 // End ConnectionConfig.java

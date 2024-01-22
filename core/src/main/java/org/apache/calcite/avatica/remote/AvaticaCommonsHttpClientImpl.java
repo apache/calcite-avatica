@@ -104,6 +104,7 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
     RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
     RequestConfig requestConfig = requestConfigBuilder
         .setConnectTimeout(config.getHttpConnectionTimeout(), TimeUnit.MILLISECONDS)
+        .setResponseTimeout(config.getHttpResponseTimeout(), TimeUnit.MILLISECONDS)
         .build();
     HttpClientBuilder httpClientBuilder = HttpClients.custom().setConnectionManager(pool)
         .setDefaultRequestConfig(requestConfig);

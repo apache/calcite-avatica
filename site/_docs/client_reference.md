@@ -254,7 +254,15 @@ failover retry.
 
 <strong><a name="http_connection_timeout" href="#http_connection_timeout">http_connection_timeout</a></strong>
 
-: _Description_: Timeout in milliseconds for the connection between the Avatica HTTP client and server.
+: _Description_: Timeout in milliseconds for establishing the connection between the Avatica HTTP client and server.
+
+: _Default_: `180000` (3 minutes).
+
+: _Required_: No.
+
+<strong><a name="http_response_timeout" href="#http_response_timeout">http_response_timeout</a></strong>
+
+: _Description_: Socket Timeout in milliseconds for the connection between the Avatica HTTP client and server.
 
 : _Default_: `180000` (3 minutes).
 
