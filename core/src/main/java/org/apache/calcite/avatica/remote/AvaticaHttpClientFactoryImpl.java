@@ -132,28 +132,16 @@ public class AvaticaHttpClientFactoryImpl implements AvaticaHttpClientFactory {
 
     if (client instanceof BearerAuthenticateable) {
       if (AuthenticationType.BEARER == authType) {
-        if (config.bearerToken() == null && config.tokenFile() == null
-            || config.bearerToken() != null && config.tokenFile() != null) {
-          LOG.debug("Failed to initialize bearer authentication:"
-              + "either the tokenfile or bearertoken must be set");
-        } else {
-          BearerTokenProvider tokenProvider;
-          if (config.bearerToken() != null) {
-            tokenProvider = new ConstantBearerTokenProvider();
-          } else {
-            tokenProvider = new FileBearerTokenProvider();
+        try {
+          BearerTokenProvider tokenProvider =
+                  BearerTokenProviderFactory.getBearerTokenProvider(config);
+          String username = config.avaticaUser();
+          if (null == username) {
+            username = System.getProperty("user.name");
           }
-
-          try {
-            tokenProvider.init(config);
-            String username = config.avaticaUser();
-            if (null == username) {
-              username = System.getProperty("user.name");
-            }
-            ((BearerAuthenticateable) client).setTokenProvider(username, tokenProvider);
-          } catch (java.io.IOException e) {
-            LOG.debug("Failed to initialize bearer authentication");
-          }
+          ((BearerAuthenticateable) client).setTokenProvider(username, tokenProvider);
+        } catch (java.io.IOException e) {
+          LOG.debug("Failed to initialize bearer authentication");
         }
       }
     } else {

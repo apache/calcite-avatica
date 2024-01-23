@@ -129,11 +129,11 @@ public enum BuiltInConnectionProperty implements ConnectionProperty {
   HTTP_CONNECTION_TIMEOUT("http_connection_timeout",
       Type.NUMBER, Timeout.ofMinutes(3).toMilliseconds(), false),
 
-  /** File containing bearer tokens to use to perform Bearer authentication. */
-  TOKEN_FILE("tokenfile", Type.STRING, "", false),
-
   /** Bearer token to use to perform Bearer authentication. */
-  BEARER_TOKEN("bearertoken", Type.STRING, "", false);
+  BEARER_TOKEN("bearertoken", Type.STRING, null, false),
+
+  /** Classname of the BearerTokenProvider. */
+  TOKEN_PROVIDER_CLASS("bearer_token_provider_class", Type.STRING, null, false);
 
   private final String camelName;
   private final Type type;

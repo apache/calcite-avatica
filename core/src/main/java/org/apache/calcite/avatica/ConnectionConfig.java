@@ -81,10 +81,12 @@ public interface ConnectionConfig {
   long getLBConnectionFailoverSleepTime();
   /** @see BuiltInConnectionProperty#HTTP_CONNECTION_TIMEOUT **/
   long getHttpConnectionTimeout();
-  /** @see BuiltInConnectionProperty#TOKEN_FILE */
-  String tokenFile();
   /** @see BuiltInConnectionProperty#BEARER_TOKEN */
   String bearerToken();
+  /** @see BuiltInConnectionProperty#TOKEN_PROVIDER_CLASS */
+  String bearerTokenProviderClass();
+
+  ConnectionPropertyValue customPropertyValue(ConnectionProperty property);
 }
 
 // End ConnectionConfig.java

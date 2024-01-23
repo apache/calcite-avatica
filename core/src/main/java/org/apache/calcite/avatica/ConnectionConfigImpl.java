@@ -168,13 +168,16 @@ public class ConnectionConfigImpl implements ConnectionConfig {
   public long getHttpConnectionTimeout() {
     return BuiltInConnectionProperty.HTTP_CONNECTION_TIMEOUT.wrap(properties).getLong();
   }
-
-  public String tokenFile() {
-    return BuiltInConnectionProperty.TOKEN_FILE.wrap(properties).getString();
-  }
-
   public String bearerToken() {
     return BuiltInConnectionProperty.BEARER_TOKEN.wrap(properties).getString();
+  }
+
+  public String bearerTokenProviderClass() {
+    return BuiltInConnectionProperty.TOKEN_PROVIDER_CLASS.wrap(properties).getString();
+  }
+
+  public ConnectionPropertyValue customPropertyValue(ConnectionProperty property) {
+    return property.wrap(properties);
   }
 
   /** Converts a {@link Properties} object containing (name, value)
@@ -206,7 +209,7 @@ public class ConnectionConfigImpl implements ConnectionConfig {
   }
 
   /** The combination of a property definition and a map of property values. */
-  public static class PropEnv {
+  public static class PropEnv implements ConnectionPropertyValue {
     final Map<? extends ConnectionProperty, String> map;
     private final ConnectionProperty property;
 
