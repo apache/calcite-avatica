@@ -181,3 +181,10 @@ highly welcomed!
 * *License*: [MIT](https://opensource.org/licenses/MIT)
 * Any Avatica version
 * *Maintainer*: Waylay.io
+
+### Calcite Avatica CLI: A Go-based Toool
+* [Home page](https://github.com/satyakommula96/calcite-cli)
+* Language: Go
+* *License*: [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)
+* Avatica version 1.8.0 onwards
+* *Maintainer*: [Satya Kommula](https://github.com/satyakommula96)
