@@ -23,6 +23,8 @@ import org.apache.calcite.avatica.Meta.Signature;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.io.NumberInput;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,7 +73,7 @@ public class LookerResponseParser {
     switch (columnMetaData.type.rep) {
     case PRIMITIVE_BOOLEAN:
     case BOOLEAN:
-      return parser.getBooleanValue();
+      return parser.getValueAsBoolean();
     case PRIMITIVE_BYTE:
     case BYTE:
       return parser.getByteValue();
@@ -82,19 +84,23 @@ public class LookerResponseParser {
       return parser.getShortValue();
     case PRIMITIVE_INT:
     case INTEGER:
-      return parser.getIntValue();
+      return parser.getValueAsInt();
     case PRIMITIVE_LONG:
     case LONG:
-      return parser.getLongValue();
+      return parser.getValueAsLong();
     case PRIMITIVE_FLOAT:
     case FLOAT:
       return parser.getFloatValue();
     case PRIMITIVE_DOUBLE:
     case DOUBLE:
-      return parser.getDoubleValue();
+      return parser.getValueAsDouble();
     case NUMBER:
       // NUMBER is represented as BigDecimal
-      return parser.getDecimalValue();
+      if (parser.currentToken() == JsonToken.VALUE_STRING) {
+        return NumberInput.parseBigDecimal(parser.getValueAsString());
+      } else {
+        return parser.getDecimalValue();
+      }
     // TODO: MEASURE types are appearing as Objects. This should have been solved by CALCITE-5549.
     //  Be sure that the signature of a prepared query matches the metadata we see from JDBC.
     case OBJECT:
@@ -112,6 +118,47 @@ public class LookerResponseParser {
     default:
       throw new IOException("Unable to parse " + columnMetaData.type.rep + " from stream!");
     }
+  }
+
+  /**
+   * Collects the values of an array whose elements are represented by {@code metaData.type.rep}.
+   * Does not support nested arrays.
+   *
+   * @param metaData the {@link ColumnMetaData} for this value.
+   * @param parser a JsonParser whose current token is JsonToken.START_ARRAY. The parser is advanced
+   *        through the elements until the end of the array is reached. Parse does not advance past
+   *        END_ARRAY.
+   * @return An array of values with element type matching {@code metaData.type.rep}.
+   */
+  static Object[] deserializeArray(JsonParser parser, ColumnMetaData metaData) throws IOException {
+    assert parser.currentToken() == JsonToken.START_ARRAY
+        : "Invalid parsing state. Expecting start of array.";
+
+    boolean isPrimitive = isPrimitive(metaData);
+    ArrayList result = new ArrayList();
+    while (parser.nextToken() != JsonToken.END_ARRAY) {
+      Object deserialized = deserializeValue(parser, metaData);
+      if (isPrimitive && deserialized == null) {
+        throw new IOException("Primitive array cannot contain null values");
+      }
+      result.add(deserialized);
+    }
+    return result.toArray();
+  }
+
+  static boolean isPrimitive(ColumnMetaData metaData) {
+    switch (metaData.type.rep) {
+    case PRIMITIVE_BOOLEAN:
+    case PRIMITIVE_BYTE:
+    case PRIMITIVE_CHAR:
+    case PRIMITIVE_SHORT:
+    case PRIMITIVE_INT:
+    case PRIMITIVE_LONG:
+    case PRIMITIVE_FLOAT:
+    case PRIMITIVE_DOUBLE:
+      return true;
+    }
+    return false;
   }
 
   private void seekToRows(JsonParser parser) throws IOException {
@@ -176,8 +223,13 @@ public class LookerResponseParser {
               return;
             }
 
-            // add the value to the column list
-            columnValues.add(deserializeValue(parser, signature.columns.get(i)));
+            ColumnMetaData metaData = signature.columns.get(i);
+            if (parser.currentToken() == JsonToken.START_ARRAY) {
+              columnValues.add(deserializeArray(parser, metaData));
+            } else {
+              // add the value to the column list
+              columnValues.add(deserializeValue(parser, metaData));
+            }
           }
 
           // Meta.CursorFactory#deduce will select an OBJECT cursor if there is only a single

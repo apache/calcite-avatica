@@ -21,6 +21,7 @@ import org.apache.calcite.avatica.AvaticaConnection;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -33,6 +34,7 @@ import java.sql.Types;
 import java.util.Properties;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -46,6 +48,21 @@ public class LookerDriverTest {
       "SELECT " + "`users.created_date`, `users.created_year`, `users.created_time`, `users.name`\n"
           + "`users.age`, `users.is45or30`, SUM(`users.age`), AGGREGATE(`users.average_age`)\n"
           + "FROM example.users\n" + "GROUP BY 1, 2, 3, 4, 5, 6";
+
+  static final String TEST_LIST_MEASURE_SQL = "SELECT `users.created_year`\n"
+      + "        , AGGREGATE(`users.names`) as `names`\n"
+      + "        , AGGREGATE(`users.ages`) as `ages`\n"
+      + "       FROM `example`.`users`\n"
+      + "       GROUP BY `users.created_year`\n"
+      + "       LIMIT 2";
+
+  static final String TEST_ARRAY_PRIMITIVES_SQL = "SELECT \"testing arrays\" as `test_name`\n"
+      + "        , array[1,2,3] as `int_arrs`\n"
+      + "        , array[1.1, 2.2, 3.3] as `float_arr`\n"
+      + "        , array[\"this\", \"and\", \"that\"] as `varchar_arr`\n"
+      + "        , array[true, false, false] as `boolean_arr`\n"
+      + "       FROM `example`.`users`\n"
+      + "       LIMIT 1";
 
   @Test
   public void driverIsRegistered() throws SQLException {
@@ -162,6 +179,93 @@ public class LookerDriverTest {
       assertNotNull(test.getDouble(8));
     }
   }
+
+  @Test
+  public void listMeasureResultsCanBeParsedIntoResultSet() throws SQLException {
+    // Set up the driver with some pre-recorded responses from Looker. These are large JSON strings
+    // so have been placed in the LookerTestCommon class to make this test easier to read.
+    Driver driver = new StubbedLookerDriver().withStubbedResponse(
+        LookerTestCommon.stubbedListMeasuresSignature,
+        LookerTestCommon.stubbedListMeasureResponse);
+    Connection connection = driver.connect(LookerTestCommon.getUrl(),
+        LookerTestCommon.getBaseProps());
+
+    ResultSet test = connection.createStatement().executeQuery(TEST_LIST_MEASURE_SQL);
+    ResultSetMetaData rsMetaData = test.getMetaData();
+
+    // verify column types
+    Assert.assertThat(rsMetaData.getColumnCount(), is(3));
+
+    // YEAR
+    Assert.assertThat(rsMetaData.getColumnType(1), is(Types.INTEGER));
+    Assert.assertThat(rsMetaData.getColumnName(1), is("users.created_year"));
+
+    // Names
+    Assert.assertThat(rsMetaData.getColumnType(2), is(Types.ARRAY));
+    Assert.assertThat(rsMetaData.getColumnName(2), is("names"));
+
+    // Ages
+    Assert.assertThat(rsMetaData.getColumnType(3), is(Types.ARRAY));
+    Assert.assertThat(rsMetaData.getColumnName(3), is("ages"));
+
+    // verify every row can be fetched with the appropriate getter method
+    while (test.next()) {
+      assertNotNull(test.getInt(1));
+      assertNotNull(test.getArray(2));
+      assertNotNull(test.getArray(3));
+    }
+  }
+
+  @Test
+  public void canProcessAllArrayTypes() throws SQLException {
+    // Set up the driver with some pre-recorded responses from Looker. These are large JSON strings
+    // so have been placed in the LookerTestCommon class to make this test easier to read.
+    Driver driver = new StubbedLookerDriver().withStubbedResponse(
+        LookerTestCommon.stubbedArrayPrimitivesSig,
+        LookerTestCommon.stubbedArrayPrimitivesResponse);
+    Connection connection = driver.connect(LookerTestCommon.getUrl(),
+        LookerTestCommon.getBaseProps());
+
+    ResultSet test = connection.createStatement().executeQuery(TEST_ARRAY_PRIMITIVES_SQL);
+    ResultSetMetaData rsMetaData = test.getMetaData();
+    int columnCount = rsMetaData.getColumnCount();
+
+    // Verify we got our arrays, skipping index 1 becuase it isn't an array
+    for (int i = 2; i <= columnCount; i++) {
+      Assert.assertThat(rsMetaData.getColumnType(i), is(Types.ARRAY));
+    }
+
+    while (test.next()) {
+      Object actualArrayValue = test.getArray(2).getArray();
+
+      int[] expectedInts = new int[]{1, 2, 3};
+      Assert.assertThat(actualArrayValue, is(equalTo(expectedInts)));
+
+      actualArrayValue = test.getArray(3).getArray();
+      BigDecimal[] expectedDecimals = new BigDecimal[]{
+          BigDecimal.valueOf(1.1), BigDecimal.valueOf(2.2), BigDecimal.valueOf(3.3)
+      };
+      Assert.assertThat(
+          actualArrayValue,
+          is(equalTo(expectedDecimals))
+      );
+
+      String[] expectedStrs = new String[]{"this", "and", null, "that"};
+      actualArrayValue = test.getArray(4).getArray();
+      Assert.assertThat(
+          actualArrayValue,
+          is(equalTo(expectedStrs))
+      );
+
+      boolean[] expectedBools = new boolean[]{true, false, false};
+      actualArrayValue = test.getArray(5).getArray();
+      Assert.assertThat(
+          actualArrayValue,
+          is(equalTo(expectedBools))
+      );
+    }
+  }
+
 
   @Test
   public void canUsePreparedStatement() throws SQLException {
