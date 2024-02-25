@@ -40,6 +40,10 @@ public class TimestampFromNumberAccessorTest {
   // UTC: 2014-09-30 15:28:27.356
   private static final long DST_INSTANT = 1412090907356L;
   private static final String DST_STRING = "2014-09-30 15:28:27";
+  // With precision 2
+  private static final String DST_STRING_2 = "2014-09-30 15:28:27.35";
+  // With precision 3
+  private static final String DST_STRING_3 = "2014-09-30 15:28:27.356";
 
   // UTC: 1500-04-30 12:00:00.123 (JULIAN CALENDAR)
   private static final long PRE_GREG_INSTANT = -14821444799877L;
@@ -56,7 +60,7 @@ public class TimestampFromNumberAccessorTest {
   @Before public void before() {
     final AbstractCursor.Getter getter = new LocalGetter();
     localCalendar = Calendar.getInstance(TimeZone.getDefault(), Locale.ROOT);
-    instance = new AbstractCursor.TimestampFromNumberAccessor(getter, localCalendar);
+    instance = new AbstractCursor.TimestampFromNumberAccessor(getter, localCalendar, 0);
   }
 
   /**
@@ -70,6 +74,31 @@ public class TimestampFromNumberAccessorTest {
     value = DateTimeUtils.timestampStringToUnixDate("1500-04-30 12:00:00");
     assertThat(instance.getDate(localCalendar),
         is(Timestamp.valueOf("1500-04-30 12:00:00")));
+  }
+
+  /**
+   * Test case for <a href="https://issues.apache.org/jira/browse/CALCITE-6282">
+   * [CALCITE-6282] Avatica ignores time precision when returning TIME results</a>. */
+  @Test public void testPrecision() throws SQLException {
+    final AbstractCursor.Getter getter = new AbstractCursor.Getter() {
+      @Override
+      public Object getObject() throws SQLException {
+        return DST_INSTANT;
+      }
+
+      @Override
+      public boolean wasNull() throws SQLException {
+        return false;
+      }
+    };
+    AbstractCursor.TimestampFromNumberAccessor accessor =
+        new AbstractCursor.TimestampFromNumberAccessor(getter, null, 2);
+    String string = accessor.getString();
+    assertThat(string, is(DST_STRING_2));
+    accessor = new AbstractCursor.TimestampFromNumberAccessor(
+        getter, null, 3);
+    string = accessor.getString();
+    assertThat(string, is(DST_STRING_3));
   }
 
   /**

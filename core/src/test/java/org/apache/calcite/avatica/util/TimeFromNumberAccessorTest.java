@@ -48,7 +48,7 @@ public class TimeFromNumberAccessorTest {
     final AbstractCursor.Getter getter = new LocalGetter();
     localCalendar = Calendar.getInstance(TimeZone.getDefault(), Locale.ROOT);
     instance = new AbstractCursor.TimeFromNumberAccessor(getter,
-        localCalendar);
+        localCalendar, 0);
   }
 
   /**
@@ -155,5 +155,27 @@ public class TimeFromNumberAccessorTest {
     @Override public boolean wasNull() {
       return value == null;
     }
+  }
+
+  /**
+   * Test case for <a href="https://issues.apache.org/jira/browse/CALCITE-6282">[CALCITE-6282]
+   * Avatica ignores time precision when returning TIME results</a>. */
+  @Test public void testPrecision() throws SQLException {
+    final AbstractCursor.Getter getter = new AbstractCursor.Getter() {
+      @Override
+      public Object getObject() throws SQLException {
+        // This is the representation of TIME '12:42:25.34'
+        return 45745340;
+      }
+
+      @Override
+      public boolean wasNull() throws SQLException {
+        return false;
+      }
+    };
+    AbstractCursor.TimeFromNumberAccessor accessor = new AbstractCursor.TimeFromNumberAccessor(
+        getter, null, 2);
+    String string = accessor.getString();
+    assertThat(string, is("12:42:25.34"));
   }
 }
