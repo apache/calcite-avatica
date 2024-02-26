@@ -26,10 +26,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -82,6 +85,30 @@ public class HttpServerCustomizerTest {
    * A server type that cannot be customized
    */
   private static class UnsupportedServer {
+  }
+
+  @Test
+  public void testServerVersionNotReturnedForUnauthorisedAccess() throws Exception {
+    ServerCustomizer<Server> mockCustomizer1 =
+            (ServerCustomizer<Server>) mock(ServerCustomizer.class);
+    ServerCustomizer<Server> mockCustomizer2 =
+            (ServerCustomizer<Server>) mock(ServerCustomizer.class);
+    Service service = new LocalService(mockMeta);
+    HttpServer server =
+            HttpServer.Builder.<Server>newBuilder().withHandler(service,
+                            Driver.Serialization.PROTOBUF)
+                    .withServerCustomizers(
+                            Arrays.asList(mockCustomizer1, mockCustomizer2), Server.class)
+                    .withPort(0).build();
+    try {
+      server.start();
+      URL httpServerUrl = new URL("http://localhost:" + server.getPort());
+      HttpURLConnection conn = (HttpURLConnection) httpServerUrl.openConnection();
+      conn.setRequestMethod("GET");
+      assertNull("Server information was not expected", conn.getHeaderField("server"));
+    } finally {
+      server.stop();
+    }
   }
 }
 
