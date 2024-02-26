@@ -56,6 +56,7 @@ import javax.security.auth.kerberos.KerberosTicket;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -184,6 +185,14 @@ public class HttpServerSpnegoWithoutJaasTest {
     conn.setRequestMethod("GET");
     // Authentication should fail because we didn't provide anything
     assertEquals(401, conn.getResponseCode());
+  }
+
+  @Test public void testServerVersionNotReturnedForUnauthorisedAccess() throws Exception {
+    LOG.info("Connecting to {}", httpServerUrl.toString());
+    HttpURLConnection conn = (HttpURLConnection) httpServerUrl.openConnection();
+    conn.setRequestMethod("GET");
+    assertEquals("Unauthorized response status code", 401, conn.getResponseCode());
+    assertNull("Server information was not expected", conn.getHeaderField("server"));
   }
 
   @Test public void testAuthenticatedClientsAllowed() throws Exception {
