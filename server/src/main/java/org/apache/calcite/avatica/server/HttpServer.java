@@ -35,6 +35,7 @@ import org.eclipse.jetty.security.authentication.DigestAuthenticator;
 import org.eclipse.jetty.server.AbstractConnectionFactory;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -319,7 +320,9 @@ public class HttpServer {
 
   protected ServerConnector getServerConnector() {
     HttpConnectionFactory factory = new HttpConnectionFactory();
-    factory.getHttpConfiguration().setRequestHeaderSize(maxAllowedHeaderSize);
+    HttpConfiguration httpConfiguration = factory.getHttpConfiguration();
+    httpConfiguration.setSendServerVersion(false);
+    httpConfiguration.setRequestHeaderSize(maxAllowedHeaderSize);
 
     if (null == sslFactory) {
       return new ServerConnector(server, factory);
