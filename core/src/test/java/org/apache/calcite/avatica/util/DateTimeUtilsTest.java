@@ -790,12 +790,10 @@ public class DateTimeUtilsTest {
     checkDateString("0200-01-01", d200);
     final int d100 = d200 - century + 1;
     checkDateString("0100-01-01", d100);
-    final int d000 = d100 - century;
-    checkDateString("0000-01-01", d000);
   }
 
   @Test public void testDateConversion() {
-    for (int i = 0; i < 4000; ++i) {
+    for (int i = 1; i < 4000; ++i) {
       for (int j = 1; j <= 12; ++j) {
         String date = String.format(Locale.ENGLISH, "%04d-%02d-28", i, j);
         assertThat(unixDateToString(ymdToUnixDate(i, j, 28)), is(date));
@@ -1681,6 +1679,24 @@ public class DateTimeUtilsTest {
    * Test exception is raised if date in inappropriate meaning.
    */
   @Test public void testBrokenDate() {
+    // Test case for https://issues.apache.org/jira/browse/CALCITE-6248
+    // [CALCITE-6248] Illegal dates are accepted by casts
+    assertThrows(() -> DateTimeUtils.dateStringToUnixDate("2023-02-29"),
+        IllegalArgumentException.class,
+        is("Value of DAY field is out of range in '2023-02-29'"));
+
+    // Test case for https://issues.apache.org/jira/browse/CALCITE-6248
+    // [CALCITE-6248] Illegal dates are accepted by casts
+    assertThrows(() -> DateTimeUtils.dateStringToUnixDate("2023-13-1"),
+        IllegalArgumentException.class,
+        is("Value of MONTH field is out of range in '2023-13-1'"));
+
+    // Test case for https://issues.apache.org/jira/browse/CALCITE-6248
+    // [CALCITE-6248] Illegal dates are accepted by casts
+    assertThrows(() -> DateTimeUtils.dateStringToUnixDate("0-1-1"),
+        IllegalArgumentException.class,
+        is("Value of YEAR field is out of range in '0-1-1'"));
+
     // 2023 is not a leap year
     assertThrows(() ->
             DateTimeUtils.timestampStringToUnixDate("2023-02-29 12:00:00.123"),
