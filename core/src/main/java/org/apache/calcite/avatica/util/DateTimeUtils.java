@@ -63,6 +63,10 @@ public class DateTimeUtils {
   private static final Pattern ISO_DATE_PATTERN =
       Pattern.compile("^(\\d{4})-([0]\\d|1[0-2])-([0-2]\\d|3[01])$");
 
+  /** Regex for lenient date patterns. */
+  private static final Pattern LENIENT_DATE_PATTERN =
+      Pattern.compile("^\\s*(\\d{1,4})-(\\d{1,2})-(\\d{1,2})\\s*$");
+
   /** Regex for time, HH:MM:SS. */
   private static final Pattern ISO_TIME_PATTERN =
       Pattern.compile("^([0-2]\\d):[0-5]\\d:[0-5]\\d(\\.\\d*)*$");
@@ -653,6 +657,7 @@ public class DateTimeUtils {
   }
 
   public static int dateStringToUnixDate(String s) {
+    validateLenientDate(s);
     int hyphen1 = s.indexOf('-');
     int y;
     int m;
@@ -739,15 +744,44 @@ public class DateTimeUtils {
     return r;
   }
 
+  /** Check that the combination year, month, date forms a legal date. */
+  static void checkLegalDate(int year, int month, int day, String full) {
+    if (day > daysInMonth(year, month)) {
+      throw fieldOutOfRange("DAY", full);
+    }
+    if (month < 1 || month > 12) {
+      throw fieldOutOfRange("MONTH", full);
+    }
+    if (year <= 0) {
+      // Year 0 is not really a legal value.
+      throw fieldOutOfRange("YEAR", full);
+    }
+  }
+
+  /** Lenient date validation.  This accepts more date strings
+   * than validateDate: it does not insist on having two-digit
+   * values for days and months, and accepts spaces around the value.
+   * @param s     A string representing a date.
+   */
+  private static void validateLenientDate(String s) {
+    Matcher matcher = LENIENT_DATE_PATTERN.matcher(s);
+    if (matcher.find()) {
+      int year = Integer.parseInt(matcher.group(1));
+      int month = Integer.parseInt(matcher.group(2));
+      int day = Integer.parseInt(matcher.group(3));
+      checkLegalDate(year, month, day, s);
+    } else {
+      throw invalidType("DATE", s);
+    }
+  }
+
   private static void validateDate(String s, String full) {
     Matcher matcher = ISO_DATE_PATTERN.matcher(s);
     if (matcher.find()) {
       int year = Integer.parseInt(matcher.group(1));
       int month = Integer.parseInt(matcher.group(2));
       int day = Integer.parseInt(matcher.group(3));
-      if (day > daysInMonth(year, month)) {
-        throw fieldOutOfRange("DAY", full);
-      }
+      checkLegalDate(year, month, day, full);
     } else {
       throw invalidType("DATE", full);
     }
