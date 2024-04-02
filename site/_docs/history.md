@@ -28,40 +28,54 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-<!--
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.25.0">1.25.0</a> / XXXX-XX-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.25.0">1.25.0</a> / 2024-04-XX
 {: #v1-25-0}
 
-This release comes x months after [1.24.0](#v1-24-0),
-contains contributions from x contributors, and resolves x issues.
+Avatica 1.25.0 is a routine release featuring support for JDK 21, Gradle 8.5 and several bug fixes.
 
-Contributors to this release:
-x,
-y (release manager),
-z.
-
-#### Breaking Changes
-{: #breaking-1-25-0}
+*Breaking Change*: Due to [<a href="https://issues.apache.org/jira/browse/CALCITE-6282">CALCITE-6282</a>] and
+[<a href="https://issues.apache.org/jira/browse/CALCITE-6248">CALCITE-6248</a>], illegal dates are no longer
+accepted by casts and time precision will not be ignored when returning TIME results, respectively. If you are relying
+on this behavior, your applications may break.
 
 Compatibility: This release is tested on Linux, macOS, Microsoft Windows;
 using JDK/OpenJDK versions 8, 11, 17, 21;
 other software versions as specified in `gradle.properties`.
 
-#### New features
-{: #new-features-1-25-0}
+Contributors to this release:
+Benchao Li,
+Francis Chuang (release manager),
+Istvan Toth,
+Mihai Budiu,
+Satya Kommula,
+Sergey Nuyanzin,
+Vaibhav Joshi.
 
-#### Dependency version upgrade
-{: #dependency-1-25-0}
+Features and bug fixes
 
-#### Bug-fixes, API changes and minor enhancements
-{: #fixes-1-25-0}
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6280">CALCITE-6280</a>]
+  Jetty version number leaked by Avatica http server
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6209">CALCITE-6209</a>]
+  Long queries are failing with "java.net.SocketTimeoutException: Read timed out" after 3 minutes
+  make socket timeout configurable via the new 'http_response_timeout' URL option
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6137">CALCITE-6137</a>]
+  Upgrade Gradle from 8.1.1 to 8.4, support jdk21
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6282">CALCITE-6282</a>]
+  Avatica ignores time precision when returning TIME results
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6248">CALCITE-6248</a>]
+  Illegal dates are accepted by casts
 
-#### Build and test suite
-{: #build-1-25-0}
+Build and tests
 
-#### Web site and documentation
-{: #site-1-25-0}
--->
+* Install git and set safe.directory when using docker release script to promote release
+* Disable JIRA worklog notifications for GitHub PRs
+* Apply same vcs.xml as for Calcite
+
+Website and documentation
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6212">CALCITE-6212</a>]
+  Config locale = en_US for javadoc task
+* Add Calcite CLI tool to list of Avatica Clients on website
 
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.24.0">1.24.0</a> / 2023-12-04
 {: #v1-24-0}
