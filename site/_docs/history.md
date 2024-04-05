@@ -28,7 +28,7 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.25.0">1.25.0</a> / 2024-04-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.25.0">1.25.0</a> / 2024-04-05
 {: #v1-25-0}
 
 Avatica 1.25.0 is a routine release featuring support for JDK 21, Gradle 8.5 and several bug fixes.
@@ -59,7 +59,7 @@ Features and bug fixes
   Long queries are failing with "java.net.SocketTimeoutException: Read timed out" after 3 minutes
   make socket timeout configurable via the new 'http_response_timeout' URL option
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-6137">CALCITE-6137</a>]
-  Upgrade Gradle from 8.1.1 to 8.4, support jdk21
+  Upgrade Gradle from 8.1.1 to 8.5, support jdk21
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-6282">CALCITE-6282</a>]
   Avatica ignores time precision when returning TIME results
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-6248">CALCITE-6248</a>]
