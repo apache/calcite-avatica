@@ -315,7 +315,7 @@ case $1 in
         ;;
 
     test)
-        ./gradlew test
+        gradle test
         ;;
 
     *)
