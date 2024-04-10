@@ -91,7 +91,7 @@ Prerequisites are [Docker](https://docs.docker.com/install/) and
 [Docker Compose](https://docs.docker.com/compose/install/).
 
 {% highlight bash %}
-docker-compose run test
+docker compose run test
 {% endhighlight %}
 
 ## Contributing
@@ -255,16 +255,16 @@ the script will make a copy of the contents and move it to a different location,
 
 {% highlight bash %}
 # On Linux (dry-run):
-docker-compose run -v ~/.gnupg:/.gnupg dry-run
+docker compose run -v ~/.gnupg:/.gnupg dry-run
 
 # On Windows (dry-run):
-docker-compose run -v /c/Users/username/AppData/Roaming/gnupg:/.gnupg dry-run
+docker compose run -v /c/Users/username/AppData/Roaming/gnupg:/.gnupg dry-run
 
 # On Linux (push to ASF servers):
-docker-compose run -v ~/.gnupg:/.gnupg publish-release-for-voting
+docker compose run -v ~/.gnupg:/.gnupg publish-release-for-voting
 
 # On Windows (push to ASF servers):
-docker-compose run -v /c/Users/username/AppData/Roaming/gnupg:/.gnupg publish-release-for-voting
+docker compose run -v /c/Users/username/AppData/Roaming/gnupg:/.gnupg publish-release-for-voting
 {% endhighlight %}
 
 ## Checking the artifacts
@@ -473,7 +473,7 @@ The old releases will remain available in the
 This assumes that a rc release was tagged and pushed to the git repository.
 
 {% highlight bash %}
-docker-compose run promote-release
+docker compose run promote-release
 {% endhighlight %}
 
 ## Add release notes and announce the release
