@@ -24,7 +24,7 @@ Do not merge to Avatica's main branch.
 
 Looker has poor infrastructure for testing with local builds of Avatica.
 The easiest way is to upload a snapshot version to Looker's Nexus repository and use it.
-To upload a snapshot version, simply run `./upload-looker-snapshot.sh`,
+To upload a snapshot version, simply run `./looker-snapshot.sh`,
 which runs `./gradlew build` and,
 if successful, uploads the resulting artifacts to the repo
 using the version number configured in `gradle.properties` (plus a "-SNAPSHOT" suffix).

@@ -439,6 +439,7 @@ allprojects {
                             // contains altered text at $rootDir/LICENSE
                             textFrom("$rootDir/src/main/config/licenses/LICENSE")
                             textFrom("$rootDir/NOTICE")
+                            textFrom("$rootDir/THIRD_PARTY_NOTICES")
                         }
                     }
                 }
