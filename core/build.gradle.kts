@@ -79,7 +79,7 @@ tasks {
     }
 }
 
-val generatedProtobufDir = File(buildDir, "generated/source/proto/main/java")
+val generatedProtobufDir = layout.buildDirectory.get().file("generated/source/proto/main/java")
 
 val String.v: String get() = rootProject.extra["$this.version"] as String
 
@@ -94,16 +94,16 @@ protobuf {
                 dependsOn(task)
             }
             ide {
-                generatedJavaSources(task, generatedProtobufDir)
+                generatedJavaSources(task, generatedProtobufDir.asFile)
             }
         }
     }
 }
 
-val javaFilteredOutput = File(buildDir, "generated/java-filtered")
+val javaFilteredOutput = layout.buildDirectory.get().file("generated/java-filtered")
 
 ide {
-    generatedJavaSources(filterJava.get(), javaFilteredOutput)
+    generatedJavaSources(filterJava.get(), javaFilteredOutput.asFile)
 }
 
 tasks.processResources {
