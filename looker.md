@@ -64,7 +64,9 @@ You should make it from a branch that differs from Avatica's
 
 In Avatica's `gradle.properties`, update the value of
 `calcite.avatica.version` to the release name (something like
-`1.22.1-looker`) and commit.
+`1.22.1-looker`). Additionally, update the `DRIVER_USER_AGENT` property string
+in [LookerSdkFactory](core/src/main/java/org/apache/calcite/avatica/remote/looker/LookerSdkFactory.java)
+to point to the same build version and commit.
 
 Define Looker's Nexus repository in your `~/.gradle/init.gradle.kts`
 file:

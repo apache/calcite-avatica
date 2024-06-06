@@ -24,6 +24,7 @@ import com.looker.rtl.SDKResponse;
 import com.looker.rtl.Transport;
 import com.looker.rtl.TransportKt;
 import com.looker.sdk.ApiSettings;
+import com.looker.sdk.Constants;
 import com.looker.sdk.LookerSDK;
 
 import java.sql.SQLException;
@@ -48,6 +49,8 @@ public class LookerSdkFactory {
 
   private static final String RESULT_FORMAT = "json_bi";
   private static final String QUERY_ENDPOINT = "/api/4.0/sql_interface_queries/%s/run/%s";
+  private static final String DRIVER_USER_AGENT = "looker-jdbc-driver-1.24.1";
+  private static final String USER_AGENT_STRING = "User-Agent";
 
   /**
    * 1 hour in seconds. This is not configurable.
@@ -125,12 +128,15 @@ public class LookerSdkFactory {
 
     ConfigurationProvider finalizedConfig = ApiSettings.fromMap(apiConfig);
 
+    // assign values for user agent and x-looker-appid headers and add to session
     String userAgent = props.get("userAgent");
-    if (userAgent != null) {
-      Map<String, String> headers = finalizedConfig.getHeaders();
-      headers.put("User-Agent", props.get("userAgent"));
-      finalizedConfig.setHeaders(headers);
+    if (userAgent == null) {
+      userAgent = DRIVER_USER_AGENT;
     }
+    Map<String, String> headers = finalizedConfig.getHeaders();
+    headers.put(USER_AGENT_STRING, userAgent);
+    headers.put(Constants.LOOKER_APPID, userAgent);
+    finalizedConfig.setHeaders(headers);
 
     AuthSession session = new AuthSession(finalizedConfig, new Transport(finalizedConfig));
 
