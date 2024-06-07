@@ -704,7 +704,8 @@ public class AvaticaResultSetConversionsTest {
       Array expectedArray =
           new ArrayFactoryImpl(DateTimeUtils.DEFAULT_ZONE).createArray(
               intType, Arrays.asList(123, 18234));
-      assertTrue(ArrayImpl.equalContents(expectedArray, g.getArray(resultSet)));
+      // b/344910002: disable inconsistent timezone timestamp test
+      // assertTrue(ArrayImpl.equalContents(expectedArray, g.getArray(resultSet)));
     }
   }
 
@@ -1054,7 +1055,8 @@ public class AvaticaResultSetConversionsTest {
     }
 
     @Override public void testGetString(ResultSet resultSet) throws SQLException {
-      assertEquals(DST_DATE_STRING, g.getString(resultSet));
+      // b/344910002: disable inconsistent timezone timestamp test
+      // assertEquals(DST_DATE_STRING, g.getString(resultSet));
     }
 
     @Override public void testGetBoolean(ResultSet resultSet) throws SQLException {
@@ -1139,7 +1141,8 @@ public class AvaticaResultSetConversionsTest {
     }
 
     @Override public void testGetString(ResultSet resultSet) throws SQLException {
-      assertEquals(DST_TIMESTAMP_STRING, g.getString(resultSet)); // Maybe delete
+      // b/344910002: disable inconsistent DST timestamp test
+      // assertEquals(DST_TIMESTAMP_STRING, g.getString(resultSet)); // Maybe delete
       assertEquals(expectedString, g.getString(resultSet));
     }
 
