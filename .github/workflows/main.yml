@@ -77,7 +77,7 @@ jobs:
         ./gradlew publishToMavenLocal -Pcalcite.avatica.version=1.0.0-dev-main -PskipJavadoc
     - name: 'Test Calcite'
       run: |
-        git clone --depth 100 https://github.com/apache/calcite.git ../calcite
+        git clone -b looker --single-branch --depth 100 https://github.com/looker-open-source/calcite.git ../calcite
         cd ../calcite
         ./gradlew --no-parallel --no-daemon build -Pcalcite.avatica.version=1.0.0-dev-main-SNAPSHOT -PenableMavenLocal
 
