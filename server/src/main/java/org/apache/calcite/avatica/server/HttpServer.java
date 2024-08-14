@@ -79,6 +79,7 @@ import javax.security.auth.login.LoginException;
 public class HttpServer {
   private static final Logger LOG = LoggerFactory.getLogger(HttpServer.class);
   private static final int MAX_ALLOWED_HEADER_SIZE = 1024 * 64;
+  private static final int MAX_SESSION_INACTIVE_INTERVAL = 60 * 60;
 
   private static final String DEFAULT_KEYSTORE_TYPE = "JKS";
 
@@ -288,6 +289,9 @@ public class HttpServer {
       securityHandler.setHandler(handler);
       // SPNEGO requires a session
       SessionHandler sessionHandler = new SessionHandler();
+      // We could make this configurable, but the only downside of expiring the session is
+      // forcing re-autentication
+      sessionHandler.setMaxInactiveInterval(MAX_SESSION_INACTIVE_INTERVAL);
       sessionHandler.setHandler(securityHandler);
       avaticaHandler = sessionHandler;
     }
