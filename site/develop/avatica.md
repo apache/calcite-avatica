@@ -47,7 +47,7 @@ Create a local copy of the git repository, `cd` to its root directory,
 then build using maven:
 
 {% highlight bash %}
-$ git clone git://github.com/apache/calcite-avatica.git avatica
+$ git clone git@github.com:apache/calcite-avatica.git
 $ cd calcite-avatica
 $ ./gradlew build
 {% endhighlight %}
