@@ -62,7 +62,7 @@ Create a local copy of the GitHub repository,
 then build using Gradle:
 
 {% highlight bash %}
-$ git clone git://github.com/apache/calcite-avatica.git avatica
+$ git clone git@github.com:apache/calcite-avatica.git
 $ cd avatica
 $ ./gradlew build
 {% endhighlight %}
