@@ -91,6 +91,7 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
   protected CredentialsProvider credentialsProvider = null;
   protected Lookup<AuthSchemeFactory> authRegistry = null;
   protected Object userToken;
+  protected HttpClientContext context;
 
   public AvaticaCommonsHttpClientImpl(URL url) {
     this.uri = toURI(Objects.requireNonNull(url));
@@ -109,23 +110,22 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
     HttpClientBuilder httpClientBuilder = HttpClients.custom().setConnectionManager(pool)
         .setDefaultRequestConfig(requestConfig);
     this.client = httpClientBuilder.build();
+
+    this.context = HttpClientContext.create();
+    // Set the credentials if they were provided.
+    if (null != this.credentialsProvider) {
+      context.setCredentialsProvider(credentialsProvider);
+      context.setAuthSchemeRegistry(authRegistry);
+      context.setAuthCache(authCache);
+    }
+    if (null != userToken) {
+      context.setUserToken(userToken);
+    }
+
   }
 
   @Override public byte[] send(byte[] request) {
     while (true) {
-      HttpClientContext context = HttpClientContext.create();
-
-      // Set the credentials if they were provided.
-      if (null != this.credentialsProvider) {
-        context.setCredentialsProvider(credentialsProvider);
-        context.setAuthSchemeRegistry(authRegistry);
-        context.setAuthCache(authCache);
-      }
-
-      if (null != userToken) {
-        context.setUserToken(userToken);
-      }
-
       ByteArrayEntity entity = new ByteArrayEntity(request, ContentType.APPLICATION_OCTET_STREAM);
 
       // Create the client with the AuthSchemeRegistry and manager
@@ -184,6 +184,8 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
       throw new IllegalArgumentException("Unsupported authentiation type: " + authType);
     }
     this.authRegistry = authRegistryBuilder.build();
+    context.setCredentialsProvider(credentialsProvider);
+    context.setAuthSchemeRegistry(authRegistry);
   }
 
   @Override public void setGSSCredential(GSSCredential credential) {
@@ -205,6 +207,8 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
       ((BasicCredentialsProvider) this.credentialsProvider)
               .setCredentials(anyAuthScope, EmptyCredentials.INSTANCE);
     }
+    context.setCredentialsProvider(credentialsProvider);
+    context.setAuthSchemeRegistry(authRegistry);
   }
 
   /**

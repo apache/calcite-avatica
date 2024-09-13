@@ -17,25 +17,33 @@
 package org.apache.calcite.avatica.remote;
 
 import org.apache.calcite.avatica.AvaticaUtils;
+import org.apache.calcite.avatica.ConnectionConfig;
 
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.core5.http.NoHttpResponseException;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import java.io.ByteArrayInputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -64,9 +72,11 @@ public class AvaticaCommonsHttpClientImplTest {
 
     final AvaticaCommonsHttpClientImpl client =
             spy(new AvaticaCommonsHttpClientImpl(new URL("http://127.0.0.1")));
+    client.setHttpClientPool(mock(PoolingHttpClientConnectionManager.class), mock(
+        ConnectionConfig.class));
 
     doAnswer(failThenSucceed).when(client)
-            .execute(any(HttpPost.class), any(HttpClientContext.class));
+            .execute(any(HttpPost.class), eq(client.context));
 
     when(badResponse.getCode()).thenReturn(HttpURLConnection.HTTP_UNAVAILABLE);
 
@@ -96,9 +106,11 @@ public class AvaticaCommonsHttpClientImplTest {
 
     final AvaticaCommonsHttpClientImpl client =
             spy(new AvaticaCommonsHttpClientImpl(new URL("http://127.0.0.1")));
+    client.setHttpClientPool(mock(PoolingHttpClientConnectionManager.class), mock(
+        ConnectionConfig.class));
 
     doAnswer(failThenSucceed).when(client)
-            .execute(any(HttpPost.class), any(HttpClientContext.class));
+            .execute(any(HttpPost.class), eq(client.context));
 
     when(badResponse.getCode()).thenReturn(HttpURLConnection.HTTP_UNAVAILABLE);
 
@@ -107,6 +119,63 @@ public class AvaticaCommonsHttpClientImplTest {
 
     byte[] responseBytes = client.send(requestBytes);
     assertEquals("success", AvaticaUtils.newStringUtf8(responseBytes));
+  }
+
+  @Test
+  public void testPersistentContextReusedAcrossRequests() throws Exception {
+    final AvaticaCommonsHttpClientImpl client =
+        spy(new AvaticaCommonsHttpClientImpl(new URL("http://127.0.0.1")));
+    client.setHttpClientPool(mock(PoolingHttpClientConnectionManager.class), mock(
+        ConnectionConfig.class));
+
+    CloseableHttpResponse response = mock(CloseableHttpResponse.class);
+    when(response.getCode()).thenReturn(HttpURLConnection.HTTP_OK);
+
+    ByteArrayEntity entity = mock(ByteArrayEntity.class);
+    when(entity.getContent()).thenReturn(new ByteArrayInputStream(new byte[0]));
+    when(response.getEntity()).thenReturn(entity);
+
+    doReturn(response).when(client)
+        .execute(any(HttpPost.class), eq(client.context));
+
+    client.send(new byte[0]);
+    client.send(new byte[0]);
+
+    // Verify that the persistent context was reused and not created again
+    verify(client, times(2)).execute(any(HttpPost.class),
+        eq(client.context));
+  }
+
+  @Test
+  public void testPersistentContextThreadSafety() throws Exception {
+    final AvaticaCommonsHttpClientImpl client =
+        spy(new AvaticaCommonsHttpClientImpl(new URL("http://127.0.0.1")));
+    client.setHttpClientPool(mock(PoolingHttpClientConnectionManager.class), mock(
+        ConnectionConfig.class));
+
+    doReturn(mock(CloseableHttpResponse.class)).when(client)
+        .execute(any(HttpPost.class), eq(client.context));
+
+    Runnable requestTask = () -> {
+      try {
+        client.send(new byte[0]);
+      } catch (Exception e) {
+        fail("Threaded request failed with exception: " + e.getMessage());
+      }
+    };
+
+    int threadCount = 5;
+    Thread[] threads = new Thread[threadCount];
+    for (int i = 0; i < threadCount; i++) {
+      threads[i] = new Thread(requestTask);
+      threads[i].start();
+    }
+
+    for (Thread thread : threads) {
+      thread.join();
+    }
+
+    verify(client, times(threadCount)).execute(any(HttpPost.class), eq(client.context));
   }
 
 }
