@@ -233,8 +233,8 @@ public class HttpServerSpnegoWithoutJaasTest {
         // Passes the GSSCredential into the HTTP client implementation
         final AvaticaCommonsHttpClientImpl httpClient =
             new AvaticaCommonsHttpClientImpl(httpServerUrl);
-        httpClient.setGSSCredential(credential);
         httpClient.setHttpClientPool(pool, config);
+        httpClient.setGSSCredential(credential);
 
         return httpClient.send(new byte[0]);
       }
