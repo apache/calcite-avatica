@@ -133,6 +133,8 @@ public class SpnegoTestUtil {
     }
   }
 
+  // See CALCITE-6590
+  @SuppressWarnings("removal")
   public static void refreshJaasConfiguration() {
     // This is *extremely* important to make sure we get the right Configuration instance.
     // Configuration keeps a static instance of Configuration that it will return once it

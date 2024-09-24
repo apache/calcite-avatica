@@ -392,6 +392,9 @@ allprojects {
                 options.encoding = "UTF-8"
             }
             withType<Test>().configureEach {
+                if (JavaVersion.current() >= JavaVersion.VERSION_23) {
+                    jvmArgs("-Djava.security.manager=allow")
+                }
                 testLogging {
                     exceptionFormat = TestExceptionFormat.FULL
                     showStandardStreams = true

@@ -33,7 +33,9 @@ public class DoAsAvaticaHttpClient implements AvaticaHttpClient {
     this.kerberosUtil = Objects.requireNonNull(kerberosUtil);
   }
 
-  @Override public byte[] send(final byte[] request) {
+  // See CALCITE-6590
+  @Override @SuppressWarnings("removal")
+  public byte[] send(final byte[] request) {
     return Subject.doAs(kerberosUtil.getSubject(), new PrivilegedAction<byte[]>() {
       @Override public byte[] run() {
         return wrapped.send(request);
