@@ -19,6 +19,7 @@ package org.apache.calcite.avatica;
 import org.apache.calcite.avatica.remote.Driver;
 import org.apache.calcite.avatica.server.AvaticaJaasKrbUtil;
 import org.apache.calcite.avatica.server.HttpServer;
+import org.apache.calcite.avatica.util.SecurityUtils;
 
 import org.apache.kerby.kerberos.kerb.KrbException;
 import org.apache.kerby.kerberos.kerb.client.KrbConfig;
@@ -34,13 +35,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.security.PrivilegedExceptionAction;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import javax.security.auth.Subject;
 
 import static org.junit.Assert.assertEquals;
@@ -217,8 +218,8 @@ public class AvaticaSpnegoTest extends HttpBaseTest {
       // The name of the principal
 
       // Run this code, logged in as the subject (the client)
-      Subject.doAs(clientSubject, new PrivilegedExceptionAction<Void>() {
-        @Override public Void run() throws Exception {
+      SecurityUtils.callAs(clientSubject, new Callable<Void>() {
+        @Override public Void call() throws Exception {
           try (Connection conn = DriverManager.getConnection(jdbcUrl)) {
             try (Statement stmt = conn.createStatement()) {
               assertFalse(stmt.execute("DROP TABLE IF EXISTS " + tableName));
