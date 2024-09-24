@@ -16,14 +16,20 @@
  */
 package org.apache.calcite.avatica.server;
 
-import java.security.AccessController;
+import org.apache.calcite.avatica.util.SecurityUtils;
+
 import java.security.PrivilegedAction;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadFactory;
 import javax.security.auth.Subject;
 
 /**
  * Encapsulates creating the new Thread in a doPrivileged and a doAs call.
  * The doPrivilieged block is taken from Jetty, and prevents some classloader leak isses.
+ *
+ * Also according to Jetty, the referred leak was fixed in JDK17, and the doPriviliged block
+ * is no longer needed in 17 and later-
+ *
  * Saving the subject, and creating the Thread in the inner doAs call works around
  * doPriviliged resetting the kerberos subject, which breaks SPNEGO authentication.
  *
@@ -39,12 +45,13 @@ class SubjectPreservingPrivilegedThreadFactory implements ThreadFactory {
    * @param Runnable object for the thread
    * @return a new thread, protected from classloader pinning, but keeping the current Subject
    */
+  @Override
   public Thread newThread(Runnable runnable) {
-    Subject subject = Subject.getSubject(AccessController.getContext());
-    return AccessController.doPrivileged(new PrivilegedAction<Thread>() {
+    Subject subject = SecurityUtils.currentSubject();
+    return SecurityUtils.doPrivileged(new PrivilegedAction<Thread>() {
       @Override public Thread run() {
-        return Subject.doAs(subject, new PrivilegedAction<Thread>() {
-          @Override public Thread run() {
+        return SecurityUtils.callAs(subject, new Callable<Thread>() {
+          @Override public Thread call() {
             Thread thread = new Thread(runnable);
             thread.setDaemon(true);
             thread.setName("avatica_qtp" + hashCode() + "-" + thread.getId());
