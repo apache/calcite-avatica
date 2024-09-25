@@ -137,7 +137,7 @@ public class SpnegoTestUtil {
   // SecurityManager is enabled. However, the replacement API is not available in JDK8,
   // so as a workaround we require enabling the securityManager on JDK23+.
   // Also see https://issues.apache.org/jira/browse/CALCITE-6590 and https://openjdk.org/jeps/411
-  // We add the "-Djava.security.manager=allow" cli option for tests when running with JDK23+ 
+  // We add the "-Djava.security.manager=allow" cli option for tests when running with JDK23+
   // so that this keeps working.
   @SuppressWarnings("removal")
   public static void refreshJaasConfiguration() {
