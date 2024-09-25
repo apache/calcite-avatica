@@ -33,7 +33,11 @@ public class DoAsAvaticaHttpClient implements AvaticaHttpClient {
     this.kerberosUtil = Objects.requireNonNull(kerberosUtil);
   }
 
-  // See CALCITE-6590
+  // Subject.doAs is deprecated and does not work in JDK23+ unless the (also deprecated)
+  // SecurityManager is enabled. However, the replacement API is not available in JDK8,
+  // so as a workaround we require enabling the securityManager on JDK23+.
+  // Also see https://issues.apache.org/jira/browse/CALCITE-6590 and https://openjdk.org/jeps/411
+  // This class is used with Hadoop, which has the same issue.
   @Override @SuppressWarnings("removal")
   public byte[] send(final byte[] request) {
     return Subject.doAs(kerberosUtil.getSubject(), new PrivilegedAction<byte[]>() {
