@@ -21,6 +21,7 @@ import org.apache.calcite.avatica.remote.AuthenticationType;
 import org.apache.calcite.avatica.remote.Driver.Serialization;
 import org.apache.calcite.avatica.remote.Service;
 import org.apache.calcite.avatica.remote.Service.RpcMetadataResponse;
+import org.apache.calcite.avatica.util.SecurityUtils;
 
 import org.eclipse.jetty.security.Authenticator;
 import org.eclipse.jetty.security.ConfigurableSpnegoLoginService;
@@ -53,7 +54,6 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.Principal;
-import java.security.PrivilegedAction;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -205,8 +205,8 @@ public class HttpServer {
   public void start() {
     if (null != subject) {
       // Run the start in the privileged block (as the kerberos-identified user)
-      Subject.doAs(subject, new PrivilegedAction<Void>() {
-        @Override public Void run() {
+      SecurityUtils.callAs(subject, new Callable<Void>() {
+        @Override public Void call() {
           internalStart();
           return null;
         }
