@@ -32,13 +32,13 @@ import javax.security.auth.Subject;
  * of the security classes defined by <a href="https://openjdk.org/jeps/411">JEP 411</a>.</p>
  */
 public class SecurityUtils {
-  private static final MethodHandle DO_AS = lookupDoAs();
-  private static final MethodHandle DO_PRIVILEGED = lookupDoPrivileged();
-  private static final MethodHandle GET_CONTEXT = lookupGetContext();
-  private static final MethodHandle GET_SUBJECT = lookupGetSubject();
+  private static final MethodHandle CALL_AS = lookupCallAs();
   private static final MethodHandle CURRENT = lookupCurrent();
+  private static final MethodHandle DO_PRIVILEGED = lookupDoPrivileged();
+  private static final MethodHandle GET_SUBJECT = lookupGetSubject();
+  private static final MethodHandle GET_CONTEXT = lookupGetContext();
 
-  private static MethodHandle lookupDoAs() {
+  private static MethodHandle lookupCallAs() {
     MethodHandles.Lookup lookup = MethodHandles.lookup();
     try {
       // Subject.doAs() is deprecated for removal and replaced by Subject.callAs().
@@ -133,7 +133,7 @@ public class SecurityUtils {
 
   /**
    * Get the current security manager, if available.
-   * @return the current security manager, if available
+   * @return the current security manager, if available, null otherwise
    */
   public static Object getSecurityManager() {
     try {
@@ -176,11 +176,10 @@ public class SecurityUtils {
    */
   public static <T> T doPrivileged(PrivilegedAction<T> action) {
     // Keep this method short and inlineable.
-    MethodHandle methodHandle = DO_PRIVILEGED;
-    if (methodHandle == null) {
+    if (DO_PRIVILEGED == null) {
       return action.run();
     }
-    return doPrivileged(methodHandle, action);
+    return doPrivileged(DO_PRIVILEGED, action);
   }
 
   @SuppressWarnings("unchecked")
@@ -190,6 +189,8 @@ public class SecurityUtils {
     } catch (RuntimeException | Error x) {
       throw x;
     } catch (Throwable x) {
+      // Unlikely to happen, as we catch Errors and RuntimeExceptions above, and doPrivileged
+      // does not throw checked exceptions
       throw new RuntimeException(x);
     }
   }
@@ -206,11 +207,11 @@ public class SecurityUtils {
   @SuppressWarnings("unchecked")
   public static <T> T callAs(Subject subject, Callable<T> action) {
     try {
-      MethodHandle methodHandle = DO_AS;
-      if (methodHandle == null) {
-        return action.call();
+      if (CALL_AS == null) {
+        throw new RuntimeException(
+            "Was unable to run either of Subject.callAs() or Subject.doAs()");
       }
-      return (T) methodHandle.invoke(subject, action);
+      return (T) CALL_AS.invoke(subject, action);
     } catch (RuntimeException | Error x) {
       throw x;
     } catch (Throwable x) {
@@ -234,7 +235,7 @@ public class SecurityUtils {
       MethodHandle methodHandle = CURRENT;
       return (Subject) methodHandle.invoke();
     } catch (Throwable x) {
-      throw new RuntimeException("Error when trying to get the current user", x);
+      throw new RuntimeException("Error while trying to get the current user", x);
     }
 
   }
@@ -243,9 +244,9 @@ public class SecurityUtils {
     return () -> {
       try {
         return callable.call();
-      } catch (RuntimeException x) {
+      } catch (RuntimeException | Error x) {
         throw x;
-      } catch (Exception x) {
+      } catch (Throwable x) {
         throw new RuntimeException(x);
       }
     };
@@ -253,11 +254,8 @@ public class SecurityUtils {
 
   private static Subject getSubjectFallback() {
     try {
-      MethodHandle contextMethodHandle = GET_CONTEXT;
-      Object context = contextMethodHandle.invoke();
-
-      MethodHandle getSubjectMethodHandle = GET_SUBJECT;
-      return (Subject) getSubjectMethodHandle.invoke(context);
+      Object context = GET_CONTEXT.invoke();
+      return (Subject) GET_SUBJECT.invoke(context);
     } catch (Throwable x) {
       throw new RuntimeException("Error trying to get the current Subject", x);
     }
