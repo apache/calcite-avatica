@@ -26,7 +26,6 @@ import javax.security.auth.Subject;
 /**
  * Encapsulates creating the new Thread in a doPrivileged and a doAs call.
  * The doPrivilieged block is taken from Jetty, and prevents some classloader leak isses.
- *
  * Saving the subject, and creating the Thread in the inner doAs call works around
  * doPriviliged resetting the kerberos subject, which breaks SPNEGO authentication.
  *
@@ -35,11 +34,6 @@ import javax.security.auth.Subject;
  *
  * see https://www.ibm.com/docs/en/was-zos/8.5.5\\
  * ?topic=service-java-authentication-authorization-authorization
- *
- * Also according to Jetty, the leak the doPrivileged call works around was fixed in JDK 18,
- * and the doPriviliged block is no longer needed in JDK 18 and later.
- * However, as long as the Jetty default ThreadFactory calls doPrivileged, we must replace it,
- * regardless of the JDK version we run on. See https://github.com/jetty/jetty.project/issues/12430
  */
 class SubjectPreservingPrivilegedThreadFactory implements ThreadFactory {
 
