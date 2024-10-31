@@ -65,6 +65,7 @@ val enableSpotBugs = props.bool("spotbugs", default = false)
 val skipCheckstyle by props()
 val skipAutostyle by props()
 val skipJavadoc by props()
+var nvdApiKey: String? = props.string("nvdApiKey")
 // Inherited from stage-vote-release-plugin: skipSign, useGpgCmd
 val enableMavenLocal by props()
 val enableGradleMetadata by props()
@@ -164,6 +165,15 @@ val javadocAggregateIncludingTests by tasks.registering(Javadoc::class) {
     setDestinationDir(file(layout.buildDirectory.get().file("docs/javadocAggregateIncludingTests")))
 }
 
+if (nvdApiKey != null) {
+    apply(plugin = "org.owasp.dependencycheck")
+    dependencyCheck {
+        nvd {
+            apiKey = nvdApiKey
+        }
+    }
+}
+
 allprojects {
     group = "org.apache.calcite.avatica"
     version = buildVersion
@@ -236,6 +246,7 @@ allprojects {
         fileMode = "664".toInt(8)
     }
 
+    tasks.register<DependencyReportTask>("allDependencies") {}
     tasks {
         withType<Javadoc>().configureEach {
             (options as StandardJavadocDocletOptions).apply {
