@@ -60,6 +60,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -92,6 +94,8 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
   protected Lookup<AuthSchemeFactory> authRegistry = null;
   protected Object userToken;
   protected HttpClientContext context;
+  protected long connectTimeout;
+  protected long responseTimeout;
 
   public AvaticaCommonsHttpClientImpl(URL url) {
     this.uri = toURI(Objects.requireNonNull(url));
@@ -100,13 +104,11 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
   protected void initializeClient(PoolingHttpClientConnectionManager pool,
                                   ConnectionConfig config) {
     this.authCache = new BasicAuthCache();
+    this.connectTimeout = config.getHttpConnectionTimeout();
+    this.responseTimeout = config.getHttpResponseTimeout();
     // A single thread-safe HttpClient, pooling connections via the
     // ConnectionManager
-    RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
-    RequestConfig requestConfig = requestConfigBuilder
-        .setConnectTimeout(config.getHttpConnectionTimeout(), TimeUnit.MILLISECONDS)
-        .setResponseTimeout(config.getHttpResponseTimeout(), TimeUnit.MILLISECONDS)
-        .build();
+    RequestConfig requestConfig = createRequestConfig();
     HttpClientBuilder httpClientBuilder = HttpClients.custom().setConnectionManager(pool)
         .setDefaultRequestConfig(requestConfig);
     this.client = httpClientBuilder.build();
@@ -122,6 +124,30 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
       context.setUserToken(userToken);
     }
 
+  }
+
+  // This is needed because we initialize the client object too early.
+  private RequestConfig createRequestConfig() {
+    RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
+    requestConfigBuilder
+        .setConnectTimeout(this.connectTimeout, TimeUnit.MILLISECONDS)
+        .setResponseTimeout(this.responseTimeout, TimeUnit.MILLISECONDS);
+    List<String> preferredSchemes = new ArrayList<>();
+    // In HttpClient 5.3+ SPNEGO is not enabled by default
+    if (authRegistry != null) {
+      if (authRegistry.lookup(StandardAuthScheme.DIGEST) != null) {
+        preferredSchemes.add(StandardAuthScheme.DIGEST);
+      }
+      if (authRegistry.lookup(StandardAuthScheme.BASIC) != null) {
+        preferredSchemes.add(StandardAuthScheme.BASIC);
+      }
+      if (authRegistry.lookup(StandardAuthScheme.SPNEGO) != null) {
+        preferredSchemes.add(StandardAuthScheme.SPNEGO);
+      }
+      requestConfigBuilder.setTargetPreferredAuthSchemes(preferredSchemes);
+      requestConfigBuilder.setProxyPreferredAuthSchemes(preferredSchemes);
+    }
+    return requestConfigBuilder.build();
   }
 
   @Override public byte[] send(byte[] request) {
@@ -186,6 +212,7 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
     this.authRegistry = authRegistryBuilder.build();
     context.setCredentialsProvider(credentialsProvider);
     context.setAuthSchemeRegistry(authRegistry);
+    context.setRequestConfig(createRequestConfig());
   }
 
   @Override public void setGSSCredential(GSSCredential credential) {
@@ -209,6 +236,7 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
     }
     context.setCredentialsProvider(credentialsProvider);
     context.setAuthSchemeRegistry(authRegistry);
+    context.setRequestConfig(createRequestConfig());
   }
 
   /**
