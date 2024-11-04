@@ -41,6 +41,7 @@ configurations {
 
 dependencies {
     shaded(project(":core"))
+    testImplementation("junit:junit")
 }
 
 tasks {
@@ -69,7 +70,7 @@ tasks {
         listOf(
             "com.fasterxml.jackson",
             "com.google.protobuf",
-            "org.apache.http",
+            "org.apache.hc",
             "org.apache.commons"
         ).forEach {
             relocate(it, "${project.group}.shaded.$it")

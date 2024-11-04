@@ -50,6 +50,8 @@ dependencies {
 
     shaded("org.slf4j:slf4j-api")
     shaded("org.apache.logging.log4j:log4j-slf4j-impl")
+
+    testImplementation("junit:junit")
 }
 
 tasks {
@@ -97,7 +99,7 @@ tasks {
             "com.google.common",
             "com.google.protobuf",
             "javax.servlet",
-            "org.apache.http",
+            "org.apache.hc",
             "org.apache.commons"
         ).forEach {
             relocate(it, "${project.group}.standalone.shaded.$it")
