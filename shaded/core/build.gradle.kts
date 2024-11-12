@@ -72,7 +72,7 @@ tasks {
             "org.apache.http",
             "org.apache.commons"
         ).forEach {
-            relocate(it, "${project.group}.$it")
+            relocate(it, "${project.group}.shaded.$it")
         }
         CrLfSpec(LineEndings.LF).run {
             into("META-INF") {
