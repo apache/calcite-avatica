@@ -31,6 +31,20 @@ import de.thetaphi.forbiddenapis.gradle.CheckForbiddenApis
 import de.thetaphi.forbiddenapis.gradle.CheckForbiddenApisExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
+buildscript {
+    dependencies {
+        constraints {
+            // Looks like we cannot access the versions defined in gradle.properties from here
+            "classpath"("org.ow2.asm:asm:9.7.1")
+            "classpath"("org.ow2.asm:asm-all:9.7.1")
+            "classpath"("org.ow2.asm:asm-analysis:9.7.1")
+            "classpath"("org.ow2.asm:asm-commons:9.7.1")
+            "classpath"("org.ow2.asm:asm-tree:9.7.1")
+            "classpath"("org.ow2.asm:asm-util:9.7.1")
+        }
+    }
+}
+
 plugins {
     publishing
     // Verification
@@ -344,16 +358,6 @@ allprojects {
                 excludeFilter = file("$rootDir/src/main/config/spotbugs/spotbugs-filter.xml")
                 // By default spotbugs verifies TEST classes as well, and we do not want that
                 this.sourceSets = listOf(sourceSets["main"])
-            }
-            dependencies {
-                constraints {
-                    "spotbugs"("org.ow2.asm:asm:${"asm".v}")
-                    "spotbugs"("org.ow2.asm:asm-all:${"asm".v}")
-                    "spotbugs"("org.ow2.asm:asm-analysis:${"asm".v}")
-                    "spotbugs"("org.ow2.asm:asm-commons:${"asm".v}")
-                    "spotbugs"("org.ow2.asm:asm-tree:${"asm".v}")
-                    "spotbugs"("org.ow2.asm:asm-util:${"asm".v}")
-                }
             }
         }
 
