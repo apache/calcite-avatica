@@ -31,6 +31,19 @@ import de.thetaphi.forbiddenapis.gradle.CheckForbiddenApis
 import de.thetaphi.forbiddenapis.gradle.CheckForbiddenApisExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
+buildscript {
+    dependencies {
+        constraints {
+            "classpath"("org.ow2.asm:asm:${property("asm.version")}")
+            "classpath"("org.ow2.asm:asm-all:${property("asm.version")}")
+            "classpath"("org.ow2.asm:asm-analysis:${property("asm.version")}")
+            "classpath"("org.ow2.asm:asm-commons:${property("asm.version")}")
+            "classpath"("org.ow2.asm:asm-tree:${property("asm.version")}")
+            "classpath"("org.ow2.asm:asm-util:${property("asm.version")}")
+        }
+    }
+}
+
 plugins {
     publishing
     // Verification
@@ -344,16 +357,6 @@ allprojects {
                 excludeFilter = file("$rootDir/src/main/config/spotbugs/spotbugs-filter.xml")
                 // By default spotbugs verifies TEST classes as well, and we do not want that
                 this.sourceSets = listOf(sourceSets["main"])
-            }
-            dependencies {
-                constraints {
-                    "spotbugs"("org.ow2.asm:asm:${"asm".v}")
-                    "spotbugs"("org.ow2.asm:asm-all:${"asm".v}")
-                    "spotbugs"("org.ow2.asm:asm-analysis:${"asm".v}")
-                    "spotbugs"("org.ow2.asm:asm-commons:${"asm".v}")
-                    "spotbugs"("org.ow2.asm:asm-tree:${"asm".v}")
-                    "spotbugs"("org.ow2.asm:asm-util:${"asm".v}")
-                }
             }
         }
 
