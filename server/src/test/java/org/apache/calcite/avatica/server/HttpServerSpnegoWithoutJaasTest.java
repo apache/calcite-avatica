@@ -22,6 +22,7 @@ import org.apache.calcite.avatica.ConnectionConfigImpl;
 import org.apache.calcite.avatica.SpnegoTestUtil;
 import org.apache.calcite.avatica.remote.AvaticaCommonsHttpClientImpl;
 import org.apache.calcite.avatica.remote.CommonsHttpClientPoolCache;
+import org.apache.calcite.avatica.util.SecurityUtils;
 
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.kerby.kerberos.kerb.KrbException;
@@ -47,9 +48,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
-import java.security.PrivilegedExceptionAction;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import javax.security.auth.Subject;
 import javax.security.auth.kerberos.KerberosTicket;
 
@@ -216,8 +217,8 @@ public class HttpServerSpnegoWithoutJaasTest {
     final String principalName = clientPrincipals.iterator().next().getName();
 
     // Run this code, logged in as the subject (the client)
-    byte[] response = Subject.doAs(clientSubject, new PrivilegedExceptionAction<byte[]>() {
-      @Override public byte[] run() throws Exception {
+    byte[] response = SecurityUtils.callAs(clientSubject, new Callable<byte[]>() {
+      @Override public byte[] call() throws Exception {
         // Logs in with Kerberos via GSS
         GSSManager gssManager = GSSManager.getInstance();
         Oid oid = new Oid(SpnegoTestUtil.JGSS_KERBEROS_TICKET_OID);

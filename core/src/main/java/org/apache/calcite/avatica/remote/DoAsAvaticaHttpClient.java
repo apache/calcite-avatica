@@ -16,9 +16,10 @@
  */
 package org.apache.calcite.avatica.remote;
 
-import java.security.PrivilegedAction;
+import org.apache.calcite.avatica.util.SecurityUtils;
+
 import java.util.Objects;
-import javax.security.auth.Subject;
+import java.util.concurrent.Callable;
 
 /**
  * HTTP client implementation which invokes the wrapped HTTP client in a doAs with the provided
@@ -33,9 +34,10 @@ public class DoAsAvaticaHttpClient implements AvaticaHttpClient {
     this.kerberosUtil = Objects.requireNonNull(kerberosUtil);
   }
 
-  @Override public byte[] send(final byte[] request) {
-    return Subject.doAs(kerberosUtil.getSubject(), new PrivilegedAction<byte[]>() {
-      @Override public byte[] run() {
+  @Override
+  public byte[] send(final byte[] request) {
+    return SecurityUtils.callAs(kerberosUtil.getSubject(), new Callable<byte[]>() {
+      @Override public byte[] call() {
         return wrapped.send(request);
       }
     });

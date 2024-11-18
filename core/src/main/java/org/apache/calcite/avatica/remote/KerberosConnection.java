@@ -172,7 +172,7 @@ public class KerberosConnection {
         renewalPeriod);
     Thread t = new Thread(task);
 
-    // Don't prevent the JVM from existing
+    // Don't prevent the JVM from exiting
     t.setDaemon(true);
     // Log an error message if this thread somehow dies
     t.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
