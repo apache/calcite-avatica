@@ -44,6 +44,7 @@ import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -265,6 +266,15 @@ public class TypedValueTest {
     assertTrue("The JDBC object is an " + jdbcObjCopy.getClass(), jdbcObjCopy instanceof Array);
     Object localObjCopy = tv1Copy.toLocal();
     assertTrue("The local object is an " + localObjCopy.getClass(), localObjCopy instanceof List);
+  }
+
+  @Test public void testObjects() {
+    Object o1 = "This is a string";
+    TypedValue tv1 = TypedValue.ofJdbc(Rep.OBJECT, o1, Unsafe.localCalendar());
+    Object jdbcObj = tv1.toJdbc(Unsafe.localCalendar());
+    assertThat(jdbcObj, is(sameInstance(o1)));
+    Object localObj = tv1.toLocal();
+    assertThat(jdbcObj, is(sameInstance(o1)));
   }
 }
 
