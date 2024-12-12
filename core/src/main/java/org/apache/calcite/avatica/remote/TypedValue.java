@@ -269,7 +269,7 @@ public class TypedValue {
    * representation. */
   private static Object serialToLocal(ColumnMetaData.Rep rep, Object value) {
     assert value != null;
-    if (value.getClass() == rep.clazz) {
+    if (rep.clazz.isInstance(value)) {
       return value;
     }
     switch (rep) {
