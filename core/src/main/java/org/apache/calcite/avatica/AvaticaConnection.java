@@ -614,18 +614,20 @@ public abstract class AvaticaConnection implements Connection {
       return;
     }
     if (signature.statementType.canUpdate() && statement.updateCount == -1) {
-      statement.openResultSet.next();
-      Object obj = statement.openResultSet.getObject(ROWCOUNT_COLUMN_NAME);
-      if (obj instanceof Number) {
-        statement.updateCount = ((Number) obj).intValue();
-      } else if (obj instanceof List) {
-        @SuppressWarnings("unchecked")
-        final List<Number> numbers = (List<Number>) obj;
-        statement.updateCount = numbers.get(0).intValue();
-      } else {
-        throw HELPER.createException("Not a valid return result.");
+      if (statement.openResultSet.next()) {
+        statement.openResultSet.next();
+        Object obj = statement.openResultSet.getObject(ROWCOUNT_COLUMN_NAME);
+        if (obj instanceof Number) {
+          statement.updateCount = ((Number) obj).intValue();
+        } else if (obj instanceof List) {
+          @SuppressWarnings("unchecked")
+          final List<Number> numbers = (List<Number>) obj;
+          statement.updateCount = numbers.get(0).intValue();
+        } else {
+          throw HELPER.createException("Not a valid return result.");
+        }
+        statement.openResultSet = null;
       }
-      statement.openResultSet = null;
     }
   }
 
