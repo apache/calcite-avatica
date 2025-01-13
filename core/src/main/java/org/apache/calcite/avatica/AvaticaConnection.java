@@ -615,7 +615,6 @@ public abstract class AvaticaConnection implements Connection {
     }
     if (signature.statementType.canUpdate() && statement.updateCount == -1) {
       if (statement.openResultSet.next()) {
-        statement.openResultSet.next();
         Object obj = statement.openResultSet.getObject(ROWCOUNT_COLUMN_NAME);
         if (obj instanceof Number) {
           statement.updateCount = ((Number) obj).intValue();
