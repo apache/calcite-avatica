@@ -41,6 +41,7 @@ configurations {
 
 dependencies {
     shaded(project(":core"))
+    testImplementation("junit:junit")
 }
 
 tasks {

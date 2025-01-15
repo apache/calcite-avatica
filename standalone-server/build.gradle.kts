@@ -50,6 +50,8 @@ dependencies {
 
     shaded("org.slf4j:slf4j-api")
     shaded("org.apache.logging.log4j:log4j-slf4j-impl")
+
+    testImplementation("junit:junit")
 }
 
 tasks {
