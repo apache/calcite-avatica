@@ -35,7 +35,7 @@ public class ShadingTest {
   // Note that many of these files could be excluded.
   // This is for regression testing, and not the minimum file set.
   String[] allowedPathPatterns = { "^META-INF", "^org/apache/calcite/", "^log4j2.xml", ".*\\.proto",
-      "^org/publicsuffix/", "^org/slf4j/", "^org/apache/logging/slf4j/", "^org/slf4j/",
+      "^org/publicsuffix/", "^org/slf4j/", "^org/apache/logging/slf4j/", "^com/google/j2objc/",
       "^google/protobuf/", "^about.html$", "^org/eclipse/jetty/", "^jetty-dir.css",
       "^com/google/thirdparty/", "^org/checkerframework/", "^javax/annotation/",
       "^com/google/errorprone/", "^Log4j-.*\\.xsd$", "^Log4j-.*\\.dtd$", "^Log4j-.*\\.properties$",
