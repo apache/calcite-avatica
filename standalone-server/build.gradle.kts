@@ -97,7 +97,7 @@ tasks {
             "com.google.common",
             "com.google.protobuf",
             "javax.servlet",
-            "org.apache.http",
+            "org.apache.hc",
             "org.apache.commons"
         ).forEach {
             relocate(it, "${project.group}.standalone.shaded.$it")
