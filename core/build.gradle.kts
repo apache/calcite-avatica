@@ -68,6 +68,15 @@ val filterJava by tasks.registering(Sync::class) {
             x.replace("${'$'}{avatica.release.version}", project.version.toString())
         }
     }
+    if (JavaVersion.current() >= JavaVersion.VERSION_18) {
+        from("$projectDir/src/main/java18") {
+            include("**/*.java")
+        }
+    } else {
+        from("$projectDir/src/main/java8") {
+            include("**/*.java")
+        }
+    }
     into(javaFilteredOutput)
 }
 

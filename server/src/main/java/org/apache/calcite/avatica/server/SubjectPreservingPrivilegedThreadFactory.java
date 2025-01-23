@@ -16,7 +16,8 @@
  */
 package org.apache.calcite.avatica.server;
 
-import java.security.AccessController;
+import org.apache.calcite.avatica.util.SecurityUtil;
+
 import java.security.PrivilegedAction;
 import java.util.concurrent.ThreadFactory;
 import javax.security.auth.Subject;
@@ -40,10 +41,10 @@ class SubjectPreservingPrivilegedThreadFactory implements ThreadFactory {
    * @return a new thread, protected from classloader pinning, but keeping the current Subject
    */
   public Thread newThread(Runnable runnable) {
-    Subject subject = Subject.getSubject(AccessController.getContext());
-    return AccessController.doPrivileged(new PrivilegedAction<Thread>() {
+    Subject subject = SecurityUtil.currentSubject();
+    return SecurityUtil.doPrivileged(new PrivilegedAction<Thread>() {
       @Override public Thread run() {
-        return Subject.doAs(subject, new PrivilegedAction<Thread>() {
+        return SecurityUtil.callAs(subject, new PrivilegedAction<Thread>() {
           @Override public Thread run() {
             Thread thread = new Thread(runnable);
             thread.setDaemon(true);

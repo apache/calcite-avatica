@@ -19,6 +19,7 @@ package org.apache.calcite.avatica;
 import org.apache.calcite.avatica.remote.Driver;
 import org.apache.calcite.avatica.server.AvaticaJaasKrbUtil;
 import org.apache.calcite.avatica.server.HttpServer;
+import org.apache.calcite.avatica.util.SecurityUtil;
 
 import org.apache.kerby.kerberos.kerb.KrbException;
 import org.apache.kerby.kerberos.kerb.client.KrbConfig;
@@ -217,7 +218,7 @@ public class AvaticaSpnegoTest extends HttpBaseTest {
       // The name of the principal
 
       // Run this code, logged in as the subject (the client)
-      Subject.doAs(clientSubject, new PrivilegedExceptionAction<Void>() {
+      SecurityUtil.callAs(clientSubject, new PrivilegedExceptionAction<Void>() {
         @Override public Void run() throws Exception {
           try (Connection conn = DriverManager.getConnection(jdbcUrl)) {
             try (Statement stmt = conn.createStatement()) {

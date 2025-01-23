@@ -19,6 +19,7 @@ package org.apache.calcite.avatica;
 import org.apache.calcite.avatica.remote.KerberosConnection;
 import org.apache.calcite.avatica.remote.Service.RpcMetadataResponse;
 import org.apache.calcite.avatica.server.AvaticaHandler;
+import org.apache.calcite.avatica.util.SecurityUtil;
 
 import org.apache.kerby.kerberos.kerb.KrbException;
 import org.apache.kerby.kerberos.kerb.server.SimpleKdcServer;
@@ -38,7 +39,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
-import java.security.AccessController;
 import java.security.Principal;
 import java.security.PrivilegedAction;
 import javax.security.auth.login.Configuration;
@@ -138,7 +138,7 @@ public class SpnegoTestUtil {
     // Configuration keeps a static instance of Configuration that it will return once it
     // has been initialized. We need to nuke that static instance to make sure our
     // serverSpnegoConfigFile gets read.
-    AccessController.doPrivileged(new PrivilegedAction<Configuration>() {
+    SecurityUtil.doPrivileged(new PrivilegedAction<Configuration>() {
       public Configuration run() {
         return Configuration.getConfiguration();
       }

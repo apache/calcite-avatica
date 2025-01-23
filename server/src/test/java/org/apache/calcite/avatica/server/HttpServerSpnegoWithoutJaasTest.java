@@ -22,6 +22,7 @@ import org.apache.calcite.avatica.ConnectionConfigImpl;
 import org.apache.calcite.avatica.SpnegoTestUtil;
 import org.apache.calcite.avatica.remote.AvaticaCommonsHttpClientImpl;
 import org.apache.calcite.avatica.remote.CommonsHttpClientPoolCache;
+import org.apache.calcite.avatica.util.SecurityUtil;
 
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.kerby.kerberos.kerb.KrbException;
@@ -216,7 +217,7 @@ public class HttpServerSpnegoWithoutJaasTest {
     final String principalName = clientPrincipals.iterator().next().getName();
 
     // Run this code, logged in as the subject (the client)
-    byte[] response = Subject.doAs(clientSubject, new PrivilegedExceptionAction<byte[]>() {
+    byte[] response = SecurityUtil.callAs(clientSubject, new PrivilegedExceptionAction<byte[]>() {
       @Override public byte[] run() throws Exception {
         // Logs in with Kerberos via GSS
         GSSManager gssManager = GSSManager.getInstance();
