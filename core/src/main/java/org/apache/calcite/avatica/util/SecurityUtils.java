@@ -20,7 +20,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
-import java.security.Permission;
 import java.security.PrivilegedAction;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionException;
@@ -129,42 +128,6 @@ public class SecurityUtils {
         MethodType.methodType(contextklass));
     } catch (Throwable x) {
       return null;
-    }
-  }
-
-  /**
-   * Get the current security manager, if available.
-   * @return the current security manager, if available, null otherwise
-   */
-  public static Object getSecurityManager() {
-    try {
-      // Use reflection to work with Java versions that have and don't have SecurityManager.
-      return System.class.getMethod("getSecurityManager").invoke(null);
-    } catch (InvocationTargetException x) {
-      return unwrapInvocationTargetException(x);
-    } catch (Throwable ignored) {
-      return null;
-    }
-  }
-
-  /**
-   * <p>
-   * Checks the given permission, if the {@link #getSecurityManager() security manager} is set.
-   * </p>
-   * @param permission the permission to check
-   * @throws SecurityException if the permission check fails
-   */
-  public static void checkPermission(Permission permission) throws SecurityException {
-    Object securityManager = SecurityUtils.getSecurityManager();
-    if (securityManager == null) {
-      return;
-    }
-    try {
-      securityManager.getClass().getMethod("checkPermission").invoke(securityManager,
-          permission);
-    } catch (InvocationTargetException x) {
-      unwrapInvocationTargetException(x);
-    } catch (Throwable ignored) {
     }
   }
 
