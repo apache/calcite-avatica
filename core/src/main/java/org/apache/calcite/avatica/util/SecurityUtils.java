@@ -19,7 +19,6 @@ package org.apache.calcite.avatica.util;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
-import java.lang.reflect.InvocationTargetException;
 import java.security.PrivilegedAction;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionException;
@@ -37,6 +36,9 @@ public class SecurityUtils {
   private static final MethodHandle DO_PRIVILEGED = lookupDoPrivileged();
   private static final MethodHandle GET_SUBJECT = lookupGetSubject();
   private static final MethodHandle GET_CONTEXT = lookupGetContext();
+
+  private SecurityUtils() {
+  }
 
   private static MethodHandle lookupCallAs() {
     MethodHandles.Lookup lookup = MethodHandles.lookup();
@@ -151,8 +153,6 @@ public class SecurityUtils {
   private static <T> T doPrivileged(MethodHandle doPrivileged, PrivilegedAction<T> action) {
     try {
       return (T) doPrivileged.invoke(action);
-    } catch (InvocationTargetException x) {
-      return unwrapInvocationTargetException(x);
     } catch (Throwable x) {
       throw new RuntimeException(x);
     }
@@ -174,8 +174,6 @@ public class SecurityUtils {
             "Was unable to run either of Subject.callAs() or Subject.doAs()");
       }
       return (T) CALL_AS.invoke(subject, action);
-    } catch (InvocationTargetException x) {
-      return unwrapInvocationTargetException(x);
     } catch (Throwable x) {
       throw new CompletionException(x);
     }
@@ -195,8 +193,6 @@ public class SecurityUtils {
     try {
       MethodHandle methodHandle = CURRENT;
       return (Subject) methodHandle.invoke();
-    } catch (InvocationTargetException x) {
-      return unwrapInvocationTargetException(x);
     } catch (Throwable x) {
       throw new RuntimeException("Error while trying to get the current user", x);
     }
@@ -208,8 +204,6 @@ public class SecurityUtils {
     return () -> {
       try {
         return callable.call();
-      } catch (InvocationTargetException x) {
-        return unwrapInvocationTargetException(x);
       } catch (RuntimeException | Error x) {
         throw x;
       } catch (Throwable x) {
@@ -223,27 +217,10 @@ public class SecurityUtils {
     try {
       Object context = GET_CONTEXT.invoke();
       return (Subject) GET_SUBJECT.invoke(context);
-    } catch (InvocationTargetException x) {
-      return unwrapInvocationTargetException(x);
     } catch (Throwable x) {
       throw new RuntimeException("Error trying to get the current Subject", x);
     }
   }
 
-  private static <T> T unwrapInvocationTargetException(InvocationTargetException x) {
-    Throwable cause = x.getCause();
-    if (cause == null) {
-      throw new AssertionError("InvocationTargetException has null cause", x);
-    } else if (cause instanceof RuntimeException) {
-      throw (RuntimeException) cause;
-    } else if (cause instanceof Error) {
-      throw (Error) cause;
-    } else {
-      // methods invoked in this class only throw RuntimeExceptions
-      throw new AssertionError("Unexpected exception", x);
-    }
-  }
 
-  private SecurityUtils() {
-  }
 }
