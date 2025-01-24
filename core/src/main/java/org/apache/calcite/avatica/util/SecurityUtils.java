@@ -20,6 +20,8 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionException;
 import javax.security.auth.Subject;
@@ -34,8 +36,6 @@ public class SecurityUtils {
   private static final MethodHandle CALL_AS = lookupCallAs();
   private static final MethodHandle CURRENT = lookupCurrent();
   private static final MethodHandle DO_PRIVILEGED = lookupDoPrivileged();
-  private static final MethodHandle GET_SUBJECT = lookupGetSubject();
-  private static final MethodHandle GET_CONTEXT = lookupGetContext();
 
   private SecurityUtils() {
   }
@@ -43,29 +43,34 @@ public class SecurityUtils {
   private static MethodHandle lookupCallAs() {
     MethodHandles.Lookup lookup = MethodHandles.lookup();
     try {
-      // Subject.doAs() is deprecated for removal and replaced by Subject.callAs().
-      // Lookup first the new API, since for Java versions where both exist, the
-      // new API delegates to the old API (for example Java 18, 19 and 20).
-      // Otherwise (Java 17), lookup the old API.
-      return lookup.findStatic(Subject.class, "callAs",
-        MethodType.methodType(Object.class, Subject.class, Callable.class));
-    } catch (Throwable x) {
       try {
-        // Lookup the old API.
-        MethodType oldSignature =
-            MethodType.methodType(Object.class, Subject.class, PrivilegedAction.class);
-        MethodHandle doAs = lookup.findStatic(Subject.class, "doAs", oldSignature);
-        // Convert the Callable used in the new API to the PrivilegedAction used in the old
-        // API.
-        MethodType convertSignature =
-            MethodType.methodType(PrivilegedAction.class, Callable.class);
-        MethodHandle converter =
-            lookup.findStatic(SecurityUtils.class, "callableToPrivilegedAction",
-              convertSignature);
-        return MethodHandles.filterArguments(doAs, 1, converter);
-      } catch (Throwable t) {
-        return null;
+        // Subject.doAs() is deprecated for removal and replaced by Subject.callAs().
+        // Lookup first the new API, since for Java versions where both exist, the
+        // new API delegates to the old API (for example Java 18, 19 and 20).
+        // Otherwise (Java 17), lookup the old API.
+        return lookup.findStatic(Subject.class, "callAs",
+          MethodType.methodType(Object.class, Subject.class, Callable.class));
+      } catch (NoSuchMethodException x) {
+        try {
+          // Lookup the old API.
+          MethodType oldSignature =
+              MethodType.methodType(Object.class, Subject.class, PrivilegedExceptionAction.class);
+          MethodHandle doAs = lookup.findStatic(Subject.class, "doAs", oldSignature);
+          // Convert the Callable used in the new API to the PrivilegedAction used in the old
+          // API.
+          MethodType convertSignature =
+              MethodType.methodType(PrivilegedExceptionAction.class, Callable.class);
+          MethodHandle converter =
+              lookup.findStatic(SecurityUtils.class, "callableToPrivilegedExceptionAction",
+                convertSignature);
+          return MethodHandles.filterArguments(doAs, 1, converter);
+        } catch (NoSuchMethodException t) {
+          t.addSuppressed(x);
+          throw new AssertionError(t);
+        }
       }
+    } catch (IllegalAccessException e) {
+      throw new AssertionError(e);
     }
   }
 
@@ -77,7 +82,9 @@ public class SecurityUtils {
       MethodHandles.Lookup lookup = MethodHandles.lookup();
       return lookup.findStatic(klass, "doPrivileged",
         MethodType.methodType(Object.class, PrivilegedAction.class));
-    } catch (Throwable x) {
+    } catch (NoSuchMethodException | IllegalAccessException x) {
+      throw new AssertionError(x);
+    } catch (ClassNotFoundException e) {
       return null;
     }
   }
@@ -92,14 +99,12 @@ public class SecurityUtils {
       // Otherwise (Java 17), lookup the old API.
       return lookup.findStatic(Subject.class, "current",
         MethodType.methodType(Subject.class));
-    } catch (Throwable x) {
-      try {
-        // This is a bit awkward, but the code is more symmetrical this way
-        return lookup.findStatic(SecurityUtils.class, "getSubjectFallback",
-          MethodType.methodType(Subject.class));
-      } catch (Throwable t) {
-        return null;
-      }
+    } catch (NoSuchMethodException e) {
+      MethodHandle getContext = lookupGetContext();
+      MethodHandle getSubject = lookupGetSubject();
+      return MethodHandles.filterReturnValue(getContext, getSubject);
+    } catch (IllegalAccessException e) {
+      throw new AssertionError(e);
     }
   }
 
@@ -111,8 +116,8 @@ public class SecurityUtils {
               .loadClass("java.security.AccessControlContext");
       return lookup.findStatic(Subject.class, "getSubject",
         MethodType.methodType(Subject.class, contextklass));
-    } catch (Throwable t) {
-      return null;
+    } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
+      throw new AssertionError(e);
     }
   }
 
@@ -128,8 +133,8 @@ public class SecurityUtils {
       MethodHandles.Lookup lookup = MethodHandles.lookup();
       return lookup.findStatic(controllerKlass, "getContext",
         MethodType.methodType(contextklass));
-    } catch (Throwable x) {
-      return null;
+    } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException e) {
+      throw new AssertionError(e);
     }
   }
 
@@ -153,8 +158,8 @@ public class SecurityUtils {
   private static <T> T doPrivileged(MethodHandle doPrivileged, PrivilegedAction<T> action) {
     try {
       return (T) doPrivileged.invoke(action);
-    } catch (Throwable x) {
-      throw new RuntimeException(x);
+    } catch (Throwable t) {
+      throw sneaky(t);
     }
   }
 
@@ -167,15 +172,14 @@ public class SecurityUtils {
    * @return the result of the action
    * @param <T> the type of the result
    */
+  @SuppressWarnings("unchecked")
   public static <T> T callAs(Subject subject, Callable<T> action) {
     try {
-      if (CALL_AS == null) {
-        throw new RuntimeException(
-            "Was unable to run either of Subject.callAs() or Subject.doAs()");
-      }
       return (T) CALL_AS.invoke(subject, action);
-    } catch (Throwable x) {
-      throw new CompletionException(x);
+    } catch (PrivilegedActionException e) {
+      throw new CompletionException(e.getCause());
+    } catch (Throwable t) {
+      throw sneaky(t);
     }
   }
 
@@ -186,41 +190,20 @@ public class SecurityUtils {
    * @return the current subject
    */
   public static Subject currentSubject() {
-    if (CURRENT == null) {
-      throw new RuntimeException(
-          "Was unable to run either of Subject.current() or Subject.getSubject()");
-    }
     try {
-      MethodHandle methodHandle = CURRENT;
-      return (Subject) methodHandle.invoke();
-    } catch (Throwable x) {
-      throw new RuntimeException("Error while trying to get the current user", x);
-    }
-
-  }
-
-  @SuppressWarnings("unused")
-  private static <T> PrivilegedAction<T> callableToPrivilegedAction(Callable<T> callable) {
-    return () -> {
-      try {
-        return callable.call();
-      } catch (RuntimeException | Error x) {
-        throw x;
-      } catch (Throwable x) {
-        throw new RuntimeException(x);
-      }
-    };
-  }
-
-  @SuppressWarnings("unused")
-  private static Subject getSubjectFallback() {
-    try {
-      Object context = GET_CONTEXT.invoke();
-      return (Subject) GET_SUBJECT.invoke(context);
-    } catch (Throwable x) {
-      throw new RuntimeException("Error trying to get the current Subject", x);
+      return (Subject) CURRENT.invoke();
+    } catch (Throwable t) {
+      throw sneaky(t);
     }
   }
 
+  private static <T> PrivilegedExceptionAction<T> callableToPrivilegedExceptionAction(
+      Callable<T> callable) {
+    return callable::call;
+  }
 
+  @SuppressWarnings("unchecked")
+  private static <E extends Throwable> RuntimeException sneaky(Throwable e) throws E {
+    throw (E) e;
+  }
 }
