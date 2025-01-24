@@ -19,6 +19,7 @@ package org.apache.calcite.avatica.util;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.lang.reflect.InvocationTargetException;
 import java.security.Permission;
 import java.security.PrivilegedAction;
 import java.util.concurrent.Callable;
@@ -42,7 +43,7 @@ public class SecurityUtils {
     MethodHandles.Lookup lookup = MethodHandles.lookup();
     try {
       // Subject.doAs() is deprecated for removal and replaced by Subject.callAs().
-      // Lookup first the new API, since for Java versions where both exists, the
+      // Lookup first the new API, since for Java versions where both exist, the
       // new API delegates to the old API (for example Java 18, 19 and 20).
       // Otherwise (Java 17), lookup the old API.
       return lookup.findStatic(Subject.class, "callAs",
@@ -139,6 +140,8 @@ public class SecurityUtils {
     try {
       // Use reflection to work with Java versions that have and don't have SecurityManager.
       return System.class.getMethod("getSecurityManager").invoke(null);
+    } catch (InvocationTargetException x) {
+      return unwrapInvocationTargetException(x);
     } catch (Throwable ignored) {
       return null;
     }
@@ -159,8 +162,8 @@ public class SecurityUtils {
     try {
       securityManager.getClass().getMethod("checkPermission").invoke(securityManager,
           permission);
-    } catch (SecurityException x) {
-      throw x;
+    } catch (InvocationTargetException x) {
+      unwrapInvocationTargetException(x);
     } catch (Throwable ignored) {
     }
   }
@@ -182,15 +185,12 @@ public class SecurityUtils {
     return doPrivileged(DO_PRIVILEGED, action);
   }
 
-  @SuppressWarnings("unchecked")
   private static <T> T doPrivileged(MethodHandle doPrivileged, PrivilegedAction<T> action) {
     try {
       return (T) doPrivileged.invoke(action);
-    } catch (RuntimeException | Error x) {
-      throw x;
+    } catch (InvocationTargetException x) {
+      return unwrapInvocationTargetException(x);
     } catch (Throwable x) {
-      // Unlikely to happen, as we catch Errors and RuntimeExceptions above, and doPrivileged
-      // does not throw checked exceptions
       throw new RuntimeException(x);
     }
   }
@@ -204,7 +204,6 @@ public class SecurityUtils {
    * @return the result of the action
    * @param <T> the type of the result
    */
-  @SuppressWarnings("unchecked")
   public static <T> T callAs(Subject subject, Callable<T> action) {
     try {
       if (CALL_AS == null) {
@@ -212,8 +211,8 @@ public class SecurityUtils {
             "Was unable to run either of Subject.callAs() or Subject.doAs()");
       }
       return (T) CALL_AS.invoke(subject, action);
-    } catch (RuntimeException | Error x) {
-      throw x;
+    } catch (InvocationTargetException x) {
+      return unwrapInvocationTargetException(x);
     } catch (Throwable x) {
       throw new CompletionException(x);
     }
@@ -225,7 +224,6 @@ public class SecurityUtils {
    * </p>
    * @return the current subject
    */
-  @SuppressWarnings("unchecked")
   public static Subject currentSubject() {
     if (CURRENT == null) {
       throw new RuntimeException(
@@ -234,16 +232,21 @@ public class SecurityUtils {
     try {
       MethodHandle methodHandle = CURRENT;
       return (Subject) methodHandle.invoke();
+    } catch (InvocationTargetException x) {
+      return unwrapInvocationTargetException(x);
     } catch (Throwable x) {
       throw new RuntimeException("Error while trying to get the current user", x);
     }
 
   }
 
+  @SuppressWarnings("unused")
   private static <T> PrivilegedAction<T> callableToPrivilegedAction(Callable<T> callable) {
     return () -> {
       try {
         return callable.call();
+      } catch (InvocationTargetException x) {
+        return unwrapInvocationTargetException(x);
       } catch (RuntimeException | Error x) {
         throw x;
       } catch (Throwable x) {
@@ -252,12 +255,29 @@ public class SecurityUtils {
     };
   }
 
+  @SuppressWarnings("unused")
   private static Subject getSubjectFallback() {
     try {
       Object context = GET_CONTEXT.invoke();
       return (Subject) GET_SUBJECT.invoke(context);
+    } catch (InvocationTargetException x) {
+      return unwrapInvocationTargetException(x);
     } catch (Throwable x) {
       throw new RuntimeException("Error trying to get the current Subject", x);
+    }
+  }
+
+  private static <T> T unwrapInvocationTargetException(InvocationTargetException x) {
+    Throwable cause = x.getCause();
+    if (cause == null) {
+      throw new AssertionError("InvocationTargetException has null cause", x);
+    } else if (cause instanceof RuntimeException) {
+      throw (RuntimeException) cause;
+    } else if (cause instanceof Error) {
+      throw (Error) cause;
+    } else {
+      // methods invoked in this class only throw RuntimeExceptions
+      throw new AssertionError("Unexpected exception", x);
     }
   }
 
