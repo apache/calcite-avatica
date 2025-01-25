@@ -27,7 +27,7 @@ import java.util.concurrent.CompletionException;
 import javax.security.auth.Subject;
 
 /**
- * This class is heavily based on SecurityUtils in Jetty 12.0
+ * This class is loosely based on SecurityUtils in Jetty 12.0
  *
  * <p>Collections of utility methods to deal with the scheduled removal
  * of the security classes defined by <a href="https://openjdk.org/jeps/411">JEP 411</a>.</p>
@@ -64,9 +64,8 @@ public class SecurityUtils {
               lookup.findStatic(SecurityUtils.class, "callableToPrivilegedExceptionAction",
                 convertSignature);
           return MethodHandles.filterArguments(doAs, 1, converter);
-        } catch (NoSuchMethodException t) {
-          t.addSuppressed(x);
-          throw new AssertionError(t);
+        } catch (NoSuchMethodException e) {
+          throw new AssertionError(e);
         }
       }
     } catch (IllegalAccessException e) {
@@ -83,6 +82,7 @@ public class SecurityUtils {
       return lookup.findStatic(klass, "doPrivileged",
         MethodType.methodType(Object.class, PrivilegedAction.class));
     } catch (NoSuchMethodException | IllegalAccessException x) {
+      // Assume that single methods won't be removed from AcessController
       throw new AssertionError(x);
     } catch (ClassNotFoundException e) {
       return null;
@@ -139,10 +139,7 @@ public class SecurityUtils {
   }
 
   /**
-   * <p>
-   * Runs the given action with the calling context restricted to just the calling frame, not all
-   * the frames in the stack.
-   * </p>
+   * Maps to AccessController#doPrivileged if available, otherwise returns action.run().
    * @param action the action to run
    * @return the result of running the action
    * @param <T> the type of the result
@@ -159,33 +156,29 @@ public class SecurityUtils {
     try {
       return (T) doPrivileged.invoke(action);
     } catch (Throwable t) {
-      throw sneaky(t);
+      throw inferAndCast(t);
     }
   }
 
   /**
-   * <p>
-   * Runs the given action as the given subject.
-   * </p>
+   * Maps to Subject.callAs() if available, otherwise maps to Subject.doAs()
    * @param subject the subject this action runs as
    * @param action the action to run
    * @return the result of the action
    * @param <T> the type of the result
    */
-  @SuppressWarnings("unchecked")
   public static <T> T callAs(Subject subject, Callable<T> action) {
     try {
       return (T) CALL_AS.invoke(subject, action);
     } catch (PrivilegedActionException e) {
       throw new CompletionException(e.getCause());
     } catch (Throwable t) {
-      throw sneaky(t);
+      throw inferAndCast(t);
     }
   }
 
   /**
-   * <p>
-   * Gets the current subject
+   * Maps to Subject.currect() is available, otherwise maps to Subject.getSubject()
    * </p>
    * @return the current subject
    */
@@ -193,17 +186,18 @@ public class SecurityUtils {
     try {
       return (Subject) CURRENT.invoke();
     } catch (Throwable t) {
-      throw sneaky(t);
+      throw inferAndCast(t);
     }
   }
 
+  @SuppressWarnings("unused")
   private static <T> PrivilegedExceptionAction<T> callableToPrivilegedExceptionAction(
       Callable<T> callable) {
     return callable::call;
   }
 
   @SuppressWarnings("unchecked")
-  private static <E extends Throwable> RuntimeException sneaky(Throwable e) throws E {
+  private static <E extends Throwable> RuntimeException inferAndCast(Throwable e) throws E {
     throw (E) e;
   }
 }
