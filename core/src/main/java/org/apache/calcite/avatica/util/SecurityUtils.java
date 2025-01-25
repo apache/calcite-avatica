@@ -179,7 +179,6 @@ public class SecurityUtils {
 
   /**
    * Maps to Subject.currect() is available, otherwise maps to Subject.getSubject()
-   * </p>
    * @return the current subject
    */
   public static Subject currentSubject() {
