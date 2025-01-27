@@ -167,13 +167,11 @@ public class SecurityUtils {
    * @return the result of the action
    * @param <T> the type of the result
    */
-  public static <T> T callAs(Subject subject, Callable<T> action) throws Exception {
+  public static <T> T callAs(Subject subject, Callable<T> action) {
     try {
       return (T) CALL_AS.invoke(subject, action);
     } catch (PrivilegedActionException e) {
       throw new CompletionException(e.getCause());
-    } catch (Exception e) {
-      throw e;
     } catch (Throwable t) {
       throw sneakyThrow(t);
     }
