@@ -156,7 +156,7 @@ public class SecurityUtils {
     try {
       return (T) doPrivileged.invoke(action);
     } catch (Throwable t) {
-      throw inferAndCast(t);
+      throw sneakyThrow(t);
     }
   }
 
@@ -173,7 +173,7 @@ public class SecurityUtils {
     } catch (PrivilegedActionException e) {
       throw new CompletionException(e.getCause());
     } catch (Throwable t) {
-      throw inferAndCast(t);
+      throw sneakyThrow(t);
     }
   }
 
@@ -185,7 +185,7 @@ public class SecurityUtils {
     try {
       return (Subject) CURRENT.invoke();
     } catch (Throwable t) {
-      throw inferAndCast(t);
+      throw sneakyThrow(t);
     }
   }
 
@@ -196,7 +196,7 @@ public class SecurityUtils {
   }
 
   @SuppressWarnings("unchecked")
-  private static <E extends Throwable> RuntimeException inferAndCast(Throwable e) throws E {
+  private static <E extends Throwable> RuntimeException sneakyThrow(Throwable e) throws E {
     throw (E) e;
   }
 }
