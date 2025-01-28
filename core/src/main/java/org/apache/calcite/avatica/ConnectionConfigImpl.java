@@ -18,7 +18,6 @@ package org.apache.calcite.avatica;
 
 import org.apache.calcite.avatica.ha.LBStrategy;
 import org.apache.calcite.avatica.remote.AvaticaHttpClientFactory;
-import org.apache.calcite.avatica.remote.HostnameVerificationConfigurable.HostnameVerification;
 import org.apache.calcite.avatica.remote.Service;
 
 import java.io.File;
@@ -130,9 +129,12 @@ public class ConnectionConfigImpl implements ConnectionConfig {
 
   }
 
-  public HostnameVerification hostnameVerification() {
+  @SuppressWarnings("deprecation")
+  public org.apache.calcite.avatica.remote.
+      HostnameVerificationConfigurable.HostnameVerification hostnameVerification() {
     return BuiltInConnectionProperty.HOSTNAME_VERIFICATION.wrap(properties)
-        .getEnum(HostnameVerification.class);
+        .getEnum(org.apache.calcite.avatica.remote.
+            HostnameVerificationConfigurable.HostnameVerification.class);
   }
 
   @Override public boolean transparentReconnectionEnabled() {

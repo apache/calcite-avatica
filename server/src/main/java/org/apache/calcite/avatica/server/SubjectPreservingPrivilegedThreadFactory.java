@@ -47,6 +47,7 @@ class SubjectPreservingPrivilegedThreadFactory implements ThreadFactory {
     return SecurityUtils.doPrivileged(new PrivilegedAction<Thread>() {
       @Override public Thread run() {
         return SecurityUtils.callAs(subject, new Callable<Thread>() {
+          @SuppressWarnings("deprecation")
           @Override public Thread call() {
             Thread thread = new Thread(runnable);
             thread.setDaemon(true);

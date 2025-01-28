@@ -27,14 +27,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.Properties;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 /**
@@ -177,7 +178,7 @@ public class DigestAuthHttpServerTest extends HttpAuthBase {
   }
   @Test
   public void testServerVersionNotReturnedForUnauthorisedAccess() throws Exception {
-    URL httpServerUrl = new URL("http://localhost:" + server.getPort());
+    URL httpServerUrl = new URI("http://localhost:" + server.getPort()).toURL();
     HttpURLConnection conn = (HttpURLConnection) httpServerUrl.openConnection();
     conn.setRequestMethod("GET");
     assertEquals("Unauthorized response status code", 401, conn.getResponseCode());

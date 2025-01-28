@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 import static org.apache.calcite.avatica.AvaticaMatchers.isArrayAccessorResult;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Test class for verifying functionality in array accessor from abstract cursor.

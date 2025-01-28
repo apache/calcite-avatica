@@ -17,7 +17,6 @@
 package org.apache.calcite.avatica.remote;
 
 import org.apache.calcite.avatica.ConnectionConfig;
-import org.apache.calcite.avatica.remote.HostnameVerificationConfigurable.HostnameVerification;
 
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
@@ -128,11 +127,15 @@ public class CommonsHttpClientPoolCache {
    * @throws IllegalArgumentException if the provided verification cannot be
    *                                  handled.
    */
-  private static HostnameVerifier getHostnameVerifier(HostnameVerification verification) {
+  @SuppressWarnings("deprecation")
+  private static HostnameVerifier getHostnameVerifier(
+      org.apache.calcite.avatica.remote.
+          HostnameVerificationConfigurable.HostnameVerification verification) {
     // Normally, the configuration logic would give us a default of STRICT if it was
     // not provided by the user. It's easy for us to do a double-check.
     if (verification == null) {
-      verification = HostnameVerification.STRICT;
+      verification = org.apache.calcite.avatica.remote.
+          HostnameVerificationConfigurable.HostnameVerification.STRICT;
     }
     switch (verification) {
     case STRICT:

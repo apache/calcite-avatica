@@ -16,34 +16,32 @@
  */
 package org.apache.calcite.avatica;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.Properties;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
 
 /**
  * Test class for {@link UnregisteredDriver}.
  */
 public class UnregisteredDriverTest {
 
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
-
-  @Test public void testAcceptsURLWithNull() throws SQLException {
+  @Test public void testAcceptsURLWithNull() {
     final Driver driver = new UnregisteredTestDriver();
-    thrown.expect(SQLException.class);
-    thrown.expectMessage("url can not be null!");
-    driver.acceptsURL(null);
+    SQLException thrown = assertThrows(SQLException.class, () -> driver.acceptsURL(null));
+    assertThat(thrown.getMessage(), containsString("url can not be null!"));
   }
 
-  @Test public void testConnectWithNullURL() throws SQLException {
+  @Test public void testConnectWithNullURL() {
     final Driver driver = new UnregisteredTestDriver();
-    thrown.expect(SQLException.class);
-    thrown.expectMessage("url can not be null!");
-    driver.connect(null, new Properties());
+    SQLException thrown = assertThrows(SQLException.class,
+        () -> driver.connect(null, new Properties()).close());
+    assertThat(thrown.getMessage(), containsString("url can not be null!"));
   }
 
   private static final class UnregisteredTestDriver extends UnregisteredDriver {

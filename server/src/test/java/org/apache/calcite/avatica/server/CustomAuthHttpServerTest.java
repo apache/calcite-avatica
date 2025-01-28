@@ -45,8 +45,8 @@ import java.util.Properties;
 import java.util.concurrent.Callable;
 import javax.servlet.http.HttpServletRequest;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 /**

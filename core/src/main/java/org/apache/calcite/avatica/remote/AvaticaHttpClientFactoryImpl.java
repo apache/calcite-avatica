@@ -53,6 +53,7 @@ public class AvaticaHttpClientFactoryImpl implements AvaticaHttpClientFactory {
     return INSTANCE;
   }
 
+  @SuppressWarnings("deprecation")
   @Override public AvaticaHttpClient getClient(URL url, ConnectionConfig config,
       KerberosConnection kerberosUtil) {
     String className = config.httpClientClass();

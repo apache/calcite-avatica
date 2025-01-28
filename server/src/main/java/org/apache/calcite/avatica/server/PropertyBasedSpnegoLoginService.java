@@ -18,7 +18,6 @@ package org.apache.calcite.avatica.server;
 
 import org.eclipse.jetty.security.SpnegoUserPrincipal;
 import org.eclipse.jetty.server.UserIdentity;
-import org.eclipse.jetty.util.B64Code;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
@@ -65,7 +64,7 @@ public class PropertyBasedSpnegoLoginService extends org.eclipse.jetty.security.
   @Override public UserIdentity login(String username, Object credentials,
       ServletRequest request) {
     String encodedAuthToken = (String) credentials;
-    byte[] authToken = B64Code.decode(encodedAuthToken);
+    byte[] authToken = org.eclipse.jetty.util.B64Code.decode(encodedAuthToken);
 
     GSSManager manager = GSSManager.getInstance();
     try {

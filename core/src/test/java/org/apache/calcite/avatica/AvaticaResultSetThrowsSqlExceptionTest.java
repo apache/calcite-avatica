@@ -16,9 +16,7 @@
  */
 package org.apache.calcite.avatica;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -27,6 +25,7 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -35,9 +34,6 @@ import static org.junit.Assert.assertTrue;
  * and {@link ResultSet#updateNull}, for example.
  */
 public class AvaticaResultSetThrowsSqlExceptionTest {
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   /**
    * A fake test driver for test.
@@ -81,8 +77,7 @@ public class AvaticaResultSetThrowsSqlExceptionTest {
     try (Connection connection = driver.connect("jdbc:test", properties);
          ResultSet resultSet =
              connection.createStatement().executeQuery("SELECT * FROM TABLE")) {
-      thrown.expect(SQLFeatureNotSupportedException.class);
-      resultSet.previous();
+      assertThrows(SQLFeatureNotSupportedException.class, resultSet::previous);
     }
   }
 
@@ -94,8 +89,7 @@ public class AvaticaResultSetThrowsSqlExceptionTest {
     try (Connection connection = driver.connect("jdbc:test", properties);
          ResultSet resultSet =
              connection.createStatement().executeQuery("SELECT * FROM TABLE")) {
-      thrown.expect(SQLFeatureNotSupportedException.class);
-      resultSet.updateNull(1);
+      assertThrows(SQLFeatureNotSupportedException.class, () -> resultSet.updateNull(1));
     }
   }
 
@@ -119,8 +113,7 @@ public class AvaticaResultSetThrowsSqlExceptionTest {
     assertTrue(resultSet.isClosed());
 
     // once closed, next should fail
-    thrown.expect(SQLException.class);
-    resultSet.next();
+    assertThrows(SQLException.class, resultSet::next);
   }
 
   /**
