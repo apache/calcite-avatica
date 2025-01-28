@@ -17,14 +17,10 @@
 package org.apache.calcite.avatica.remote;
 
 import org.apache.calcite.avatica.ConnectionConfig;
-import org.apache.calcite.avatica.remote.HostnameVerificationConfigurable.HostnameVerification;
 
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
-import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
 import org.apache.hc.client5.http.ssl.HttpsSupport;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.apache.hc.core5.http.config.Registry;
 import org.apache.hc.core5.http.config.RegistryBuilder;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
@@ -70,8 +66,10 @@ public class CommonsHttpClientPoolCache {
     return CACHED_POOLS.computeIfAbsent(sslDisc, k -> setupPool(config));
   }
 
+  @SuppressWarnings("deprecation")
   private static PoolingHttpClientConnectionManager setupPool(ConnectionConfig config) {
-    Registry<ConnectionSocketFactory> csfr = createCSFRegistry(config);
+    Registry<org.apache.hc.client5.http.socket.ConnectionSocketFactory> csfr
+        = createCSFRegistry(config);
     PoolingHttpClientConnectionManager pool = new PoolingHttpClientConnectionManager(csfr);
     final String maxCnxns =
         System.getProperty(MAX_POOLED_CONNECTIONS_KEY, MAX_POOLED_CONNECTIONS_DEFAULT);
@@ -84,20 +82,26 @@ public class CommonsHttpClientPoolCache {
     return pool;
   }
 
-  private static Registry<ConnectionSocketFactory> createCSFRegistry(ConnectionConfig config) {
-    RegistryBuilder<ConnectionSocketFactory> registryBuilder = RegistryBuilder.create();
+  @SuppressWarnings("deprecation")
+  private static Registry<org.apache.hc.client5.http.socket.ConnectionSocketFactory>
+      createCSFRegistry(ConnectionConfig config) {
+    RegistryBuilder<org.apache.hc.client5.http.socket.ConnectionSocketFactory> registryBuilder
+        = RegistryBuilder.create();
     configureHttpRegistry(registryBuilder);
     configureHttpsRegistry(registryBuilder, config);
 
     return registryBuilder.build();
   }
 
+  @SuppressWarnings("deprecation")
   private static void configureHttpsRegistry(
-      RegistryBuilder<ConnectionSocketFactory> registryBuilder, ConnectionConfig config) {
+      RegistryBuilder<org.apache.hc.client5.http.socket.ConnectionSocketFactory> registryBuilder,
+      ConnectionConfig config) {
     try {
       SSLContext sslContext = getSSLContext(config);
       final HostnameVerifier verifier = getHostnameVerifier(config.hostnameVerification());
-      SSLConnectionSocketFactory sslFactory = new SSLConnectionSocketFactory(sslContext, verifier);
+      org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory sslFactory
+          = new org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory(sslContext, verifier);
       registryBuilder.register("https", sslFactory);
     } catch (Exception e) {
       LOG.error("HTTPS registry configuration failed");
@@ -134,9 +138,11 @@ public class CommonsHttpClientPoolCache {
     LOG.info("Trustore loaded from: {}", config.truststore());
   }
 
+  @SuppressWarnings("deprecation")
   private static void configureHttpRegistry(
-      RegistryBuilder<ConnectionSocketFactory> registryBuilder) {
-    registryBuilder.register("http", PlainConnectionSocketFactory.getSocketFactory());
+      RegistryBuilder<org.apache.hc.client5.http.socket.ConnectionSocketFactory> registryBuilder) {
+    registryBuilder.register("http",
+        org.apache.hc.client5.http.socket.PlainConnectionSocketFactory.getSocketFactory());
   }
 
   /**
@@ -147,11 +153,15 @@ public class CommonsHttpClientPoolCache {
    * @throws IllegalArgumentException if the provided verification cannot be
    *                                  handled.
    */
-  private static HostnameVerifier getHostnameVerifier(HostnameVerification verification) {
+  @SuppressWarnings("deprecation")
+  private static HostnameVerifier getHostnameVerifier(
+      org.apache.calcite.avatica.remote.
+          HostnameVerificationConfigurable.HostnameVerification verification) {
     // Normally, the configuration logic would give us a default of STRICT if it was
     // not provided by the user. It's easy for us to do a double-check.
     if (verification == null) {
-      verification = HostnameVerification.STRICT;
+      verification = org.apache.calcite.avatica.remote.
+          HostnameVerificationConfigurable.HostnameVerification.STRICT;
     }
     switch (verification) {
     case STRICT:

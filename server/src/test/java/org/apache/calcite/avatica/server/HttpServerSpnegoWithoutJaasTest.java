@@ -45,7 +45,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Properties;
@@ -81,7 +81,7 @@ public class HttpServerSpnegoWithoutJaasTest {
   private static boolean isKdcStarted = false;
   private static boolean isHttpServerStarted = false;
 
-  private static URL httpServerUrl;
+  private static URI httpServerUrl;
 
   @BeforeClass public static void setupKdc() throws Exception {
     kdc = new SimpleKdcServer();
@@ -144,7 +144,7 @@ public class HttpServerSpnegoWithoutJaasTest {
     httpServer.start();
     isHttpServerStarted = true;
 
-    httpServerUrl = new URL("http://" + SpnegoTestUtil.KDC_HOST + ":" + httpServer.getPort());
+    httpServerUrl = new URI("http://" + SpnegoTestUtil.KDC_HOST + ":" + httpServer.getPort());
     LOG.info("HTTP server running at {}", httpServerUrl);
   }
 
@@ -182,7 +182,7 @@ public class HttpServerSpnegoWithoutJaasTest {
 
   @Test public void testNormalClientsDisallowed() throws Exception {
     LOG.info("Connecting to {}", httpServerUrl.toString());
-    HttpURLConnection conn = (HttpURLConnection) httpServerUrl.openConnection();
+    HttpURLConnection conn = (HttpURLConnection) httpServerUrl.toURL().openConnection();
     conn.setRequestMethod("GET");
     // Authentication should fail because we didn't provide anything
     assertEquals(401, conn.getResponseCode());
@@ -190,7 +190,7 @@ public class HttpServerSpnegoWithoutJaasTest {
 
   @Test public void testServerVersionNotReturnedForUnauthorisedAccess() throws Exception {
     LOG.info("Connecting to {}", httpServerUrl.toString());
-    HttpURLConnection conn = (HttpURLConnection) httpServerUrl.openConnection();
+    HttpURLConnection conn = (HttpURLConnection) httpServerUrl.toURL().openConnection();
     conn.setRequestMethod("GET");
     assertEquals("Unauthorized response status code", 401, conn.getResponseCode());
     assertNull("Server information was not expected", conn.getHeaderField("server"));

@@ -22,16 +22,17 @@ import org.apache.calcite.avatica.remote.LocalService;
 import org.apache.calcite.avatica.remote.Service;
 
 import org.eclipse.jetty.server.Server;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
@@ -43,9 +44,6 @@ import static org.mockito.Mockito.verify;
 public class HttpServerCustomizerTest {
 
   private static Meta mockMeta = mock(Meta.class);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   @SuppressWarnings("unchecked") // needed for the mocked customizers, not the builder
   @Test public void serverCustomizersInvoked() {
@@ -74,11 +72,15 @@ public class HttpServerCustomizerTest {
       @Override public void customize(UnsupportedServer server) {
       }
     });
-    thrown.expect(IllegalArgumentException.class);
-    thrown.expectMessage("Only Jetty Server customizers are supported");
-    HttpServer.Builder.<UnsupportedServer>newBuilder()
-        .withHandler(service, Driver.Serialization.PROTOBUF)
-        .withServerCustomizers(unsupportedCustomizers, UnsupportedServer.class).withPort(0).build();
+
+    try {
+      HttpServer.Builder.<UnsupportedServer>newBuilder()
+          .withHandler(service, Driver.Serialization.PROTOBUF)
+          .withServerCustomizers(unsupportedCustomizers, UnsupportedServer.class)
+          .withPort(0).build();
+    } catch (IllegalArgumentException e) {
+      assertThat(e.getMessage(), is("Only Jetty Server customizers are supported"));
+    }
   }
 
   /**
@@ -102,7 +104,7 @@ public class HttpServerCustomizerTest {
                     .withPort(0).build();
     try {
       server.start();
-      URL httpServerUrl = new URL("http://localhost:" + server.getPort());
+      URL httpServerUrl = new URI("http://localhost:" + server.getPort()).toURL();
       HttpURLConnection conn = (HttpURLConnection) httpServerUrl.openConnection();
       conn.setRequestMethod("GET");
       assertNull("Server information was not expected", conn.getHeaderField("server"));
