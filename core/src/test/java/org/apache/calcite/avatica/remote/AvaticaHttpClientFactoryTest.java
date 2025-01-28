@@ -22,6 +22,7 @@ import org.apache.calcite.avatica.ConnectionConfigImpl;
 
 import org.junit.Test;
 
+import java.net.URI;
 import java.net.URL;
 import java.util.Properties;
 
@@ -34,7 +35,7 @@ public class AvaticaHttpClientFactoryTest {
 
   @Test public void testDefaultHttpClient() throws Exception {
     Properties props = new Properties();
-    URL url = new URL("http://localhost:8765");
+    URL url = new URI("http://localhost:8765").toURL();
     ConnectionConfig config = new ConnectionConfigImpl(props);
     AvaticaHttpClientFactory httpClientFactory = new AvaticaHttpClientFactoryImpl();
 
@@ -47,7 +48,7 @@ public class AvaticaHttpClientFactoryTest {
     Properties props = new Properties();
     props.setProperty(BuiltInConnectionProperty.HTTP_CLIENT_IMPL.name(),
         AvaticaHttpClientImpl.class.getName());
-    URL url = new URL("http://localhost:8765");
+    URL url = new URI("http://localhost:8765").toURL();
     ConnectionConfig config = new ConnectionConfigImpl(props);
     AvaticaHttpClientFactory httpClientFactory = new AvaticaHttpClientFactoryImpl();
 
@@ -60,7 +61,7 @@ public class AvaticaHttpClientFactoryTest {
     Properties props = new Properties();
     props.setProperty(BuiltInConnectionProperty.HTTP_CLIENT_IMPL.name(),
         Properties.class.getName()); // Properties is intentionally *not* a valid class
-    URL url = new URL("http://localhost:8765");
+    URL url = new URI("http://localhost:8765").toURL();
     ConnectionConfig config = new ConnectionConfigImpl(props);
     AvaticaHttpClientFactory httpClientFactory = new AvaticaHttpClientFactoryImpl();
 

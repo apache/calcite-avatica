@@ -51,6 +51,7 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Array;
@@ -73,12 +74,12 @@ import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -504,7 +505,7 @@ public class RemoteMetaTest {
   @Test public void testServerAddressInResponse() throws Exception {
     ConnectionSpec.getDatabaseLock().lock();
     try {
-      URL url = new URL("http://localhost:" + this.port);
+      URL url = new URI("http://localhost:" + this.port).toURL();
       AvaticaHttpClient httpClient = new AvaticaHttpClientImpl(url);
       byte[] request;
 
@@ -671,7 +672,7 @@ public class RemoteMetaTest {
   }
 
   @Test public void testMalformedRequest() throws Exception {
-    URL url = new URL("http://localhost:" + this.port);
+    URL url = new URI("http://localhost:" + this.port).toURL();
 
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     conn.setRequestMethod("POST");

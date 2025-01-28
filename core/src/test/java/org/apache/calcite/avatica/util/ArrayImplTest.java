@@ -24,7 +24,6 @@ import org.apache.calcite.avatica.ColumnMetaData.StructType;
 import org.apache.calcite.avatica.MetaImpl;
 import org.apache.calcite.avatica.util.Cursor.Accessor;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.sql.Array;
@@ -37,6 +36,7 @@ import java.util.Objects;
 
 import static org.apache.calcite.avatica.AvaticaMatchers.isArrayAccessorResult;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -61,7 +61,7 @@ public class ArrayImplTest {
       int rowid = 0;
       while (cursor.next()) {
         List<Object> expectedArray = rowsValues.get(rowid);
-        Assert.assertThat(accessor, isArrayAccessorResult(expectedArray, Integer.class));
+        assertThat(accessor, isArrayAccessorResult(expectedArray, Integer.class));
         rowid++;
       }
     }
@@ -82,7 +82,7 @@ public class ArrayImplTest {
       int rowid = 0;
       while (cursor.next()) {
         List<Object> expectedArray = rowsValues.get(rowid);
-        Assert.assertThat(accessor, isArrayAccessorResult(expectedArray, Float.class));
+        assertThat(accessor, isArrayAccessorResult(expectedArray, Float.class));
         rowid++;
       }
     }
@@ -103,7 +103,7 @@ public class ArrayImplTest {
       int rowid = 0;
       while (cursor.next()) {
         List<Object> expectedArray = rowsValues.get(rowid);
-        Assert.assertThat(accessor, isArrayAccessorResult(expectedArray, Double.class));
+        assertThat(accessor, isArrayAccessorResult(expectedArray, Double.class));
         rowid++;
       }
     }
@@ -124,7 +124,7 @@ public class ArrayImplTest {
       int rowid = 0;
       while (cursor.next()) {
         List<Object> expectedArray = rowsValues.get(rowid);
-        Assert.assertThat(accessor, isArrayAccessorResult(expectedArray, Double.class));
+        assertThat(accessor, isArrayAccessorResult(expectedArray, Double.class));
         rowid++;
       }
     }

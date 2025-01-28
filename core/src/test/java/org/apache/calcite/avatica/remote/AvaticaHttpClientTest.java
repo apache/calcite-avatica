@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
@@ -41,7 +42,7 @@ public class AvaticaHttpClientTest {
   @Test
   public void testRetryOnUnavailable() throws Exception {
     // HTTP-503, try again
-    URL url = new URL("http://127.0.0.1:8765");
+    URL url = new URI("http://127.0.0.1:8765").toURL();
     final HttpURLConnection cnxn = Mockito.mock(HttpURLConnection.class);
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     ByteArrayInputStream bais = new ByteArrayInputStream(RESPONSE.getBytes(StandardCharsets.UTF_8));
@@ -68,7 +69,7 @@ public class AvaticaHttpClientTest {
   @Test(expected = RuntimeException.class)
   public void testServerError() throws Exception {
     // HTTP 500 should error out
-    URL url = new URL("http://127.0.0.1:8765");
+    URL url = new URI("http://127.0.0.1:8765").toURL();
     final HttpURLConnection cnxn = Mockito.mock(HttpURLConnection.class);
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
 

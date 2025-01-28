@@ -33,7 +33,7 @@ import org.mockito.stubbing.Answer;
 
 import java.io.ByteArrayInputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -72,7 +72,7 @@ public class AvaticaCommonsHttpClientImplTest {
     };
 
     final AvaticaCommonsHttpClientImpl client =
-            spy(new AvaticaCommonsHttpClientImpl(new URL("http://127.0.0.1")));
+            spy(new AvaticaCommonsHttpClientImpl(new URI("http://127.0.0.1")));
     client.setHttpClientPool(mock(PoolingHttpClientConnectionManager.class), mock(
         ConnectionConfig.class));
 
@@ -106,7 +106,7 @@ public class AvaticaCommonsHttpClientImplTest {
     };
 
     final AvaticaCommonsHttpClientImpl client =
-            spy(new AvaticaCommonsHttpClientImpl(new URL("http://127.0.0.1")));
+            spy(new AvaticaCommonsHttpClientImpl(new URI("http://127.0.0.1")));
     client.setHttpClientPool(mock(PoolingHttpClientConnectionManager.class), mock(
         ConnectionConfig.class));
 
@@ -125,7 +125,7 @@ public class AvaticaCommonsHttpClientImplTest {
   @Test
   public void testPersistentContextReusedAcrossRequests() throws Exception {
     final AvaticaCommonsHttpClientImpl client =
-        spy(new AvaticaCommonsHttpClientImpl(new URL("http://127.0.0.1")));
+        spy(new AvaticaCommonsHttpClientImpl(new URI("http://127.0.0.1")));
     client.setHttpClientPool(mock(PoolingHttpClientConnectionManager.class), mock(
         ConnectionConfig.class));
 
@@ -150,7 +150,7 @@ public class AvaticaCommonsHttpClientImplTest {
   @Test
   public void testPersistentContextThreadSafety() throws Exception {
     final AvaticaCommonsHttpClientImpl client =
-        spy(new AvaticaCommonsHttpClientImpl(new URL("http://127.0.0.1")));
+        spy(new AvaticaCommonsHttpClientImpl(new URI("http://127.0.0.1")));
     client.setHttpClientPool(mock(PoolingHttpClientConnectionManager.class), mock(
         ConnectionConfig.class));
 

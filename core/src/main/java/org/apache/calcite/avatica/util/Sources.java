@@ -59,8 +59,8 @@ public abstract class Sources {
 
   public static Source url(String url) {
     try {
-      return of(new URL(url));
-    } catch (MalformedURLException | IllegalArgumentException e) {
+      return of(new URI(url).toURL());
+    } catch (MalformedURLException | IllegalArgumentException | URISyntaxException e) {
       throw new RuntimeException("Malformed URL: '" + url + "'", e);
     }
   }
@@ -133,11 +133,7 @@ public abstract class Sources {
           filePath += "/";
         }
         try {
-          // We need to encode path. For instance, " " should become "%20"
-          // That is why java.net.URLEncoder.encode(java.lang.String, java.lang.String) is not
-          // suitable because it replaces " " with "+".
-          String encodedPath = new URI(null, null, filePath, null).getRawPath();
-          return new URL("file", null, 0, encodedPath);
+          return new URI("file", filePath, null).toURL();
         } catch (MalformedURLException | URISyntaxException e) {
           throw new IllegalArgumentException("Unable to create URL for file " + filePath, e);
         }

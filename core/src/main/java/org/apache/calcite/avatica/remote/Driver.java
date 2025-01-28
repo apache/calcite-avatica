@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -156,8 +158,8 @@ public class Driver extends UnregisteredDriver {
       urlStr = config.url();
     }
     try {
-      url = new URL(urlStr);
-    } catch (MalformedURLException e) {
+      url = new URI(urlStr).toURL();
+    } catch (MalformedURLException | URISyntaxException e) {
       throw new RuntimeException(e);
     }
 

@@ -52,6 +52,7 @@ public class MetaImplCreateIterableTest {
       return null;
     }
 
+    @Deprecated
     @Override public ExecuteResult prepareAndExecute(StatementHandle h, String sql,
         long maxRowCount,
         PrepareCallback callback) {
@@ -87,6 +88,7 @@ public class MetaImplCreateIterableTest {
       return new Frame(offset, done, next);
     }
 
+    @Deprecated
     @Override public ExecuteResult execute(StatementHandle h, List<TypedValue> parameterValues,
         long maxRowCount)
         throws NoSuchStatementException {

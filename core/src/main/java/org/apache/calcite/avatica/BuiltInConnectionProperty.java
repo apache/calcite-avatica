@@ -18,7 +18,6 @@ package org.apache.calcite.avatica;
 
 import org.apache.calcite.avatica.ha.ShuffledRoundRobinLBStrategy;
 import org.apache.calcite.avatica.remote.AvaticaHttpClientFactoryImpl;
-import org.apache.calcite.avatica.remote.HostnameVerificationConfigurable.HostnameVerification;
 
 import org.apache.hc.core5.util.Timeout;
 
@@ -92,8 +91,13 @@ public enum BuiltInConnectionProperty implements ConnectionProperty {
   /** Password for the key inside keystore */
   KEY_PASSWORD("key_password", Type.STRING, "", false),
 
-  HOSTNAME_VERIFICATION("hostname_verification", Type.ENUM, HostnameVerification.STRICT,
-      HostnameVerification.class, false),
+  @SuppressWarnings("deprecation")
+  HOSTNAME_VERIFICATION("hostname_verification", Type.ENUM,
+      org.apache.calcite.avatica.remote.
+          HostnameVerificationConfigurable.HostnameVerification.STRICT,
+      org.apache.calcite.avatica.remote.
+          HostnameVerificationConfigurable.HostnameVerification.class,
+      false),
 
   TRANSPARENT_RECONNECTION("transparent_reconnection", Type.BOOLEAN, Boolean.FALSE, false),
 

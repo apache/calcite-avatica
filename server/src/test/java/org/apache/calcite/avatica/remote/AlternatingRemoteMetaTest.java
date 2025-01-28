@@ -38,6 +38,8 @@ import org.junit.Test;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -52,9 +54,9 @@ import java.util.Map;
 import java.util.Random;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -157,8 +159,8 @@ public class AlternatingRemoteMetaTest {
       int index = urlStr.indexOf(comma);
       if (-1 == index) {
         try {
-          return Collections.singletonList(new URL(urlStr));
-        } catch (MalformedURLException e) {
+          return Collections.singletonList(new URI(urlStr).toURL());
+        } catch (MalformedURLException | URISyntaxException e) {
           throw new RuntimeException(e);
         }
       }
@@ -166,8 +168,8 @@ public class AlternatingRemoteMetaTest {
       // String split w/o regex
       while (-1 != index) {
         try {
-          urls.add(new URL(urlStr.substring(prevIndex, index)));
-        } catch (MalformedURLException e) {
+          urls.add(new URI(urlStr.substring(prevIndex, index)).toURL());
+        } catch (MalformedURLException | URISyntaxException e) {
           throw new RuntimeException(e);
         }
         prevIndex = index + 1;
@@ -176,8 +178,8 @@ public class AlternatingRemoteMetaTest {
 
       // Get the last one
       try {
-        urls.add(new URL(urlStr.substring(prevIndex)));
-      } catch (MalformedURLException e) {
+        urls.add(new URI(urlStr.substring(prevIndex)).toURL());
+      } catch (MalformedURLException | URISyntaxException e) {
         throw new RuntimeException(e);
       }
 
@@ -382,15 +384,15 @@ public class AlternatingRemoteMetaTest {
   @Test public void testSingleUrlParsing() throws Exception {
     AlternatingDriver d = new AlternatingDriver();
     List<URL> urls = d.parseUrls("http://localhost:1234");
-    assertEquals(Arrays.asList(new URL("http://localhost:1234")), urls);
+    assertEquals(Arrays.asList(new URI("http://localhost:1234").toURL()), urls);
   }
 
   @Test public void testMultipleUrlParsing() throws Exception {
     AlternatingDriver d = new AlternatingDriver();
     List<URL> urls = d.parseUrls("http://localhost:1234,http://localhost:2345,"
         + "http://localhost:3456");
-    List<URL> expectedUrls = Arrays.asList(new URL("http://localhost:1234"),
-        new URL("http://localhost:2345"), new URL("http://localhost:3456"));
+    List<URL> expectedUrls = Arrays.asList(new URI("http://localhost:1234").toURL(),
+        new URI("http://localhost:2345").toURL(), new URI("http://localhost:3456").toURL());
     assertEquals(expectedUrls, urls);
   }
 }

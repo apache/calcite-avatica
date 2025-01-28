@@ -45,7 +45,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Properties;
@@ -81,7 +81,7 @@ public class HttpServerSpnegoWithoutJaasTest {
   private static boolean isKdcStarted = false;
   private static boolean isHttpServerStarted = false;
 
-  private static URL httpServerUrl;
+  private static URI httpServerUri;
 
   @BeforeClass public static void setupKdc() throws Exception {
     kdc = new SimpleKdcServer();
@@ -144,13 +144,13 @@ public class HttpServerSpnegoWithoutJaasTest {
     httpServer.start();
     isHttpServerStarted = true;
 
-    httpServerUrl = new URL("http://" + SpnegoTestUtil.KDC_HOST + ":" + httpServer.getPort());
-    LOG.info("HTTP server running at {}", httpServerUrl);
+    httpServerUri = new URI("http://" + SpnegoTestUtil.KDC_HOST + ":" + httpServer.getPort());
+    LOG.info("HTTP server running at {}", httpServerUri);
   }
 
   @AfterClass public static void stopKdc() throws Exception {
     if (isHttpServerStarted) {
-      LOG.info("Stopping HTTP server at {}", httpServerUrl);
+      LOG.info("Stopping HTTP server at {}", httpServerUri);
       httpServer.stop();
     }
 
@@ -181,16 +181,16 @@ public class HttpServerSpnegoWithoutJaasTest {
   }
 
   @Test public void testNormalClientsDisallowed() throws Exception {
-    LOG.info("Connecting to {}", httpServerUrl.toString());
-    HttpURLConnection conn = (HttpURLConnection) httpServerUrl.openConnection();
+    LOG.info("Connecting to {}", httpServerUri.toString());
+    HttpURLConnection conn = (HttpURLConnection) httpServerUri.toURL().openConnection();
     conn.setRequestMethod("GET");
     // Authentication should fail because we didn't provide anything
     assertEquals(401, conn.getResponseCode());
   }
 
   @Test public void testServerVersionNotReturnedForUnauthorisedAccess() throws Exception {
-    LOG.info("Connecting to {}", httpServerUrl.toString());
-    HttpURLConnection conn = (HttpURLConnection) httpServerUrl.openConnection();
+    LOG.info("Connecting to {}", httpServerUri.toString());
+    HttpURLConnection conn = (HttpURLConnection) httpServerUri.toURL().openConnection();
     conn.setRequestMethod("GET");
     assertEquals("Unauthorized response status code", 401, conn.getResponseCode());
     assertNull("Server information was not expected", conn.getHeaderField("server"));
@@ -233,7 +233,7 @@ public class HttpServerSpnegoWithoutJaasTest {
 
         // Passes the GSSCredential into the HTTP client implementation
         final AvaticaCommonsHttpClientImpl httpClient =
-            new AvaticaCommonsHttpClientImpl(httpServerUrl);
+            new AvaticaCommonsHttpClientImpl(httpServerUri);
         httpClient.setHttpClientPool(pool, config);
         httpClient.setGSSCredential(credential);
 
