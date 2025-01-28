@@ -166,8 +166,9 @@ public class SecurityUtils {
    * @param action the action to run
    * @return the result of the action
    * @param <T> the type of the result
+   * @throws CompletionException
    */
-  public static <T> T callAs(Subject subject, Callable<T> action) {
+  public static <T> T callAs(Subject subject, Callable<T> action) throws CompletionException {
     try {
       return (T) CALL_AS.invoke(subject, action);
     } catch (PrivilegedActionException e) {
