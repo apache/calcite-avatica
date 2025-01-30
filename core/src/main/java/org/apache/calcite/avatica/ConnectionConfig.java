@@ -18,7 +18,6 @@ package org.apache.calcite.avatica;
 
 import org.apache.calcite.avatica.ha.LBStrategy;
 import org.apache.calcite.avatica.remote.AvaticaHttpClientFactory;
-import org.apache.calcite.avatica.remote.HostnameVerificationConfigurable.HostnameVerification;
 import org.apache.calcite.avatica.remote.Service;
 
 import java.io.File;
@@ -64,7 +63,9 @@ public interface ConnectionConfig {
   /** @see BuiltInConnectionProperty#KEY_PASSWORD */
   String keyPassword();
   /** @see BuiltInConnectionProperty#HOSTNAME_VERIFICATION */
-  HostnameVerification hostnameVerification();
+  @SuppressWarnings("deprecation")
+  org.apache.calcite.avatica.remote.
+      HostnameVerificationConfigurable.HostnameVerification hostnameVerification();
   /** @see BuiltInConnectionProperty#TRANSPARENT_RECONNECTION */
   boolean transparentReconnectionEnabled();
   /** @see BuiltInConnectionProperty#FETCH_SIZE */
