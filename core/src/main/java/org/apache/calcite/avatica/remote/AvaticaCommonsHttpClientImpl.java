@@ -36,16 +36,17 @@ import org.apache.hc.client5.http.impl.auth.BasicSchemeFactory;
 import org.apache.hc.client5.http.impl.auth.DigestSchemeFactory;
 import org.apache.hc.client5.http.impl.auth.SPNegoSchemeFactory;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
-import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.routing.RoutingSupport;
+import org.apache.hc.core5.http.ClassicHttpResponse;
 import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpException;
+import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.NoHttpResponseException;
 import org.apache.hc.core5.http.config.Lookup;
-import org.apache.hc.core5.http.config.Registry;
 import org.apache.hc.core5.http.config.RegistryBuilder;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
@@ -84,9 +85,9 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
   private static AuthScope anyAuthScope = new AuthScope(null, -1);
 
   protected final URI uri;
+  protected HttpHost httpHost;
   protected BasicAuthCache authCache;
   protected CloseableHttpClient client;
-  protected Registry<ConnectionSocketFactory> socketFactoryRegistry;
   protected PoolingHttpClientConnectionManager pool;
 
   protected UsernamePasswordCredentials credentials = null;
@@ -130,6 +131,8 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
   private RequestConfig createRequestConfig() {
     RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
     requestConfigBuilder
+        // We cannot avoid this. If the timeout were defined on the pool, then
+        // it couldn't be overridden later
         .setConnectTimeout(this.connectTimeout, TimeUnit.MILLISECONDS)
         .setResponseTimeout(this.responseTimeout, TimeUnit.MILLISECONDS);
     List<String> preferredSchemes = new ArrayList<>();
@@ -151,6 +154,13 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
   }
 
   @Override public byte[] send(byte[] request) {
+    try {
+      // Doing this earlier would break API backwards compatibility
+      determineHost();
+    } catch (HttpException e) {
+      LOG.debug("Failed to execute HTTP request", e);
+      throw new RuntimeException("Could not determine Http Host from URI", e);
+    }
     while (true) {
       ByteArrayEntity entity = new ByteArrayEntity(request, ContentType.APPLICATION_OCTET_STREAM);
 
@@ -158,7 +168,7 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
       HttpPost post = new HttpPost(uri);
       post.setEntity(entity);
 
-      try (CloseableHttpResponse response = execute(post, context)) {
+      try (ClassicHttpResponse response = executeOpen(httpHost, post, context)) {
         final int statusCode = response.getCode();
         if (HttpURLConnection.HTTP_OK == statusCode
             || HttpURLConnection.HTTP_INTERNAL_ERROR == statusCode) {
@@ -184,10 +194,17 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
     }
   }
 
+  private void determineHost() throws HttpException {
+    if (httpHost == null) {
+      HttpPost dummy = new HttpPost(uri);
+      this.httpHost = RoutingSupport.determineHost(dummy);
+    }
+  }
+
   // Visible for testing
-  CloseableHttpResponse execute(HttpPost post, HttpClientContext context)
+  ClassicHttpResponse executeOpen(HttpHost httpHost, HttpPost post, HttpClientContext context)
       throws IOException, ClientProtocolException {
-    return client.execute(post, context);
+    return client.executeOpen(httpHost, post, context);
   }
 
   @Override public void setUsernamePassword(AuthenticationType authType, String username,
