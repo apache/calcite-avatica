@@ -22,6 +22,7 @@ import org.apache.calcite.avatica.ConnectionConfig;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.NoHttpResponseException;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.io.entity.StringEntity;
@@ -76,7 +77,7 @@ public class AvaticaCommonsHttpClientImplTest {
         ConnectionConfig.class));
 
     doAnswer(failThenSucceed).when(client)
-            .execute(any(HttpPost.class), eq(client.context));
+            .executeOpen(any(HttpHost.class), any(HttpPost.class), eq(client.context));
 
     when(badResponse.getCode()).thenReturn(HttpURLConnection.HTTP_UNAVAILABLE);
 
@@ -110,7 +111,7 @@ public class AvaticaCommonsHttpClientImplTest {
         ConnectionConfig.class));
 
     doAnswer(failThenSucceed).when(client)
-            .execute(any(HttpPost.class), eq(client.context));
+            .executeOpen(any(HttpHost.class), any(HttpPost.class), eq(client.context));
 
     when(badResponse.getCode()).thenReturn(HttpURLConnection.HTTP_UNAVAILABLE);
 
@@ -136,13 +137,13 @@ public class AvaticaCommonsHttpClientImplTest {
     when(response.getEntity()).thenReturn(entity);
 
     doReturn(response).when(client)
-        .execute(any(HttpPost.class), eq(client.context));
+        .executeOpen(any(HttpHost.class), any(HttpPost.class), eq(client.context));
 
     client.send(new byte[0]);
     client.send(new byte[0]);
 
     // Verify that the persistent context was reused and not created again
-    verify(client, times(2)).execute(any(HttpPost.class),
+    verify(client, times(2)).executeOpen(any(HttpHost.class), any(HttpPost.class),
         eq(client.context));
   }
 
@@ -154,7 +155,7 @@ public class AvaticaCommonsHttpClientImplTest {
         ConnectionConfig.class));
 
     doReturn(mock(CloseableHttpResponse.class)).when(client)
-        .execute(any(HttpPost.class), eq(client.context));
+        .executeOpen(any(HttpHost.class), any(HttpPost.class), eq(client.context));
 
     Runnable requestTask = () -> {
       try {
@@ -175,7 +176,8 @@ public class AvaticaCommonsHttpClientImplTest {
       thread.join();
     }
 
-    verify(client, times(threadCount)).execute(any(HttpPost.class), eq(client.context));
+    verify(client, times(threadCount)).executeOpen(any(HttpHost.class), any(HttpPost.class),
+        eq(client.context));
   }
 
 }
