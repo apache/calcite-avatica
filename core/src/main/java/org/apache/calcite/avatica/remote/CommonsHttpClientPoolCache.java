@@ -20,13 +20,11 @@ import org.apache.calcite.avatica.ConnectionConfig;
 import org.apache.calcite.avatica.remote.HostnameVerificationConfigurable.HostnameVerification;
 
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
-import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
 import org.apache.hc.client5.http.ssl.HttpsSupport;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
-import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
-import org.apache.hc.core5.http.config.Registry;
-import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.client5.http.ssl.TlsSocketStrategy;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.hc.core5.ssl.SSLContexts;
 
@@ -71,36 +69,24 @@ public class CommonsHttpClientPoolCache {
   }
 
   private static PoolingHttpClientConnectionManager setupPool(ConnectionConfig config) {
-    Registry<ConnectionSocketFactory> csfr = createCSFRegistry(config);
-    PoolingHttpClientConnectionManager pool = new PoolingHttpClientConnectionManager(csfr);
-    final String maxCnxns =
-        System.getProperty(MAX_POOLED_CONNECTIONS_KEY, MAX_POOLED_CONNECTIONS_DEFAULT);
-    pool.setMaxTotal(Integer.parseInt(maxCnxns));
-    // Increase default max connection per route to 25
+    final String maxCnxns = System.getProperty(MAX_POOLED_CONNECTIONS_KEY,
+        MAX_POOLED_CONNECTIONS_DEFAULT);
     final String maxCnxnsPerRoute = System.getProperty(MAX_POOLED_CONNECTION_PER_ROUTE_KEY,
         MAX_POOLED_CONNECTION_PER_ROUTE_DEFAULT);
-    pool.setDefaultMaxPerRoute(Integer.parseInt(maxCnxnsPerRoute));
+    PoolingHttpClientConnectionManager pool = PoolingHttpClientConnectionManagerBuilder.create()
+        .setTlsSocketStrategy(createTlsSocketStrategy(config))
+        .setMaxConnTotal(Integer.parseInt(maxCnxns))
+        .setMaxConnPerRoute(Integer.parseInt(maxCnxnsPerRoute)).build();
     LOG.debug("Created new pool {}", pool);
     return pool;
   }
 
-  private static Registry<ConnectionSocketFactory> createCSFRegistry(ConnectionConfig config) {
-    RegistryBuilder<ConnectionSocketFactory> registryBuilder = RegistryBuilder.create();
-    configureHttpRegistry(registryBuilder);
-    configureHttpsRegistry(registryBuilder, config);
-
-    return registryBuilder.build();
-  }
-
-  private static void configureHttpsRegistry(
-      RegistryBuilder<ConnectionSocketFactory> registryBuilder, ConnectionConfig config) {
+  private static TlsSocketStrategy createTlsSocketStrategy(ConnectionConfig config) {
     try {
-      SSLContext sslContext = getSSLContext(config);
-      final HostnameVerifier verifier = getHostnameVerifier(config.hostnameVerification());
-      SSLConnectionSocketFactory sslFactory = new SSLConnectionSocketFactory(sslContext, verifier);
-      registryBuilder.register("https", sslFactory);
+      return new DefaultClientTlsStrategy(getSSLContext(config),
+          getHostnameVerifier(config.hostnameVerification()));
     } catch (Exception e) {
-      LOG.error("HTTPS registry configuration failed");
+      LOG.error("HTTPS TlsSocketStrategy configuration failed");
       throw new RuntimeException(e);
     }
   }
@@ -132,11 +118,6 @@ public class CommonsHttpClientPoolCache {
         config.truststorePassword().toCharArray());
     // Avoid printing sensitive information such as passwords in the logs
     LOG.info("Trustore loaded from: {}", config.truststore());
-  }
-
-  private static void configureHttpRegistry(
-      RegistryBuilder<ConnectionSocketFactory> registryBuilder) {
-    registryBuilder.register("http", PlainConnectionSocketFactory.getSocketFactory());
   }
 
   /**
