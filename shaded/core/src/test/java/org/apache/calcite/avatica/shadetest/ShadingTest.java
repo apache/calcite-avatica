@@ -35,7 +35,7 @@ public class ShadingTest {
   // Note that many of these files could be excluded.
   // This is for regression testing, and not the minimum file set.
   String[] allowedPathPatterns = { "^META-INF", "^org/apache/calcite/",  ".*\\.proto",
-      "^org/slf4j/", "^org/publicsuffix/" };
+      "^org/slf4j/", "^org/publicsuffix/", "^org/joou/" };
 
   @Test
   public void validateShadedJar() throws Exception {

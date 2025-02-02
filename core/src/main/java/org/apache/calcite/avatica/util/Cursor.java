@@ -18,6 +18,11 @@ package org.apache.calcite.avatica.util;
 
 import org.apache.calcite.avatica.ColumnMetaData;
 
+import org.joou.UByte;
+import org.joou.UInteger;
+import org.joou.ULong;
+import org.joou.UShort;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -87,11 +92,19 @@ public interface Cursor extends AutoCloseable {
 
     byte getByte() throws SQLException;
 
+    UByte getUByte() throws SQLException;
+
     short getShort() throws SQLException;
+
+    UShort getUShort() throws SQLException;
 
     int getInt() throws SQLException;
 
+    UInteger getUInt() throws SQLException;
+
     long getLong() throws SQLException;
+
+    ULong getULong() throws SQLException;
 
     float getFloat() throws SQLException;
 

@@ -291,7 +291,7 @@ public class AvaticaSite {
 
   /** Similar logic to {@link #setObject}. */
   public static Object get(Cursor.Accessor accessor, int targetSqlType,
-      Calendar localCalendar) throws SQLException {
+      boolean signed, Calendar localCalendar) throws SQLException {
     switch (targetSqlType) {
     case Types.CLOB:
     case Types.DATALINK:
@@ -304,6 +304,9 @@ public class AvaticaSite {
     case Types.ARRAY:
       return accessor.getArray();
     case Types.BIGINT:
+      if (!signed) {
+        return accessor.wasNull() ? null : accessor.getULong();
+      }
       final long aLong = accessor.getLong();
       if (aLong == 0 && accessor.wasNull()) {
         return null;
@@ -337,6 +340,9 @@ public class AvaticaSite {
       }
       return aDouble;
     case Types.INTEGER:
+      if (!signed) {
+        return accessor.wasNull() ? null : accessor.getUInt();
+      }
       final int anInt = accessor.getInt();
       if (anInt == 0 && accessor.wasNull()) {
         return null;
@@ -362,6 +368,9 @@ public class AvaticaSite {
     case Types.ROWID:
       throw notImplemented();
     case Types.SMALLINT:
+      if (!signed) {
+        return accessor.wasNull() ? null : accessor.getUShort();
+      }
       final short aShort = accessor.getShort();
       if (aShort == 0 && accessor.wasNull()) {
         return null;
@@ -372,6 +381,9 @@ public class AvaticaSite {
     case Types.TIMESTAMP:
       return accessor.getTimestamp(localCalendar);
     case Types.TINYINT:
+      if (!signed) {
+        return accessor.wasNull() ? null : accessor.getUByte();
+      }
       final byte aByte = accessor.getByte();
       if (aByte == 0 && accessor.wasNull()) {
         return null;

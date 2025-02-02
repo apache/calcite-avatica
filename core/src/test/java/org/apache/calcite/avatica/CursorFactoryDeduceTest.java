@@ -21,6 +21,7 @@ import org.apache.calcite.avatica.util.Unsafe;
 
 import org.junit.Test;
 
+import java.math.BigInteger;
 import java.sql.Types;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,19 +50,29 @@ public class CursorFactoryDeduceTest {
       ColumnMetaData.scalar(Types.DOUBLE, "DOUBLE", ColumnMetaData.Rep.DOUBLE);
 
   static final List<Object> ROWS = IntStream.range(1, 5)
-      .mapToObj(i -> (Object) new SimplePOJO(i, Integer.toString(i), (double) i))
+      .mapToObj(i -> (Object) new SimplePOJO((byte) i, (short) i, i, i,
+          new BigInteger(Integer.toString(i)), Integer.toString(i), (double) i))
       .collect(Collectors.toList());
 
   /**
    * Simple POJO for testing cursors over Java objects.
    */
   protected static class SimplePOJO {
+    public byte byteField;
+    public short shortField;
     public int intField;
+    public long longField;
+    public BigInteger bigIntField;
     public String stringField;
     public Double doubleField;
 
-    SimplePOJO(int intField, String stringField, Double doubleField) {
+    SimplePOJO(byte byteField, short shortField, int intField, long longField,
+               BigInteger bigIntField, String stringField, Double doubleField) {
+      this.byteField = byteField;
+      this.shortField = shortField;
       this.intField = intField;
+      this.longField = longField;
+      this.bigIntField = bigIntField;
       this.stringField = stringField;
       this.doubleField = doubleField;
     }
@@ -81,13 +92,18 @@ public class CursorFactoryDeduceTest {
 
       SimplePOJO pjo = (SimplePOJO) o;
 
-      return Objects.equals(stringField, pjo.stringField)
+      return Objects.equals(byteField, pjo.byteField)
+          && Objects.equals(shortField, pjo.shortField)
           && Objects.equals(intField, pjo.intField)
+          && Objects.equals(longField, pjo.longField)
+          && Objects.equals(bigIntField, pjo.bigIntField)
+          && Objects.equals(stringField, pjo.stringField)
           && Objects.equals(doubleField, pjo.doubleField);
     }
 
     @Override public int hashCode() {
-      return Objects.hash(stringField, intField, doubleField);
+      return Objects.hash(byteField, shortField, intField,
+          longField, bigIntField, stringField, doubleField);
     }
   }
 
@@ -239,6 +255,88 @@ public class CursorFactoryDeduceTest {
         assertTrue(cursor.next());
         SimplePOJO pjo = (SimplePOJO) row;
         assertEquals(pjo.stringField, strAccessor.getObject());
+      }
+
+      assertFalse(cursor.next());
+    }
+  }
+
+  @Test public void deduceRecordCursorFactoryProjectedSignedField() throws Exception {
+    List<ColumnMetaData> columnsMetaDataList = Arrays.asList(
+        MetaImpl.columnMetaData("byteField", 1, ColumnMetaData.scalar(
+            Types.TINYINT, "TINYINT", ColumnMetaData.Rep.BYTE), true, true),
+        MetaImpl.columnMetaData("shortField", 2, ColumnMetaData.scalar(
+            Types.SMALLINT, "SMALLINT", ColumnMetaData.Rep.SHORT), true, true),
+        MetaImpl.columnMetaData("intField", 3, ColumnMetaData.scalar(
+            Types.INTEGER, "MEDIUMINT", ColumnMetaData.Rep.INTEGER), true, true),
+        MetaImpl.columnMetaData("intField", 4, ColumnMetaData.scalar(
+            Types.INTEGER, "INT", ColumnMetaData.Rep.INTEGER), true, true),
+        MetaImpl.columnMetaData("longField", 5, ColumnMetaData.scalar(
+            Types.BIGINT, "BIGINT", ColumnMetaData.Rep.LONG), true, true)
+    );
+    Meta.CursorFactory cursorFactory =
+        Meta.CursorFactory.deduce(columnsMetaDataList, SimplePOJO.class);
+
+    try (Cursor cursor = MetaImpl.createCursor(cursorFactory, ROWS)) {
+      List<Cursor.Accessor> accessors =
+          cursor.createAccessors(columnsMetaDataList, Unsafe.localCalendar(), null);
+
+      assertEquals(columnsMetaDataList.size(), accessors.size());
+      Cursor.Accessor byteAccessor = accessors.get(0);
+      Cursor.Accessor shortAccessor = accessors.get(1);
+      Cursor.Accessor intAccessor = accessors.get(2);
+      Cursor.Accessor intAccessor2 = accessors.get(3);
+      Cursor.Accessor longAccessor = accessors.get(4);
+
+      for (Object row : ROWS) {
+        assertTrue(cursor.next());
+        SimplePOJO pjo = (SimplePOJO) row;
+        assertEquals(pjo.byteField, byteAccessor.getObject());
+        assertEquals(pjo.shortField, shortAccessor.getObject());
+        assertEquals(pjo.intField, intAccessor.getObject());
+        assertEquals(pjo.intField, intAccessor2.getObject());
+        assertEquals(pjo.longField, longAccessor.getObject());
+      }
+
+      assertFalse(cursor.next());
+    }
+  }
+
+  @Test public void deduceRecordCursorFactoryProjectedUnsignedField() throws Exception {
+    List<ColumnMetaData> columnsMetaDataList = Arrays.asList(
+        MetaImpl.columnMetaData("shortField", 1, ColumnMetaData.scalar(
+            Types.TINYINT, "TINYINT_UNSIGNED", ColumnMetaData.Rep.UBYTE), true, false),
+        MetaImpl.columnMetaData("intField", 2, ColumnMetaData.scalar(
+            Types.SMALLINT, "SMALLINT_UNSIGNED", ColumnMetaData.Rep.USHORT), true, false),
+        MetaImpl.columnMetaData("longField", 3, ColumnMetaData.scalar(
+            Types.INTEGER, "MEDIUMINT_UNSIGNED", ColumnMetaData.Rep.UINTEGER), true, false),
+        MetaImpl.columnMetaData("longField", 4, ColumnMetaData.scalar(
+            Types.INTEGER, "INT_UNSIGNED", ColumnMetaData.Rep.UINTEGER), true, false),
+        MetaImpl.columnMetaData("bigIntField", 5, ColumnMetaData.scalar(
+            Types.BIGINT, "BIGINT_UNSIGNED", ColumnMetaData.Rep.ULONG), true, false)
+    );
+    Meta.CursorFactory cursorFactory =
+        Meta.CursorFactory.deduce(columnsMetaDataList, SimplePOJO.class);
+
+    try (Cursor cursor = MetaImpl.createCursor(cursorFactory, ROWS)) {
+      List<Cursor.Accessor> accessors =
+          cursor.createAccessors(columnsMetaDataList, Unsafe.localCalendar(), null);
+
+      assertEquals(columnsMetaDataList.size(), accessors.size());
+      Cursor.Accessor shortAccessor = accessors.get(0);
+      Cursor.Accessor intAccessor = accessors.get(1);
+      Cursor.Accessor longAccessor = accessors.get(2);
+      Cursor.Accessor longAccessor2 = accessors.get(3);
+      Cursor.Accessor bigIntAccessor = accessors.get(4);
+
+      for (Object row : ROWS) {
+        assertTrue(cursor.next());
+        SimplePOJO pjo = (SimplePOJO) row;
+        assertEquals(pjo.shortField, shortAccessor.getObject());
+        assertEquals(pjo.intField, intAccessor.getObject());
+        assertEquals(pjo.longField, longAccessor.getObject());
+        assertEquals(pjo.longField, longAccessor2.getObject());
+        assertEquals(pjo.bigIntField, bigIntAccessor.getObject());
       }
 
       assertFalse(cursor.next());

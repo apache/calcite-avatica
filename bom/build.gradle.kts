@@ -54,6 +54,7 @@ dependencies {
         apiv("com.google.protobuf:protobuf-java", "protobuf")
         apiv("com.h2database:h2")
         apiv("javax.servlet:javax.servlet-api", "servlet")
+        apiv("org.jooq:joou-java-6", "joou-java-6")
         apiv("junit:junit")
         apiv("net.bytebuddy:byte-buddy", "bytebuddy")
         apiv("net.bytebuddy:byte-buddy-agent", "bytebuddy")
