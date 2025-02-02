@@ -102,13 +102,15 @@ public abstract class AbstractCursor implements Cursor {
     }
     switch (columnMetaData.type.id) {
     case Types.TINYINT:
-      return new ByteAccessor(getter);
+      return columnMetaData.signed ? new ByteAccessor(getter) : new ShortAccessor(getter);
     case Types.SMALLINT:
-      return new ShortAccessor(getter);
+      return columnMetaData.signed ? new ShortAccessor(getter) : new IntAccessor(getter);
     case Types.INTEGER:
-      return new IntAccessor(getter);
+      return columnMetaData.signed ? new IntAccessor(getter) : new LongAccessor(getter);
     case Types.BIGINT:
-      return new LongAccessor(getter);
+      return columnMetaData.signed
+          ? new LongAccessor(getter)
+          : new NumberAccessor(getter, columnMetaData.scale);
     case Types.BOOLEAN:
     case Types.BIT:
       return new BooleanAccessor(getter);

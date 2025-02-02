@@ -33,6 +33,7 @@ import org.junit.runners.Parameterized.Parameters;
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.URL;
 import java.sql.Array;
 import java.sql.Blob;
@@ -147,46 +148,70 @@ public class AvaticaResultSetConversionsTest {
               ColumnMetaData.scalar(Types.SMALLINT, "SMALLINT",
                   ColumnMetaData.Rep.PRIMITIVE_SHORT),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("int", 3,
+          columnMetaData("medium", 3,
+              ColumnMetaData.scalar(Types.INTEGER, "MEDIUMINT",
+                  ColumnMetaData.Rep.PRIMITIVE_INT),
+              DatabaseMetaData.columnNoNulls),
+          columnMetaData("int", 4,
               ColumnMetaData.scalar(Types.INTEGER, "INTEGER",
                   ColumnMetaData.Rep.PRIMITIVE_INT),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("long", 4,
+          columnMetaData("long", 5,
               ColumnMetaData.scalar(Types.BIGINT, "BIGINT",
                   ColumnMetaData.Rep.PRIMITIVE_LONG),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("float", 5,
+          columnMetaData("byte_unsigned", 6,
+              ColumnMetaData.scalar(Types.TINYINT, "TINYINT_UNSIGNED",
+                  ColumnMetaData.Rep.PRIMITIVE_SHORT),
+              DatabaseMetaData.columnNoNulls, false),
+          columnMetaData("short_unsigned", 7,
+              ColumnMetaData.scalar(Types.SMALLINT, "SMALLINT_UNSIGNED",
+                  ColumnMetaData.Rep.PRIMITIVE_INT),
+              DatabaseMetaData.columnNoNulls, false),
+          columnMetaData("medium_unsigned", 8,
+              ColumnMetaData.scalar(Types.INTEGER, "MEDIUMINT_UNSIGNED",
+                  ColumnMetaData.Rep.PRIMITIVE_INT),
+              DatabaseMetaData.columnNoNulls, false),
+          columnMetaData("int_unsigned", 9,
+              ColumnMetaData.scalar(Types.INTEGER, "INTEGER_UNSIGNED",
+                  ColumnMetaData.Rep.PRIMITIVE_LONG),
+              DatabaseMetaData.columnNoNulls, false),
+          columnMetaData("long_unsigned", 10,
+              ColumnMetaData.scalar(Types.BIGINT, "BIGINT_UNSIGNED",
+                  ColumnMetaData.Rep.NUMBER),
+              DatabaseMetaData.columnNoNulls, false),
+          columnMetaData("float", 11,
               ColumnMetaData.scalar(Types.REAL, "REAL",
                   ColumnMetaData.Rep.FLOAT),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("double", 6,
+          columnMetaData("double", 12,
               ColumnMetaData.scalar(Types.FLOAT, "FLOAT",
                   ColumnMetaData.Rep.DOUBLE),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("string", 7,
+          columnMetaData("string", 13,
               ColumnMetaData.scalar(Types.VARCHAR, "VARCHAR",
                   ColumnMetaData.Rep.STRING),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("date", 8,
+          columnMetaData("date", 14,
               ColumnMetaData.scalar(Types.DATE, "DATE",
                   ColumnMetaData.Rep.JAVA_SQL_DATE),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("time", 9,
+          columnMetaData("time", 15,
               ColumnMetaData.scalar(Types.TIME, "TIME",
                   ColumnMetaData.Rep.JAVA_SQL_TIME),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("timestamp", 10,
+          columnMetaData("timestamp", 16,
               ColumnMetaData.scalar(Types.TIMESTAMP, "TIMESTAMP",
                   ColumnMetaData.Rep.JAVA_SQL_TIMESTAMP),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("array", 11,
+          columnMetaData("array", 17,
               ColumnMetaData.array(
                   ColumnMetaData.scalar(Types.INTEGER, "INTEGER",
                       ColumnMetaData.Rep.PRIMITIVE_INT),
                   "ARRAY",
                   ColumnMetaData.Rep.ARRAY),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("struct", 12,
+          columnMetaData("struct", 18,
               ColumnMetaData.struct(
                   Arrays.asList(
                       columnMetaData("int", 0,
@@ -198,36 +223,36 @@ public class AvaticaResultSetConversionsTest {
                               ColumnMetaData.Rep.PRIMITIVE_BOOLEAN),
                           DatabaseMetaData.columnNoNulls))),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("bit", 13,
+          columnMetaData("bit", 19,
               ColumnMetaData.scalar(Types.BIT, "BIT",
                   ColumnMetaData.Rep.PRIMITIVE_BOOLEAN),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("null", 14,
+          columnMetaData("null", 20,
               ColumnMetaData.scalar(Types.NULL, "NULL",
                   ColumnMetaData.Rep.OBJECT),
               DatabaseMetaData.columnNullable),
-          columnMetaData("date_array", 15,
+          columnMetaData("date_array", 21,
               ColumnMetaData.array(
                   ColumnMetaData.scalar(Types.DATE, "DATE",
                       ColumnMetaData.Rep.PRIMITIVE_INT),
                   "ARRAY",
                   ColumnMetaData.Rep.ARRAY),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("timestamp_array", 16,
+          columnMetaData("timestamp_array", 22,
               ColumnMetaData.array(
                   ColumnMetaData.scalar(Types.TIMESTAMP, "TIMESTAMP",
                       ColumnMetaData.Rep.PRIMITIVE_LONG),
                   "ARRAY",
                   ColumnMetaData.Rep.ARRAY),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("time_array", 17,
+          columnMetaData("time_array", 23,
               ColumnMetaData.array(
                   ColumnMetaData.scalar(Types.TIME, "TIME",
                       ColumnMetaData.Rep.NUMBER),
                   "ARRAY",
                   ColumnMetaData.Rep.ARRAY),
               DatabaseMetaData.columnNoNulls),
-          columnMetaData("decimal_array", 18,
+          columnMetaData("decimal_array", 24,
               ColumnMetaData.array(
                   ColumnMetaData.scalar(Types.DECIMAL, "DECIMAL",
                       ColumnMetaData.Rep.PRIMITIVE_DOUBLE),
@@ -237,7 +262,8 @@ public class AvaticaResultSetConversionsTest {
 
       List<Object> row = Collections.<Object>singletonList(
           new Object[] {
-              true, (byte) 1, (short) 2, 3, 4L, 5.0f, 6.0d, "testvalue",
+              true, (byte) 1, (short) 2, 3, 3, 4L, (short) 2, 3, 4L, 4L,
+              new BigInteger("7"), 5.0f, 6.0d, "testvalue",
               new Date(DST_INSTANT), new Time(DST_INSTANT),
               new Timestamp(DST_INSTANT),
               Arrays.asList(1, 2, 3),
@@ -911,6 +937,51 @@ public class AvaticaResultSetConversionsTest {
   }
 
   /**
+   * Accessor test helper for the long unsigned column.
+   */
+  private static final class LongUnsingedAccessorTestHelper extends AccessorTestHelper {
+    private LongUnsingedAccessorTestHelper(Getter g) {
+      super(g);
+    }
+
+    @Override public void testGetString(ResultSet resultSet) throws SQLException {
+      assertEquals("7", g.getString(resultSet));
+    }
+
+    @Override public void testGetBoolean(ResultSet resultSet) throws SQLException {
+      assertEquals(true, g.getBoolean(resultSet));
+    }
+
+    @Override public void testGetByte(ResultSet resultSet) throws SQLException {
+      assertEquals((byte) 7, g.getByte(resultSet));
+    }
+
+    @Override public void testGetShort(ResultSet resultSet) throws SQLException {
+      assertEquals((short) 7, g.getShort(resultSet));
+    }
+
+    @Override public void testGetInt(ResultSet resultSet) throws SQLException {
+      assertEquals(7, g.getInt(resultSet));
+    }
+
+    @Override public void testGetLong(ResultSet resultSet) throws SQLException {
+      assertEquals(7L, g.getLong(resultSet));
+    }
+
+    @Override public void testGetDecimal(ResultSet resultSet) throws SQLException {
+      assertEquals(new BigDecimal(7), g.getBigDecimal(resultSet));
+    }
+
+    @Override public void testGetFloat(ResultSet resultSet) throws SQLException {
+      assertEquals(7.0f, g.getFloat(resultSet), 0);
+    }
+
+    @Override public void testGetDouble(ResultSet resultSet) throws SQLException {
+      assertEquals(7.0d, g.getDouble(resultSet), 0);
+    }
+  }
+
+  /**
    * accessor test helper for the float column
    */
   private static final class FloatAccessorTestHelper extends AccessorTestHelper {
@@ -1169,36 +1240,48 @@ public class AvaticaResultSetConversionsTest {
         new ShortAccessorTestHelper(new OrdinalGetter(3)),
         new ShortAccessorTestHelper(new LabelGetter("short")),
         new IntAccessorTestHelper(new OrdinalGetter(4)),
+        new IntAccessorTestHelper(new LabelGetter("medium")),
+        new IntAccessorTestHelper(new OrdinalGetter(5)),
         new IntAccessorTestHelper(new LabelGetter("int")),
-        new LongAccessorTestHelper(new OrdinalGetter(5)),
+        new LongAccessorTestHelper(new OrdinalGetter(6)),
         new LongAccessorTestHelper(new LabelGetter("long")),
-        new FloatAccessorTestHelper(new OrdinalGetter(6)),
+        new ShortAccessorTestHelper(new OrdinalGetter(7)),
+        new ShortAccessorTestHelper(new LabelGetter("byte_unsigned")),
+        new IntAccessorTestHelper(new OrdinalGetter(8)),
+        new IntAccessorTestHelper(new LabelGetter("short_unsigned")),
+        new LongAccessorTestHelper(new OrdinalGetter(9)),
+        new LongAccessorTestHelper(new LabelGetter("medium_unsigned")),
+        new LongAccessorTestHelper(new OrdinalGetter(10)),
+        new LongAccessorTestHelper(new LabelGetter("int_unsigned")),
+        new LongUnsingedAccessorTestHelper(new OrdinalGetter(11)),
+        new LongUnsingedAccessorTestHelper(new LabelGetter("long_unsigned")),
+        new FloatAccessorTestHelper(new OrdinalGetter(12)),
         new FloatAccessorTestHelper(new LabelGetter("float")),
-        new DoubleAccessorTestHelper(new OrdinalGetter(7)),
+        new DoubleAccessorTestHelper(new OrdinalGetter(13)),
         new DoubleAccessorTestHelper(new LabelGetter("double")),
-        new StringAccessorTestHelper(new OrdinalGetter(8)),
+        new StringAccessorTestHelper(new OrdinalGetter(14)),
         new StringAccessorTestHelper(new LabelGetter("string")),
-        new DateAccessorTestHelper(new OrdinalGetter(9)),
+        new DateAccessorTestHelper(new OrdinalGetter(15)),
         new DateAccessorTestHelper(new LabelGetter("date")),
-        new TimeAccessorTestHelper(new OrdinalGetter(10)),
+        new TimeAccessorTestHelper(new OrdinalGetter(16)),
         new TimeAccessorTestHelper(new LabelGetter("time")),
-        new TimestampAccessorTestHelper(new OrdinalGetter(11)),
+        new TimestampAccessorTestHelper(new OrdinalGetter(17)),
         new TimestampAccessorTestHelper(new LabelGetter("timestamp")),
-        new ArrayAccessorTestHelper(new OrdinalGetter(12)),
+        new ArrayAccessorTestHelper(new OrdinalGetter(18)),
         new ArrayAccessorTestHelper(new LabelGetter("array")),
-        new StructAccessorTestHelper(new OrdinalGetter(13)),
+        new StructAccessorTestHelper(new OrdinalGetter(19)),
         new StructAccessorTestHelper(new LabelGetter("struct")),
-        new BooleanAccessorTestHelper(new OrdinalGetter(14)),
+        new BooleanAccessorTestHelper(new OrdinalGetter(20)),
         new BooleanAccessorTestHelper(new LabelGetter("bit")),
-        new NullObjectAccessorTestHelper(new OrdinalGetter(15)),
+        new NullObjectAccessorTestHelper(new OrdinalGetter(21)),
         new NullObjectAccessorTestHelper(new LabelGetter("null")),
-        new DateArrayAccessorTestHelper(new OrdinalGetter(16)),
+        new DateArrayAccessorTestHelper(new OrdinalGetter(22)),
         new DateArrayAccessorTestHelper(new LabelGetter("date_array")),
-        new TimestampArrayAccessorTestHelper(new OrdinalGetter(17)),
+        new TimestampArrayAccessorTestHelper(new OrdinalGetter(23)),
         new TimestampArrayAccessorTestHelper(new LabelGetter("timestamp_array")),
-        new TimeArrayAccessorTestHelper(new OrdinalGetter(18)),
+        new TimeArrayAccessorTestHelper(new OrdinalGetter(24)),
         new TimeArrayAccessorTestHelper(new LabelGetter("time_array")),
-        new DecimalArrayAccessorTestHelper(new OrdinalGetter(19)),
+        new DecimalArrayAccessorTestHelper(new OrdinalGetter(25)),
         new DecimalArrayAccessorTestHelper(new LabelGetter("decimal_array")));
   }
 
