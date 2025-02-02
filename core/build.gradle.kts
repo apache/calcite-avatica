@@ -34,6 +34,7 @@ dependencies {
     api("com.fasterxml.jackson.core:jackson-annotations")
     api("com.fasterxml.jackson.core:jackson-databind")
     api("com.google.protobuf:protobuf-java")
+    api("org.jooq:joou-java-6")
     implementation("com.fasterxml.jackson.core:jackson-core")
     implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation("org.apache.httpcomponents.core5:httpcore5")

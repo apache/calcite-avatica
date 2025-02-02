@@ -25,6 +25,11 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.protobuf.Descriptors.FieldDescriptor;
 
+import org.joou.UByte;
+import org.joou.UInteger;
+import org.joou.ULong;
+import org.joou.UShort;
+
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.Array;
@@ -327,10 +332,14 @@ public class ColumnMetaData {
     PRIMITIVE_DOUBLE(double.class, Types.DOUBLE),
     BOOLEAN(Boolean.class, Types.BOOLEAN),
     BYTE(Byte.class, Types.TINYINT),
+    UBYTE(UByte.class, Types.TINYINT),
     CHARACTER(Character.class, Types.CHAR),
     SHORT(Short.class, Types.SMALLINT),
+    USHORT(UShort.class, Types.SMALLINT),
     INTEGER(Integer.class, Types.INTEGER),
+    UINTEGER(UInteger.class, Types.INTEGER),
     LONG(Long.class, Types.BIGINT),
+    ULONG(ULong.class, Types.BIGINT),
     FLOAT(Float.class, Types.FLOAT),
     DOUBLE(Double.class, Types.DOUBLE),
     JAVA_SQL_TIME(Time.class, Types.TIME),

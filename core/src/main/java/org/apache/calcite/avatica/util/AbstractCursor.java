@@ -20,6 +20,11 @@ import org.apache.calcite.avatica.AvaticaSite;
 import org.apache.calcite.avatica.AvaticaUtils;
 import org.apache.calcite.avatica.ColumnMetaData;
 
+import org.joou.UByte;
+import org.joou.UInteger;
+import org.joou.ULong;
+import org.joou.UShort;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.lang.reflect.Field;
@@ -102,13 +107,13 @@ public abstract class AbstractCursor implements Cursor {
     }
     switch (columnMetaData.type.id) {
     case Types.TINYINT:
-      return new ByteAccessor(getter);
+      return columnMetaData.signed ? new ByteAccessor(getter) : new UByteAccessor(getter);
     case Types.SMALLINT:
-      return new ShortAccessor(getter);
+      return columnMetaData.signed ? new ShortAccessor(getter) : new UShortAccessor(getter);
     case Types.INTEGER:
-      return new IntAccessor(getter);
+      return columnMetaData.signed ? new IntAccessor(getter) : new UIntAccessor(getter);
     case Types.BIGINT:
-      return new LongAccessor(getter);
+      return columnMetaData.signed ? new LongAccessor(getter) : new ULongAccessor(getter);
     case Types.BOOLEAN:
     case Types.BIT:
       return new BooleanAccessor(getter);
@@ -288,16 +293,36 @@ public abstract class AbstractCursor implements Cursor {
       return (byte) getLong();
     }
 
+    @Override
+    public UByte getUByte() throws SQLException {
+      return UByte.valueOf(getLong());
+    }
+
     public short getShort() throws SQLException {
       return (short) getLong();
+    }
+
+    @Override
+    public UShort getUShort() throws SQLException {
+      return UShort.valueOf(String.valueOf(getLong()));
     }
 
     public int getInt() throws SQLException {
       return (int) getLong();
     }
 
+    @Override
+    public UInteger getUInt() throws SQLException {
+      return UInteger.valueOf(getLong());
+    }
+
     public long getLong() throws SQLException {
       throw cannotConvert("long");
+    }
+
+    @Override
+    public ULong getULong() throws SQLException {
+      return ULong.valueOf(getBigDecimal().toBigInteger());
     }
 
     public float getFloat() throws SQLException {
@@ -486,6 +511,30 @@ public abstract class AbstractCursor implements Cursor {
   }
 
   /**
+   * Accessor that assumes that the underlying value is a {@link UByte};
+   * corresponds to {@link java.sql.Types#TINYINT} with unsigned flag.
+   */
+  private static class UByteAccessor extends ExactNumericAccessor {
+    private UByteAccessor(Getter getter) {
+      super(getter);
+    }
+
+    public UByte getUByte() throws SQLException {
+      Object obj = getObject();
+      if (null == obj) {
+        return UByte.valueOf(0);
+      } else if (obj instanceof Integer) {
+        return UByte.valueOf(((Integer) obj).byteValue());
+      }
+      return UByte.valueOf(String.valueOf(obj));
+    }
+
+    public long getLong() throws SQLException {
+      return getUByte().longValue();
+    }
+  }
+
+  /**
    * Accessor that assumes that the underlying value is a {@link Short};
    * corresponds to {@link java.sql.Types#SMALLINT}.
    */
@@ -510,6 +559,30 @@ public abstract class AbstractCursor implements Cursor {
   }
 
   /**
+   * Accessor that assumes that the underlying value is a {@link UShort};
+   * corresponds to {@link java.sql.Types#SMALLINT} with unsigned flag.
+   */
+  private static class UShortAccessor extends ExactNumericAccessor {
+    private UShortAccessor(Getter getter) {
+      super(getter);
+    }
+
+    public UShort getUShort() throws SQLException {
+      Object obj = getObject();
+      if (null == obj) {
+        return UShort.valueOf(0);
+      } else if (obj instanceof Integer) {
+        return UShort.valueOf(((Integer) obj).shortValue());
+      }
+      return UShort.valueOf(String.valueOf(obj));
+    }
+
+    public long getLong() throws SQLException {
+      return getUShort().longValue();
+    }
+  }
+
+  /**
    * Accessor that assumes that the underlying value is an {@link Integer};
    * corresponds to {@link java.sql.Types#INTEGER}.
    */
@@ -529,6 +602,25 @@ public abstract class AbstractCursor implements Cursor {
   }
 
   /**
+   * Accessor that assumes that the underlying value is an {@link UInteger};
+   * corresponds to {@link java.sql.Types#INTEGER} with unsigned flag.
+   */
+  private static class UIntAccessor extends ExactNumericAccessor {
+    private UIntAccessor(Getter getter) {
+      super(getter);
+    }
+
+    public UInteger getUInt() throws SQLException {
+      Object o = getObject();
+      return UInteger.valueOf(o == null ? "0" : String.valueOf(o));
+    }
+
+    public long getLong() throws SQLException {
+      return getUInt().longValue();
+    }
+  }
+
+  /**
    * Accessor that assumes that the underlying value is a {@link Long};
    * corresponds to {@link java.sql.Types#BIGINT}.
    */
@@ -540,6 +632,26 @@ public abstract class AbstractCursor implements Cursor {
     public long getLong() throws SQLException {
       Long o = (Long) super.getObject();
       return o == null ? 0 : o;
+    }
+  }
+
+  /**
+   * Accessor that assumes that the underlying value is a {@link ULong};
+   * corresponds to {@link java.sql.Types#BIGINT} with unsigned flag.
+   */
+  private static class ULongAccessor extends ExactNumericAccessor {
+    private ULongAccessor(Getter getter) {
+      super(getter);
+    }
+
+    public ULong getULong() throws SQLException {
+      Object o = getObject();
+      return ULong.valueOf(o == null ? "0" : String.valueOf(o));
+    }
+
+    @Override
+    public long getLong() throws SQLException {
+      return getULong().longValue();
     }
   }
 
