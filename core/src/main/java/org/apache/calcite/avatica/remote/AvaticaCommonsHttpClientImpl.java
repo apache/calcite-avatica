@@ -154,19 +154,19 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
   }
 
   @Override public byte[] send(byte[] request) {
-    try {
-      // Doing this earlier would break API backwards compatibility
-      determineHost();
-    } catch (HttpException e) {
-      LOG.debug("Failed to execute HTTP request", e);
-      throw new RuntimeException("Could not determine Http Host from URI", e);
-    }
     while (true) {
       ByteArrayEntity entity = new ByteArrayEntity(request, ContentType.APPLICATION_OCTET_STREAM);
-
-      // Create the client with the AuthSchemeRegistry and manager
       HttpPost post = new HttpPost(uri);
       post.setEntity(entity);
+
+      if (httpHost == null) {
+        try {
+          httpHost = RoutingSupport.determineHost(post);
+        } catch (HttpException e) {
+          LOG.debug("Failed to execute HTTP request", e);
+          throw new RuntimeException("Could not determine Http Host from URI", e);
+        }
+      }
 
       try (ClassicHttpResponse response = executeOpen(httpHost, post, context)) {
         final int statusCode = response.getCode();
@@ -191,13 +191,6 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
         LOG.debug("Failed to execute HTTP request", e);
         throw new RuntimeException(e);
       }
-    }
-  }
-
-  private void determineHost() throws HttpException {
-    if (httpHost == null) {
-      HttpPost dummy = new HttpPost(uri);
-      this.httpHost = RoutingSupport.determineHost(dummy);
     }
   }
 
