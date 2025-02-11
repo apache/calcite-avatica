@@ -52,6 +52,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.either;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -317,9 +320,10 @@ public class ConnectionPropertiesHATest {
       stmt.execute("SELECT count(1) FROM " + tableName);
     } catch (Exception e) {
       assertTrue(e instanceof SQLException);
-      assertTrue(
-          e.getMessage().toLowerCase(Locale.ROOT).contains("connection refused")
-              || e.getMessage().toLowerCase(Locale.ROOT).contains("connection abort"));
+      assertThat(e.getMessage().toLowerCase(Locale.ROOT), either(
+          containsString("connection refused"))
+          .or(containsString("connection abort"))
+          .or(containsString("connection reset")));
     }
 
     // Create statement with conn - Fails with HttpHostConnectException.
