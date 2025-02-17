@@ -41,7 +41,7 @@ limitations under the License.
         {% if c.avatar %}
           {% assign avatar = c.avatar %}
         {% else %}
-          {% capture avatar %}http://github.com/{{ c.githubId }}.png{% endcapture %}
+          {% capture avatar %}https://calcite.apache.org/img/avatars/{{ c.githubId }}.png{% endcapture %}
         {% endif %}
       {% endif %}
     {% endfor %}
