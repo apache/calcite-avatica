@@ -28,6 +28,99 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.26.0">1.26.0</a> / 2025-02-XX
+{: #v1-26-0}
+
+Avatica 1.26.0 contains bug fixes, dependency upgrades and support for JDK 23 and Gradle 8.7.
+
+Compatibility: This release is tested on Linux, macOS, Microsoft Windows;
+using JDK/OpenJDK versions 8, 11, 17, 23;
+other software versions as specified in `gradle.properties`.
+
+Contributors to this release:
+Chris Dennis,
+Francis Chuang (release manager),
+Istvan Toth,
+Mihai Budiu,
+Sergey Nuyanzin,
+Villő Szűcs.
+
+Features and bug fixes
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6421">CALCITE-6421</a>]
+  Add support for JDK 22
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6530">CALCITE-6530</a>]
+  HTTP Sessions are never expired in Avatica server
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6529">CALCITE-6529</a>]
+  Use persistent sessionContext in AvaticaCommonsHttpClientImpl
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6601">CALCITE-6601</a>]
+  Upgrade ByteBuddy version from 1.14.10 to 1.15.1 in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6661">CALCITE-6661</a>]
+  Update shadow plugin from 8.0.0 to 8.1.1 and asm from 7.1 to 9.7.1 in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6657">CALCITE-6657</a>]
+  Update checkstyle from 10.3.2 to 10.19.0 in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6656">CALCITE-6656</a>]
+  Update owasp plugin from 5.2.2 to 10.0.4 in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6660">CALCITE-6660</a>]
+  Update protobuf-java from 3.21.9 to 3.25.5 in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6659">CALCITE-6659</a>]
+  Update Jetty from 9.4.44.v20210927 to 9.4.56.v20240826 in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6729">CALCITE-6729</a>]
+  Ensure TypedValue allows sub-types for local representations
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6671">CALCITE-6671</a>]
+  Update httpclient5 to 5.4.1 and httpcore 5.3.1 in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6670">CALCITE-6670</a>]
+  Use org.apache.calcite.avatica.shaded as base package for relocated libraries
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6687">CALCITE-6687</a>]
+  Add dependency constraints for org.ow2.asm for Gradle build environment in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6658">CALCITE-6658</a>]
+  Update Jackson from 2.15.2 to 2.15.4 in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6669">CALCITE-6669</a>]
+  Httpcore/Httpclient not relocated in shaded Avatica jar
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6590">CALCITE-6590</a>]
+  Use reflection to handle Java SecurityManager deprecation in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6807">CALCITE-6807</a>]
+  Update Guava from 32.1.1-jre to 33.4.0-jre in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6811">CALCITE-6811</a>]
+  Refactor deprecated httpclient API usage in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6828">CALCITE-6828</a>]
+  Upgrade Kerby from 1.1.1 to 2.1.0 in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6826">CALCITE-6826</a>]
+  Update Junit from 4.12.0 to 4.13.2 in Avatica
+
+Build and tests
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6354">CALCITE-6354</a>]
+  Use gradle docker image when running tests using docker-compose
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6359">CALCITE-6359</a>]
+  Update GitHub Actions workflows to use docker compose v2
+* update CI config for for latest guava
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6808">CALCITE-6808</a>]
+  Use JDK23 instead of JDK22 in CI test for latest JVM in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6799">CALCITE-6799</a>]
+  ConnectionPropertiesHATest flakey on MacOS
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5136">CALCITE-5136</a>]
+  Avatica build (or CI) must fail if there are deprecation warnings
+* Remove version attribute from docker-compose file
+
+Website and documentation
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6351">CALCITE-6351</a>]
+  Update LICENSE for Jekyll website template
+* Bump rexml from 3.2.5 to 3.2.8 in /site
+* Bump rexml from 3.2.8 to 3.3.3 in /site
+* Bump rexml from 3.3.3 to 3.3.6 in /site
+* Site: Cloning source code from GitHub using git protocol fails
+* Bump rexml from 3.3.6 to 3.3.9 in /site
+* Bump webrick from 1.7.0 to 1.8.2 in /site
+* Site: Fix typo in index.md
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6842">CALCITE-6842</a>]
+  Upgrade vulnerable ruby libraries used in Jekyll site generation
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6843">CALCITE-6843</a>]
+  Self-host Lato font on website due to ASF's content security policy
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6845">CALCITE-6845</a>]
+  Self-host website images
+
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.25.0">1.25.0</a> / 2024-04-05
 {: #v1-25-0}
 
