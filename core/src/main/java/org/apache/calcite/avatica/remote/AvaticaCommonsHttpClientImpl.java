@@ -24,8 +24,8 @@ import org.apache.hc.client5.http.auth.AuthSchemeFactory;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.Credentials;
 import org.apache.hc.client5.http.auth.CredentialsProvider;
-import org.apache.hc.client5.http.auth.KerberosConfig;
 import org.apache.hc.client5.http.auth.KerberosCredentials;
+import org.apache.hc.client5.http.auth.MutualKerberosConfig;
 import org.apache.hc.client5.http.auth.StandardAuthScheme;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
@@ -34,7 +34,7 @@ import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.auth.BasicSchemeFactory;
 import org.apache.hc.client5.http.impl.auth.DigestSchemeFactory;
-import org.apache.hc.client5.http.impl.auth.SPNegoSchemeFactory;
+import org.apache.hc.client5.http.impl.auth.MutualSpnegoSchemeFactory;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
@@ -78,8 +78,8 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
   private static final boolean USE_CANONICAL_HOSTNAME = Boolean
       .parseBoolean(System.getProperty("avatica.http.spnego.use_canonical_hostname", "true"));
   private static final boolean STRIP_PORT_ON_SERVER_LOOKUP = true;
-  private static final KerberosConfig KERBEROS_CONFIG =
-          KerberosConfig.custom().setStripPort(STRIP_PORT_ON_SERVER_LOOKUP)
+  private static final MutualKerberosConfig KERBEROS_CONFIG =
+          MutualKerberosConfig.custom().setStripPort(STRIP_PORT_ON_SERVER_LOOKUP)
           .setUseCanonicalHostname(USE_CANONICAL_HOSTNAME)
           .build();
   private static AuthScope anyAuthScope = new AuthScope(null, -1);
@@ -229,7 +229,7 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
 
     this.authRegistry = RegistryBuilder.<AuthSchemeFactory>create()
         .register(StandardAuthScheme.SPNEGO,
-                new SPNegoSchemeFactory(KERBEROS_CONFIG, SystemDefaultDnsResolver.INSTANCE))
+                new MutualSpnegoSchemeFactory(KERBEROS_CONFIG, SystemDefaultDnsResolver.INSTANCE))
         .build();
 
     this.credentialsProvider = new BasicCredentialsProvider();
