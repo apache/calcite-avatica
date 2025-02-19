@@ -221,7 +221,12 @@ public abstract class MetaImpl implements Meta {
 
   public static ColumnMetaData columnMetaData(String name, int index, AvaticaType type,
       boolean columnNullable) {
-    return columnMetaData(name, index, type, intForColumnNullable(columnNullable));
+    return columnMetaData(name, index, type, intForColumnNullable(columnNullable), true);
+  }
+
+  public static ColumnMetaData columnMetaData(String name, int index, AvaticaType type,
+      boolean columnNullable, boolean signed) {
+    return columnMetaData(name, index, type, intForColumnNullable(columnNullable), signed);
   }
 
   public static ColumnMetaData columnMetaData(String name, int index,
@@ -231,15 +236,20 @@ public abstract class MetaImpl implements Meta {
         ColumnMetaData.Rep.VALUE_MAP.get(type);
     ColumnMetaData.AvaticaType scalarType =
         ColumnMetaData.scalar(pair.sqlType, pair.sqlTypeName, rep);
-    return columnMetaData(name, index, scalarType, columnNullable);
+    return columnMetaData(name, index, scalarType, columnNullable, true);
   }
 
   public static ColumnMetaData columnMetaData(String name, int index, AvaticaType type,
       int columnNullable) {
+    return columnMetaData(name, index, type, columnNullable, true);
+  }
+
+  public static ColumnMetaData columnMetaData(String name, int index, AvaticaType type,
+      int columnNullable, boolean signed) {
     return new ColumnMetaData(
         index, false, true, false, false,
         columnNullable,
-        true, -1, name, name, null,
+        signed, -1, name, name, null,
         0, 0, null, null, type, true, false, false,
         type.columnClassName());
   }

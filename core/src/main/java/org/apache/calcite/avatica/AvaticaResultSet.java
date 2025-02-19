@@ -392,7 +392,7 @@ public class AvaticaResultSet extends ArrayFactoryImpl implements ResultSet {
   public Object getObject(int columnIndex) throws SQLException {
     final Cursor.Accessor accessor = getAccessor(columnIndex);
     final ColumnMetaData metaData = columnMetaDataList.get(columnIndex - 1);
-    return AvaticaSite.get(accessor, metaData.type.id, localCalendar);
+    return AvaticaSite.get(accessor, metaData.type.id, metaData.signed, localCalendar);
   }
 
   public Object getObject(String columnLabel) throws SQLException {

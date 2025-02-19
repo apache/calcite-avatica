@@ -138,28 +138,44 @@ public class AvaticaResultSetThrowsSqlExceptionTest {
       case 3: // SMALLINT
         resultSet.getShort(index);
         break;
-      case 4: // INTEGER
+      case 4: // MEDIUMINT
+      case 5: // INTEGER
         resultSet.getInt(index);
         break;
-      case 5: // BIGINT
+      case 6: // BIGINT
         resultSet.getLong(index);
         break;
-      case 6: // REAL
+      case 7: // TINYINT_UNSIGNED
+        resultSet.getShort(index);
+        break;
+      case 8: // SMALLINT_UNSIGNED
+        resultSet.getInt(index);
+        break;
+      case 9: // MEDIUMINT_UNSIGNED
+        resultSet.getLong(index);
+        break;
+      case 10: // INTEGER_UNSIGNED
+        resultSet.getLong(index);
+        break;
+      case 11: // BIGINT_UNSIGNED
+        resultSet.getBigDecimal(index);
+        break;
+      case 12: // REAL
         resultSet.getFloat(index);
         break;
-      case 7: // FLOAT
+      case 13: // FLOAT
         resultSet.getDouble(index);
         break;
-      case 8: // VARCHAR
+      case 14: // VARCHAR
         resultSet.getString(index);
         break;
-      case 9: // DATE
+      case 15: // DATE
         resultSet.getDate(index);
         break;
-      case 10: // TIME
+      case 16: // TIME
         resultSet.getTime(index);
         break;
-      case 11: // TIMESTAMP
+      case 17: // TIMESTAMP
         resultSet.getTimestamp(index);
         break;
       default:
