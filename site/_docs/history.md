@@ -28,7 +28,7 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.26.0">1.26.0</a> / 2025-02-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.26.0">1.26.0</a> / 2025-02-24
 {: #v1-26-0}
 
 Avatica 1.26.0 contains bug fixes, dependency upgrades and support for JDK 23 and Gradle 8.7.
