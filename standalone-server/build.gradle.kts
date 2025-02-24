@@ -111,6 +111,10 @@ tasks {
             }
         }
     }
+
+    test {
+        dependsOn(shadowJar)
+    }
 }
 
 artifacts {
