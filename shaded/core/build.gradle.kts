@@ -87,6 +87,10 @@ tasks {
         enabled = false
         dependsOn(shadowJar)
     }
+
+    test {
+        dependsOn(shadowJar)
+    }
 }
 
 artifacts {
