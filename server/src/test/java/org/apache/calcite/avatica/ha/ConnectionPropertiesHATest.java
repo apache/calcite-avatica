@@ -36,6 +36,8 @@ import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -61,6 +63,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.junit.Assume.assumeFalse;
 
 public class ConnectionPropertiesHATest {
   private static final AvaticaServersForTest SERVERS = new AvaticaServersForTest();
@@ -250,24 +253,38 @@ public class ConnectionPropertiesHATest {
   @Test
   public void testConnectionPropertiesHAHttpConnectionTimeout5Sec() throws Exception {
     // Skip the test for Windows.
-    Assume.assumeFalse(OS_NAME_LOWERCASE.startsWith(WINDOWS_OS_PREFIX));
+    Assume.assumeFalse("Skipping on Windows.", OS_NAME_LOWERCASE.startsWith(WINDOWS_OS_PREFIX));
     Properties properties = new Properties();
 
     properties.put(BuiltInConnectionProperty.USE_CLIENT_SIDE_LB.name(), "true");
     properties.put(BuiltInConnectionProperty.HTTP_CONNECTION_TIMEOUT.name(), "5000");
     properties.put(BuiltInConnectionProperty.LB_CONNECTION_FAILOVER_RETRIES.name(), "0");
     // 240.0.0.1 is special URL which should result in connection timeout.
+    // (Except on Windows)
     properties.put(BuiltInConnectionProperty.LB_URLS.name(), "http://240.0.0.1:" + 9000);
     String url = SERVERS.getJdbcUrl(START_PORT, Driver.Serialization.PROTOBUF);
     long startTime = System.currentTimeMillis();
     try {
       DriverManager.getConnection(url, properties);
     } catch (RuntimeException re) {
+      assumeFalse(
+          "Got HttpHostConnectException, probably running in  WSL / Docker Desktop on Windows.",
+          re.getCause() instanceof HttpHostConnectException);
       long endTime = System.currentTimeMillis();
       long elapsedTime = endTime - startTime;
-      Assert.assertTrue(elapsedTime < Timeout.ofMinutes(3).toMilliseconds());
-      Assert.assertTrue(elapsedTime >= 5000);
-      Assert.assertTrue(re.getCause() instanceof ConnectTimeoutException);
+      String stackTrace = "";
+      try (StringWriter sw = new StringWriter();
+           PrintWriter pw = new PrintWriter(sw)) {
+        re.printStackTrace(pw);
+        stackTrace = sw.toString();
+      }
+      Assert.assertTrue(
+          "Expected RuntimeException with ConnectTimeoutException cause, got:\n" + stackTrace,
+          re.getCause() instanceof ConnectTimeoutException);
+      Assert.assertTrue("Elapsed time: " + elapsedTime + " ms, expected less than 3 minutes",
+          elapsedTime < Timeout.ofMinutes(3).toMilliseconds());
+      Assert.assertTrue("Elapsed time: " + elapsedTime + " ms, expected at least 5000 ms",
+          elapsedTime >= 5000);
     }
   }
 
