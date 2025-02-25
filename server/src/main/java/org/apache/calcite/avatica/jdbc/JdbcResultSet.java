@@ -16,7 +16,6 @@
  */
 package org.apache.calcite.avatica.jdbc;
 
-import org.apache.calcite.avatica.AvaticaStatement;
 import org.apache.calcite.avatica.AvaticaUtils;
 import org.apache.calcite.avatica.ColumnMetaData;
 import org.apache.calcite.avatica.ColumnMetaData.ArrayType;
@@ -65,41 +64,28 @@ class JdbcResultSet extends Meta.MetaResultSet {
       ResultSet resultSet) {
     // -1 still limits to 100 but -2 does not limit to any number
     return create(connectionId, statementId, resultSet,
-        JdbcMeta.UNLIMITED_COUNT);
+        FrameLimiters.unlimited());
   }
 
-  /** Creates a result set with maxRowCount.
-   *
-   * <p>If {@code maxRowCount} is -2 ({@link JdbcMeta#UNLIMITED_COUNT}),
-   * returns an unlimited number of rows in a single frame; any other
-   * negative value (typically -1) returns an unlimited number of rows
-   * in frames of the default frame size. */
+  /**
+   * Creates a result set with the given FrameLimiter.
+   */
   public static JdbcResultSet create(String connectionId, int statementId,
-      ResultSet resultSet, int maxRowCount) {
+      ResultSet resultSet, FrameLimiter frameLimiter) {
     try {
       Meta.Signature sig = JdbcMeta.signature(resultSet.getMetaData());
-      return create(connectionId, statementId, resultSet, maxRowCount, sig);
+      return create(connectionId, statementId, resultSet, frameLimiter, sig);
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
   }
 
   public static JdbcResultSet create(String connectionId, int statementId,
-      ResultSet resultSet, int maxRowCount, Meta.Signature signature) {
+      ResultSet resultSet, FrameLimiter frameLimiter, Meta.Signature signature) {
     try {
       final Calendar calendar = DateTimeUtils.calendar();
-      final int fetchRowCount;
-      if (maxRowCount == JdbcMeta.UNLIMITED_COUNT) {
-        fetchRowCount = -1;
-      } else if (maxRowCount < 0L) {
-        fetchRowCount = AvaticaStatement.DEFAULT_FETCH_SIZE;
-      } else if (maxRowCount > AvaticaStatement.DEFAULT_FETCH_SIZE) {
-        fetchRowCount = AvaticaStatement.DEFAULT_FETCH_SIZE;
-      } else {
-        fetchRowCount = maxRowCount;
-      }
-      final Meta.Frame firstFrame = frame(null, resultSet, 0, fetchRowCount, calendar,
-          Optional.of(signature));
+      final Meta.Frame firstFrame = frame(null, resultSet, 0, frameLimiter,
+          calendar, Optional.of(signature));
       if (firstFrame.done) {
         resultSet.close();
       }
@@ -126,7 +112,8 @@ class JdbcResultSet extends Meta.MetaResultSet {
   /** Creates a frame containing a given number or unlimited number of rows
    * from a result set. */
   static Meta.Frame frame(StatementInfo info, ResultSet resultSet, long offset,
-      int fetchMaxRowCount, Calendar calendar, Optional<Meta.Signature> sig) throws SQLException {
+        FrameLimiter frameLimiter, Calendar calendar,
+        Optional<Meta.Signature> sig) throws SQLException {
     final ResultSetMetaData metaData = resultSet.getMetaData();
     final int columnCount = metaData.getColumnCount();
     final int[] types = new int[columnCount];
@@ -139,8 +126,9 @@ class JdbcResultSet extends Meta.MetaResultSet {
     }
     final List<Object> rows = new ArrayList<>();
     // Meta prepare/prepareAndExecute 0 return 0 row and done
-    boolean done = fetchMaxRowCount == 0;
-    for (int i = 0; fetchMaxRowCount < 0 || i < fetchMaxRowCount; i++) {
+    boolean done = frameLimiter.getRowCountLimit().map(limit -> limit == 0).orElse(false);
+    FrameLimiter.Context frameLimiterContext = frameLimiter.start(resultSet);
+    while (!frameLimiterContext.limitReached()) {
       final boolean hasRow;
       if (null != info) {
         hasRow = info.next();
@@ -179,6 +167,7 @@ class JdbcResultSet extends Meta.MetaResultSet {
         }
       }
       rows.add(columns);
+      frameLimiterContext.addRow(columns);
     }
     return new Meta.Frame(offset, done, rows);
   }
