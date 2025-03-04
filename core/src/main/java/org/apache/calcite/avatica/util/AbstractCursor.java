@@ -260,7 +260,7 @@ public abstract class AbstractCursor implements Cursor {
     if (calendar != null) {
       v += calendar.getTimeZone().getOffset(v);
     }
-    return DateTimeUtils.unixTimestampToString(v, precision);
+    return DateTimeUtils.unixTimestampToString(v);
   }
 
   /** Accesses a date value as a string, e.g. "2013-09-22". */
@@ -984,6 +984,12 @@ public abstract class AbstractCursor implements Cursor {
       this.fixedInstant = fixedInstant;
     }
 
+    TimeFromNumberAccessor(Getter getter, Calendar localCalendar, int precision) {
+      super(getter, 0);
+      this.localCalendar = localCalendar;
+      this.fixedInstant = false;
+    }
+
     @Override public Object getObject() throws SQLException {
       return getTime(localCalendar);
     }
@@ -1049,6 +1055,13 @@ public abstract class AbstractCursor implements Cursor {
       super(getter, 0);
       this.localCalendar = localCalendar;
       this.fixedInstant = fixedInstant;
+    }
+
+    TimestampFromNumberAccessor(
+        Getter getter, Calendar localCalendar, int precision) {
+      super(getter, 0);
+      this.localCalendar = localCalendar;
+      this.fixedInstant = false;
     }
 
     @Override public Object getObject() throws SQLException {
