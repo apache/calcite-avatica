@@ -526,6 +526,9 @@ public class HttpServer {
 
     private String keystoreType;
 
+    private String[] includeProtocols;
+    private String[] includeCipherSuites;
+
     private List<ServerCustomizer<T>> serverCustomizers = Collections.emptyList();
 
     // The maximum size in bytes of an http header the server will read (64KB)
@@ -796,6 +799,29 @@ public class HttpServer {
     }
 
     /**
+     * Configures the server to use TLS for wire encryption.
+     *
+     * @param keystore The server's keystore
+     * @param keystorePassword The keystore's password
+     * @param truststore The truststore containing the key used to generate the server's key
+     * @param truststorePassword The truststore's password
+     * @param keyStoreType The keystore's type
+     * @param includeProtocols Included TLS protocols, as expected by Jetty
+     * @param includeCipherSuites Included cypher suites, as expected by Jetty
+     * @return <code>this</code>
+     */
+    public Builder<T> withTLS(File keystore, String keystorePassword, File truststore,
+            String truststorePassword, String keyStoreType, String[] includeProtocols,
+            String[] includeCipherSuites) {
+      this.withTLS(keystore, keystorePassword, truststore, truststorePassword);
+      // we don't want to force specifying a keyStoreType here, null is default
+      this.keystoreType = keyStoreType;
+      this.includeProtocols = includeProtocols;
+      this.includeCipherSuites = includeCipherSuites;
+      return this;
+    }
+
+    /**
      * Adds customizers to configure a Server before startup.
      *
      * @param serverCustomizers The customizers to use
@@ -870,7 +896,8 @@ public class HttpServer {
           maxAllowedHeaderSize);
     }
 
-    protected SslContextFactory.Server buildSSLContextFactory() {
+    // Visible for testing
+    public SslContextFactory.Server buildSSLContextFactory() {
       SslContextFactory.Server sslFactory = null;
       if (usingTLS) {
         sslFactory = new SslContextFactory.Server();
@@ -880,6 +907,12 @@ public class HttpServer {
         sslFactory.setTrustStorePassword(truststorePassword);
         if (keystoreType != null && !keystoreType.equals(DEFAULT_KEYSTORE_TYPE)) {
           sslFactory.setKeyStoreType(keystoreType);
+        }
+        if (includeProtocols != null) {
+          sslFactory.setIncludeProtocols(includeProtocols);
+        }
+        if (includeCipherSuites != null) {
+          sslFactory.setIncludeCipherSuites(includeCipherSuites);
         }
       }
       return sslFactory;
