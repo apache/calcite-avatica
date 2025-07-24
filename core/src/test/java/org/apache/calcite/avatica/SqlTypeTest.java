@@ -20,6 +20,7 @@ package org.apache.calcite.avatica;
 import org.junit.Test;
 
 import java.sql.Types;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -43,18 +44,20 @@ public class SqlTypeTest {
     assertEquals(SqlType.ANY, tsSqlType);
     assertEquals(SqlType.ANY, dtoSqlType);
   }
-  
+
   @Test public void ensureStandardSqlTypesAreFound() {
     // Arrange
-    int doubleTypeValue = Types.DOUBLE;
-    int varcharTypeValue = Types.VARCHAR;
+    Map<Integer, SqlType> typeMap = new HashMap<>();
 
-    // Act
-    SqlType doubleSqlType = SqlType.valueOf(doubleTypeValue);
-    SqlType varcharSqlType = SqlType.valueOf(varcharTypeValue);
+    for (SqlType sqlType : SqlType.values()) {
+      typeMap.put(sqlType.id, sqlType);
+    }
 
-    // Assert
-    assertEquals(SqlType.DOUBLE, doubleSqlType);
-    assertEquals(SqlType.VARCHAR, varcharSqlType);
+    Set<Integer> typeValues = typeMap.keySet();
+
+    // Act and Assert
+    for (Integer typeValue : typeValues) {
+      assertEquals(typeMap.get(typeValue), SqlType.valueOf(typeValue));
+    }
   }
 }
