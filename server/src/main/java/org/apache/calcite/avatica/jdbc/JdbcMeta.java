@@ -18,6 +18,7 @@ package org.apache.calcite.avatica.jdbc;
 
 import org.apache.calcite.avatica.AvaticaParameter;
 import org.apache.calcite.avatica.AvaticaPreparedStatement;
+import org.apache.calcite.avatica.AvaticaStatement;
 import org.apache.calcite.avatica.AvaticaUtils;
 import org.apache.calcite.avatica.ColumnMetaData;
 import org.apache.calcite.avatica.ConnectionPropertiesImpl;
@@ -756,7 +757,8 @@ public class JdbcMeta implements ProtobufMeta {
                 AvaticaUtils.getLargeUpdateCount(statement)));
       } else {
         resultSets.add(
-            JdbcResultSet.create(h.connectionId, h.id, info.getResultSet(), maxRowsInFirstFrame));
+            JdbcResultSet.create(h.connectionId, h.id, info.getResultSet(),
+                createFrameLimiter(maxRowsInFirstFrame)));
       }
       LOG.trace("prepAndExec statement {}", h);
       // TODO: review client to ensure statementId is updated when appropriate
@@ -823,7 +825,8 @@ public class JdbcMeta implements ProtobufMeta {
         return Frame.EMPTY;
       } else {
         return JdbcResultSet.frame(statementInfo, statementInfo.getResultSet(), offset,
-            fetchMaxRowCount, calendar, Optional.<Meta.Signature>absent());
+            createFrameLimiter(fetchMaxRowCount),
+            calendar, Optional.<Meta.Signature>absent());
       }
     } catch (SQLException e) {
       throw propagate(e);
@@ -885,7 +888,7 @@ public class JdbcMeta implements ProtobufMeta {
         } else {
           resultSets = Collections.<MetaResultSet>singletonList(
               JdbcResultSet.create(h.connectionId, h.id, statementInfo.getResultSet(),
-                  maxRowsInFirstFrame, signature2));
+                  createFrameLimiter(maxRowsInFirstFrame), signature2));
         }
       } else {
         resultSets = Collections.<MetaResultSet>singletonList(
@@ -990,6 +993,18 @@ public class JdbcMeta implements ProtobufMeta {
       return new ExecuteBatchResult(AvaticaUtils.executeLargeBatch(preparedStmt));
     } catch (SQLException e) {
       throw propagate(e);
+    }
+  }
+
+  protected FrameLimiter createFrameLimiter(int maxRowCount) {
+    if (maxRowCount == JdbcMeta.UNLIMITED_COUNT) {
+      return FrameLimiters.unlimited();
+    } else if (maxRowCount < 0L) {
+      return FrameLimiters.rowCountLimited(AvaticaStatement.DEFAULT_FETCH_SIZE);
+    } else if (maxRowCount > AvaticaStatement.DEFAULT_FETCH_SIZE) {
+      return FrameLimiters.rowCountLimited(AvaticaStatement.DEFAULT_FETCH_SIZE);
+    } else {
+      return FrameLimiters.rowCountLimited(maxRowCount);
     }
   }
 
