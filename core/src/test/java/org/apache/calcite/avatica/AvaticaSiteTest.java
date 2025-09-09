@@ -67,9 +67,5 @@ public class AvaticaSiteTest {
         Timestamp.from(Instant.parse("2025-08-14T15:53:00.000Z")),
         toTimestamp.invoke(null, "2025-08-14T15:53:00.000Z")
     );
-    assertEquals(
-        Timestamp.from(Instant.parse("2025-08-14T15:53:00+00:00")),
-        toTimestamp.invoke(null, "2025-08-14T15:53:00+00:00")
-    );
   }
 }

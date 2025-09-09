@@ -536,10 +536,14 @@ public class AvaticaSite {
     if (x instanceof String) {
       String s = (String) x;
       try {
-        return Timestamp.from(Instant.parse(s));
+        Instant instant = Instant.parse(s);
+        LocalDateTime ldt = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        return Timestamp.valueOf(ldt);
       } catch (DateTimeParseException e) {
         try {
-          return Timestamp.from(OffsetDateTime.parse(s).toInstant());
+          OffsetDateTime odt = OffsetDateTime.parse(s);
+          LocalDateTime ldt = odt.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+          return Timestamp.valueOf(ldt);
         } catch (DateTimeParseException e2) {
           try {
             return Timestamp.valueOf(LocalDateTime.parse(s));
