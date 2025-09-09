@@ -37,6 +37,8 @@ import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.*;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 
 /**
@@ -500,21 +502,52 @@ public class AvaticaSite {
 
   private static Date toDate(Object x) {
     if (x instanceof String) {
-      return Date.valueOf((String) x);
+      String s = (String) x;
+      try {
+        return Date.valueOf(LocalDate.parse(s));
+      } catch (DateTimeParseException e) {
+        try {
+          return Date.valueOf(OffsetDateTime.parse(s).toLocalDate());
+        } catch (DateTimeParseException e3) {
+          return Date.valueOf(s);
+        }
+      }
     }
     return new Date(toLong(x));
   }
 
   private static Time toTime(Object x) {
     if (x instanceof String) {
-      return Time.valueOf((String) x);
+      String s = (String) x;
+      try {
+        return Time.valueOf(LocalTime.parse(s));
+      } catch (DateTimeParseException e) {
+        try {
+          return Time.valueOf(OffsetTime.parse(s).toLocalTime());
+        } catch (DateTimeParseException e2) {
+          return Time.valueOf(s);
+        }
+      }
     }
     return new Time(toLong(x));
   }
 
   private static Timestamp toTimestamp(Object x) {
     if (x instanceof String) {
-      return Timestamp.valueOf((String) x);
+      String s = (String) x;
+      try {
+        return Timestamp.from(Instant.parse(s));
+      } catch (DateTimeParseException e) {
+        try {
+          return Timestamp.from(OffsetDateTime.parse(s).toInstant());
+        } catch (DateTimeParseException e2) {
+          try {
+            return Timestamp.valueOf(LocalDateTime.parse(s));
+          } catch (DateTimeParseException e3) {
+            return Timestamp.valueOf(s);
+          }
+        }
+      }
     }
     return new Timestamp(toLong(x));
   }
