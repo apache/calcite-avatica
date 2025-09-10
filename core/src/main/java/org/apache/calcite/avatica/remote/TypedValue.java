@@ -706,16 +706,15 @@ public class TypedValue {
       return Float.intBitsToFloat((int) protoValue.getNumberValue());
     case INTEGER:
     case PRIMITIVE_INT:
+    case JAVA_SQL_DATE:
+    case JAVA_SQL_TIME:
       return Long.valueOf(protoValue.getNumberValue()).intValue();
     case PRIMITIVE_SHORT:
     case SHORT:
       return Long.valueOf(protoValue.getNumberValue()).shortValue();
     case LONG:
     case PRIMITIVE_LONG:
-      return Long.valueOf(protoValue.getNumberValue());
-    case JAVA_SQL_DATE:
-    case JAVA_SQL_TIME:
-      return Long.valueOf(protoValue.getNumberValue()).intValue();
+    case NUMBER:
     case JAVA_SQL_TIMESTAMP:
     case JAVA_UTIL_DATE:
       return protoValue.getNumberValue();
@@ -729,8 +728,6 @@ public class TypedValue {
         return new BigDecimal(bigInt, (int) protoValue.getNumberValue());
       }
       return new BigDecimal(protoValue.getStringValueBytes().toStringUtf8());
-    case NUMBER:
-      return Long.valueOf(protoValue.getNumberValue());
     case NULL:
       return null;
     case ARRAY:
