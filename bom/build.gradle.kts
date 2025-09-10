@@ -46,9 +46,7 @@ dependencies {
         // dependency on it during compilation
         apiv("com.beust:jcommander")
         apiv("org.checkerframework:checker-qual", "checkerframework")
-        apiv("com.fasterxml.jackson.core:jackson-annotations", "jackson")
-        apiv("com.fasterxml.jackson.core:jackson-core", "jackson")
-        apiv("com.fasterxml.jackson.core:jackson-databind", "jackson")
+        apiv("com.fasterxml.jackson:jackson-bom", "jackson")
         apiv("com.github.stephenc.jcip:jcip-annotations")
         apiv("com.google.guava:guava")
         apiv("com.google.protobuf:protobuf-java", "protobuf")
