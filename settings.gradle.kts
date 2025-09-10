@@ -31,7 +31,11 @@ pluginManagement {
         idv("de.thetaphi.forbiddenapis")
         idv("org.jetbrains.gradle.plugin.idea-ext")
         idv("org.nosphere.apache.rat")
-        idv("org.owasp.dependencycheck")
+        if (JavaVersion.current() < JavaVersion.VERSION_11) {
+            idv("org.owasp.dependencycheck", "jdk8.org.owasp.dependencycheck")
+        } else {
+            idv("org.owasp.dependencycheck")
+        }
     }
 }
 
