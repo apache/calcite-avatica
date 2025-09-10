@@ -38,6 +38,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 
@@ -504,14 +505,21 @@ public class AvaticaSite {
     if (x instanceof String) {
       String s = (String) x;
       try {
-        return Date.valueOf(LocalDate.parse(s));
-      } catch (DateTimeParseException e) {
-        try {
-          return Date.valueOf(OffsetDateTime.parse(s).toLocalDate());
-        } catch (DateTimeParseException e3) {
-          return Date.valueOf(s);
-        }
-      }
+        LocalDate d = LocalDate.parse(s, DateTimeFormatter.ISO_LOCAL_DATE);
+        return Date.valueOf(d);
+      } catch (DateTimeParseException ignored) { }
+      try {
+        OffsetDateTime odt = OffsetDateTime.parse(s, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        return Date.valueOf(odt.toLocalDate());
+      } catch (DateTimeParseException ignored) { }
+      try {
+        Instant instant = Instant.from(DateTimeFormatter.ISO_INSTANT.parse(s));
+        LocalDate d = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+        return Date.valueOf(d);
+      } catch (DateTimeParseException | IllegalArgumentException ignored) { }
+      try {
+        return Date.valueOf(s);
+      } catch (IllegalArgumentException ignored) { }
     }
     return new Date(toLong(x));
   }
@@ -520,14 +528,14 @@ public class AvaticaSite {
     if (x instanceof String) {
       String s = (String) x;
       try {
-        return Time.valueOf(LocalTime.parse(s));
-      } catch (DateTimeParseException e) {
-        try {
-          return Time.valueOf(OffsetTime.parse(s).toLocalTime());
-        } catch (DateTimeParseException e2) {
-          return Time.valueOf(s);
-        }
-      }
+        OffsetTime ot = OffsetTime.parse(s, DateTimeFormatter.ISO_OFFSET_TIME);
+        return Time.valueOf(ot.toLocalTime());
+      } catch (DateTimeParseException ignored) { }
+      try {
+        LocalTime lt = LocalTime.parse(s, DateTimeFormatter.ISO_LOCAL_TIME);
+        return Time.valueOf(lt);
+      } catch (DateTimeParseException ignored) { }
+      return Time.valueOf(s);
     }
     return new Time(toLong(x));
   }
@@ -536,22 +544,17 @@ public class AvaticaSite {
     if (x instanceof String) {
       String s = (String) x;
       try {
-        Instant instant = Instant.parse(s);
-        LocalDateTime ldt = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-        return Timestamp.valueOf(ldt);
-      } catch (DateTimeParseException e) {
-        try {
-          OffsetDateTime odt = OffsetDateTime.parse(s);
-          LocalDateTime ldt = odt.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-          return Timestamp.valueOf(ldt);
-        } catch (DateTimeParseException e2) {
-          try {
-            return Timestamp.valueOf(LocalDateTime.parse(s));
-          } catch (DateTimeParseException e3) {
-            return Timestamp.valueOf(s);
-          }
-        }
-      }
+        ZonedDateTime zdt = ZonedDateTime.parse(s, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        return Timestamp.from(zdt.toInstant());
+      } catch (DateTimeParseException ignored) { }
+      try {
+        OffsetDateTime odt = OffsetDateTime.parse(s, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        return Timestamp.from(odt.toInstant());
+      } catch (DateTimeParseException ignored) { }
+      try {
+        return Timestamp.valueOf(LocalDateTime.parse(s));
+      } catch (DateTimeParseException ignored) { }
+      return Timestamp.valueOf(s);
     }
     return new Timestamp(toLong(x));
   }
