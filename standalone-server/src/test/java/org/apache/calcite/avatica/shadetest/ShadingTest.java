@@ -39,7 +39,8 @@ public class ShadingTest {
       "^google/protobuf/", "^about.html$", "^org/eclipse/jetty/", "^jetty-dir.css",
       "^com/google/thirdparty/", "^org/checkerframework/", "^javax/annotation/",
       "^com/google/errorprone/", "^Log4j-.*\\.xsd$", "^Log4j-.*\\.dtd$", "^Log4j-.*\\.properties$",
-      "^org/apache/logging/log4j/", "^org/codehaus/mojo/animal_sniffer/", "^org/joou/" };
+      "^org/apache/logging/log4j/", "^org/codehaus/mojo/animal_sniffer/", "^org/joou/",
+      "^org/jspecify/annotations/"};
 
   @Test
   public void validateShadedJar() throws Exception {
