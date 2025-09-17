@@ -31,6 +31,7 @@ plugins {
 //   and "implementation" is for dependencies that do not participate in API
 dependencies {
     api(project(":metrics"))
+    api(platform("com.fasterxml.jackson:jackson-bom"))
     api("com.fasterxml.jackson.core:jackson-annotations")
     api("com.fasterxml.jackson.core:jackson-databind")
     api("com.google.protobuf:protobuf-java")
