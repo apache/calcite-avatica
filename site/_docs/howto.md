@@ -31,7 +31,7 @@ Here's some miscellaneous documentation about using Avatica.
 ## Building from a source distribution
 
 Prerequisites are Java (JDK 8 or later)
-and Gradle (version 8.7) on your path.
+and Gradle (version 8.14.3) on your path.
 
 (The source distribution
 [does not include the Gradle wrapper](https://issues.apache.org/jira/browse/CALCITE-4575);
@@ -43,8 +43,8 @@ Unpack the source distribution `.tar.gz` file,
 then build using Gradle:
 
 {% highlight bash %}
-$ tar xvfz apache-calcite-avatica-1.26.0-src.tar.gz
-$ cd apache-calcite-avatica-1.26.0-src
+$ tar xvfz apache-calcite-avatica-1.27.0-src.tar.gz
+$ cd apache-calcite-avatica-1.27.0-src
 $ gradle build
 {% endhighlight %}
 

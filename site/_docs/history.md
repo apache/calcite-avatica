@@ -28,6 +28,60 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.27.0">1.27.0</a> / 2025-10-XX
+{: #v1-27-0}
+
+Avatica 1.27.0 contains dependency upgrades and support for MySQL unsigned types.
+
+Compatibility: This release is tested on Linux, macOS, Microsoft Windows;
+using JDK/OpenJDK versions 8, 11, 17, 21, 23;
+other software versions as specified in `gradle.properties`.
+
+Contributors to this release:
+Francis Chuang (release manager),
+Istvan Toth,
+Niels Pardon,
+Richard Antal,
+Stamatis Zampetakis,
+Zhengqiang Duan.
+
+Features and bug fixes
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6851">CALCITE-6851</a>]
+  ShadingTest.validateShadedJar fails on first/clean build
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6854">CALCITE-6854</a>]
+  ConnectionPropertiesHATest fails when running in eclipse-temurin:8 docker container on Windows
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-1480">CALCITE-1480</a>]
+  Support specifying ciphersuites and algorithms for TLS
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-5094">CALCITE-5094</a>]
+  Calcite JDBC Adapter and Avatica should support MySQL UNSIGNED types of TINYINT, SMALLINT, INT, BIGINT
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7099">CALCITE-7099</a>]
+  Update httpclient5 from 5.4.1 to 5.5
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7167">CALCITE-7167</a>]
+  Upgrade Jetty from 9.4.56.v20240826 to 9.4.58.v20250814 in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7168">CALCITE-7168</a>]
+  Update httpcore5 from 5.3.1 to 5.3.5 in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7169">CALCITE-7169</a>]
+  Update protobuf from 3.25.5 to 3.25.8 in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7172">CALCITE-7172</a>]
+  Update chekstyle version from 10.19.0 to 10.26.1 in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7165">CALCITE-7165</a>]
+  Update OWASP plugin version to 12.1.3 for JDKs >= 11
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7177">CALCITE-7177</a>]
+  Update Guava from 33.4.0-jre to 33.4.8-jre in Avatica
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7171">CALCITE-7171</a>]
+  Update Jackson from 2.15.4 to 2.18.4.1 and switch to using jackson-bom in Avatica
+
+Build and tests
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7166">CALCITE-7166</a>]
+  Update Gradle from 8.7 to 8.14.3 in Avatica
+
+Website and documentation
+
+* Bump json from 2.10.1 to 2.10.2 in /site
+* Bump rexml from 3.4.1 to 3.4.2 in /site
+
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.26.0">1.26.0</a> / 2025-02-24
 {: #v1-26-0}
 
