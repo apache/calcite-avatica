@@ -28,10 +28,10 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.27.0">1.27.0</a> / 2025-10-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.27.0">1.27.0</a> / 2025-09-30
 {: #v1-27-0}
 
-Avatica 1.27.0 contains dependency upgrades and support for MySQL unsigned types.
+Avatica 1.27.0 contains dependency upgrades, Gradle 8.14 and support for MySQL unsigned types.
 
 Compatibility: This release is tested on Linux, macOS, Microsoft Windows;
 using JDK/OpenJDK versions 8, 11, 17, 21, 23;
@@ -47,10 +47,6 @@ Zhengqiang Duan.
 
 Features and bug fixes
 
-* [<a href="https://issues.apache.org/jira/browse/CALCITE-6851">CALCITE-6851</a>]
-  ShadingTest.validateShadedJar fails on first/clean build
-* [<a href="https://issues.apache.org/jira/browse/CALCITE-6854">CALCITE-6854</a>]
-  ConnectionPropertiesHATest fails when running in eclipse-temurin:8 docker container on Windows
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-1480">CALCITE-1480</a>]
   Support specifying ciphersuites and algorithms for TLS
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-5094">CALCITE-5094</a>]
@@ -74,6 +70,10 @@ Features and bug fixes
 
 Build and tests
 
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6851">CALCITE-6851</a>]
+  ShadingTest.validateShadedJar fails on first/clean build
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6854">CALCITE-6854</a>]
+  ConnectionPropertiesHATest fails when running in eclipse-temurin:8 docker container on Windows
 * [<a href="https://issues.apache.org/jira/browse/CALCITE-7166">CALCITE-7166</a>]
   Update Gradle from 8.7 to 8.14.3 in Avatica
 
