@@ -81,6 +81,9 @@ tasks {
                 dependencyLicenses(licenseFiles)
             }
         }
+        dependencies {
+            exclude(dependency("org.slf4j:slf4j-api"))
+        }
     }
 
     jar {
