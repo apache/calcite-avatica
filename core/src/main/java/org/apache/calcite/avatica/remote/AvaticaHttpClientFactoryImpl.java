@@ -131,6 +131,24 @@ public class AvaticaHttpClientFactoryImpl implements AvaticaHttpClientFactory {
       LOG.debug("{} is not capable of kerberos authentication.", authType);
     }
 
+    if (client instanceof BearerAuthenticateable) {
+      if (AuthenticationType.BEARER == authType) {
+        try {
+          BearerTokenProvider tokenProvider =
+                  BearerTokenProviderFactory.getBearerTokenProvider(config);
+          String username = config.avaticaUser();
+          if (null == username) {
+            username = System.getProperty("user.name");
+          }
+          ((BearerAuthenticateable) client).setTokenProvider(username, tokenProvider);
+        } catch (java.io.IOException e) {
+          LOG.debug("Failed to initialize bearer authentication");
+        }
+      }
+    } else {
+      LOG.debug("{} is not capable of bearer authentication.", authType);
+    }
+
     if (null != kerberosUtil) {
       client = new DoAsAvaticaHttpClient(client, kerberosUtil);
     }

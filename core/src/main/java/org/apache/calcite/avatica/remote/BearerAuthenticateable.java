@@ -17,15 +17,15 @@
 package org.apache.calcite.avatica.remote;
 
 /**
- * An enumeration for support types of authentication for the HttpServer.
+ * Interface that allows configuration of a username and BearerTokenProvider HTTP authentication.
  */
-public enum AuthenticationType {
-  NONE,
-  BASIC,
-  DIGEST,
-  SPNEGO,
-  BEARER,
-  CUSTOM;
-}
+public interface BearerAuthenticateable {
 
-// End AuthenticationType.java
+  /**
+   * Sets the username, tokenProvider to be used for authentication.
+   *
+   * @param username Username
+   * @param tokenProvider Bearer Token Provider
+   */
+  void setTokenProvider(String username, BearerTokenProvider tokenProvider);
+}
