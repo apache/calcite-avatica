@@ -79,6 +79,7 @@ dependencies {
         apiv("org.ow2.asm:asm-tree", "asm")
         apiv("org.ow2.asm:asm-util", "asm")
         apiv("org.slf4j:slf4j-api", "slf4j")
+        apiv("commons-io:commons-io")
         // The log4j2 binding should be a runtime dependency but given that
         // some modules shade this dependency we need to keep it as api
         apiv("org.apache.logging.log4j:log4j-slf4j-impl", "log4j2")

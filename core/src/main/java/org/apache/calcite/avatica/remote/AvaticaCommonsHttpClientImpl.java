@@ -22,6 +22,7 @@ import org.apache.hc.client5.http.ClientProtocolException;
 import org.apache.hc.client5.http.SystemDefaultDnsResolver;
 import org.apache.hc.client5.http.auth.AuthSchemeFactory;
 import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.BearerToken;
 import org.apache.hc.client5.http.auth.Credentials;
 import org.apache.hc.client5.http.auth.CredentialsProvider;
 import org.apache.hc.client5.http.auth.StandardAuthScheme;
@@ -31,6 +32,7 @@ import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.auth.BasicSchemeFactory;
+import org.apache.hc.client5.http.impl.auth.BearerSchemeFactory;
 import org.apache.hc.client5.http.impl.auth.DigestSchemeFactory;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
@@ -68,7 +70,7 @@ import java.util.concurrent.TimeUnit;
  * sent and received across the wire.
  */
 public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClientPoolConfigurable,
-    UsernamePasswordAuthenticateable, GSSAuthenticateable {
+    UsernamePasswordAuthenticateable, GSSAuthenticateable, BearerAuthenticateable {
   private static final Logger LOG = LoggerFactory.getLogger(AvaticaCommonsHttpClientImpl.class);
 
   // SPNEGO specific settings
@@ -151,6 +153,9 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
       }
       if (authRegistry.lookup(StandardAuthScheme.SPNEGO) != null) {
         preferredSchemes.add(StandardAuthScheme.SPNEGO);
+      }
+      if (authRegistry.lookup(StandardAuthScheme.BEARER) != null) {
+        preferredSchemes.add(StandardAuthScheme.BEARER);
       }
       requestConfigBuilder.setTargetPreferredAuthSchemes(preferredSchemes);
       requestConfigBuilder.setProxyPreferredAuthSchemes(preferredSchemes);
@@ -258,10 +263,36 @@ public class AvaticaCommonsHttpClientImpl implements AvaticaHttpClient, HttpClie
     context.setRequestConfig(createRequestConfig());
   }
 
+  @Override public void setTokenProvider(String username, BearerTokenProvider tokenProvider) {
+    this.credentialsProvider = new BasicCredentialsProvider();
+    BearerToken bearerToken = null;
+    try {
+      bearerToken = new BearerToken(tokenProvider.obtain(Objects.requireNonNull(username)));
+    } catch (NullPointerException exception) {
+      LOG.warn("Failed to create BearerToken for the user: " + username, exception);
+    }
+    if (bearerToken != null) {
+      ((BasicCredentialsProvider) this.credentialsProvider)
+          .setCredentials(anyAuthScope, bearerToken);
+    } else {
+      // User does not have bearerToken
+      ((BasicCredentialsProvider) this.credentialsProvider)
+          .setCredentials(anyAuthScope, EmptyCredentials.INSTANCE);
+    }
+
+    this.authRegistry = RegistryBuilder.<AuthSchemeFactory>create()
+        .register(StandardAuthScheme.BEARER,
+            new BearerSchemeFactory())
+        .build();
+    context.setCredentialsProvider(credentialsProvider);
+    context.setAuthSchemeRegistry(authRegistry);
+    context.setRequestConfig(createRequestConfig());
+  }
+
   /**
    * A credentials implementation which returns null.
    */
-  private static class EmptyCredentials implements Credentials {
+  static class EmptyCredentials implements Credentials {
     public static final EmptyCredentials INSTANCE = new EmptyCredentials();
 
     @Deprecated

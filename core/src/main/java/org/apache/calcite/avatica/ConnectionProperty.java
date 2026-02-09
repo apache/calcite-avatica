@@ -40,7 +40,7 @@ public interface ConnectionProperty {
 
   /** Wraps this property with a properties object from which its value can be
    * obtained when needed. */
-  ConnectionConfigImpl.PropEnv wrap(Properties properties);
+  ConnectionPropertyValue wrap(Properties properties);
 
   /** Whether the property is mandatory. */
   boolean required();
