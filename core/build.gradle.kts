@@ -40,6 +40,7 @@ dependencies {
     implementation("org.apache.httpcomponents.client5:httpclient5")
     implementation("org.apache.httpcomponents.core5:httpcore5")
     implementation("org.slf4j:slf4j-api")
+    testImplementation("com.code-intelligence:jazzer-api:0.22.1")
     testImplementation("junit:junit")
     testImplementation("org.mockito:mockito-core")
     testImplementation("org.mockito:mockito-inline")
@@ -116,4 +117,9 @@ tasks.processResources {
 tasks.autostyleJavaCheck {
     dependsOn(filterJava)
     dependsOn(tasks.getByName("generateProto"))
+}
+
+tasks.register<Copy>("copyFuzzDependencies") {
+    from(configurations.testRuntimeClasspath)
+    into(layout.buildDirectory.dir("fuzz-dependencies"))
 }

@@ -1,0 +1,70 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to you under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+name: CIFuzz
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  Fuzzing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build Fuzzers
+        id: build
+        uses: google/oss-fuzz/infra/cifuzz/actions/build_fuzzers@master
+        with:
+          oss-fuzz-project-name: "calcite-avatica"
+          language: jvm
+
+      - name: Run Fuzzers
+        uses: google/oss-fuzz/infra/cifuzz/actions/run_fuzzers@master
+        with:
+          oss-fuzz-project-name: "calcite-avatica"
+          language: jvm
+          fuzz-seconds: 600
+          output-sarif: true
+          fail: false
+
+      - name: Upload SARIF results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && steps.build.outcome == 'success'
+        with:
+          sarif_file: ./out/results.sarif.json
+          category: fuzzing
+
+      - name: Upload Crash Artifacts
+        uses: actions/upload-artifact@v4
+        if: steps.run.outcome == 'failure' && steps.build.outcome == 'success'
+        with:
+          name: fuzzing-crash-artifacts
+          path: ./out/artifacts
+          retention-days: 30
+
+      - name: Report Fuzzing Status
+        if: steps.run.outcome == 'failure'
+        run: |
+          echo "::notice::Fuzzing found potential bugs! Check the artifacts for details."
+          echo "To reproduce locally: Download artifacts and run with Jazzer"
+          echo ""
+          echo "IMPORTANT: This is an informational check. The PR can still be merged."
+          echo "For bug tracking, see: https://issues.apache.org/jira/browse/CALCITE"
