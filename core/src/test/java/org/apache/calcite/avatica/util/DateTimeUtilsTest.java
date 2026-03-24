@@ -351,6 +351,18 @@ public class DateTimeUtilsTest {
         intervalDayTimeToString(0, TimeUnitRange.MINUTE_TO_SECOND, 0));
     assertEquals("+0",
         intervalDayTimeToString(0, TimeUnitRange.SECOND, 0));
+    // Test cases for https://issues.apache.org/jira/browse/CALCITE-7449
+    // DateTimeUtils.intervalDayTimeToString silently truncates large intervals
+    assertEquals("+2147483648",
+        intervalDayTimeToString(2147483648L * 86400000L, TimeUnitRange.DAY, 0));
+    assertEquals("+51539607552",
+        intervalDayTimeToString(2147483648L * 86400000L, TimeUnitRange.HOUR, 0));
+    assertEquals("+51539607552:00",
+        intervalDayTimeToString(2147483648L * 86400000L, TimeUnitRange.HOUR_TO_MINUTE, 0));
+    assertEquals("+3092376453120",
+        intervalDayTimeToString(2147483648L * 86400000L, TimeUnitRange.MINUTE, 0));
+    assertEquals("+185542587187200",
+        intervalDayTimeToString(2147483648L * 86400000L, TimeUnitRange.SECOND, 0));
   }
 
   @Test public void testYmdToJulian() {

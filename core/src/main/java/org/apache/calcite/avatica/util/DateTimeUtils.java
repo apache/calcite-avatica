@@ -520,7 +520,7 @@ public class DateTimeUtils {
       h = v % 24;
       v /= 24;
       d = v;
-      buf.append((int) d);
+      buf.append(d);
       buf.append(' ');
       number(buf, (int) h, 2);
       buf.append(':');
@@ -538,7 +538,7 @@ public class DateTimeUtils {
       h = v % 24;
       v /= 24;
       d = v;
-      buf.append((int) d);
+      buf.append(d);
       buf.append(' ');
       number(buf, (int) h, 2);
       buf.append(':');
@@ -552,14 +552,14 @@ public class DateTimeUtils {
       h = v % 24;
       v /= 24;
       d = v;
-      buf.append((int) d);
+      buf.append(d);
       buf.append(' ');
       number(buf, (int) h, 2);
       break;
     case DAY:
       v = roundUp(v, 1000 * 60 * 60 * 24);
       d = v / (1000 * 60 * 60 * 24);
-      buf.append((int) d);
+      buf.append(d);
       break;
     case HOUR:
       v = roundUp(v, 1000 * 60 * 60);
@@ -567,7 +567,7 @@ public class DateTimeUtils {
       v /= 60;
       v /= 60;
       h = v;
-      buf.append((int) h);
+      buf.append(h);
       break;
     case HOUR_TO_MINUTE:
       v = roundUp(v, 1000 * 60);
@@ -576,7 +576,7 @@ public class DateTimeUtils {
       m = v % 60;
       v /= 60;
       h = v;
-      buf.append((int) h);
+      buf.append(h);
       buf.append(':');
       number(buf, (int) m, 2);
       break;
@@ -589,7 +589,7 @@ public class DateTimeUtils {
       m = v % 60;
       v /= 60;
       h = v;
-      buf.append((int) h);
+      buf.append(h);
       buf.append(':');
       number(buf, (int) m, 2);
       buf.append(':');
@@ -603,7 +603,7 @@ public class DateTimeUtils {
       s = v % 60;
       v /= 60;
       m = v;
-      buf.append((int) m);
+      buf.append(m);
       buf.append(':');
       number(buf, (int) s, 2);
       fraction(buf, scale, ms);
@@ -613,14 +613,14 @@ public class DateTimeUtils {
       v /= 1000;
       v /= 60;
       m = v;
-      buf.append((int) m);
+      buf.append(m);
       break;
     case SECOND:
       v = roundUp(v, powerX(10, 3 - scale));
       ms = v % 1000;
       v /= 1000;
       s = v;
-      buf.append((int) s);
+      buf.append(s);
       fraction(buf, scale, ms);
       break;
     default:
