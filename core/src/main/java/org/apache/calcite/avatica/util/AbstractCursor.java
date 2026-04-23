@@ -427,6 +427,10 @@ public abstract class AbstractCursor implements Cursor {
     }
 
     public <T> T getObject(Class<T> type) throws SQLException {
+      Object val = getObject();
+      if (val == null || type == null || type.isAssignableFrom(val.getClass())) {
+        return (T) val;
+      }
       throw cannotConvert("Object (with type)");
     }
   }
