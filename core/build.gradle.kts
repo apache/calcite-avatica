@@ -114,9 +114,11 @@ tasks.processResources {
     dependsOn(tasks.getByName("extractProto"))
 }
 
-tasks.autostyleJavaCheck {
-    dependsOn(filterJava)
-    dependsOn(tasks.getByName("generateProto"))
+listOf("autostyleJavaCheck", "autostyleJavaProcess").forEach { taskName ->
+    tasks.matching { it.name == taskName }.configureEach {
+        dependsOn(filterJava)
+        dependsOn(tasks.getByName("generateProto"))
+    }
 }
 
 tasks.register<Copy>("copyFuzzDependencies") {

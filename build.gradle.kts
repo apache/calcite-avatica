@@ -203,7 +203,7 @@ allprojects {
     }
     if (!skipAutostyle) {
         apply(plugin = "com.github.autostyle")
-        autostyle {
+        configure<com.github.autostyle.gradle.AutostyleExtension> {
             fun com.github.autostyle.gradle.BaseFormatExtension.license() {
                 licenseHeader(rootProject.ide.licenseHeader)
                 trimTrailingWhitespace()
@@ -255,8 +255,8 @@ allprojects {
         // Ensure builds are reproducible
         isPreserveFileTimestamps = false
         isReproducibleFileOrder = true
-        dirMode = "775".toInt(8)
-        fileMode = "664".toInt(8)
+        dirPermissions { unix("775") }
+        filePermissions { unix("664") }
     }
 
     tasks.register<DependencyReportTask>("allDependencies") {}
@@ -319,7 +319,7 @@ allprojects {
         }
 
         if (!skipAutostyle) {
-            autostyle {
+            configure<com.github.autostyle.gradle.AutostyleExtension> {
                 java {
                     licenseHeader(rootProject.ide.licenseHeader)
                     importOrder(
@@ -421,7 +421,7 @@ allprojects {
                 passProperty("user.country", "tr")
                 passProperty("user.timezone", "UTC")
                 val props = System.getProperties()
-                for (e in props.propertyNames() as `java.util`.Enumeration<String>) {
+                for (e in props.stringPropertyNames()) {
                     if (e.startsWith("calcite.") || e.startsWith("avatica.")) {
                         passProperty(e)
                     }
