@@ -28,6 +28,57 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.28.0">1.28.0</a> / 2026-05-XX
+{: #v1-28-0}
+
+Avatica 1.28.0 contains dependency upgrades, support for JDK 24, BEARER authentication support and bug fixes.
+
+Compatibility: This release is tested on Linux, macOS, Microsoft Windows;
+using JDK/OpenJDK versions 8, 11, 17, 21, 24;
+other software versions as specified in `gradle.properties`.
+
+This release is dedicated to Istvan Toth, a prolific contributor to Avatica who passed away in early 2026. Istvan's
+contributions to Avatica were significant and wide-ranging, including bug fixes, new features, and improvements
+to the build system. He was an active member of the community and his work has had a lasting impact on the project.
+He will be greatly missed by all who knew him.
+
+Contributors to this release:
+Aron Meszaros,
+Cancai Cai,
+Francis Chuang (release manager),
+Istvan Toth,
+Mihai Budiu,
+Richard Antal,
+Sergey Nuyanzin,
+Soumyakanti Das,
+Vishal Satish.
+
+Features and bug fixes
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6135">CALCITE-6135</a>]
+  BEARER authentication support
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7436">CALCITE-7436</a>]
+  Add high-coverage Jazzer fuzzing for Avatica core modules
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7449">CALCITE-7449</a>]
+  DateTimeUtils.intervalDayTimeToString silently truncates large intervals
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7459">CALCITE-7459</a>]
+  Upgrade Jackson in Avatica to 2.18.6 due to CVE
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7329">CALCITE-7329</a>]
+  Remove slf4j-api from avatica-shadow jar
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-6781">CALCITE-6781</a>]
+  The isUpdateCapable method of calcite.avatica will incorrectly traverse the returned result value
+
+Build and tests
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7500">CALCITE-7500</a>]
+  Add support for jdk 24 in CI
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7507">CALCITE-7507</a>]
+  NPE in ReleaseExtension.<init> when building from sources
+
+Website and documentation
+
+* Bump addressable from 2.8.7 to 2.9.0 in /site
+
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.27.0">1.27.0</a> / 2025-09-30
 {: #v1-27-0}
 
