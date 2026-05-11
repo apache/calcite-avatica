@@ -49,7 +49,7 @@ services:
       - gradle-cache:/home/gradle/.gradle
 
   test:
-    image: gradle:8.5-jdk8
+    image: gradle:8.14-jdk8
     working_dir: /src
     command: sh -c "./docker.sh test"
     volumes:
