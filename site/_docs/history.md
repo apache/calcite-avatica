@@ -28,7 +28,7 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
-## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.28.0">1.28.0</a> / 2026-05-XX
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.28.0">1.28.0</a> / 2026-05-12
 {: #v1-28-0}
 
 Avatica 1.28.0 contains dependency upgrades, support for JDK 24, BEARER authentication support and bug fixes.
@@ -50,6 +50,7 @@ Istvan Toth,
 Mihai Budiu,
 Richard Antal,
 Sergey Nuyanzin,
+Stamatis Zampetakis,
 Soumyakanti Das,
 Vishal Satish.
 
