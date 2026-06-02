@@ -722,7 +722,10 @@ public interface Meta {
 
       if (proto.hasField(CLASS_NAME_DESCRIPTOR)) {
         try {
-          clz = Class.forName(proto.getClassName());
+          // Resolve without initializing: a server parsing this from an untrusted
+          // client must not run the named class's static initializer.
+          clz = Class.forName(proto.getClassName(), false,
+              CursorFactory.class.getClassLoader());
         } catch (ClassNotFoundException e) {
           throw new RuntimeException(e);
         }
