@@ -473,7 +473,6 @@ public abstract class MetaImpl implements Meta {
       return tableName;
     }
   }
-
   /** Metadata describing a schema. */
   public static class MetaSchema implements Named {
     @ColumnNoNulls
