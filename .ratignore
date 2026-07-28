@@ -2,6 +2,9 @@
 **/.gitignore
 .ratignore
 .idea/vcs.xml
+AGENTS.md
+CLAUDE.md
+SECURITY.md
 # Third-party license files
 src/main/config/licenses/
 #

@@ -38,6 +38,10 @@
   - go_client_reference
   - go_howto
 
+- title: Security
+  docs:
+    - security_threat_model
+
 - title: Avatica Meta
   docs:
   - history
