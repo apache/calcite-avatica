@@ -170,6 +170,10 @@ public abstract class AbstractCursor implements Cursor {
       case PRIMITIVE_LONG:
       case LONG:
       case NUMBER:
+        if (isTimestampTz(columnMetaData)) {
+          return new TimestampTzFromNumberAccessor(getter, localCalendar,
+              columnMetaData.precision);
+        }
         return new TimestampFromNumberAccessor(getter, localCalendar, columnMetaData.precision);
       case JAVA_SQL_TIMESTAMP:
         return new TimestampAccessor(getter, localCalendar, columnMetaData.precision);
@@ -237,6 +241,17 @@ public abstract class AbstractCursor implements Cursor {
     default:
       throw new RuntimeException("unknown type " + columnMetaData.type.id);
     }
+  }
+
+  /** Returns whether a column contains TIMESTAMP WITH TIME ZONE values.
+   *
+   * <p>Such columns share the JDBC type {@link Types#TIMESTAMP} with plain
+   * TIMESTAMP columns; only the type name distinguishes them. */
+  private static boolean isTimestampTz(ColumnMetaData columnMetaData) {
+    final String typeName = columnMetaData.type.getName();
+    return typeName != null
+        && (typeName.startsWith("TIMESTAMP_TZ")
+            || typeName.startsWith("TIMESTAMP WITH TIME ZONE"));
   }
 
   protected abstract Getter createGetter(int ordinal);
@@ -1180,6 +1195,27 @@ public abstract class AbstractCursor implements Cursor {
         return ((Timestamp) v).getTime();
       }
       return (Number) v;
+    }
+  }
+
+  /**
+   * Accessor that assumes that the underlying value is a TIMESTAMP WITH TIME
+   * ZONE, in its default representation {@code long}: milliseconds since the
+   * UNIX epoch in UTC; corresponds to a {@link java.sql.Types#TIMESTAMP}
+   * column whose type name is {@code TIMESTAMP_TZ}.
+   */
+  static class TimestampTzFromNumberAccessor extends TimestampFromNumberAccessor {
+    TimestampTzFromNumberAccessor(Getter getter, Calendar localCalendar, int precision) {
+      super(getter, localCalendar, precision);
+    }
+
+    /** {@inheritDoc}
+     *
+     * <p>The value is rendered in UTC and includes the time zone,
+     * e.g. "1970-01-01 00:00:00 UTC". */
+    @Override public String getString() throws SQLException {
+      final String s = super.getString();
+      return s == null ? null : s + " " + DateTimeUtils.UTC_ZONE.getID();
     }
   }
 
