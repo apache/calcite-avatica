@@ -46,6 +46,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -232,6 +233,20 @@ public abstract class AbstractCursor implements Cursor {
           return new IntervalDayTimeAccessor(getter, range,
               columnMetaData.scale);
         }
+      }
+      if (columnMetaData.type instanceof ColumnMetaData.MapType) {
+        final ColumnMetaData.MapType mapType =
+            (ColumnMetaData.MapType) columnMetaData.type;
+        final SlotGetter keyGetter = new SlotGetter();
+        final Accessor keyAccessor =
+            createAccessor(ColumnMetaData.dummy(mapType.keyType, true),
+                keyGetter, localCalendar, factory);
+        final SlotGetter valueGetter = new SlotGetter();
+        final Accessor valueAccessor =
+            createAccessor(ColumnMetaData.dummy(mapType.valueType, true),
+                valueGetter, localCalendar, factory);
+        return new MapAccessor(getter, mapType, keyAccessor, keyGetter,
+            valueAccessor, valueGetter);
       }
       return new ObjectAccessor(getter);
     default:
@@ -1505,48 +1520,7 @@ public abstract class AbstractCursor implements Cursor {
     }
 
     private Object convertValue() throws SQLException {
-      switch (componentType.id) {
-      case Types.BOOLEAN:
-      case Types.BIT:
-        return componentAccessor.getBoolean();
-      case Types.TINYINT:
-        return componentAccessor.getByte();
-      case Types.SMALLINT:
-        return componentAccessor.getShort();
-      case Types.INTEGER:
-        return componentAccessor.getInt();
-      case Types.BIGINT:
-        return componentAccessor.getLong();
-      case Types.REAL:
-        return componentAccessor.getFloat();
-      case Types.FLOAT:
-      case Types.DOUBLE:
-        return componentAccessor.getDouble();
-      case Types.ARRAY:
-        return componentAccessor.getArray();
-      case Types.CHAR:
-      case Types.VARCHAR:
-      case Types.LONGVARCHAR:
-      case Types.NCHAR:
-      case Types.LONGNVARCHAR:
-        return componentAccessor.getString();
-      case Types.BINARY:
-      case Types.VARBINARY:
-      case Types.LONGVARBINARY:
-        return componentAccessor.getBytes();
-      case Types.DECIMAL:
-        return componentAccessor.getBigDecimal();
-      case Types.DATE:
-      case Types.TIME:
-      case Types.TIMESTAMP:
-      case Types.STRUCT:
-      case Types.JAVA_OBJECT:
-      case Types.OTHER:
-        return componentAccessor.getObject();
-      default:
-        throw new IllegalStateException("Unhandled ARRAY component type: " + componentType.rep
-            + ", id: " + componentType.id);
-      }
+      return AbstractCursor.convertValue(componentAccessor, componentType);
     }
 
     @SuppressWarnings("unchecked") @Override public Array getArray() throws SQLException {
@@ -1564,6 +1538,148 @@ public abstract class AbstractCursor implements Cursor {
     @Override public String getString() throws SQLException {
       final Array array = getArray();
       return array == null ? null : array.toString();
+    }
+  }
+
+  /** Converts a value, set beforehand in an accessor's slot, to the JDBC
+   * representation of the given type. Used for the components of composite
+   * values (array elements, map keys and values), which are stored in their
+   * internal representation. */
+  static Object convertValue(Accessor accessor,
+      ColumnMetaData.AvaticaType type) throws SQLException {
+    switch (type.id) {
+    case Types.BOOLEAN:
+    case Types.BIT:
+      return accessor.getBoolean();
+    case Types.TINYINT:
+      return accessor.getByte();
+    case Types.SMALLINT:
+      return accessor.getShort();
+    case Types.INTEGER:
+      return accessor.getInt();
+    case Types.BIGINT:
+      return accessor.getLong();
+    case Types.REAL:
+      return accessor.getFloat();
+    case Types.FLOAT:
+    case Types.DOUBLE:
+      return accessor.getDouble();
+    case Types.ARRAY:
+      return accessor.getArray();
+    case Types.CHAR:
+    case Types.VARCHAR:
+    case Types.LONGVARCHAR:
+    case Types.NCHAR:
+    case Types.NVARCHAR:
+    case Types.LONGNVARCHAR:
+      return accessor.getString();
+    case Types.BINARY:
+    case Types.VARBINARY:
+    case Types.LONGVARBINARY:
+      return accessor.getBytes();
+    case Types.DECIMAL:
+    case Types.NUMERIC:
+      return accessor.getBigDecimal();
+    case Types.TIME_WITH_TIMEZONE:
+    case Types.TIMESTAMP_WITH_TIMEZONE:
+      // Represented as strings, see createAccessor
+      return accessor.getString();
+    case Types.DATE:
+    case Types.TIME:
+    case Types.TIMESTAMP:
+    case Types.STRUCT:
+    case Types.JAVA_OBJECT:
+    case Types.OTHER:
+      return accessor.getObject();
+    default:
+      throw new IllegalStateException("Unhandled component type: " + type.rep
+          + ", id: " + type.id);
+    }
+  }
+
+  /**
+   * Accessor that assumes that the underlying value is a MAP;
+   * corresponds to the SQL {@code MAP} type, which JDBC represents as
+   * {@link java.sql.Types#OTHER}.
+   */
+  public static class MapAccessor extends AccessorImpl {
+    final ColumnMetaData.MapType mapType;
+    final Accessor keyAccessor;
+    final SlotGetter keySlotGetter;
+    final Accessor valueAccessor;
+    final SlotGetter valueSlotGetter;
+
+    public MapAccessor(Getter getter, ColumnMetaData.MapType mapType,
+        Accessor keyAccessor, SlotGetter keySlotGetter,
+        Accessor valueAccessor, SlotGetter valueSlotGetter) {
+      super(getter);
+      this.mapType = mapType;
+      this.keyAccessor = keyAccessor;
+      this.keySlotGetter = keySlotGetter;
+      this.valueAccessor = valueAccessor;
+      this.valueSlotGetter = valueSlotGetter;
+    }
+
+    @Override public Object getObject() throws SQLException {
+      final Object object = super.getObject();
+      if (!(object instanceof Map)) {
+        return object;
+      }
+      // Run the keys and values through the component accessors
+      final Map<Object, Object> converted = new LinkedHashMap<>();
+      for (Map.Entry<?, ?> entry : ((Map<?, ?>) object).entrySet()) {
+        converted.put(convertEntryValue(entry.getKey(), keySlotGetter,
+                keyAccessor, mapType.keyType),
+            convertEntryValue(entry.getValue(), valueSlotGetter,
+                valueAccessor, mapType.valueType));
+      }
+      return converted;
+    }
+
+    private static Object convertEntryValue(Object value, SlotGetter slot,
+        Accessor accessor, ColumnMetaData.AvaticaType type)
+        throws SQLException {
+      if (value == null) {
+        return null;
+      }
+      slot.slot = value;
+      final Object converted = convertValue(accessor, type);
+      slot.slot = null;
+      return converted;
+    }
+
+    /** Renders the map like {@link java.util.AbstractMap#toString()}, with
+     * every key and value rendered by its accessor's {@code getString()}. */
+    @Override public String getString() throws SQLException {
+      final Object object = super.getObject();
+      if (object == null) {
+        return null;
+      }
+      if (!(object instanceof Map)) {
+        return object.toString();
+      }
+      final StringBuilder buf = new StringBuilder("{");
+      for (Map.Entry<?, ?> entry : ((Map<?, ?>) object).entrySet()) {
+        if (buf.length() > 1) {
+          buf.append(", ");
+        }
+        buf.append(entryToString(entry.getKey(), keySlotGetter, keyAccessor))
+            .append("=")
+            .append(entryToString(entry.getValue(), valueSlotGetter,
+                valueAccessor));
+      }
+      return buf.append("}").toString();
+    }
+
+    private static String entryToString(Object value, SlotGetter slot,
+        Accessor accessor) throws SQLException {
+      if (value == null) {
+        return "null";
+      }
+      slot.slot = value;
+      final String converted = accessor.getString();
+      slot.slot = null;
+      return converted;
     }
   }
 
