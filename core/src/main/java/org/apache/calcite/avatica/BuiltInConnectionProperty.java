@@ -19,8 +19,6 @@ package org.apache.calcite.avatica;
 import org.apache.calcite.avatica.ha.ShuffledRoundRobinLBStrategy;
 import org.apache.calcite.avatica.remote.AvaticaHttpClientFactoryImpl;
 
-import org.apache.hc.core5.util.Timeout;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -128,16 +126,16 @@ public enum BuiltInConnectionProperty implements ConnectionProperty {
       Type.NUMBER, 1000, false),
 
   /**
-   * HTTP Connection Timeout in milliseconds.
+   * HTTP Connection Timeout in milliseconds defaults to 3 minutes
    */
   HTTP_CONNECTION_TIMEOUT("http_connection_timeout",
-      Type.NUMBER, Timeout.ofMinutes(3).toMilliseconds(), false),
+      Type.NUMBER, 180000, false),
 
   /**
-   * HTTP Response Timeout (socket timeout) in milliseconds.
+   * HTTP Response Timeout (socket timeout) in milliseconds defaults to 3 minutes
    */
   HTTP_RESPONSE_TIMEOUT("http_response_timeout",
-                        Type.NUMBER, Timeout.ofMinutes(3).toMilliseconds(), false),
+                        Type.NUMBER, 180000, false),
 
   /** Bearer token to use to perform Bearer authentication. */
   BEARER_TOKEN("bearer_token", Type.STRING, null, false),
