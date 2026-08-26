@@ -61,10 +61,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -78,6 +80,26 @@ public class JdbcMeta implements ProtobufMeta {
   private static final String CONN_CACHE_KEY_BASE = "avatica.connectioncache";
 
   private static final String STMT_CACHE_KEY_BASE = "avatica.statementcache";
+
+  /** JVM system property naming a comma-separated list of client
+   * connection-property names that are always rejected. Checked before
+   * {@link #CLIENT_PROPERTIES_ALLOWLIST_KEY}. Unset by default; when unset,
+   * no property is rejected on this basis.
+   *
+   * <p>Configured on the server JVM (for example
+   * {@code -Davatica.server.connection.properties.denylist=allowLoadLocalInfile}). */
+  public static final String CLIENT_PROPERTIES_DENYLIST_KEY =
+      "avatica.server.connection.properties.denylist";
+
+  /** JVM system property naming a comma-separated list of the only client
+   * connection-property names that are accepted. Applied after
+   * {@link #CLIENT_PROPERTIES_DENYLIST_KEY}. Unset by default; when unset,
+   * any property that survives the denylist check is accepted.
+   *
+   * <p>Configured on the server JVM (for example
+   * {@code -Davatica.server.connection.properties.allowlist=user,password,schema}). */
+  public static final String CLIENT_PROPERTIES_ALLOWLIST_KEY =
+      "avatica.server.connection.properties.allowlist";
 
   /** Special value for {@code Statement#getLargeMaxRows()} that means fetch
    * an unlimited number of rows in a single batch.
@@ -99,6 +121,12 @@ public class JdbcMeta implements ProtobufMeta {
   private final Cache<String, Connection> connectionCache;
   private final Cache<Integer, StatementInfo> statementCache;
   private final MetricsSystem metrics;
+
+  /** Names of client properties always rejected; {@code null} if unset. */
+  private final Set<String> clientPropertyDenylist;
+
+  /** Names of the only client properties accepted; {@code null} if unset. */
+  private final Set<String> clientPropertyAllowlist;
 
   /**
    * Creates a JdbcMeta.
@@ -209,6 +237,54 @@ public class JdbcMeta implements ProtobufMeta {
         return statementCache.size();
       }
     });
+
+    this.clientPropertyDenylist =
+        parsePropertyNameList(System.getProperty(CLIENT_PROPERTIES_DENYLIST_KEY));
+    this.clientPropertyAllowlist =
+        parsePropertyNameList(System.getProperty(CLIENT_PROPERTIES_ALLOWLIST_KEY));
+  }
+
+  /** Parses a comma-separated list of property names into a set. Returns
+   * {@code null} when {@code value} is {@code null} or blank, meaning
+   * "unconfigured". Whitespace around entries is trimmed, and blank entries
+   * are dropped. Package-private for tests. */
+  static Set<String> parsePropertyNameList(String value) {
+    if (value == null) {
+      return null;
+    }
+    final Set<String> names = new HashSet<>();
+    for (String part : value.split(",")) {
+      final String trimmed = part.trim();
+      if (!trimmed.isEmpty()) {
+        names.add(trimmed);
+      }
+    }
+    return names.isEmpty() ? null : Collections.unmodifiableSet(names);
+  }
+
+  /** Applies the configured denylist and allowlist to a client-supplied
+   * property map. Denylist is checked first; a hit rejects immediately.
+   * If a non-null allowlist is configured, any name not on it is rejected.
+   * A {@code null} list argument means the corresponding rule
+   * is unconfigured. Package-private for tests. */
+  static void checkClientProperties(Set<String> denylist,
+      Set<String> allowlist, Map<String, String> info) {
+    if (info == null || info.isEmpty()) {
+      return;
+    }
+    if (denylist == null && allowlist == null) {
+      return;
+    }
+    for (String name : info.keySet()) {
+      if (denylist != null && denylist.contains(name)) {
+        throw new ForbiddenConnectionPropertyException(name,
+            ForbiddenConnectionPropertyException.Rule.DENYLIST);
+      }
+      if (allowlist != null && !allowlist.contains(name)) {
+        throw new ForbiddenConnectionPropertyException(name,
+            ForbiddenConnectionPropertyException.Rule.ALLOWLIST);
+      }
+    }
   }
 
   // For testing purposes
@@ -610,6 +686,7 @@ public class JdbcMeta implements ProtobufMeta {
 
   @Override public void openConnection(ConnectionHandle ch,
       Map<String, String> info) {
+    checkClientProperties(clientPropertyDenylist, clientPropertyAllowlist, info);
     Properties fullInfo = new Properties();
     fullInfo.putAll(this.info);
     if (info != null) {

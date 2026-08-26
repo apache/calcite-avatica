@@ -32,14 +32,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.fail;
 
 /**
@@ -201,6 +206,122 @@ public class JdbcMetaTest {
     }
     // Our opened connection should get closed when this race condition happens
     Mockito.verify(conn2).close();
+  }
+
+  private static Set<String> setOf(String... names) {
+    return new HashSet<>(java.util.Arrays.asList(names));
+  }
+
+  @Test public void testCheckClientPropertiesNoRulesConfigured() {
+    // With both lists null, every client name is passed through.
+    JdbcMeta.checkClientProperties(null, null,
+        Collections.singletonMap("anything", "v"));
+  }
+
+  @Test public void testCheckClientPropertiesDenylistRejectsListedName() {
+    final ForbiddenConnectionPropertyException e =
+        assertThrows(ForbiddenConnectionPropertyException.class, () ->
+            JdbcMeta.checkClientProperties(setOf("propA", "propB"), null,
+                Collections.singletonMap("propA", "v")));
+    assertThat(e.getPropertyName(), is("propA"));
+    assertThat(e.getRule(), is(ForbiddenConnectionPropertyException.Rule.DENYLIST));
+    assertThat(e.getMessage(), containsString("propA"));
+    assertThat(e.getMessage(), containsString("denylist"));
+    assertThat(e.getMessage(),
+        containsString(JdbcMeta.CLIENT_PROPERTIES_DENYLIST_KEY));
+  }
+
+  @Test public void testCheckClientPropertiesDenylistPermitsUnlistedName() {
+    // No exception when the name is not on the denylist.
+    JdbcMeta.checkClientProperties(setOf("propA"), null,
+        Collections.singletonMap("propOther", "v"));
+  }
+
+  @Test public void testCheckClientPropertiesAllowlistRejectsUnlistedName() {
+    final ForbiddenConnectionPropertyException e =
+        assertThrows(ForbiddenConnectionPropertyException.class, () ->
+            JdbcMeta.checkClientProperties(null, setOf("propA", "propB"),
+                Collections.singletonMap("propC", "v")));
+    assertThat(e.getPropertyName(), is("propC"));
+    assertThat(e.getRule(), is(ForbiddenConnectionPropertyException.Rule.ALLOWLIST));
+    assertThat(e.getMessage(), containsString("propC"));
+    assertThat(e.getMessage(), containsString("allowlist"));
+    assertThat(e.getMessage(),
+        containsString(JdbcMeta.CLIENT_PROPERTIES_ALLOWLIST_KEY));
+  }
+
+  @Test public void testCheckClientPropertiesAllowlistPermitsListedName() {
+    JdbcMeta.checkClientProperties(null, setOf("propA", "propB"),
+        Collections.singletonMap("propA", "v"));
+  }
+
+  @Test public void testCheckClientPropertiesDenylistAppliedBeforeAllowlistForCertainProperty() {
+    // A name on both lists is rejected by the denylist, not the allowlist,
+    // the denylist rule always wins because it is checked first.
+    final ForbiddenConnectionPropertyException e =
+        assertThrows(ForbiddenConnectionPropertyException.class, () ->
+            JdbcMeta.checkClientProperties(setOf("propA"), setOf("propA", "propB"),
+                Collections.singletonMap("propA", "v")));
+    assertThat(e.getRule(), is(ForbiddenConnectionPropertyException.Rule.DENYLIST));
+  }
+
+  @Test public void testCheckClientPropertiesEmptyMapBypassesChecks() {
+    // An empty client map trivially satisfies both lists; the check must
+    // not fabricate a rejection when there is nothing to check.
+    JdbcMeta.checkClientProperties(null, setOf("propA"), Collections.emptyMap());
+    JdbcMeta.checkClientProperties(setOf("propA"), setOf("propA"),
+        Collections.emptyMap());
+  }
+
+  @Test public void testCheckClientPropertiesNullMapBypassesChecks() {
+    JdbcMeta.checkClientProperties(setOf("propA"), setOf("propA"), null);
+  }
+
+  @Test public void testParsePropertyNameListNullOrBlankIsUnconfigured() {
+    // A null or all-blank value means the rule was not configured; the
+    // parser must return null so the check treats it as absent, not as an
+    // empty allowlist that would reject everything.
+    assertThat(JdbcMeta.parsePropertyNameList(null), nullValue());
+    assertThat(JdbcMeta.parsePropertyNameList(""), nullValue());
+    assertThat(JdbcMeta.parsePropertyNameList("   "), nullValue());
+    assertThat(JdbcMeta.parsePropertyNameList(" , , "), nullValue());
+  }
+
+  @Test public void testParsePropertyNameListTrimsAndDropsBlanks() {
+    // Whitespace around entries is trimmed; blank entries are dropped so
+    // that operators can format their config with padding.
+    final Set<String> parsed =
+        JdbcMeta.parsePropertyNameList(" , propA ,  ,propB ,");
+    assertThat(parsed, is(setOf("propA", "propB")));
+  }
+
+  /** End-to-end wiring check: constructing a JdbcMeta reads the JVM system
+   * property, so a rejected property short-circuits openConnection before
+   * any backend Connection is created. */
+  @Test public void testSystemPropertyRestrictsOpenConnection() throws SQLException {
+    final String previous =
+        System.setProperty(JdbcMeta.CLIENT_PROPERTIES_DENYLIST_KEY, "propX");
+    try {
+      final JdbcMeta meta = new JdbcMeta("jdbc:url") {
+        @Override protected Connection createConnection(String url, Properties info) {
+          throw new AssertionError("createConnection must not be reached "
+              + "when a client property is rejected");
+        }
+      };
+      final ForbiddenConnectionPropertyException e =
+          assertThrows(ForbiddenConnectionPropertyException.class, () ->
+              meta.openConnection(new ConnectionHandle("id-sysprop"),
+                  Collections.singletonMap("propX", "v")));
+      assertThat(e.getPropertyName(), is("propX"));
+      assertThat(e.getRule(),
+          is(ForbiddenConnectionPropertyException.Rule.DENYLIST));
+    } finally {
+      if (previous == null) {
+        System.clearProperty(JdbcMeta.CLIENT_PROPERTIES_DENYLIST_KEY);
+      } else {
+        System.setProperty(JdbcMeta.CLIENT_PROPERTIES_DENYLIST_KEY, previous);
+      }
+    }
   }
 }
 
