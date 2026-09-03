@@ -21,6 +21,7 @@ import org.apache.calcite.avatica.ConnectionConfig;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
+import org.apache.hc.client5.http.ssl.HostnameVerificationPolicy;
 import org.apache.hc.client5.http.ssl.HttpsSupport;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.apache.hc.client5.http.ssl.TlsSocketStrategy;
@@ -34,7 +35,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 
 /**
@@ -82,8 +82,7 @@ public class CommonsHttpClientPoolCache {
 
   private static TlsSocketStrategy createTlsSocketStrategy(ConnectionConfig config) {
     try {
-      return new DefaultClientTlsStrategy(getSSLContext(config),
-          getHostnameVerifier(config.hostnameVerification()));
+      return createTlsSocketStrategy(getSSLContext(config), config.hostnameVerification());
     } catch (Exception e) {
       LOG.error("HTTPS TlsSocketStrategy configuration failed");
       throw new RuntimeException(e);
@@ -120,15 +119,16 @@ public class CommonsHttpClientPoolCache {
   }
 
   /**
-   * Creates the {@code HostnameVerifier} given the provided {@code verification}.
+   * Creates the {@code TlsSocketStrategy} given the provided {@code verification}.
    *
+   * @param sslContext The SSL context to use for the connections.
    * @param verification The intended hostname verification action.
-   * @return A verifier for the request verification.
+   * @return A strategy performing the requested verification.
    * @throws IllegalArgumentException if the provided verification cannot be
    *                                  handled.
    */
   @SuppressWarnings("deprecation")
-  private static HostnameVerifier getHostnameVerifier(
+  private static TlsSocketStrategy createTlsSocketStrategy(SSLContext sslContext,
       org.apache.calcite.avatica.remote.
           HostnameVerificationConfigurable.HostnameVerification verification) {
     // Normally, the configuration logic would give us a default of STRICT if it was
@@ -139,9 +139,12 @@ public class CommonsHttpClientPoolCache {
     }
     switch (verification) {
     case STRICT:
-      return HttpsSupport.getDefaultHostnameVerifier();
+      return new DefaultClientTlsStrategy(sslContext, HostnameVerificationPolicy.BOTH,
+          HttpsSupport.getDefaultHostnameVerifier());
     case NONE:
-      return NoopHostnameVerifier.INSTANCE;
+      // CLIENT leaves verification to the supplied verifier (which does nothing)
+      return new DefaultClientTlsStrategy(sslContext, HostnameVerificationPolicy.CLIENT,
+          NoopHostnameVerifier.INSTANCE);
     default:
       throw new IllegalArgumentException("Unhandled HostnameVerification: " + verification.name());
     }
