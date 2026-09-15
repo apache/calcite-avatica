@@ -28,6 +28,55 @@ For a full list of releases, see
 Downloads are available on the
 [downloads page]({{ site.baseurl }}/downloads/avatica.html).
 
+## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.29.0">1.29.0</a> / 2026-09-XX
+{: #v1-29-0}
+
+Avatica 1.29.0 contains dependency upgrades, improvements to the docker images and bug fixes.
+
+Compatibility: This release is tested on Linux, macOS, Microsoft Windows;
+using JDK/OpenJDK versions 8, 11, 17, 21, 24;
+other software versions as specified in `gradle.properties`.
+
+Contributors to this release:
+David Handermann,
+Francis Chuang (release manager),
+Mihai Budiu,
+Ruben Quesada Lopez,
+Stamatis Zampetakis.
+
+Features and bug fixes
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7610">CALCITE-7610</a>]
+  Improve type checking when instantiating plugins
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7715">CALCITE-7715</a>]
+  Removed HttpCore Timeout from BuiltInConnectionProperty
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7739">CALCITE-7739</a>]
+  Upgrade Jackson version from 2.18.6 to 2.22.2
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7745">CALCITE-7745</a>]
+  Implement a mechanism to restrict the connection properties that can be set by the caller
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7674">CALCITE-7674</a>]
+  Add Avatica threat model
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7494">CALCITE-7494</a>]
+  Avatica conversion to string of TIMESTAMP WITH TIME ZONE does not include time zone
+
+Build and tests
+
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7519">CALCITE-7519</a>]
+  Use eclipse-temurin base image for building Avatica docker images
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7520">CALCITE-7520</a>]
+  Upgrade Docker Gradle image for running tests to 8.14
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7518">CALCITE-7518</a>]
+  Use GitHub actions to build Avatica Docker images
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7573">CALCITE-7573</a>]
+  Fix Java executable path in Avatica docker entrypoints
+
+Website and documentation
+
+* Bump concurrent-ruby from 1.3.5 to 1.3.7 in /site
+* Bump json from 2.10.2 to 2.19.9 in /site
+* [<a href="https://issues.apache.org/jira/browse/CALCITE-7786">CALCITE-7786</a>]
+  Use Jekyll docker images for site generation
+
 ## <a href="https://github.com/apache/calcite-avatica/releases/tag/rel/avatica-1.28.0">1.28.0</a> / 2026-05-12
 {: #v1-28-0}
 
