@@ -50,6 +50,26 @@ public class NumberAccessorTest {
     assertEquals(orig, accessor.getBigDecimal(0));
   }
 
+
+  @Test
+  public void testGetLongObjectWithType() throws SQLException {
+    final Long orig = 1337L;
+    NumberAccessor accessor = new AbstractCursor.NumberAccessor(
+        new Getter() {
+          @Override public Object getObject() {
+            return orig;
+          }
+
+          @Override public boolean wasNull() {
+            return false;
+          }
+        },
+        0);
+
+    assertEquals(orig, accessor.getObject(Long.class));
+  }
+
+
 }
 
 // End NumberAccessorTest.java
