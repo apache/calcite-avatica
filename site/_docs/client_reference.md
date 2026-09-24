@@ -185,6 +185,37 @@ on-hover images for the permalink, but oh well.
 
 : _Required_: No.
 
+<strong><a name="keystore" href="#keystore">keystore</a></strong>
+
+: _Description_: A path to a Java KeyStore (JKS) file on the local filesystem
+  which contains the client's private key and certificate to present during
+  a TLS handshake for mutual TLS (mTLS) client certificate authentication.
+  Only necessary when the Avatica server requires clients to authenticate
+  with a certificate.
+
+: _Default_: `null`.
+
+: _Required_: No.
+
+<strong><a name="keystore_password" href="#keystore_password">keystore_password</a></strong>
+
+: _Description_: The password for the Java KeyStore file specified by <a href="#keystore">keystore</a>.
+
+: _Default_: `null`.
+
+: _Required_: Only if `keystore` was provided.
+
+<strong><a name="key_password" href="#key_password">key_password</a></strong>
+
+: _Description_: The password that protects the private key entry inside the
+  Java KeyStore file specified by <a href="#keystore">keystore</a>. This may
+  differ from <a href="#keystore_password">keystore_password</a> depending on
+  how the keystore was created.
+
+: _Default_: `null`.
+
+: _Required_: Only if `keystore` was provided.
+
 <strong><a name="fetch_size" href="#fetch_size">fetch_size</a></strong>
 
 : _Description_: The number of rows to fetch. If
