@@ -245,7 +245,10 @@ public class DateTimeUtilsTest {
   }
 
   @Test public void testTimeToString() {
-    checkTimeString("00", "00:00:00", 0, 0);
+    // No major SQL dialect accepts the following pattern for a date
+    assertThrows(() -> timeStringToUnixDate("00"),
+        IllegalArgumentException.class,
+        is("Invalid TIME value, '00'"));
     checkTimeString("00:00", "00:00:00", 0, 0);
     checkTimeString("00:00:00", 0, 0);
     checkTimeString("23:59:59", 0, 86400000 - 1000);
@@ -1782,6 +1785,39 @@ public class DateTimeUtilsTest {
         DateTimeUtils.timestampStringToUnixDate("2023-02-28 24:00:00.123"),
         IllegalArgumentException.class,
         is("Value of HOUR field is out of range in '2023-02-28 24:00:00.123'"));
+  }
+
+  /** Test case for
+   * <a href="https://issues.apache.org/jira/browse/CALCITE-6092">[CALCITE-6092]
+   * Invalid test cases in CAST String to Time</a>. */
+  @Test public void testBrokenTime() {
+    // The hour 1241241 used to overflow the milliseconds in an int
+    assertThrows(() -> timeStringToUnixDate("1241241"),
+        IllegalArgumentException.class,
+        is("Invalid TIME value, '1241241'"));
+    assertThrows(() -> timeStringToUnixDate("24:00:00"),
+        IllegalArgumentException.class,
+        is("Value of HOUR field is out of range in '24:00:00'"));
+    assertThrows(() -> timeStringToUnixDate("12:60:00"),
+        IllegalArgumentException.class,
+        is("Value of MINUTE field is out of range in '12:60:00'"));
+    assertThrows(() -> timeStringToUnixDate("12:54:78"),
+        IllegalArgumentException.class,
+        is("Value of SECOND field is out of range in '12:54:78'"));
+
+    // Integer.parseInt accepts a sign and digits of any script, such as
+    // U+0661 (ARABIC-INDIC DIGIT ONE); String.trim accepts a space in a field
+    for (String s : new String[] {"10:+1:12", "١٠:11:12", "10 :11:12"}) {
+      assertThrows(() -> timeStringToUnixDate(s),
+          IllegalArgumentException.class,
+          is("Invalid TIME value, '" + s + "'"));
+    }
+
+    // Fields can have one digit, and the seconds are optional
+    assertThat(timeStringToUnixDate("1:2:3"), is(3723000));
+    assertThat(timeStringToUnixDate("1:2"), is(3720000));
+    // Characters up to U+0020 around the value are removed, as String.trim does
+    assertThat(timeStringToUnixDate("\t1:2:3\u001F"), is(3723000));
   }
 }
 
