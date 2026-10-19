@@ -67,6 +67,11 @@ public class DateTimeUtils {
   private static final Pattern LENIENT_DATE_PATTERN =
       Pattern.compile("^\\s*(\\d{1,4})-(\\d{1,2})-(\\d{1,2})\\s*$");
 
+  /** Regex for lenient time patterns, H:M, H:M:S or H:M:S.F, where H, M and S
+   * have one or two digits. */
+  private static final Pattern LENIENT_TIME_PATTERN =
+      Pattern.compile("^(\\d{1,2}):(\\d{1,2})(?::(\\d{1,2})(?:\\.(\\d*))?)?$");
+
   /** Regex for time, HH:MM:SS. */
   private static final Pattern ISO_TIME_PATTERN =
       Pattern.compile("^([0-2]\\d):[0-5]\\d:[0-5]\\d(\\.\\d*)*$");
@@ -685,35 +690,18 @@ public class DateTimeUtils {
   }
 
   public static int timeStringToUnixDate(String v, int start) {
-    final int colon1 = v.indexOf(':', start);
-    int hour;
-    int minute;
-    int second;
-    int milli;
-    if (colon1 < 0) {
-      hour = Integer.parseInt(v.trim());
-      minute = 0;
-      second = 0;
-      milli = 0;
-    } else {
-      hour = Integer.parseInt(v.substring(start, colon1).trim());
-      final int colon2 = v.indexOf(':', colon1 + 1);
-      if (colon2 < 0) {
-        minute = Integer.parseInt(v.substring(colon1 + 1).trim());
-        second = 0;
-        milli = 0;
-      } else {
-        minute = Integer.parseInt(v.substring(colon1 + 1, colon2).trim());
-        int dot = v.indexOf('.', colon2);
-        if (dot < 0) {
-          second = Integer.parseInt(v.substring(colon2 + 1).trim());
-          milli = 0;
-        } else {
-          second = Integer.parseInt(v.substring(colon2 + 1, dot).trim());
-          milli = parseFraction(v.substring(dot + 1).trim(), 100);
-        }
-      }
+    final String s = v.substring(start).trim();
+    final Matcher matcher = LENIENT_TIME_PATTERN.matcher(s);
+    if (!matcher.matches()) {
+      throw invalidType("TIME", s);
     }
+    final int hour = Integer.parseInt(matcher.group(1));
+    final int minute = Integer.parseInt(matcher.group(2));
+    final String seconds = matcher.group(3);
+    final int second = seconds == null ? 0 : Integer.parseInt(seconds);
+    final String fraction = matcher.group(4);
+    final int milli = fraction == null ? 0 : parseFraction(fraction, 100);
+    checkLegalTime(hour, minute, second, s);
     return hour * (int) MILLIS_PER_HOUR
         + minute * (int) MILLIS_PER_MINUTE
         + second * (int) MILLIS_PER_SECOND
@@ -742,6 +730,20 @@ public class DateTimeUtils {
       multiplier /= 10;
     }
     return r;
+  }
+
+  /** Check that the combination hour, minute, second forms a legal time. */
+  private static void checkLegalTime(int hour, int minute, int second,
+      String full) {
+    if (hour > 23) {
+      throw fieldOutOfRange("HOUR", full);
+    }
+    if (minute > 59) {
+      throw fieldOutOfRange("MINUTE", full);
+    }
+    if (second > 59) {
+      throw fieldOutOfRange("SECOND", full);
+    }
   }
 
   /** Check that the combination year, month, date forms a legal date. */
