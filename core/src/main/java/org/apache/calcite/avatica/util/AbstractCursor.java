@@ -1645,6 +1645,29 @@ public abstract class AbstractCursor implements Cursor {
         return new StructImpl(list);
       }
     }
+
+    @Override public String getString() throws SQLException {
+      final Object o = super.getObject();
+      if (o == null) {
+        return null;
+      }
+      if (o instanceof StructImpl || o instanceof List) {
+        // The field accessors cannot read from these representations;
+        // render the wrapped struct as before
+        return getStruct().toString();
+      }
+      // Render each field with its accessor's getString(), which formats
+      // datetime fields from their internal representation.
+      // Using getObject() would format a Date field in the JVM default time zone
+      final StringBuilder buf = new StringBuilder("{");
+      for (Accessor fieldAccessor : fieldAccessors) {
+        if (buf.length() > 1) {
+          buf.append(", ");
+        }
+        buf.append(fieldAccessor.getString());
+      }
+      return buf.append("}").toString();
+    }
   }
 
   /**
