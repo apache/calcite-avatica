@@ -103,6 +103,38 @@ public class MockProtobufService extends ProtobufService {
             Meta.Frame.create(0, true,
                 Arrays.<Object>asList(new Object[] {new Object[]{"my_table", 10}})), -1, null));
 
+    mappings.put(
+        new TablesRequest(connectionId, null, null,
+            "additionalColumnsTest", Collections.<String>emptyList()),
+        // ownStatement=false just to avoid the extra close statement call.
+        new ResultSetResponse("0", 1, false,
+            Meta.Signature.create(
+                Arrays.<ColumnMetaData>asList(
+                    MetaImpl.columnMetaData("TABLE_CAT", 0, String.class, true),
+                    MetaImpl.columnMetaData("TABLE_SCHEM", 1, String.class, true),
+                    MetaImpl.columnMetaData("TABLE_NAME", 2, String.class, true),
+                    MetaImpl.columnMetaData("TABLE_TYPE", 3, String.class, true),
+                    MetaImpl.columnMetaData("REMARKS", 4, String.class, true),
+                    MetaImpl.columnMetaData("TYPE_CAT", 5, String.class, true),
+                    MetaImpl.columnMetaData("TYPE_SCHEM", 6, String.class, true),
+                    MetaImpl.columnMetaData("TYPE_NAME", 7, String.class, true),
+                    MetaImpl.columnMetaData("SELF_REFERENCING_COL_NAME", 8, String.class, true),
+                    MetaImpl.columnMetaData("REF_GENERATION", 9, String.class, true),
+                    MetaImpl.columnMetaData("HSQLDB_TYPE", 10, String.class, true),
+                    MetaImpl.columnMetaData("READ_ONLY",  11, Boolean.class, true),
+                    MetaImpl.columnMetaData("COMMIT_ACTION", 12, String.class, true),
+                    MetaImpl.columnMetaData("EXTRA_LABEL", 13, Boolean.class, true)),
+                null, null, Meta.CursorFactory.ARRAY, Meta.StatementType.SELECT),
+            Meta.Frame.create(0, true,
+                Arrays.<Object>asList(
+                    new Object[] {"table_cat", "table_schem", "table_name", "table_type", "remarks",
+                        "type_cat", "type_schem", "type_name", "self_referencing_col_name",
+                        "ref_generation", "hsqldb_type", true, "commit_action", "extra_label1"},
+                    new Object[] {"table_cat", "table_schem", "table_name", "table_type",
+                        "remarks", "type_cat", "type_schem", "type_name", "self_referencing_col_name",
+                        "ref_generation", "hsqldb_type", false, "commit_action", "extra_label2"}
+                )), -1, null));
+
     return Collections.unmodifiableMap(mappings);
   }
 
