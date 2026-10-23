@@ -37,6 +37,9 @@ import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 
 /**
@@ -500,21 +503,65 @@ public class AvaticaSite {
 
   private static Date toDate(Object x) {
     if (x instanceof String) {
-      return Date.valueOf((String) x);
+      String s = (String) x;
+
+      try {
+        LocalDate d = LocalDate.parse(s, DateTimeFormatter.ISO_LOCAL_DATE);
+        return Date.valueOf(d);
+      } catch (DateTimeParseException ignored) { }
+
+      try {
+        OffsetDateTime odt = OffsetDateTime.parse(s, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        return Date.valueOf(odt.toLocalDate());
+      } catch (DateTimeParseException ignored) { }
+
+      try {
+        Instant instant = Instant.from(DateTimeFormatter.ISO_INSTANT.parse(s));
+        LocalDate d = instant.atZone(ZoneId.systemDefault()).toLocalDate();
+        return Date.valueOf(d);
+      } catch (DateTimeParseException | IllegalArgumentException ignored) { }
+
+      return Date.valueOf(s);
     }
     return new Date(toLong(x));
   }
 
   private static Time toTime(Object x) {
     if (x instanceof String) {
-      return Time.valueOf((String) x);
+      String s = (String) x;
+      try {
+        OffsetTime ot = OffsetTime.parse(s, DateTimeFormatter.ISO_OFFSET_TIME);
+        return Time.valueOf(ot.toLocalTime());
+      } catch (DateTimeParseException ignored) { }
+
+      try {
+        LocalTime lt = LocalTime.parse(s, DateTimeFormatter.ISO_LOCAL_TIME);
+        return Time.valueOf(lt);
+      } catch (DateTimeParseException ignored) { }
+
+      return Time.valueOf(s);
     }
     return new Time(toLong(x));
   }
 
   private static Timestamp toTimestamp(Object x) {
     if (x instanceof String) {
-      return Timestamp.valueOf((String) x);
+      String s = (String) x;
+      try {
+        ZonedDateTime zdt = ZonedDateTime.parse(s, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        return Timestamp.from(zdt.toInstant());
+      } catch (DateTimeParseException ignored) { }
+
+      try {
+        OffsetDateTime odt = OffsetDateTime.parse(s, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        return Timestamp.from(odt.toInstant());
+      } catch (DateTimeParseException ignored) { }
+
+      try {
+        return Timestamp.valueOf(LocalDateTime.parse(s));
+      } catch (DateTimeParseException ignored) { }
+
+      return Timestamp.valueOf(s);
     }
     return new Timestamp(toLong(x));
   }
