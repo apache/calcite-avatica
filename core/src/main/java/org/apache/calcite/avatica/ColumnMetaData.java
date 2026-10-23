@@ -268,7 +268,15 @@ public class ColumnMetaData {
 
   /** Creates a {@link ScalarType}. */
   public static ScalarType scalar(int type, String typeName, Rep rep) {
-    return new ScalarType(type, typeName, rep);
+    return scalar(type, typeName, rep, AvaticaType.NOT_SPECIFIED,
+        AvaticaType.NOT_SPECIFIED);
+  }
+
+  /** Creates a {@link ScalarType} with a precision and scale, either of
+   * which may be {@link AvaticaType#NOT_SPECIFIED}. */
+  public static ScalarType scalar(int type, String typeName, Rep rep,
+      int precision, int scale) {
+    return new ScalarType(type, typeName, rep, precision, scale);
   }
 
   /** Creates a {@link StructType}. */
@@ -300,8 +308,13 @@ public class ColumnMetaData {
         null,
         null,
         null,
-        -1,
-        -1,
+        // Accessors take the precision and scale from the ColumnMetaData;
+        // for component types they travel on the AvaticaType. When they are
+        // not specified, substitute values the accessors treat as neutral:
+        // no fractional digits for datetime precision, and 0 for scale,
+        // which NumberAccessor treats as "do not rescale"
+        type.precision == AvaticaType.NOT_SPECIFIED ? -1 : type.precision,
+        type.scale == AvaticaType.NOT_SPECIFIED ? 0 : type.scale,
         null,
         null,
         type,
@@ -527,16 +540,39 @@ public class ColumnMetaData {
       @JsonSubTypes.Type(value = StructType.class, name = "struct"),
       @JsonSubTypes.Type(value = ArrayType.class, name = "array") })
   public static class AvaticaType {
+    /** Value of {@link #precision} and {@link #scale} when they are not
+     * specified. Distinct from 0: a timestamp of unknown precision renders
+     * without fractional seconds, like TIMESTAMP(0), but compares different
+     * from it. {@link Integer#MIN_VALUE} rather than -1, because a DECIMAL
+     * scale may legitimately be negative; matches
+     * {@code RelDataType.SCALE_NOT_SPECIFIED}. */
+    public static final int NOT_SPECIFIED = Integer.MIN_VALUE;
+
     public final int id;
     public final String name;
 
     /** The type of the field that holds the value. Not a JDBC property. */
     public final Rep rep;
 
+    /** Precision of the type, or {@link #NOT_SPECIFIED}. Carries the precision
+     * of component types (array elements, map keys and values), which unlike
+     * top-level columns and struct fields have no {@link ColumnMetaData}. */
+    public final int precision;
+
+    /** Scale of the type, or {@link #NOT_SPECIFIED}. */
+    public final int scale;
+
     public AvaticaType(int id, String name, Rep rep) {
+      this(id, name, rep, NOT_SPECIFIED, NOT_SPECIFIED);
+    }
+
+    protected AvaticaType(int id, String name, Rep rep, int precision,
+        int scale) {
       this.id = id;
       this.name = Objects.requireNonNull(name);
       this.rep = Objects.requireNonNull(rep);
+      this.precision = precision;
+      this.scale = scale;
     }
 
     public String columnClassName() {
@@ -557,6 +593,12 @@ public class ColumnMetaData {
       builder.setName(name);
       builder.setId(id);
       builder.setRep(rep.toProto());
+      if (precision != NOT_SPECIFIED) {
+        builder.setPrecision(precision);
+      }
+      if (scale != NOT_SPECIFIED) {
+        builder.setScale(scale);
+      }
 
       return builder.build();
     }
@@ -580,14 +622,21 @@ public class ColumnMetaData {
         type = ColumnMetaData.struct(columns);
       } else {
         // ScalarType
-        type = ColumnMetaData.scalar(proto.getId(), proto.getName(), rep);
+        // The proto fields track presence: absent means "not specified",
+        // which is distinct from 0
+        final int precision =
+            proto.hasPrecision() ? proto.getPrecision() : NOT_SPECIFIED;
+        final int scale = proto.hasScale() ? proto.getScale() : NOT_SPECIFIED;
+        type =
+            ColumnMetaData.scalar(proto.getId(), proto.getName(), rep,
+                precision, scale);
       }
 
       return type;
     }
 
     @Override public int hashCode() {
-      return Objects.hash(id, name, rep);
+      return Objects.hash(id, name, rep, precision, scale);
     }
 
     @Override public boolean equals(Object o) {
@@ -595,21 +644,31 @@ public class ColumnMetaData {
           || o instanceof AvaticaType
           && id == ((AvaticaType) o).id
           && Objects.equals(name, ((AvaticaType) o).name)
-          && rep == ((AvaticaType) o).rep;
+          && rep == ((AvaticaType) o).rep
+          && precision == ((AvaticaType) o).precision
+          && scale == ((AvaticaType) o).scale;
     }
   }
 
   /** Scalar type. */
   public static class ScalarType extends AvaticaType {
+    public ScalarType(int id, String name, Rep rep) {
+      this(id, name, rep, null, null);
+    }
+
     @JsonCreator
     public ScalarType(@JsonProperty("id") int id,
         @JsonProperty("name") String name,
-        @JsonProperty("rep") Rep rep) {
-      super(id, name, rep);
+        @JsonProperty("rep") Rep rep,
+        @JsonProperty("precision") Integer precision,
+        @JsonProperty("scale") Integer scale) {
+      super(id, name, rep,
+          precision == null ? NOT_SPECIFIED : precision,
+          scale == null ? NOT_SPECIFIED : scale);
     }
 
     @Override public AvaticaType setRep(Rep rep) {
-      return new ScalarType(id, name, rep);
+      return new ScalarType(id, name, rep, precision, scale);
     }
   }
 
