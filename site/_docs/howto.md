@@ -63,7 +63,7 @@ then build using Gradle:
 
 {% highlight bash %}
 $ git clone git@github.com:apache/calcite-avatica.git
-$ cd avatica
+$ cd calcite-avatica
 $ ./gradlew build
 {% endhighlight %}
 
