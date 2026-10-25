@@ -44,7 +44,7 @@ user-friendly.
 Prerequisites are Git, and Java (JDK 8 or later) on your path.
 
 Create a local copy of the git repository, `cd` to its root directory,
-then build using maven:
+then build using Gradle:
 
 {% highlight bash %}
 $ git clone git@github.com:apache/calcite-avatica.git
@@ -83,7 +83,7 @@ squash them into a single commit, and to bring your code up to date
 with the latest on the main line.
 
 Then push your commit(s) to github, and create a pull request from
-your branch to the calcite main branch. Update the JIRA case
+your branch to the calcite-avatica main branch. Update the JIRA case
 to reference your pull request, and a committer will review your
 changes.
 
