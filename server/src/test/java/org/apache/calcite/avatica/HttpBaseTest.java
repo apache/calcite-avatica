@@ -28,6 +28,8 @@ import org.bouncycastle.asn1.x500.style.IETFUtils;
 import org.bouncycastle.asn1.x500.style.RFC4519Style;
 import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
@@ -86,21 +88,25 @@ public abstract class HttpBaseTest {
 
   public static void setupClass() throws SQLException {
     // Create a self-signed cert
-    if (KEYSTORE.isFile()) {
-      assertTrue("Failed to delete keystore: " + KEYSTORE, KEYSTORE.delete());
-    }
-    new CertTool().createSelfSignedCert(KEYSTORE, "avatica", KEYSTORE_PASSWORD);
-
-    if (EMPTY_PW_KEYSTORE.isFile()) {
-      assertTrue("Failed to delete keystore: " + EMPTY_PW_KEYSTORE, EMPTY_PW_KEYSTORE.delete());
-    }
-    new CertTool().createSelfSignedCert(EMPTY_PW_KEYSTORE, "avatica", KEYSTORE_EMPTY_PASSWORD);
+    createSelfSignedKeyStore(KEYSTORE, "localhost", KEYSTORE_PASSWORD);
+    createSelfSignedKeyStore(EMPTY_PW_KEYSTORE, "localhost", KEYSTORE_EMPTY_PASSWORD);
 
     // Create a LocalService around HSQLDB
     JdbcMeta jdbcMeta;
     jdbcMeta = new JdbcMeta(CONNECTION_SPEC.url,
         CONNECTION_SPEC.username, CONNECTION_SPEC.password);
     localService = new LocalService(jdbcMeta);
+  }
+
+  /**
+   * Creates a keystore holding a self-signed certificate for {@code hostname}.
+   */
+  protected static void createSelfSignedKeyStore(File keystore, String hostname,
+      String keystorePassword) {
+    if (keystore.isFile()) {
+      assertTrue("Failed to delete keystore: " + keystore, keystore.delete());
+    }
+    new CertTool().createSelfSignedCert(keystore, "avatica", keystorePassword, hostname);
   }
 
   @AfterClass public static void stopServers() throws KrbException {
@@ -131,7 +137,7 @@ public abstract class HttpBaseTest {
     }
 
     private void createSelfSignedCert(File targetKeystore, String keyName,
-        String keystorePassword) {
+        String keystorePassword, String hostname) {
       if (targetKeystore.exists()) {
         throw new RuntimeException("Keystore already exists: " + targetKeystore);
       }
@@ -139,7 +145,7 @@ public abstract class HttpBaseTest {
       try {
         KeyPair kp = generateKeyPair();
 
-        X509Certificate cert = generateCert(keyName, kp, true, kp.getPublic(),
+        X509Certificate cert = generateCert(hostname, kp, true, kp.getPublic(),
             kp.getPrivate());
 
         char[] password = keystorePassword.toCharArray();
@@ -161,7 +167,7 @@ public abstract class HttpBaseTest {
       return gen.generateKeyPair();
     }
 
-    private X509Certificate generateCert(String keyName, KeyPair kp, boolean isCertAuthority,
+    private X509Certificate generateCert(String hostname, KeyPair kp, boolean isCertAuthority,
                                          PublicKey signerPublicKey, PrivateKey signerPrivateKey)
         throws IOException, OperatorCreationException, CertificateException,
         NoSuchAlgorithmException {
@@ -171,7 +177,7 @@ public abstract class HttpBaseTest {
 
       BigInteger serialNumber = BigInteger.valueOf(startDate.getTimeInMillis());
       X500Name issuer = new X500Name(
-          IETFUtils.rDNsFromString("cn=localhost", RFC4519Style.INSTANCE));
+          IETFUtils.rDNsFromString("cn=" + hostname, RFC4519Style.INSTANCE));
       JcaX509v3CertificateBuilder certGen = new JcaX509v3CertificateBuilder(issuer,
           serialNumber, startDate.getTime(), endDate.getTime(), issuer, kp.getPublic());
       JcaX509ExtensionUtils extensionUtils = new JcaX509ExtensionUtils();
@@ -179,6 +185,8 @@ public abstract class HttpBaseTest {
           extensionUtils.createSubjectKeyIdentifier(kp.getPublic()));
       certGen.addExtension(Extension.basicConstraints, false,
           new BasicConstraints(isCertAuthority));
+      certGen.addExtension(Extension.subjectAlternativeName, false,
+          new GeneralNames(new GeneralName(GeneralName.dNSName, hostname)));
       certGen.addExtension(Extension.authorityKeyIdentifier, false,
           extensionUtils.createAuthorityKeyIdentifier(signerPublicKey));
       if (isCertAuthority) {
