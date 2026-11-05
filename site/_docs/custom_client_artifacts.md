@@ -48,7 +48,7 @@ can be safely relocated are done so to reduce the potential for classpath issues
 Avatica 1.9.0 will introduce a new artifact `org.apache.calcite.avatica:avatica-core` which is only
 the Avatica client classes without any bundled dependencies. This artifact enables users to build a
 classpath with different versions of JARs than what Avatica presently depends upon. This is a "your-mileage-may-vary"
-or "void-your-warranty" type of decision (as you are using Avatica with dependecies which we have not tested);
+or "void-your-warranty" type of decision (as you are using Avatica with dependencies which we have not tested);
 however, some downstream projects do provide reasonable assurances of compatibilities across releases.
 
 ## Building your own Avatica client artifact
