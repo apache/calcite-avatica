@@ -118,7 +118,7 @@ $ docker run --rm -it avatica-mysql-server \
     -u jdbc:mysql://<fqdn>:3306/my_database
 ```
 
-To debug these docker images, the `ENTRYPOINT` can be overriden to launch a shell
+To debug these docker images, the `ENTRYPOINT` can be overridden to launch a shell
 
 ```
 $ docker run --rm --entrypoint='' -it avatica-mysql-server /bin/sh
