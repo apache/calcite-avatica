@@ -83,7 +83,7 @@ on-hover images for the permalink, but oh well.
   example: `GMT`, `GMT-3`, `EST` or `PDT`.
 
 : _Default_: This property's default value is `null` which will cause the Avatica Driver to
-  use the default timezone as specified by the JVM, commonly overriden by the
+  use the default timezone as specified by the JVM, commonly overridden by the
   `user.timezone` system property.
 
 : _Required_: No.
