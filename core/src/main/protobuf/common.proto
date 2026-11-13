@@ -127,6 +127,11 @@ message AvaticaType {
 
   repeated ColumnMetaData columns = 4; // Only present when name = STRUCT
   AvaticaType component = 5; // Only present when name = ARRAY
+  // Present only when specified; absence means "not specified", which is
+  // distinct from 0 (e.g. TIMESTAMP(0) versus a timestamp of unknown
+  // precision). Scale is signed because a DECIMAL scale may be negative.
+  optional uint32 precision = 6;
+  optional sint32 scale = 7;
 }
 
 // Metadata for a parameter
