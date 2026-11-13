@@ -127,6 +127,21 @@ public class RemoteDriverMockTest {
     connection.close();
   }
 
+  @Test public void testTablesAdditionalColumns() throws Exception {
+    final Connection connection = getMockConnection();
+    final ResultSet resultSet =
+        connection.getMetaData().getTables(null, null, "additionalColumnsTest", new String[0]);
+    assertTrue(resultSet.next());
+    final ResultSetMetaData metaData = resultSet.getMetaData();
+    assertTrue(metaData.getColumnCount() == 14);
+    assertEquals("TABLE_CAT", metaData.getColumnName(1));
+    assertEquals("TABLE_SCHEM", metaData.getColumnName(2));
+    assertEquals("TABLE_NAME", metaData.getColumnName(3));
+    assertEquals("EXTRA_LABEL", metaData.getColumnName(14));
+    resultSet.close();
+    connection.close();
+  }
+
   @Ignore
   @Test public void testNoFactory() throws Exception {
     final Connection connection =
