@@ -127,6 +127,8 @@ message AvaticaType {
 
   repeated ColumnMetaData columns = 4; // Only present when name = STRUCT
   AvaticaType component = 5; // Only present when name = ARRAY
+  AvaticaType key_component = 6; // Only present when name = MAP
+  AvaticaType value_component = 7; // Only present when name = MAP
 }
 
 // Metadata for a parameter

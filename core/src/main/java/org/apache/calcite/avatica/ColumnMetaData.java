@@ -282,6 +282,11 @@ public class ColumnMetaData {
     return new ArrayType(Types.ARRAY, typeName, rep, componentType);
   }
 
+  /** Creates a {@link MapType}. */
+  public static MapType map(AvaticaType keyType, AvaticaType valueType) {
+    return new MapType(keyType, valueType);
+  }
+
   /** Creates a ColumnMetaData for result sets that are not based on a struct
    * but need to have a single 'field' for purposes of
    * {@link java.sql.ResultSetMetaData}. */
@@ -525,7 +530,8 @@ public class ColumnMetaData {
   @JsonSubTypes({
       @JsonSubTypes.Type(value = ScalarType.class, name = "scalar"),
       @JsonSubTypes.Type(value = StructType.class, name = "struct"),
-      @JsonSubTypes.Type(value = ArrayType.class, name = "array") })
+      @JsonSubTypes.Type(value = ArrayType.class, name = "array"),
+      @JsonSubTypes.Type(value = MapType.class, name = "map") })
   public static class AvaticaType {
     public final int id;
     public final String name;
@@ -566,7 +572,12 @@ public class ColumnMetaData {
       Rep rep = Rep.valueOf(repProto.name());
       AvaticaType type;
 
-      if (proto.hasComponent()) {
+      if (proto.hasKeyComponent() && proto.hasValueComponent()) {
+        // MapType: recurse on the types for the map keys and values
+        AvaticaType keyType = AvaticaType.fromProto(proto.getKeyComponent());
+        AvaticaType valueType = AvaticaType.fromProto(proto.getValueComponent());
+        type = ColumnMetaData.map(keyType, valueType);
+      } else if (proto.hasComponent()) {
         // ArrayType
         // recurse on the type for the array elements
         AvaticaType nestedType = AvaticaType.fromProto(proto.getComponent());
@@ -687,6 +698,47 @@ public class ColumnMetaData {
           || o instanceof ArrayType
           && super.equals(o)
           && Objects.equals(component, ((ArrayType) o).component);
+    }
+  }
+
+  /** Map type. Corresponds to the SQL {@code MAP} type; the JDBC type is
+   * {@link Types#OTHER}, because JDBC has no MAP type. */
+  public static class MapType extends AvaticaType {
+    public final AvaticaType keyType;
+    public final AvaticaType valueType;
+
+    /**
+     * Not for public use. Use {@link ColumnMetaData#map(AvaticaType, AvaticaType)}.
+     */
+    @JsonCreator
+    public MapType(@JsonProperty("keyType") AvaticaType keyType,
+        @JsonProperty("valueType") AvaticaType valueType) {
+      super(Types.OTHER, "MAP", Rep.OBJECT);
+      this.keyType = Objects.requireNonNull(keyType);
+      this.valueType = Objects.requireNonNull(valueType);
+    }
+
+    @Override public String columnClassName() {
+      return java.util.Map.class.getName();
+    }
+
+    @Override public Common.AvaticaType toProto() {
+      Common.AvaticaType.Builder builder = Common.AvaticaType.newBuilder(super.toProto());
+      builder.setKeyComponent(keyType.toProto());
+      builder.setValueComponent(valueType.toProto());
+      return builder.build();
+    }
+
+    @Override public int hashCode() {
+      return Objects.hash(id, name, rep, keyType, valueType);
+    }
+
+    @Override public boolean equals(Object o) {
+      return o == this
+          || o instanceof MapType
+          && super.equals(o)
+          && Objects.equals(keyType, ((MapType) o).keyType)
+          && Objects.equals(valueType, ((MapType) o).valueType);
     }
   }
 }
