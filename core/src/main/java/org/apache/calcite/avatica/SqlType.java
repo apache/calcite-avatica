@@ -378,7 +378,12 @@ public enum SqlType {
   public static SqlType valueOf(int type) {
     final SqlType sqlType = BY_ID.get(type);
     if (sqlType == null) {
-      throw new IllegalArgumentException("Unknown SQL type " + type);
+      // In most cases the ANY type will allow non-standard types to be displayable in
+      // the query requests.  However, I think we should add the ability to specify
+      // a non-standard type factory that can be referenced here to see if the type is supported.
+      // For now, we will just return ANY to unblock users of databases
+      // that support non-standard types.
+      return ANY;
     }
     return sqlType;
   }
